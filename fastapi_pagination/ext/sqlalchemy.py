@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import Tuple, TypeVar, overload, Any
+from typing import TypeVar, overload, Any
 
-from sqlalchemy import func
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import Select
 
@@ -13,39 +12,25 @@ T = TypeVar("T")
 
 
 @overload
-def transform_query(
-        query: Query[T], params: PaginationParamsType
-) -> Query[T]:
+def paginate_query(query: Select[T], params: PaginationParamsType) -> Select[T]:
     pass
 
 
 @overload
-def transform_query(
-        query: Select[T], params: PaginationParamsType
-) -> Tuple[Select[int], Select[T]]:
+def paginate_query(query: Query[T], params: PaginationParamsType) -> Query[T]:
     pass
 
 
-def transform_query(
-        query: Any, params: PaginationParamsType
-) -> Any:
+def paginate_query(query: Any, params: PaginationParamsType) -> Any:
     params = params.to_limit_offset()
-    select = query.limit(params.limit).offset(params.offset)
-
-    if isinstance(query, Query):
-        return select
-
-    return (
-        query.with_only_columns([func.count()]),
-        select,
-    )
+    return query.limit(params.limit).offset(params.offset)
 
 
 def paginate(query: Query[T], params: PaginationParams) -> BasePage[T]:
     total = query.count()
-    items = transform_query(query, params).all()
+    items = paginate_query(query, params).all()
 
     return create_page(items, total, params)
 
 
-__all__ = ["transform_query", "paginate"]
+__all__ = ["paginate_query", "paginate"]

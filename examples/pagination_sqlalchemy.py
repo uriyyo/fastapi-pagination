@@ -49,7 +49,7 @@ def get_db():
         db.close()
 
 
-@app.post('/users', response_model=UserOut)
+@app.post("/users", response_model=UserOut)
 def create_user(user_in: UserIn, db: Session = Depends(get_db)):
     user = User(name=user_in.name, email=user_in.email)
     db.add(user)
@@ -58,10 +58,10 @@ def create_user(user_in: UserIn, db: Session = Depends(get_db)):
     return user
 
 
-@app.get('/users', response_model=Page[UserOut])
+@app.get("/users", response_model=Page[UserOut])
 def get_users(db: Session = Depends(get_db), params: PaginationParams = Depends()):
     return paginate(db.query(User), params)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     uvicorn.run("pagination_sqlalchemy:app")

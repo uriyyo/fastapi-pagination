@@ -80,6 +80,23 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
+name = "databases"
+version = "0.4.0"
+description = "Async database support for Python."
+category = "main"
+optional = true
+python-versions = ">=3.6"
+
+[package.dependencies]
+sqlalchemy = "*"
+
+[package.extras]
+mysql = ["aiomysql", "pymysql"]
+postgresql = ["asyncpg", "psycopg2"]
+postgresql_aiopg = ["aiopg"]
+sqlite = ["aiosqlite"]
+
+[[package]]
 name = "fastapi"
 version = "0.61.2"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -354,13 +371,14 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [extras]
+databases = ["databases"]
 gino = ["gino", "SQLAlchemy", "sqlalchemy-stubs"]
 sqlalchemy = ["SQLAlchemy", "sqlalchemy-stubs"]
 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "b0f847030deecd04318969f6a12250db631bb1036d5cc9a4eca62d221eadabac"
+content-hash = "1ab9ab757f729b4948ed504657e3e72da86f2692d8ce8c3e617bfe9220a98458"
 
 [metadata.files]
 appdirs = [
@@ -412,6 +430,10 @@ click = [
 ]
 colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
+]
+databases = [
+    {file = "databases-0.4.0-py3-none-any.whl", hash = "sha256:f8a2f48f17f39803d7b74e810be0ad4add030f392f178fc1ded374d80c9645a9"},
+    {file = "databases-0.4.0.tar.gz", hash = "sha256:8aac48977c3827a7c9bc4d94a0b138ac7fa60679facd3d4b15e4533f463e48fa"},
 ]
 fastapi = [
     {file = "fastapi-0.61.2-py3-none-any.whl", hash = "sha256:8c8517680a221e69eb34073adf46c503092db2f24845b7bdc7f85b54f24ff0df"},
