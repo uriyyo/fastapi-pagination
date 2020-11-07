@@ -13,7 +13,7 @@ T = TypeVar("T")
 
 
 async def paginate(query: Select[T], params: PaginationParamsType) -> BasePage[T]:
-    total = await query.with_only_columns([func.count()]).gino.scalar()  # type: ignore
+    total = await func.count().select().select_from(query.alias()).gino.scalar()  # type: ignore
     items = await paginate_query(query, params).gino.all()  # type: ignore
 
     return create_page(items, total, params)
