@@ -5,15 +5,13 @@ from typing import TypeVar
 from sqlalchemy import func
 from sqlalchemy.sql import Select
 
-from .sqlalchemy import paginate_query
-from ..page import create_page, BasePage
+from ..page import BasePage, create_page
 from ..params import PaginationParamsType
+from .sqlalchemy import paginate_query
 
-T = TypeVar("T")
 
-
-async def paginate(query: Select[T], params: PaginationParamsType) -> BasePage[T]:
-    total = await func.count().select().select_from(query.alias()).gino.scalar()  # type: ignore
+async def paginate(query: Select, params: PaginationParamsType) -> BasePage:
+    total = await func.count().select().select_from(query.alias()).gino.scalar()
     items = await paginate_query(query, params).gino.all()  # type: ignore
 
     return create_page(items, total, params)

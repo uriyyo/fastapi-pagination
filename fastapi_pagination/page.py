@@ -1,13 +1,14 @@
 from abc import ABC, abstractmethod
 from contextvars import ContextVar
-from typing import Generic, TypeVar, Sequence, Type
+from typing import Collection, Generic, Sequence, Type, TypeVar
 
 from pydantic import Field
 from pydantic.generics import GenericModel
 
-from .params import PaginationParamsType, LimitOffsetPaginationParams
+from .params import LimitOffsetPaginationParams, PaginationParamsType
 
 T = TypeVar("T")
+C = TypeVar("C")
 
 
 class BasePage(GenericModel, Generic[T], ABC):
@@ -19,7 +20,9 @@ class BasePage(GenericModel, Generic[T], ABC):
 
     @classmethod
     @abstractmethod
-    def create(cls, items: Sequence[T], total: int, params: PaginationParamsType):
+    def create(
+        cls: Type[C], items: Sequence[T], total: int, params: PaginationParamsType
+    ) -> C:
         pass
 
 

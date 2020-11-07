@@ -1,8 +1,7 @@
-from typing import TypeVar
+from typing import Sequence, TypeVar
 
-from fastapi_pagination.page import create_page, BasePage
+from fastapi_pagination.page import BasePage, create_page
 from fastapi_pagination.params import PaginationParamsType
-from sqlalchemy import Sequence
 
 T = TypeVar("T")
 

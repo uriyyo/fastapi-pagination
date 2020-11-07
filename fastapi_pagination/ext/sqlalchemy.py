@@ -1,32 +1,22 @@
 from __future__ import annotations
 
-from typing import TypeVar, overload, Any
+from typing import TypeVar, cast
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import Select
 
 from ..page import BasePage, create_page
-from ..params import PaginationParamsType, PaginationParams
+from ..params import PaginationParams, PaginationParamsType
 
-T = TypeVar("T")
-
-
-@overload
-def paginate_query(query: Select[T], params: PaginationParamsType) -> Select[T]:
-    pass
+T = TypeVar("T", Select, Query)
 
 
-@overload
-def paginate_query(query: Query[T], params: PaginationParamsType) -> Query[T]:
-    pass
-
-
-def paginate_query(query: Any, params: PaginationParamsType) -> Any:
+def paginate_query(query: T, params: PaginationParamsType) -> T:
     params = params.to_limit_offset()
-    return query.limit(params.limit).offset(params.offset)
+    return query.limit(params.limit).offset(params.offset)  # type: ignore
 
 
-def paginate(query: Query[T], params: PaginationParams) -> BasePage[T]:
+def paginate(query: Query, params: PaginationParams) -> BasePage:
     total = query.count()
     items = paginate_query(query, params).all()
 

@@ -1,9 +1,11 @@
+from typing import Any, Iterator
+
 import uvicorn
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from fastapi_pagination import Page, PaginationParams
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -41,7 +43,7 @@ class UserOut(UserIn):
 app = FastAPI()
 
 
-def get_db():
+def get_db() -> Iterator[Session]:
     db = SessionLocal()
     try:
         yield db
@@ -50,7 +52,7 @@ def get_db():
 
 
 @app.post("/users", response_model=UserOut)
-def create_user(user_in: UserIn, db: Session = Depends(get_db)):
+def create_user(user_in: UserIn, db: Session = Depends(get_db)) -> User:
     user = User(name=user_in.name, email=user_in.email)
     db.add(user)
     db.flush()
@@ -59,7 +61,9 @@ def create_user(user_in: UserIn, db: Session = Depends(get_db)):
 
 
 @app.get("/users", response_model=Page[UserOut])
-def get_users(db: Session = Depends(get_db), params: PaginationParams = Depends()):
+def get_users(
+    db: Session = Depends(get_db), params: PaginationParams = Depends()
+) -> Any:
     return paginate(db.query(User), params)
 
 

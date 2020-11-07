@@ -1,6 +1,6 @@
+from dataclasses import dataclass
 from typing import Union
 
-from attr import dataclass
 from fastapi import Query
 
 

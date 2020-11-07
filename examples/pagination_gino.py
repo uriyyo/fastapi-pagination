@@ -1,5 +1,7 @@
+from typing import Any
+
 import uvicorn
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 from gino_starlette import Gino
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String
@@ -13,7 +15,7 @@ db = Gino(
 )
 
 
-class User(db.Model):
+class User(db.Model):  # type: ignore
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -38,18 +40,18 @@ db.init_app(app)
 
 
 @app.on_event("startup")
-async def on_startup():
+async def on_startup() -> None:
     await db.gino.drop_all()
     await db.gino.create_all()
 
 
 @app.post("/users", response_model=UserOut)
-async def create_user(user_in: UserIn):
+async def create_user(user_in: UserIn) -> Any:
     return await User.create(**user_in.dict())
 
 
 @app.get("/users", response_model=Page[UserOut])
-async def get_users(params: PaginationParams = Depends()):
+async def get_users(params: PaginationParams = Depends()) -> Any:
     return await paginate(User.query, params)
 
 
