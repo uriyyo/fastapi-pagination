@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import TypeVar
-
 from sqlalchemy import func
 from sqlalchemy.sql import Select
 
@@ -11,7 +9,14 @@ from .sqlalchemy import paginate_query
 
 
 async def paginate(query: Select, params: PaginationParamsType) -> BasePage:
-    total = await func.count().select().select_from(query.alias()).gino.scalar()
+    count_query = query
+
+    # Check if it's a ModelLoader to add distinct columns to have correct count value
+    loader = getattr(query, "_execution_options", {}).get("loader")
+    if loader and loader._distinct:
+        count_query = query.distinct(*loader._distinct)
+
+    total = await func.count().select().select_from(count_query.alias()).gino.scalar()
     items = await paginate_query(query, params).gino.all()  # type: ignore
 
     return create_page(items, total, params)
