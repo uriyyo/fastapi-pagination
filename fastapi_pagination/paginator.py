@@ -7,10 +7,10 @@ T = TypeVar("T")
 
 
 def paginate(sequence: Sequence[T], params: PaginationParamsType) -> BasePage[T]:
-    params = params.to_limit_offset()
+    limit_offset_params = params.to_limit_offset()
 
     return create_page(
-        items=sequence[params.offset : params.offset + params.limit],
+        items=sequence[limit_offset_params.offset : limit_offset_params.offset + limit_offset_params.limit],
         total=len(sequence),
         params=params,
     )

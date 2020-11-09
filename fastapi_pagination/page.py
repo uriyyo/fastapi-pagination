@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from contextvars import ContextVar
-from typing import Collection, Generic, Sequence, Type, TypeVar
+from typing import Generic, Sequence, Type, TypeVar
 
 from pydantic import Field
 from pydantic.generics import GenericModel
@@ -20,9 +20,7 @@ class BasePage(GenericModel, Generic[T], ABC):
 
     @classmethod
     @abstractmethod
-    def create(
-        cls: Type[C], items: Sequence[T], total: int, params: PaginationParamsType
-    ) -> C:
+    def create(cls: Type[C], items: Sequence[T], total: int, params: PaginationParamsType) -> C:
         pass
 
 
@@ -31,9 +29,7 @@ class Page(BasePage[T], Generic[T]):
     size: int = Field(..., gt=0)
 
     @classmethod
-    def create(
-        cls, items: Sequence[T], total: int, params: PaginationParamsType
-    ) -> "Page[T]":
+    def create(cls, items: Sequence[T], total: int, params: PaginationParamsType) -> "Page[T]":
         if isinstance(params, LimitOffsetPaginationParams):
             raise ValueError("Page can't be used with limit offset params")
 
@@ -50,9 +46,7 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
     offset: int = Field(..., ge=0)
 
     @classmethod
-    def create(
-        cls, items: Sequence[T], total: int, params: PaginationParamsType
-    ) -> "LimitOffsetPage[T]":
+    def create(cls, items: Sequence[T], total: int, params: PaginationParamsType) -> "LimitOffsetPage[T]":
         params = params.to_limit_offset()
 
         return cls(
@@ -66,9 +60,7 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
 PageType: ContextVar[Type[BasePage]] = ContextVar("PageCls", default=Page)
 
 
-def create_page(
-    items: Sequence[T], total: int, params: PaginationParamsType
-) -> BasePage[T]:
+def create_page(items: Sequence[T], total: int, params: PaginationParamsType) -> BasePage[T]:
     return PageType.get().create(items, total, params)
 
 

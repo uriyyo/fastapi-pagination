@@ -10,16 +10,11 @@ async def paginate(query: QuerySet, params: PaginationParamsType) -> BasePage:
     total = await query.count()
 
     paginated_query = (
-        query.limit(limit_offset_params.limit)
-        .build_select_expression()
-        .offset(limit_offset_params.offset)
+        query.limit(limit_offset_params.limit).build_select_expression().offset(limit_offset_params.offset)
     )
 
     rows = await query.database.fetch_all(paginated_query)
-    items = [
-        query.model_cls.from_row(row, select_related=query._select_related)
-        for row in rows
-    ]
+    items = [query.model_cls.from_row(row, select_related=query._select_related) for row in rows]
 
     return create_page(items, total, params)
 

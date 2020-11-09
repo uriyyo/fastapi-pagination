@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TypeVar, cast
+from typing import TypeVar
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import Select

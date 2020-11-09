@@ -61,9 +61,7 @@ def create_user(user_in: UserIn, db: Session = Depends(get_db)) -> User:
 
 
 @app.get("/users", response_model=Page[UserOut])
-def get_users(
-    db: Session = Depends(get_db), params: PaginationParams = Depends()
-) -> Any:
+def get_users(db: Session = Depends(get_db), params: PaginationParams = Depends()) -> Any:
     return paginate(db.query(User), params)
 
 
