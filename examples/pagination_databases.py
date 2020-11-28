@@ -38,7 +38,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def on_startup() -> None:
-    engine = sqlalchemy.create_engine("sqlite:///.db")
+    engine = sqlalchemy.create_engine(str(db.url))
     metadata.drop_all(engine)
     metadata.create_all(engine)
 

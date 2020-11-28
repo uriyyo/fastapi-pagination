@@ -9,9 +9,18 @@ from ..params import PaginationParamsType
 from .sqlalchemy import paginate_query
 
 
-async def paginate(db: Database, query: Select, params: PaginationParamsType) -> BasePage:
-    total = await db.fetch_val(select([func.count()]).select_from(query))
+async def paginate(
+    db: Database,
+    query: Select,
+    params: PaginationParamsType,
+    *,
+    convert_to_mapping: bool = True,
+) -> BasePage:
+    total = await db.fetch_val(select([func.count()]).select_from(query.alias()))
     items = await db.fetch_all(paginate_query(query, params))
+
+    if convert_to_mapping:
+        items = [{**item} for item in items]
 
     return create_page(items, total, params)
 
