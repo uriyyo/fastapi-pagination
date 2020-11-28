@@ -3,11 +3,14 @@ from typing import Any
 import sqlalchemy
 import uvicorn
 from databases import Database
+from faker import Faker
 from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 
-from fastapi_pagination import Page, PaginationParams
+from fastapi_pagination import Page, pagination_params
 from fastapi_pagination.ext.databases import paginate
+
+faker = Faker()
 
 metadata = sqlalchemy.MetaData()
 Users = sqlalchemy.Table(
@@ -44,6 +47,15 @@ async def on_startup() -> None:
 
     await db.connect()
 
+    for _ in range(100):
+        await db.execute(
+            Users.insert(),
+            {
+                "name": faker.name(),
+                "email": faker.email(),
+            },
+        )
+
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
@@ -57,9 +69,9 @@ async def create_user(user_in: UserIn) -> Any:
     return {**user_in.dict(), "id": id_}
 
 
-@app.get("/users", response_model=Page[UserOut])
-async def get_users(params: PaginationParams = Depends()) -> Any:
-    return await paginate(db, Users.select(), params)
+@app.get("/users", response_model=Page[UserOut], dependencies=[Depends(pagination_params)])
+async def get_users() -> Any:
+    return await paginate(db, Users.select())
 
 
 if __name__ == "__main__":
