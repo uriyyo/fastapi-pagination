@@ -21,69 +21,78 @@ from ..base import (
 )
 from ..utils import faker
 
-metadata = sqlalchemy.MetaData()
-db = Database("sqlite:///.db")
+
+@fixture(scope="session")
+def db(database_url):
+    return Database(database_url)
 
 
-class User(Model):
-    __tablename__ = "users"
-    __database__ = db
-    __metadata__ = metadata
-
-    id = Integer(primary_key=True)
-    name = String(max_length=100)
+@fixture(scope="session")
+def metadata(database_url):
+    return sqlalchemy.MetaData()
 
 
-app = FastAPI()
+@fixture(scope="session")
+def User(metadata, db):
+    class User(Model):
+        __tablename__ = "users"
+        __database__ = db
+        __metadata__ = metadata
+
+        id = Integer(primary_key=True)
+        name = String(max_length=100)
+
+    return User
 
 
-@app.on_event("startup")
-async def on_startup() -> None:
-    engine = sqlalchemy.create_engine(str(db.url))
-    metadata.drop_all(engine)
-    metadata.create_all(engine)
+@fixture(scope="session")
+def app(db, metadata, User):
+    app = FastAPI()
 
-    await db.connect()
+    @app.on_event("startup")
+    async def on_startup() -> None:
+        engine = sqlalchemy.create_engine(str(db.url))
+        metadata.drop_all(engine)
+        metadata.create_all(engine)
 
-    for _ in range(100):
-        await User.objects.create(name=faker.name())
+        await db.connect()
 
+        for _ in range(100):
+            await User.objects.create(name=faker.name())
 
-@app.on_event("shutdown")
-async def on_shutdown() -> None:
-    await db.disconnect()
+    @app.on_event("shutdown")
+    async def on_shutdown() -> None:
+        await db.disconnect()
 
+    @app.get("/implicit", response_model=Page[UserOut], dependencies=[Depends(page_params)])
+    async def route():
+        return await paginate(User.objects)
 
-@app.get("/implicit", response_model=Page[UserOut], dependencies=[Depends(page_params)])
-async def route():
-    return await paginate(User.objects)
+    @app.get("/explicit", response_model=Page[UserOut])
+    async def route(params: PaginationParams = Depends()):
+        return await paginate(User.objects, params)
 
+    @app.get(
+        "/implicit-limit-offset",
+        response_model=LimitOffsetPage[UserOut],
+        dependencies=[Depends(limit_offset_params)],
+    )
+    async def route():
+        return await paginate(User.objects)
 
-@app.get("/explicit", response_model=Page[UserOut])
-async def route(params: PaginationParams = Depends()):
-    return await paginate(User.objects, params)
+    @app.get("/explicit-limit-offset", response_model=LimitOffsetPage[UserOut])
+    async def route(params: LimitOffsetPaginationParams = Depends()):
+        return await paginate(User.objects, params)
 
-
-@app.get(
-    "/implicit-limit-offset",
-    response_model=LimitOffsetPage[UserOut],
-    dependencies=[Depends(limit_offset_params)],
-)
-async def route():
-    return await paginate(User.objects)
-
-
-@app.get("/explicit-limit-offset", response_model=LimitOffsetPage[UserOut])
-async def route(params: LimitOffsetPaginationParams = Depends()):
-    return await paginate(User.objects, params)
+    return app
 
 
 class TestORM(BasePaginationTestCase):
     @fixture(scope="session")
-    async def client(self):
+    async def client(self, app):
         with TestClient(app) as c:
             yield c
 
     @fixture(scope="session")
-    async def entities(self):
+    async def entities(self, User):
         return await User.objects.all()

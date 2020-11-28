@@ -21,7 +21,9 @@ jobs:
       - name: Set up Postgresql
         uses: harmon758/postgresql-action@v1
         with:
-          postgresql version: '12'
+          postgresql db: 'postgres'
+          postgresql user: 'postgres'
+          postgresql password: 'postgres'
 
       - name: Install dependencies
         run: |

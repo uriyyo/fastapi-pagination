@@ -24,74 +24,86 @@ from ..base import (
 )
 from ..utils import faker
 
-engine = create_engine("sqlite:///.db", connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=True, autoflush=True, bind=engine)
 
-Base = declarative_base(bind=engine)
-
-
-class User(Base):
-    __tablename__ = "users"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
+@fixture(scope="session")
+def engine(database_url):
+    return create_engine(database_url)
 
 
-app = FastAPI()
+@fixture(scope="session")
+def SessionLocal(engine):
+    return sessionmaker(autocommit=True, autoflush=True, bind=engine)
 
 
-@app.on_event("startup")
-def on_startup():
-    Base.metadata.create_all()
-
-    session = SessionLocal()
-
-    session.add_all([User(name=faker.name()) for _ in range(100)])
-
-    session.flush()
-    session.close()
+@fixture(scope="session")
+def Base(engine):
+    return declarative_base(bind=engine)
 
 
-def get_db() -> Iterator[Session]:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@fixture(scope="session")
+def User(Base):
+    class User(Base):
+        __tablename__ = "users"
+
+        id = Column(Integer, primary_key=True, autoincrement=True)
+        name = Column(String, nullable=False)
+
+    return User
 
 
-@app.get("/implicit", response_model=Page[UserOut], dependencies=[Depends(page_params)])
-def route(db: Session = Depends(get_db)):
-    return paginate(db.query(User))
+@fixture(scope="session")
+def app(Base, User, SessionLocal):
+    app = FastAPI()
 
+    @app.on_event("startup")
+    def on_startup():
+        Base.metadata.create_all()
 
-@app.get("/explicit", response_model=Page[UserOut])
-def route(params: PaginationParams = Depends(), db: Session = Depends(get_db)):
-    return paginate(db.query(User), params)
+        session = SessionLocal()
 
+        session.add_all([User(name=faker.name()) for _ in range(100)])
 
-@app.get(
-    "/implicit-limit-offset",
-    response_model=LimitOffsetPage[UserOut],
-    dependencies=[Depends(limit_offset_params)],
-)
-def route(db: Session = Depends(get_db)):
-    return paginate(db.query(User))
+        session.flush()
+        session.close()
 
+    def get_db() -> Iterator[Session]:
+        db = SessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
 
-@app.get("/explicit-limit-offset", response_model=LimitOffsetPage[UserOut])
-def route(params: LimitOffsetPaginationParams = Depends(), db: Session = Depends(get_db)):
-    return paginate(db.query(User), params)
+    @app.get("/implicit", response_model=Page[UserOut], dependencies=[Depends(page_params)])
+    def route(db: Session = Depends(get_db)):
+        return paginate(db.query(User))
+
+    @app.get("/explicit", response_model=Page[UserOut])
+    def route(params: PaginationParams = Depends(), db: Session = Depends(get_db)):
+        return paginate(db.query(User), params)
+
+    @app.get(
+        "/implicit-limit-offset",
+        response_model=LimitOffsetPage[UserOut],
+        dependencies=[Depends(limit_offset_params)],
+    )
+    def route(db: Session = Depends(get_db)):
+        return paginate(db.query(User))
+
+    @app.get("/explicit-limit-offset", response_model=LimitOffsetPage[UserOut])
+    def route(params: LimitOffsetPaginationParams = Depends(), db: Session = Depends(get_db)):
+        return paginate(db.query(User), params)
+
+    return app
 
 
 class TestSQLAlchemy(BasePaginationTestCase):
     @fixture(scope="session")
-    def client(self):
+    def client(self, app):
         with TestClient(app) as c:
             yield c
 
     @fixture(scope="session")
-    def entities(self):
+    def entities(self, SessionLocal, User):
         session = SessionLocal()
         try:
             return session.query(User).all()
