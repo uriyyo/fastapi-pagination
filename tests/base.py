@@ -23,6 +23,9 @@ limit_offset_params = using_pagination_params(LimitOffsetPaginationParams)
 class UserOut(BaseModel):
     name: str
 
+    class Config:
+        orm_mode = True
+
 
 class BasePaginationTestCase:
     model: Type[BaseModel] = UserOut
@@ -68,7 +71,7 @@ class BasePaginationTestCase:
         ],
         ids=lambda p: f"limit-{p.limit},offset-{p.offset}",
     )
-    def test_params(self, client, _limit_offset_page, params, entities, path_type):
+    def test_params_limit_offset(self, client, _limit_offset_page, params, entities, path_type):
         response = client.get(getattr(self, f"path_{path_type}_limit_offset"), params=asdict(params))
 
         expected = paginate(entities, params)

@@ -1,8 +1,10 @@
-from fastapi.testclient import TestClient
+from asyncio import get_event_loop
+
+from nest_asyncio import apply
 from pytest import fixture
 
 
-@fixture
-def client(app):
-    with TestClient(app) as c:
-        yield c
+@fixture(scope="session")
+def event_loop():
+    apply()
+    return get_event_loop()

@@ -22,7 +22,7 @@ class BasePage(GenericModel, Generic[T], ABC):
     @classmethod
     @abstractmethod
     def create(cls: Type[C], items: Sequence[T], total: int, params: PaginationParamsType) -> C:
-        pass
+        pass  # pragma: no cover
 
 
 class Page(BasePage[T], Generic[T]):
