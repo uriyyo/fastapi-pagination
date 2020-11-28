@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import Generic, Sequence, Type, TypeVar
+from typing import ContextManager, Generic, Iterator, Sequence, Type, TypeVar
 
 from pydantic import Field
 from pydantic.generics import GenericModel
@@ -64,4 +65,17 @@ def create_page(items: Sequence[T], total: int, params: PaginationParamsType) ->
     return PageType.get().create(items, total, params)
 
 
-__all__ = ["BasePage", "PageType", "Page", "LimitOffsetPage", "create_page"]
+def using_page(page: Type[BasePage]) -> ContextManager[None]:
+    token = PageType.set(page)
+
+    @contextmanager
+    def _reset() -> Iterator[None]:
+        try:
+            yield
+        finally:
+            PageType.reset(token)
+
+    return _reset()
+
+
+__all__ = ["BasePage", "PageType", "Page", "LimitOffsetPage", "create_page", "using_page"]

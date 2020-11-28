@@ -27,7 +27,7 @@ repos:
     rev: v0.790
     hooks:
       - id: mypy
-        exclude: tests examples
+        exclude: tests
         additional_dependencies:
           - pydantic
           - sqlalchemy-stubs
