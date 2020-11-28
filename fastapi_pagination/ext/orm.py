@@ -1,10 +1,13 @@
+from typing import Optional
+
 from orm.models import QuerySet
 
 from ..page import BasePage, create_page
-from ..params import PaginationParamsType
+from ..params import PaginationParamsType, resolve_params
 
 
-async def paginate(query: QuerySet, params: PaginationParamsType) -> BasePage:
+async def paginate(query: QuerySet, params: Optional[PaginationParamsType] = None) -> BasePage:
+    params = resolve_params(params)
     limit_offset_params = params.to_limit_offset()
 
     total = await query.count()

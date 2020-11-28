@@ -1,4 +1,5 @@
-from typing import Any, Union
+from contextvars import ContextVar
+from typing import Any, Optional, Union
 
 from fastapi import Query, params
 from pydantic.dataclasses import dataclass
@@ -42,4 +43,23 @@ class LimitOffsetPaginationParams:
 
 PaginationParamsType = Union[PaginationParams, LimitOffsetPaginationParams]
 
-__all__ = ["PaginationParamsType", "LimitOffsetPaginationParams", "PaginationParams"]
+CurrentPaginationParamsValue: ContextVar[PaginationParamsType] = ContextVar("CurrentPaginationValue")
+
+
+def resolve_params(params: Optional[PaginationParamsType]) -> PaginationParamsType:
+    if params is None:
+        try:
+            return CurrentPaginationParamsValue.get()
+        except LookupError:
+            raise RuntimeError("Use explicit params or pagination dependency")
+
+    return params
+
+
+__all__ = [
+    "CurrentPaginationParamsValue",
+    "PaginationParamsType",
+    "LimitOffsetPaginationParams",
+    "PaginationParams",
+    "resolve_params",
+]

@@ -57,7 +57,7 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
         )
 
 
-PageType: ContextVar[Type[BasePage]] = ContextVar("PageCls", default=Page)
+PageType: ContextVar[Type[BasePage]] = ContextVar("PageType", default=Page)
 
 
 def create_page(items: Sequence[T], total: int, params: PaginationParamsType) -> BasePage[T]:
