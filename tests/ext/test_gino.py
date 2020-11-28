@@ -1,7 +1,4 @@
-from contextlib import suppress
-
 from fastapi import Depends, FastAPI
-from fastapi.testclient import TestClient
 from gino_starlette import Gino
 from orm import Integer, String
 from pytest import fixture
@@ -17,6 +14,7 @@ from fastapi_pagination.ext.gino import paginate
 
 from ..base import (
     BasePaginationTestCase,
+    SafeTestClient,
     UserOut,
     limit_offset_params,
     page_params,
@@ -84,13 +82,8 @@ def app(db, User):
 class TestGino(BasePaginationTestCase):
     @fixture(scope="session")
     async def client(self, app):
-        c = TestClient(app)
-        c.__enter__()
-
-        yield c
-
-        with suppress(BaseException):
-            c.__exit__()
+        with SafeTestClient(app) as c:
+            yield c
 
     @fixture(scope="session")
     async def entities(self, User):

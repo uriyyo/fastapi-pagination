@@ -1,6 +1,5 @@
 from fastapi import Depends, FastAPI
 from pytest import fixture
-from starlette.testclient import TestClient
 
 from fastapi_pagination import (
     LimitOffsetPage,
@@ -12,6 +11,7 @@ from fastapi_pagination.paginator import paginate
 
 from .base import (
     BasePaginationTestCase,
+    SafeTestClient,
     UserOut,
     limit_offset_params,
     page_params,
@@ -48,11 +48,11 @@ def route(params: LimitOffsetPaginationParams = Depends()):
 
 
 class TestPaginationParams(BasePaginationTestCase):
-    @fixture
+    @fixture(scope="session")
     def entities(self):
         return entities
 
-    @fixture
+    @fixture(scope="session")
     def client(self):
-        with TestClient(app) as c:
+        with SafeTestClient(app) as c:
             yield c

@@ -1,6 +1,7 @@
 from dataclasses import asdict
 from typing import Type
 
+from fastapi.testclient import TestClient
 from pydantic import BaseModel
 from pytest import fixture, mark
 
@@ -85,4 +86,12 @@ class BasePaginationTestCase:
         return obj
 
 
-__all__ = ["BasePaginationTestCase", "UserOut", "limit_offset_params", "page_params"]
+class SafeTestClient(TestClient):
+    def __exit__(self, *args):
+        try:
+            super().__exit__(*args)
+        except BaseException:
+            pass
+
+
+__all__ = ["BasePaginationTestCase", "UserOut", "limit_offset_params", "page_params", "SafeTestClient"]

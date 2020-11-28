@@ -1,7 +1,6 @@
 from typing import Iterator
 
 from fastapi import Depends, FastAPI
-from fastapi.testclient import TestClient
 from pytest import fixture
 from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -18,6 +17,7 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 
 from ..base import (
     BasePaginationTestCase,
+    SafeTestClient,
     UserOut,
     limit_offset_params,
     page_params,
@@ -99,7 +99,7 @@ def app(Base, User, SessionLocal):
 class TestSQLAlchemy(BasePaginationTestCase):
     @fixture(scope="session")
     def client(self, app):
-        with TestClient(app) as c:
+        with SafeTestClient(app) as c:
             yield c
 
     @fixture(scope="session")

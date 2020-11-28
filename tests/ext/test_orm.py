@@ -1,7 +1,6 @@
 import sqlalchemy
 from databases import Database
 from fastapi import Depends, FastAPI
-from fastapi.testclient import TestClient
 from orm import Integer, Model, String
 from pytest import fixture
 
@@ -15,6 +14,7 @@ from fastapi_pagination.ext.orm import paginate
 
 from ..base import (
     BasePaginationTestCase,
+    SafeTestClient,
     UserOut,
     limit_offset_params,
     page_params,
@@ -90,7 +90,7 @@ def app(db, metadata, User):
 class TestORM(BasePaginationTestCase):
     @fixture(scope="session")
     async def client(self, app):
-        with TestClient(app) as c:
+        with SafeTestClient(app) as c:
             yield c
 
     @fixture(scope="session")
