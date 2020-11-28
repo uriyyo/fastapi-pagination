@@ -41,6 +41,7 @@ gino = ["gino", "SQLAlchemy", "sqlalchemy-stubs"]
 sqlalchemy = ["SQLAlchemy", "sqlalchemy-stubs"]
 databases = ["databases"]
 orm = ["orm"]
+all = ["gino", "SQLAlchemy", "sqlalchemy-stubs", "databases", "orm"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
