@@ -15,7 +15,7 @@ from fastapi_pagination import (
 )
 from fastapi_pagination.paginator import paginate
 
-from .utils import compare_as
+from .utils import normalize
 
 page_params = using_pagination_params(PaginationParams)
 limit_offset_params = using_pagination_params(LimitOffsetPaginationParams)
@@ -56,11 +56,13 @@ class BasePaginationTestCase:
         response = client.get(getattr(self, f"path_{path_type}"), params=asdict(params))
 
         expected = paginate(entities, params)
-        assert compare_as(
+
+        a, b = normalize(
             Page[self.model],
             self._normalize_model(expected),
             self._normalize_model(response.json()),
         )
+        assert a == b
 
     @mark.parametrize("path_type", ["implicit", "explicit"])
     @mark.parametrize(
@@ -76,11 +78,13 @@ class BasePaginationTestCase:
         response = client.get(getattr(self, f"path_{path_type}_limit_offset"), params=asdict(params))
 
         expected = paginate(entities, params)
-        assert compare_as(
+
+        a, b = normalize(
             LimitOffsetPage[self.model],
             self._normalize_model(expected),
             self._normalize_model(response.json()),
         )
+        assert a == b
 
     def _normalize_model(self, obj):
         return obj

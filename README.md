@@ -15,6 +15,7 @@ Available integrations:
 * [gino](https://github.com/python-gino/gino)
 * [databases](https://github.com/encode/databases)
 * [orm](https://github.com/encode/orm)
+* [tortoise](https://github.com/tortoise/tortoise-orm)
 
 
 ## Example

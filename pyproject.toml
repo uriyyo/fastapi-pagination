@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-pagination"
-version = "0.4.0"
+version = "0.4.1"
 description = "FastAPI pagination"
 authors = [
     "Yurii Karabas <1998uriyyo@gmail.com>",
@@ -29,6 +29,7 @@ SQLAlchemy = { version = "^1.3.20", optional = true }
 sqlalchemy-stubs = { version = "^0.3", optional = true }
 databases = { version = "^0.4.0", extras = ["postgresql", "sqlite", "mysql"], optional = true }
 orm = { version = "^0.1.5", optional = true }
+tortoise-orm =  { version =  "^0.16.18", extras = ["asyncpg", "aiomysql", "aiosqlite"], optional = true }
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -40,13 +41,15 @@ Faker = "^4.17.1"
 requests = "^2.25.0"
 nest-asyncio = "^1.4.3"
 psycopg2 = "^2.8.6"
+asynctest = "^0.13.0"
 
 [tool.poetry.extras]
 gino = ["gino", "SQLAlchemy", "sqlalchemy-stubs"]
 sqlalchemy = ["SQLAlchemy", "sqlalchemy-stubs"]
 databases = ["databases"]
 orm = ["orm", "databases"]
-all = ["gino", "SQLAlchemy", "sqlalchemy-stubs", "databases", "orm"]
+tortoise = ["tortoise-orm"]
+all = ["gino", "SQLAlchemy", "sqlalchemy-stubs", "databases", "orm", "tortoise-orm"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

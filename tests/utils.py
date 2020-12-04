@@ -1,13 +1,15 @@
-from typing import Any, Type
+from typing import Any, List, Type, TypeVar
 
 from faker import Faker
 from pydantic import parse_obj_as
 
 faker = Faker()
 
-
-def compare_as(model: Type, first: Any, second: Any) -> bool:
-    return parse_obj_as(model, first) == parse_obj_as(model, second)
+T = TypeVar("T")
 
 
-__all__ = ["compare_as", "faker"]
+def normalize(model: Type[T], *models: Any) -> List[T]:
+    return [parse_obj_as(model, m) for m in models]
+
+
+__all__ = ["normalize", "faker"]
