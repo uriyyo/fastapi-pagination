@@ -1,6 +1,7 @@
 from typing import Optional, Type, Union
 
-from tortoise import Model, QuerySet
+from tortoise.models import Model
+from tortoise.queryset import QuerySet
 
 from ..api import create_page, resolve_params
 from ..bases import AbstractPage, AbstractParams
