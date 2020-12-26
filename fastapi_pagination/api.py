@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import (
+    Any,
     Awaitable,
     Callable,
     ContextManager,
@@ -66,6 +67,11 @@ def using_page(page: Type[AbstractPage]) -> ContextManager[None]:
     return _reset()
 
 
+def use_as_page(page: Any) -> Any:
+    using_page(page)
+    return page
+
+
 def using_response(res: Response) -> None:
     response_value.set(res)
 
@@ -79,6 +85,7 @@ __all__ = [
     "resolve_params",
     "response",
     "pagination_params",
+    "use_as_page",
     "using_params",
     "using_page",
     "using_response",
