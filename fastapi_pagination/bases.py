@@ -7,7 +7,7 @@ from pydantic.generics import GenericModel
 from typing_extensions import Protocol
 
 if TYPE_CHECKING:
-    from .params import LimitOffsetPaginationParams
+    from .params import LimitOffsetPaginationParams  # pragma no cover
 
 T = TypeVar("T")
 C = TypeVar("C")

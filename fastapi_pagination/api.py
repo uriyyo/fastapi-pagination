@@ -72,7 +72,7 @@ def use_as_page(page: Any) -> Any:
     return page
 
 
-def using_response(res: Response) -> None:
+async def using_response(res: Response) -> None:
     response_value.set(res)
 
 
