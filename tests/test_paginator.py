@@ -1,11 +1,10 @@
 from fastapi import Depends, FastAPI
 from pytest import fixture
 
-from fastapi_pagination import (
-    LimitOffsetPage,
-    LimitOffsetPaginationParams,
-    Page,
-    PaginationParams,
+from fastapi_pagination import Page, PaginationParams
+from fastapi_pagination.limit_offset import Page as LimitOffsetPage
+from fastapi_pagination.limit_offset import (
+    PaginationParams as LimitOffsetPaginationParams,
 )
 from fastapi_pagination.paginator import paginate
 

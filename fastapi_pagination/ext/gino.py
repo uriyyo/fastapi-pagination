@@ -5,13 +5,13 @@ from typing import Optional
 from sqlalchemy import func
 from sqlalchemy.sql import Select
 
-from ..page import BasePage, create_page
+from ..api import create_page, resolve_params
+from ..bases import AbstractPage, AbstractParams
 from ..paginator import paginate as base_paginate
-from ..params import PaginationParamsType, resolve_params
 from .sqlalchemy import paginate_query
 
 
-async def paginate(query: Select, params: Optional[PaginationParamsType] = None) -> BasePage:
+async def paginate(query: Select, params: Optional[AbstractParams] = None) -> AbstractPage:
     params = resolve_params(params)
 
     try:

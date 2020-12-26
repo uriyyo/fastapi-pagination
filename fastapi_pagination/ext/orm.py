@@ -3,11 +3,11 @@ from typing import Optional
 from orm.models import QuerySet
 from sqlalchemy import func
 
-from ..page import BasePage, create_page
-from ..params import PaginationParamsType, resolve_params
+from ..api import create_page, resolve_params
+from ..bases import AbstractPage, AbstractParams
 
 
-async def paginate(query: QuerySet, params: Optional[PaginationParamsType] = None) -> BasePage:
+async def paginate(query: QuerySet, params: Optional[AbstractParams] = None) -> AbstractPage:
     params = resolve_params(params)
     limit_offset_params = params.to_limit_offset()
 

@@ -2,11 +2,11 @@ from typing import Optional, Type, Union
 
 from tortoise import Model, QuerySet
 
-from ..page import BasePage, create_page
-from ..params import PaginationParamsType, resolve_params
+from ..api import create_page, resolve_params
+from ..bases import AbstractPage, AbstractParams
 
 
-async def paginate(query: Union[QuerySet, Type[Model]], params: Optional[PaginationParamsType] = None) -> BasePage:
+async def paginate(query: Union[QuerySet, Type[Model]], params: Optional[AbstractParams] = None) -> AbstractPage:
     if not isinstance(query, QuerySet):
         query = query.all()
 

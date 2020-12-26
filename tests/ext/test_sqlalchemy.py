@@ -7,13 +7,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
-from fastapi_pagination import (
-    LimitOffsetPage,
-    LimitOffsetPaginationParams,
-    Page,
-    PaginationParams,
-)
+from fastapi_pagination import Page, PaginationParams
 from fastapi_pagination.ext.sqlalchemy import paginate
+from fastapi_pagination.limit_offset import Page as LimitOffsetPage
+from fastapi_pagination.limit_offset import (
+    PaginationParams as LimitOffsetPaginationParams,
+)
 
 from ..base import (
     BasePaginationTestCase,

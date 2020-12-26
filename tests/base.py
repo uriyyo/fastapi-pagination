@@ -5,20 +5,17 @@ from fastapi.testclient import TestClient
 from pydantic import BaseModel
 from pytest import fixture, mark
 
-from fastapi_pagination import (
-    LimitOffsetPage,
-    LimitOffsetPaginationParams,
-    Page,
-    PaginationParams,
-    using_page,
-    using_pagination_params,
+from fastapi_pagination import Page, PaginationParams, using_page, using_params
+from fastapi_pagination.limit_offset import Page as LimitOffsetPage
+from fastapi_pagination.limit_offset import (
+    PaginationParams as LimitOffsetPaginationParams,
 )
 from fastapi_pagination.paginator import paginate
 
 from .utils import normalize
 
-page_params = using_pagination_params(PaginationParams)
-limit_offset_params = using_pagination_params(LimitOffsetPaginationParams)
+page_params = using_params(PaginationParams)
+limit_offset_params = using_params(LimitOffsetPaginationParams)
 
 
 class UserOut(BaseModel):

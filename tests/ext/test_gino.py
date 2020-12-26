@@ -4,13 +4,12 @@ from orm import Integer, String
 from pytest import fixture
 from sqlalchemy import Column, Integer, String
 
-from fastapi_pagination import (
-    LimitOffsetPage,
-    LimitOffsetPaginationParams,
-    Page,
-    PaginationParams,
-)
+from fastapi_pagination import Page, PaginationParams
 from fastapi_pagination.ext.gino import paginate
+from fastapi_pagination.limit_offset import Page as LimitOffsetPage
+from fastapi_pagination.limit_offset import (
+    PaginationParams as LimitOffsetPaginationParams,
+)
 
 from ..base import (
     BasePaginationTestCase,

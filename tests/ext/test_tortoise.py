@@ -5,13 +5,12 @@ from tortoise.backends.base.executor import EXECUTOR_CACHE
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.fields import IntField, TextField
 
-from fastapi_pagination import (
-    LimitOffsetPage,
-    LimitOffsetPaginationParams,
-    Page,
-    PaginationParams,
-)
+from fastapi_pagination import Page, PaginationParams
 from fastapi_pagination.ext.tortoise import paginate
+from fastapi_pagination.limit_offset import Page as LimitOffsetPage
+from fastapi_pagination.limit_offset import (
+    PaginationParams as LimitOffsetPaginationParams,
+)
 
 from ..base import (
     BasePaginationTestCase,

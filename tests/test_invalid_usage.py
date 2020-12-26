@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 from pytest import raises
 
-from fastapi_pagination import LimitOffsetPaginationParams
+from fastapi_pagination.limit_offset import PaginationParams
 from fastapi_pagination.paginator import paginate
 
 
@@ -23,8 +23,8 @@ def test_default_page_with_limit_offset():
     client = TestClient(app)
 
     @app.get("/")
-    def route(params: LimitOffsetPaginationParams = Depends()):
+    def route(params: PaginationParams = Depends()):
         return paginate([], params)
 
-    with raises(ValueError, match="Page can't be used with limit offset params"):
+    with raises(ValueError, match="Page should be used with PaginationParams"):
         client.get("/")
