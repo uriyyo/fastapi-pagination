@@ -1,3 +1,4 @@
+import inspect
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import (
@@ -12,13 +13,14 @@ from typing import (
     TypeVar,
 )
 
-from fastapi import Depends, Response
+from fastapi import Response
 
 from .bases import AbstractPage, AbstractParams
 from .page import Page
 from .params import PaginationParams
 
 T = TypeVar("T")
+TAbstractParams = TypeVar("TAbstractParams", covariant=True, bound=AbstractParams)
 
 params_value: ContextVar[AbstractParams] = ContextVar("pagination_value")
 response_value: ContextVar[Optional[Response]] = ContextVar("response_value", default=None)
@@ -36,13 +38,14 @@ def resolve_params(params: Optional[AbstractParams] = None) -> AbstractParams:
 
 
 def using_params(
-    params_type: Type[AbstractParams],
-) -> Callable[[AbstractParams], Awaitable[AbstractParams]]:
-    async def _pagination_params(
-        params: params_type = Depends(),  # type: ignore
-    ) -> params_type:  # type: ignore
+    params_type: Type[TAbstractParams],
+) -> Callable[[TAbstractParams], Awaitable[TAbstractParams]]:
+    async def _pagination_params(*args, **kwargs) -> params_type:  # type: ignore
+        params = params_type(*args, **kwargs)  # type: ignore
         params_value.set(params)
         return params
+
+    _pagination_params.__signature__ = inspect.signature(params_type)  # type: ignore
 
     return _pagination_params
 
