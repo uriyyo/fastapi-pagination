@@ -19,6 +19,7 @@ nav:
   - "Home": index.md
   - "Tutorials":
       - "First Steps": first-steps.md
+      - "Limit-Offset": limit-offset.md
       - "Customization": customization.md
       - "Advanced": advanced.md
 
