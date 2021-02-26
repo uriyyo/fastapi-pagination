@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC
 from typing import Generic, Sequence, TypeVar
 
-from pydantic import Field
+from pydantic import conint
 
 from .bases import AbstractPage, AbstractParams
 from .params import PaginationParams
@@ -14,12 +14,12 @@ C = TypeVar("C")
 
 class BasePage(AbstractPage[T], Generic[T], ABC):
     items: Sequence[T]
-    total: int = Field(..., ge=0)
+    total: conint(ge=0)  # type: ignore
 
 
 class Page(BasePage[T], Generic[T]):
-    page: int = Field(..., ge=0)
-    size: int = Field(..., gt=0)
+    page: conint(ge=0)  # type: ignore
+    size: conint(gt=0)  # type: ignore
 
     @classmethod
     def create(cls, items: Sequence[T], total: int, params: AbstractParams) -> Page[T]:
@@ -35,8 +35,8 @@ class Page(BasePage[T], Generic[T]):
 
 
 class LimitOffsetPage(BasePage[T], Generic[T]):
-    limit: int = Field(..., gt=0)
-    offset: int = Field(..., ge=0)
+    limit: conint(gt=0)  # type: ignore
+    offset: conint(ge=0)  # type: ignore
 
     @classmethod
     def create(cls, items: Sequence[T], total: int, params: AbstractParams) -> LimitOffsetPage[T]:
