@@ -1,23 +1,13 @@
 import sqlalchemy
 from databases import Database
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from orm import Integer, Model, String
 from pytest import fixture
 
-from fastapi_pagination import Page, PaginationParams
+from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.orm import paginate
-from fastapi_pagination.limit_offset import Page as LimitOffsetPage
-from fastapi_pagination.limit_offset import (
-    PaginationParams as LimitOffsetPaginationParams,
-)
 
-from ..base import (
-    BasePaginationTestCase,
-    SafeTestClient,
-    UserOut,
-    limit_offset_params,
-    page_params,
-)
+from ..base import BasePaginationTestCase, SafeTestClient, UserOut
 from ..utils import faker
 
 
@@ -63,26 +53,12 @@ def app(db, metadata, User):
     async def on_shutdown() -> None:
         await db.disconnect()
 
-    @app.get("/implicit", response_model=Page[UserOut], dependencies=[Depends(page_params)])
+    @app.get("/default", response_model=Page[UserOut])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
     async def route():
         return await paginate(User.objects)
 
-    @app.get("/explicit", response_model=Page[UserOut])
-    async def route(params: PaginationParams = Depends()):
-        return await paginate(User.objects, params)
-
-    @app.get(
-        "/implicit-limit-offset",
-        response_model=LimitOffsetPage[UserOut],
-        dependencies=[Depends(limit_offset_params)],
-    )
-    async def route():
-        return await paginate(User.objects)
-
-    @app.get("/explicit-limit-offset", response_model=LimitOffsetPage[UserOut])
-    async def route(params: LimitOffsetPaginationParams = Depends()):
-        return await paginate(User.objects, params)
-
+    add_pagination(app)
     return app
 
 

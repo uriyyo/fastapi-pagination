@@ -1,29 +1,33 @@
-To use `limit-offset` pagination you should set
-`fastapi_pagination.limit_offset.Page` as page model using `fastapi_pagination.using_page`
-function.
+To use `limit-offset` pagination you should use `fastapi_pagination.LimitOffsetPage`
+instead of `fastapi_pagination.Page`:
 
 ```python
-from fastapi_pagination.limit_offset import Page
-from fastapi_pagination import using_page
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-using_page(Page)
-```
+from fastapi_pagination import LimitOffsetPage, add_pagination, paginate
 
-After that `fastapi_pagination.limit_offset.Page` and
-`fastapi_pagination.limit_offset.pagination_params` should be used at route declaration.
-
-```python
-from fastapi_pagination.limit_offset import Page, pagination_params
+app = FastAPI()
 
 
-@router.get(
-    '',
-    response_model=Page[User],
-    dependencies=[Depends(pagination_params)],
+class User(BaseModel):
+    name: str
+    surname: str
+
+
+users = [
+    User(name='Yurii', surname='Karabas'),
+    # ...
+]
+
+
+@app.get(
+    '/users',
+    response_model=LimitOffsetPage[User],
 )
-async def route():
-    ...
-```
+async def get_users():
+    return paginate(users)
 
-Fully working example can be
-found [here](https://github.com/uriyyo/fastapi-pagination/tree/main/examples/pagination_limit_offset.py).
+
+add_pagination(app)
+```

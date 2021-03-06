@@ -1,16 +1,16 @@
 There are 3 thing you should know about:
 
 * `Page` - `pydantic` model that represents paginated results.
-* `PaginationParams` - class that represents pagination params passed from user.
+* `Params` - class that represents pagination params passed from user.
 * `paginate` - function that is used to paginate your query and data.
 
-## `Page` and `PaginationParams`
+## `Page` and `Params`
 
-`fastapi-pagination` by default provides you with 2 implementations of `Page` and `PaginationParams`.
+`fastapi-pagination` by default provides you with 2 implementations of `Page` and `Params`.
 
-### 1. `Page` and `PaginationParams` (default)
+### 1. `Page` and `Params` (default)
 
-`PaginationParams` constrains:
+`Params` constrains:
 
 1. `page` >= 0
 2. 0 < `size` <= 100 (default value 50)
@@ -39,9 +39,9 @@ Data schema of `Page`:
 
 Can be imported from `fastapi_pagination`.
 
-### 2. Limit-Offset `Page` and `PaginationParams`
+### 2. Limit-Offset `Page` and `Params`
 
-`PaginationParams` constrains:
+`Params` constrains:
 
 1. 0 < `limit` <= 100 (default value 50)
 2. `offset` > 0
@@ -68,7 +68,7 @@ Data schema of `Page`:
 }
 ```
 
-Can be imported from `fastapi_pagination.limi_offset`.
+Can be imported from `fastapi_pagination.limit_offset`.
 
 ## `paginate`
 
@@ -77,7 +77,7 @@ Can be imported from `fastapi_pagination.limi_offset`.
 `fastapi_pagination.paginate` - can be used to paginate any python sequence like tuple or list
 
 ```python
-from fastapi_pagination import paginate
+from fastapi_pagination import paginate, Page, Params
 
 users = [...]
 
