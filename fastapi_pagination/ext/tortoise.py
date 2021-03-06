@@ -13,10 +13,10 @@ async def paginate(query: Union[QuerySet, Type[Model]], params: Optional[Abstrac
 
     params = resolve_params(params)
 
-    limit_offset_params = params.to_limit_offset()
+    raw_params = params.to_raw_params()
 
     total = await query.count()
-    items = await query.offset(limit_offset_params.offset).limit(limit_offset_params.limit).all()
+    items = await query.offset(raw_params.offset).limit(raw_params.limit).all()
 
     return create_page(items, total, params)
 

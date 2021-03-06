@@ -2,13 +2,13 @@ from typing import Any
 
 import uvicorn
 from faker import Faker
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from pydantic import BaseModel
 from tortoise import Model
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.fields import IntField, TextField
 
-from fastapi_pagination import Page, pagination_params
+from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.tortoise import paginate
 
 faker = Faker()
@@ -56,10 +56,13 @@ async def create_user(user_in: UserIn) -> Any:
     return await User.create(**user_in.dict())
 
 
-@app.get("/users", response_model=Page[UserOut], dependencies=[Depends(pagination_params)])
+@app.get("/users/default", response_model=Page[UserOut])
+@app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
 async def get_users() -> Any:
     return await paginate(User)
 
+
+add_pagination(app)
 
 if __name__ == "__main__":
     uvicorn.run("pagination_tortoise:app")

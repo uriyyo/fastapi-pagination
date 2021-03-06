@@ -7,20 +7,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
-from fastapi_pagination import Page, PaginationParams
+from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy import paginate
-from fastapi_pagination.limit_offset import Page as LimitOffsetPage
-from fastapi_pagination.limit_offset import (
-    PaginationParams as LimitOffsetPaginationParams,
-)
 
-from ..base import (
-    BasePaginationTestCase,
-    SafeTestClient,
-    UserOut,
-    limit_offset_params,
-    page_params,
-)
+from ..base import BasePaginationTestCase, SafeTestClient, UserOut
 from ..utils import faker
 
 
@@ -72,26 +62,12 @@ def app(Base, User, SessionLocal):
         finally:
             db.close()
 
-    @app.get("/implicit", response_model=Page[UserOut], dependencies=[Depends(page_params)])
+    @app.get("/default", response_model=Page[UserOut])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
     def route(db: Session = Depends(get_db)):
         return paginate(db.query(User))
 
-    @app.get("/explicit", response_model=Page[UserOut])
-    def route(params: PaginationParams = Depends(), db: Session = Depends(get_db)):
-        return paginate(db.query(User), params)
-
-    @app.get(
-        "/implicit-limit-offset",
-        response_model=LimitOffsetPage[UserOut],
-        dependencies=[Depends(limit_offset_params)],
-    )
-    def route(db: Session = Depends(get_db)):
-        return paginate(db.query(User))
-
-    @app.get("/explicit-limit-offset", response_model=LimitOffsetPage[UserOut])
-    def route(params: LimitOffsetPaginationParams = Depends(), db: Session = Depends(get_db)):
-        return paginate(db.query(User), params)
-
+    add_pagination(app)
     return app
 
 
