@@ -5,6 +5,6 @@ from .api import (
     response,
     set_page,
 )
-from .default import Page
-from .limit_offset import LimitOffsetPage
+from .default import Page, Params
+from .limit_offset import LimitOffsetPage, LimitOffsetParams
 from .paginator import paginate
