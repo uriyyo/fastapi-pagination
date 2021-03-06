@@ -1,21 +1,13 @@
 import inspect
 from contextvars import ContextVar
-from typing import (
-    Awaitable,
-    Callable,
-    Optional,
-    Sequence,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Awaitable, Callable, Optional, Sequence, Type, TypeVar, cast
 
-from fastapi import APIRouter, Depends, FastAPI, Response
+from fastapi import Depends, FastAPI, Response
 from fastapi.dependencies.utils import (
     get_parameterless_sub_dependant,
     lenient_issubclass,
 )
-from fastapi.routing import APIRoute
+from fastapi.routing import APIRoute, APIRouter
 
 from .bases import AbstractPage, AbstractParams
 from .default import Page
@@ -77,27 +69,41 @@ async def _marker() -> None:
     pass
 
 
-def add_pagination(parent: Union[APIRouter, FastAPI]) -> None:
-    for route in parent.routes:
-        if (
-            isinstance(route, APIRoute)
-            and not any(d.call is _marker for d in route.dependant.dependencies)  # noqa: W503
-            and lenient_issubclass(route.response_model, AbstractPage)  # noqa: W503
-        ):
-            cls = route.response_model
+ParentT = TypeVar("ParentT", APIRouter, FastAPI)
 
-            route.dependant.dependencies.extend(
-                get_parameterless_sub_dependant(
-                    depends=d,
-                    path=route.path_format,
-                )
-                for d in [
-                    Depends(_marker),
-                    Depends(_set_response),
-                    Depends(_create_params_dependency(cls.__params_type__)),
-                    Depends(_create_page_dependency(cls)),
-                ]
+
+def _update_route(route: APIRoute) -> None:
+    if all(
+        (
+            not any(d.call is _marker for d in route.dependant.dependencies),
+            lenient_issubclass(route.response_model, AbstractPage),
+        )
+    ):
+        cls = cast(Type[AbstractPage], route.response_model)
+
+        dependencies = [
+            Depends(_marker),
+            Depends(_set_response),
+            Depends(_create_params_dependency(cls.__params_type__)),
+            Depends(_create_page_dependency(cls)),
+        ]
+
+        route.dependencies.extend(dependencies)
+        route.dependant.dependencies.extend(
+            get_parameterless_sub_dependant(
+                depends=d,
+                path=route.path_format,
             )
+            for d in dependencies
+        )
+
+
+def add_pagination(parent: ParentT) -> ParentT:
+    for route in parent.routes:
+        if isinstance(route, APIRoute):
+            _update_route(route)
+
+    return parent
 
 
 __all__ = [
