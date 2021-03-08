@@ -409,7 +409,7 @@ tornado = ">=5.0"
 
 [[package]]
 name = "mkdocs-material"
-version = "7.0.4"
+version = "7.0.5"
 description = "A Material Design theme for MkDocs"
 category = "dev"
 optional = false
@@ -926,7 +926,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "08ff4a50812c92a0643b4783a0c53178e71419e83dc0aace6477579e8c3a2416"
+content-hash = "3ab24c9673da736b444a4b704cd209b22c6cecd1fa22f98feed2b1d19f2c9f93"
 
 [metadata.files]
 aiomysql = [
@@ -1176,8 +1176,8 @@ mkdocs = [
     {file = "mkdocs-1.1.2.tar.gz", hash = "sha256:f0b61e5402b99d7789efa032c7a74c90a20220a9c81749da06dbfbcbd52ffb39"},
 ]
 mkdocs-material = [
-    {file = "mkdocs-material-7.0.4.tar.gz", hash = "sha256:a033cec8c76de63cd02ac33dce3dd74a592b217e43fa84df3ada40ea4eb1e97d"},
-    {file = "mkdocs_material-7.0.4-py2.py3-none-any.whl", hash = "sha256:cd82aace876ca4641b252320c9e9d996590184a53a234cb379eada62b6aeb3e0"},
+    {file = "mkdocs-material-7.0.5.tar.gz", hash = "sha256:d0693f911752f02ef1a9f9d5dd91c1018f85fd1536d749ece99c4321888089c4"},
+    {file = "mkdocs_material-7.0.5-py2.py3-none-any.whl", hash = "sha256:09a374d92e213af4b81e558537b4b3f70911b749c3840560d84a7383fa9e60b1"},
 ]
 mkdocs-material-extensions = [
     {file = "mkdocs-material-extensions-1.0.1.tar.gz", hash = "sha256:6947fb7f5e4291e3c61405bad3539d81e0b3cd62ae0d66ced018128af509c68f"},
