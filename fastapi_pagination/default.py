@@ -23,7 +23,7 @@ class Params(BaseModel, AbstractParams):
 
 class Page(BasePage[T], Generic[T]):
     page: conint(ge=0)  # type: ignore
-    size: conint(gt=0)  # type: ignore
+    size: conint(ge=0)  # type: ignore
 
     __params_type__ = Params
 
