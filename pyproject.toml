@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-pagination"
-version = "0.6.0"
+version = "0.6.1"
 description = "FastAPI pagination"
 authors = [
     "Yurii Karabas <1998uriyyo@gmail.com>",
