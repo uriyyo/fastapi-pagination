@@ -180,7 +180,7 @@ python-versions = "*"
 
 [[package]]
 name = "faker"
-version = "6.5.2"
+version = "6.6.0"
 description = "Faker is a Python package that generates fake data for you."
 category = "dev"
 optional = false
@@ -928,7 +928,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "cf9cfef0f0a2f5e072922460a72e347ea7646e05b77b8094a6ae3e6e54e53d72"
+content-hash = "badfeb45ef5e32523c6e32796246e95f282eacc8488f9977030e684dbee2be66"
 
 [metadata.files]
 aiomysql = [
@@ -1058,8 +1058,8 @@ distlib = [
     {file = "distlib-0.3.1.zip", hash = "sha256:edf6116872c863e1aa9d5bb7cb5e05a022c519a4594dc703843343a9ddd9bff1"},
 ]
 faker = [
-    {file = "Faker-6.5.2-py3-none-any.whl", hash = "sha256:ee86c3140e1d1651b76a7aab637c7da068660f33937143e7063c663f4cec45ab"},
-    {file = "Faker-6.5.2.tar.gz", hash = "sha256:97fb6748031569a65265d38d85370b3c3970f4333b40430d52a60b37dea97877"},
+    {file = "Faker-6.6.0-py3-none-any.whl", hash = "sha256:38bd2ff0afb7d9956fed477a2cd1007a7012b401a9ffd3de5fb909d739880582"},
+    {file = "Faker-6.6.0.tar.gz", hash = "sha256:0a68a539b236a614157581a135c82a27024a66dc96b9a491883fe583ae3689f9"},
 ]
 fastapi = [
     {file = "fastapi-0.63.0-py3-none-any.whl", hash = "sha256:98d8ea9591d8512fdadf255d2a8fa56515cdd8624dca4af369da73727409508e"},
