@@ -8,7 +8,7 @@ from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
-from fastapi_pagination import Page, pagination_params
+from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 faker = Faker()
@@ -73,10 +73,13 @@ def create_user(user_in: UserIn, db: Session = Depends(get_db)) -> User:
     return user
 
 
-@app.get("/users", response_model=Page[UserOut], dependencies=[Depends(pagination_params)])
+@app.get("/users/default", response_model=Page[UserOut])
+@app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
 def get_users(db: Session = Depends(get_db)) -> Any:
     return paginate(db.query(User))
 
+
+add_pagination(app)
 
 if __name__ == "__main__":
     uvicorn.run("pagination_sqlalchemy:app")

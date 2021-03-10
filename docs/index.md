@@ -5,11 +5,10 @@ FastAPI Pagination - easy to use pagination for FastAPI.
 Example of code and generated OpenAPI specification.
 
 ```python
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from pydantic import BaseModel
 
-from fastapi_pagination import Page, pagination_params
-from fastapi_pagination.paginator import paginate
+from fastapi_pagination import Page, add_pagination, paginate
 
 app = FastAPI()
 
@@ -25,13 +24,12 @@ users = [
 ]
 
 
-@app.get(
-    '/users',
-    response_model=Page[User],
-    dependencies=[Depends(pagination_params)],
-)
+@app.get('/users', response_model=Page[User])
 async def get_users():
-    return paginate(users) 
+    return paginate(users)
+
+
+add_pagination(app)
 ```
 
 ![OpenAPI](/images/openapi_example.png)

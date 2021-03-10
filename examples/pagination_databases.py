@@ -4,10 +4,10 @@ import sqlalchemy
 import uvicorn
 from databases import Database
 from faker import Faker
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from pydantic import BaseModel
 
-from fastapi_pagination import Page, pagination_params
+from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.databases import paginate
 
 faker = Faker()
@@ -69,10 +69,13 @@ async def create_user(user_in: UserIn) -> Any:
     return {**user_in.dict(), "id": id_}
 
 
-@app.get("/users", response_model=Page[UserOut], dependencies=[Depends(pagination_params)])
+@app.get("/users/default", response_model=Page[UserOut])
+@app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
 async def get_users() -> Any:
     return await paginate(db, Users.select())
 
+
+add_pagination(app)
 
 if __name__ == "__main__":
     uvicorn.run("pagination_databases:app")

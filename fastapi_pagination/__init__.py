@@ -1,12 +1,10 @@
 from .api import (
+    add_pagination,
     create_page,
-    pagination_params,
     resolve_params,
-    use_as_page,
-    using_page,
-    using_params,
-    using_response,
+    response,
+    set_page,
 )
-from .page import Page
+from .default import Page, Params
+from .limit_offset import LimitOffsetPage, LimitOffsetParams
 from .paginator import paginate
-from .params import PaginationParams
