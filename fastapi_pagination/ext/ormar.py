@@ -8,7 +8,7 @@ from ..bases import AbstractPage, AbstractParams
 
 async def paginate(query: Union[QuerySet, Type[Model]], params: Optional[AbstractParams] = None) -> AbstractPage:
     if not isinstance(query, QuerySet):
-        query = query.objects.all()
+        query = query.objects
 
     params = resolve_params(params)
 
