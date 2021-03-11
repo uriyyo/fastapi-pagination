@@ -22,6 +22,7 @@ Available integrations:
 * [sqlalchemy](https://github.com/sqlalchemy/sqlalchemy)
 * [gino](https://github.com/python-gino/gino)
 * [databases](https://github.com/encode/databases)
+* [ormar](http://github.com/collerek/ormar)
 * [orm](https://github.com/encode/orm)
 * [tortoise](https://github.com/tortoise/tortoise-orm)
 
