@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Generic, Sequence, TypeVar
+from typing import Any, Generic, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel, conint
 
 from .bases import AbstractParams, BasePage, RawParams
+from .utils import deprecated
 
 T = TypeVar("T")
 
@@ -21,9 +22,15 @@ class Params(BaseModel, AbstractParams):
         )
 
 
+class PaginationParams(Params):
+    @deprecated  # type: ignore
+    def __init__(self, **kwargs: Any) -> None:  # pragma: no cover
+        super().__init__(**kwargs)
+
+
 class Page(BasePage[T], Generic[T]):
     page: conint(ge=0)  # type: ignore
-    size: conint(ge=0)  # type: ignore
+    size: conint(gt=0)  # type: ignore
 
     __params_type__ = Params
 
@@ -45,4 +52,8 @@ class Page(BasePage[T], Generic[T]):
         )
 
 
-__all__ = ["Params", "Page"]
+__all__ = [
+    "Params",
+    "Page",
+    "PaginationParams",
+]

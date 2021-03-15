@@ -1,6 +1,19 @@
 import inspect
+import warnings
+from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import Awaitable, Callable, Optional, Sequence, Type, TypeVar, cast
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    ContextManager,
+    Iterator,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    cast,
+)
 
 from fastapi import Depends, FastAPI, Response
 from fastapi.dependencies.utils import (
@@ -10,7 +23,8 @@ from fastapi.dependencies.utils import (
 from fastapi.routing import APIRoute, APIRouter
 
 from .bases import AbstractPage, AbstractParams
-from .default import Page
+from .default import Page, Params
+from .utils import deprecated
 
 T = TypeVar("T")
 TAbstractParams = TypeVar("TAbstractParams", covariant=True, bound=AbstractParams)
@@ -106,10 +120,59 @@ def add_pagination(parent: ParentT) -> ParentT:
     return parent
 
 
+@deprecated
+def using_params(
+    params_type: Type[TAbstractParams],
+) -> Callable[[TAbstractParams], Awaitable[TAbstractParams]]:  # pragma: no cover
+    async def _pagination_params(*args, **kwargs) -> params_type:  # type: ignore
+        params = params_type(*args, **kwargs)  # type: ignore
+        params_value.set(params)
+        return params
+
+    _pagination_params.__signature__ = inspect.signature(params_type)  # type: ignore
+
+    return _pagination_params
+
+
+with warnings.catch_warnings():
+    pagination_params = using_params(Params)
+
+
+@deprecated
+def using_page(page: Type[AbstractPage]) -> ContextManager[None]:  # pragma: no cover
+    token = page_type.set(page)
+
+    @contextmanager
+    def _reset() -> Iterator[None]:
+        try:
+            yield
+        finally:
+            page_type.reset(token)
+
+    return _reset()
+
+
+@deprecated
+def use_as_page(page: Any) -> Any:  # pragma: no cover
+    using_page(page)
+    return page
+
+
+@deprecated
+async def using_response(res: Response) -> None:  # pragma: no cover
+    response_value.set(res)
+
+
 __all__ = [
     "add_pagination",
     "create_page",
     "resolve_params",
     "response",
     "set_page",
+    # deprecated api
+    "using_response",
+    "using_params",
+    "using_page",
+    "use_as_page",
+    "pagination_params",
 ]
