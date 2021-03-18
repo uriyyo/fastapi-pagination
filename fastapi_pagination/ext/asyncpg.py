@@ -22,7 +22,7 @@ async def paginate(
 
     raw_params = params.to_raw_params()
     items = await conn.fetch(
-        f"{query} LIMIT ${raw_params.limit} OFFSET ${raw_params.offset}",
+        f"{query} LIMIT {raw_params.limit} OFFSET {raw_params.offset}",
         *args,
     )
 
