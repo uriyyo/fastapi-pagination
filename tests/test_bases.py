@@ -1,6 +1,6 @@
 from typing import Generic, TypeVar
 
-from pytest import raises
+from pytest import mark, raises
 
 from fastapi_pagination import Page
 from fastapi_pagination.bases import AbstractParams, RawParams
@@ -28,12 +28,17 @@ def test_custom_page_invalid_values():
         Page.with_custom_options(a=1, b=2, c=3)
 
 
-def test_custom_page():
-    page_cls = Page.with_custom_options()
+@mark.parametrize(
+    "cls",
+    [Page, Page[int]],
+    ids=["non-concrete", "concrete"],
+)
+def test_custom_page(cls):
+    page_cls = cls.with_custom_options()
     assert page_cls.__params_type__().dict() == {"size": 50, "page": 0}
 
-    page_cls = Page.with_custom_options(size=100)
+    page_cls = cls.with_custom_options(size=100)
     assert page_cls.__params_type__().dict() == {"size": 100, "page": 0}
 
-    page_cls = Page.with_custom_options(size=100, page=100)
+    page_cls = cls.with_custom_options(size=100, page=100)
     assert page_cls.__params_type__().dict() == {"size": 100, "page": 100}

@@ -23,6 +23,8 @@ from pydantic.types import conint
 T = TypeVar("T")
 C = TypeVar("C")
 
+TAbstractPage = TypeVar("TAbstractPage", bound="AbstractPage")
+
 
 @dataclass
 class RawParams:
@@ -58,7 +60,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         pass  # pragma: no cover
 
     @classmethod
-    def with_custom_options(cls: C, **kwargs: Any) -> C:
+    def with_custom_options(cls: Type[TAbstractPage], **kwargs: Any) -> Type[TAbstractPage]:
         params_cls = cast(Type[AbstractPage], cls).__params_type__
 
         custom_params: Any = create_model(
@@ -67,11 +69,16 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             **_create_params(params_cls, kwargs),
         )
 
-        @wraps(cls, updated=())  # type: ignore
-        class CustomPage(cls[T], Generic[T]):  # type: ignore
+        if cls.__concrete__:
+            bases = (cls,)
+        else:
+            bases = (cls[T], Generic[T])  # type: ignore
+
+        @wraps(cls, updated=())
+        class CustomPage(*bases):  # type: ignore
             __params_type__: ClassVar[Type[AbstractParams]] = custom_params
 
-        return cast(C, CustomPage)
+        return cast(Type[TAbstractPage], CustomPage)
 
     class Config:
         arbitrary_types_allowed = True
