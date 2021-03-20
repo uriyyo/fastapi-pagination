@@ -13,10 +13,11 @@ def paginate(
 ) -> AbstractPage[T]:
     params = resolve_params(params)
     raw_params = params.to_raw_params()
+    sliced_sequence = list(islice(sequence, raw_params.offset, raw_params.offset + raw_params.limit))
 
     return create_page(
-        items=list(islice(sequence, raw_params.offset, raw_params.offset + raw_params.limit)),
-        total=len(sequence),
+        items=sliced_sequence,
+        total=len(sliced_sequence),
         params=params,
     )
 
