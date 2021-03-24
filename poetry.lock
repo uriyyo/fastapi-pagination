@@ -509,7 +509,7 @@ typesystem = "*"
 
 [[package]]
 name = "ormar"
-version = "0.9.9"
+version = "0.10.1"
 description = "A simple async ORM with fastapi in mind and pydantic validation."
 category = "main"
 optional = true
@@ -951,7 +951,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "6286ee8aeb3017381b85b78cbb11c72719eb74302f938275d42eadae558739f0"
+content-hash = "e431a03905226d56a68125aa5b46522ef4afb6ab3c4e4446e9804b13c205d0c9"
 
 [metadata.files]
 aiomysql = [
@@ -1254,8 +1254,8 @@ orm = [
     {file = "orm-0.1.5.tar.gz", hash = "sha256:37cb4757b670c1713f4e0d65874c5afe819acbd712abb9743c97e1d4b00d511c"},
 ]
 ormar = [
-    {file = "ormar-0.9.9-py3-none-any.whl", hash = "sha256:f6e3c93f5b15c8c6e502edc9978006ee48278eb7f16d916878100a18fc06c4b2"},
-    {file = "ormar-0.9.9.tar.gz", hash = "sha256:d7c74c374dbef54ceaad64731796a69aef871aa1b5b9e45e9931eba8ffbfe256"},
+    {file = "ormar-0.10.1-py3-none-any.whl", hash = "sha256:d6986e853ee5fa24a2818505e864bcf9b8364134269b44be5d40fc3ef7d4f9c2"},
+    {file = "ormar-0.10.1.tar.gz", hash = "sha256:f78235d36794a9c169a62ae702d17d30927a320c412d2651e64568a2e79545a9"},
 ]
 packaging = [
     {file = "packaging-20.9-py2.py3-none-any.whl", hash = "sha256:67714da7f7bc052e064859c05c595155bd1ee9f69f76557e21f051443c20947a"},
