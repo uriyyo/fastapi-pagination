@@ -836,7 +836,7 @@ python-versions = ">= 3.5"
 
 [[package]]
 name = "tortoise-orm"
-version = "0.17.1"
+version = "0.17.2"
 description = "Easy async ORM for python, built with relations in mind"
 category = "main"
 optional = true
@@ -1540,8 +1540,8 @@ tornado = [
     {file = "tornado-6.1.tar.gz", hash = "sha256:33c6e81d7bd55b468d2e793517c909b139960b6c790a60b7991b9b6b76fb9791"},
 ]
 tortoise-orm = [
-    {file = "tortoise-orm-0.17.1.tar.gz", hash = "sha256:07816a575a1cdf31f212042f4ec399028540cd543f85ad0577531eccb5dc9453"},
-    {file = "tortoise_orm-0.17.1-py3-none-any.whl", hash = "sha256:34eeca18d8266806f5c1028e5fd94e46d07554ea615927d660da4a266801c8e8"},
+    {file = "tortoise-orm-0.17.2.tar.gz", hash = "sha256:1a742b2f15a31d47a8dea7706b478cc9a7ce9af268b61d77d0fa22cfbaea271a"},
+    {file = "tortoise_orm-0.17.2-py3-none-any.whl", hash = "sha256:b0c02be3800398053058377ddca91fa051eb98eebb704d2db2a3ab1c6a58e347"},
 ]
 tqdm = [
     {file = "tqdm-4.59.0-py2.py3-none-any.whl", hash = "sha256:9fdf349068d047d4cfbe24862c425883af1db29bcddf4b0eeb2524f6fbdb23c7"},
