@@ -12,11 +12,11 @@ from fastapi_pagination.bases import AbstractParams, AbstractPage
 
 def paginate(query: QuerySet, schema: BaseModel, params: Optional[AbstractParams] = None) -> AbstractPage:
     params = resolve_params(params)
-    limit_offset_params = params.to_limit_offset()
+    raw_params = params.to_raw_params()
 
     total = query.count()
-    start = limit_offset_params.limit * limit_offset_params.offset
-    end = start + limit_offset_params.limit
+    start = raw_params.limit * raw_params.offset
+    end = start + raw_params.limit
     rows = query.all()[start:end]
 
     items = [schema.from_django(row) for row in rows]
