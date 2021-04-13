@@ -1,11 +1,12 @@
+import databases
 import sqlalchemy
-from databases import Database
 from fastapi import FastAPI
-from orm import Integer, Model, String
+from ormar import Integer, Model, ModelMeta, String
 from pytest import fixture
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.orm import paginate
+from fastapi_pagination import Page, add_pagination
+from fastapi_pagination.ext.ormar import paginate
+from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
 from ..base import BasePaginationTestCase, SafeTestClient, UserOut
 from ..utils import faker
@@ -13,20 +14,20 @@ from ..utils import faker
 
 @fixture(scope="session")
 def db(database_url):
-    return Database(database_url)
+    return databases.Database(database_url)
 
 
 @fixture(scope="session")
-def metadata(database_url):
+def meta(database_url):
     return sqlalchemy.MetaData()
 
 
 @fixture(scope="session")
-def User(metadata, db):
+def User(meta, db):
     class User(Model):
-        __tablename__ = "users"
-        __database__ = db
-        __metadata__ = metadata
+        class Meta(ModelMeta):
+            database = db
+            metadata = meta
 
         id = Integer(primary_key=True)
         name = String(max_length=100)
@@ -34,20 +35,28 @@ def User(metadata, db):
     return User
 
 
+@fixture(
+    scope="session",
+    params=[True, False],
+    ids=["model", "query"],
+)
+def query(request, User):
+    if request.param:
+        return User
+    else:
+        return User.objects
+
+
 @fixture(scope="session")
-def app(db, metadata, User):
+def app(db, meta, User, query):
     app = FastAPI()
 
     @app.on_event("startup")
     async def on_startup() -> None:
         engine = sqlalchemy.create_engine(str(db.url))
-        metadata.drop_all(engine)
-        metadata.create_all(engine)
-
+        meta.drop_all(engine)
+        meta.create_all(engine)
         await db.connect()
-
-        for _ in range(100):
-            await User.objects.create(name=faker.name())
 
     @app.on_event("shutdown")
     async def on_shutdown() -> None:
@@ -56,18 +65,21 @@ def app(db, metadata, User):
     @app.get("/default", response_model=Page[UserOut])
     @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
     async def route():
-        return await paginate(User.objects)
+        return await paginate(query)
 
     add_pagination(app)
     return app
 
 
-class TestORM(BasePaginationTestCase):
+class TestOrmar(BasePaginationTestCase):
     @fixture(scope="session")
     async def client(self, app):
         with SafeTestClient(app) as c:
             yield c
 
     @fixture(scope="session")
-    async def entities(self, User):
+    async def entities(self, User, query, client):
+        await User.objects.delete(each=True)
+        for _ in range(100):
+            await User.objects.create(name=faker.name())
         return await User.objects.all()

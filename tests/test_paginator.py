@@ -1,21 +1,9 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from pytest import fixture
 
-from fastapi_pagination import (
-    LimitOffsetPage,
-    LimitOffsetPaginationParams,
-    Page,
-    PaginationParams,
-)
-from fastapi_pagination.paginator import paginate
+from fastapi_pagination import LimitOffsetPage, Page, add_pagination, paginate
 
-from .base import (
-    BasePaginationTestCase,
-    SafeTestClient,
-    UserOut,
-    limit_offset_params,
-    page_params,
-)
+from .base import BasePaginationTestCase, SafeTestClient, UserOut
 from .utils import faker
 
 app = FastAPI()
@@ -23,28 +11,13 @@ app = FastAPI()
 entities = [UserOut(name=faker.name()) for _ in range(100)]
 
 
-@app.get("/implicit", response_model=Page[UserOut], dependencies=[Depends(page_params)])
-def route():
+@app.get("/default", response_model=Page[UserOut])
+@app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
+async def route():
     return paginate(entities)
 
 
-@app.get("/explicit", response_model=Page[UserOut])
-def route(params: PaginationParams = Depends()):
-    return paginate(entities, params)
-
-
-@app.get(
-    "/implicit-limit-offset",
-    response_model=LimitOffsetPage[UserOut],
-    dependencies=[Depends(limit_offset_params)],
-)
-def route():
-    return paginate(entities)
-
-
-@app.get("/explicit-limit-offset", response_model=LimitOffsetPage[UserOut])
-def route(params: LimitOffsetPaginationParams = Depends()):
-    return paginate(entities, params)
+add_pagination(app)
 
 
 class TestPaginationParams(BasePaginationTestCase):

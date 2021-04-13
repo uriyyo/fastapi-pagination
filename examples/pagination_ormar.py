@@ -5,11 +5,10 @@ import uvicorn
 from databases import Database
 from faker import Faker
 from fastapi import FastAPI
-from orm import Integer, Model, String
-from pydantic import BaseModel
+from ormar import Integer, Model, String
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.orm import paginate
+from fastapi_pagination.ext.ormar import paginate
 
 faker = Faker()
 
@@ -18,25 +17,14 @@ db = Database("sqlite:///.db")
 
 
 class User(Model):
-    __tablename__ = "users"
-    __database__ = db
-    __metadata__ = metadata
+    class Meta:
+        tablename = "users"
+        database = db
+        metadata = metadata
 
     id = Integer(primary_key=True)
     name = String(max_length=100)
     email = String(max_length=100)
-
-
-class UserIn(BaseModel):
-    name: str
-    email: str
-
-
-class UserOut(UserIn):
-    id: int
-
-    class Config:
-        orm_mode = True
 
 
 app = FastAPI()
@@ -62,13 +50,13 @@ async def on_shutdown() -> None:
     await db.disconnect()
 
 
-@app.post("/users", response_model=UserOut)
-async def create_user(user_in: UserIn) -> Any:
-    return await User.objects.create(**user_in.dict())
+@app.post("/users", response_model=User)
+async def create_user(user_in: User) -> Any:
+    return await user_in.save()
 
 
-@app.get("/users/default", response_model=Page[UserOut])
-@app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
+@app.get("/users/default", response_model=Page[User])
+@app.get("/users/limit-offset", response_model=LimitOffsetPage[User])
 async def get_users() -> Any:
     return await paginate(User.objects)
 

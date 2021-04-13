@@ -1,31 +1,16 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from pytest import fixture
 from tortoise import Model
 from tortoise.backends.base.executor import EXECUTOR_CACHE
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.fields import IntField, TextField
 
-from fastapi_pagination import (
-    LimitOffsetPage,
-    LimitOffsetPaginationParams,
-    Page,
-    PaginationParams,
-)
+from fastapi_pagination import Page, add_pagination
 from fastapi_pagination.ext.tortoise import paginate
+from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
-from ..base import (
-    BasePaginationTestCase,
-    SafeTestClient,
-    UserOut,
-    limit_offset_params,
-    page_params,
-)
+from ..base import BasePaginationTestCase, SafeTestClient, UserOut
 from ..utils import faker
-
-
-@fixture(scope="session")
-def sqlite_url() -> str:
-    return "sqlite://:memory:"
 
 
 class User(Model):
@@ -36,17 +21,26 @@ class User(Model):
         table = "users"
 
 
-@fixture(scope="session", params=["model", "query"])
-def query_type(request):
-    return request.param
+@fixture(
+    scope="session",
+    params=[True, False],
+    ids=["model", "query"],
+)
+def query(request):
+    if request.param:
+        return User
+    else:
+        return User.all()
 
 
-@fixture(scope="session", params=["model", "query"])
-def app(query_type, database_url):
+@fixture(scope="session")
+def app(query, database_url):
     app = FastAPI()
 
     if database_url.startswith("postgresql://"):
         database_url = database_url.replace("postgresql://", "postgres://")
+    if database_url.startswith("sqlite"):
+        database_url = "sqlite://:memory:"
 
     EXECUTOR_CACHE.clear()
     register_tortoise(
@@ -56,32 +50,12 @@ def app(query_type, database_url):
         generate_schemas=True,
     )
 
-    def query():
-        if query_type == "model":
-            return User
-
-        return User.all()
-
-    @app.get("/implicit", response_model=Page[UserOut], dependencies=[Depends(page_params)])
+    @app.get("/default", response_model=Page[UserOut])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
     async def route():
-        return await paginate(query())
+        return await paginate(query)
 
-    @app.get("/explicit", response_model=Page[UserOut])
-    async def route(params: PaginationParams = Depends()):
-        return await paginate(query(), params)
-
-    @app.get(
-        "/implicit-limit-offset",
-        response_model=LimitOffsetPage[UserOut],
-        dependencies=[Depends(limit_offset_params)],
-    )
-    async def route():
-        return await paginate(query())
-
-    @app.get("/explicit-limit-offset", response_model=LimitOffsetPage[UserOut])
-    async def route(params: LimitOffsetPaginationParams = Depends()):
-        return await paginate(query(), params)
-
+    add_pagination(app)
     return app
 
 
@@ -92,7 +66,8 @@ class TestTortoise(BasePaginationTestCase):
             yield c
 
     @fixture(scope="session")
-    async def entities(self, client):
+    async def entities(self, query, client):
+        await User.all().delete()
         for _ in range(100):
             await User.create(name=faker.name())
 

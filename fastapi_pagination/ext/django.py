@@ -3,13 +3,14 @@ from typing import Optional
 from django.db.models import QuerySet
 from pydantic import BaseModel
 
-from ..page import BasePage, create_page
-from ..params import PaginationParamsType, resolve_params
-
 
 # To convert from a django ORM model to a pydantic Model, provide a BaseModel with from_django() method to map fields
 # from django to pydantic
-def paginate(query: QuerySet, schema: BaseModel, params: Optional[PaginationParamsType] = None) -> BasePage:
+from fastapi_pagination import resolve_params, create_page
+from fastapi_pagination.bases import AbstractParams, AbstractPage
+
+
+def paginate(query: QuerySet, schema: BaseModel, params: Optional[AbstractParams] = None) -> AbstractPage:
     params = resolve_params(params)
     limit_offset_params = params.to_limit_offset()
 

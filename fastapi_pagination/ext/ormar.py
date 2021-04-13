@@ -1,7 +1,6 @@
 from typing import Optional, Type, Union
 
-from tortoise.models import Model
-from tortoise.queryset import QuerySet
+from ormar import Model, QuerySet
 
 from ..api import create_page, resolve_params
 from ..bases import AbstractPage, AbstractParams
@@ -9,7 +8,7 @@ from ..bases import AbstractPage, AbstractParams
 
 async def paginate(query: Union[QuerySet, Type[Model]], params: Optional[AbstractParams] = None) -> AbstractPage:
     if not isinstance(query, QuerySet):
-        query = query.all()
+        query = query.objects
 
     params = resolve_params(params)
 

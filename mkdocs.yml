@@ -1,0 +1,45 @@
+site_name: FastAPI Pagination
+site_author: Yurii Karabas
+site_description: FastAPI Pagination
+copyright: "Copyright &copy; 2021 Yurii Karabas"
+repo_url: https://github.com/uriyyo/fastapi-pagination
+repo_name: uriyyo/fastapi-pagination
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: blue grey
+    second: grey
+  icon:
+    repo: fontawesome/brands/github
+  favicon: images/favicon.ico
+
+nav:
+  - "Home": index.md
+  - "Tutorials":
+      - "First Steps": first-steps.md
+      - "Limit-Offset": limit-offset.md
+      - "Customization": customization.md
+      - "Advanced": advanced.md
+
+markdown_extensions:
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+  - extra
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.keys
+  - pymdownx.inlinehilite
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/uriyyo/fastapi-pagination
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/uriyyo
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/in/yurii-karabas-b35653140

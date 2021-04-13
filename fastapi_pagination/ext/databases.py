@@ -6,18 +6,18 @@ from databases import Database
 from sqlalchemy import func, select
 from sqlalchemy.sql import Select
 
-from ..page import BasePage, create_page
-from ..params import PaginationParamsType, resolve_params
+from ..api import create_page, resolve_params
+from ..bases import AbstractPage, AbstractParams
 from .sqlalchemy import paginate_query
 
 
 async def paginate(
     db: Database,
     query: Select,
-    params: Optional[PaginationParamsType] = None,
+    params: Optional[AbstractParams] = None,
     *,
     convert_to_mapping: bool = True,
-) -> BasePage:
+) -> AbstractPage:
     params = resolve_params(params)
 
     total = await db.fetch_val(select([func.count()]).select_from(query.alias()))

@@ -5,18 +5,18 @@ from typing import Optional, TypeVar
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import Select
 
-from ..page import BasePage, create_page
-from ..params import PaginationParamsType, resolve_params
+from ..api import create_page, resolve_params
+from ..bases import AbstractPage, AbstractParams
 
 T = TypeVar("T", Select, Query)
 
 
-def paginate_query(query: T, params: PaginationParamsType) -> T:
-    params = params.to_limit_offset()
-    return query.limit(params.limit).offset(params.offset)  # type: ignore
+def paginate_query(query: T, params: AbstractParams) -> T:
+    raw_params = params.to_raw_params()
+    return query.limit(raw_params.limit).offset(raw_params.offset)
 
 
-def paginate(query: Query, params: Optional[PaginationParamsType] = None) -> BasePage:
+def paginate(query: Query, params: Optional[AbstractParams] = None) -> AbstractPage:
     params = resolve_params(params)
 
     total = query.count()

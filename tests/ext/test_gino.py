@@ -1,24 +1,13 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from gino_starlette import Gino
 from orm import Integer, String
 from pytest import fixture
 from sqlalchemy import Column, Integer, String
 
-from fastapi_pagination import (
-    LimitOffsetPage,
-    LimitOffsetPaginationParams,
-    Page,
-    PaginationParams,
-)
+from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.gino import paginate
 
-from ..base import (
-    BasePaginationTestCase,
-    SafeTestClient,
-    UserOut,
-    limit_offset_params,
-    page_params,
-)
+from ..base import BasePaginationTestCase, SafeTestClient, UserOut
 from ..utils import faker
 
 
@@ -43,8 +32,20 @@ def User(db):
     return User
 
 
+@fixture(
+    scope="session",
+    params=[True, False],
+    ids=["model", "query"],
+)
+def query(request, User):
+    if request.param:
+        return User
+    else:
+        return User.query
+
+
 @fixture(scope="session")
-def app(db, User):
+def app(db, User, query):
     app = FastAPI()
     db.init_app(app)
 
@@ -52,30 +53,17 @@ def app(db, User):
     async def on_startup() -> None:
         await db.gino.drop_all()
         await db.gino.create_all()
+        await User.delete.gino.status()
 
         for _ in range(100):
             await User.create(name=faker.name())
 
-    @app.get("/implicit", response_model=Page[UserOut], dependencies=[Depends(page_params)])
+    @app.get("/default", response_model=Page[UserOut])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
     async def route():
-        return await paginate(User.query)
+        return await paginate(query)
 
-    @app.get("/explicit", response_model=Page[UserOut])
-    async def route(params: PaginationParams = Depends()):
-        return await paginate(User.query, params)
-
-    @app.get(
-        "/implicit-limit-offset",
-        response_model=LimitOffsetPage[UserOut],
-        dependencies=[Depends(limit_offset_params)],
-    )
-    async def route():
-        return await paginate(User.query)
-
-    @app.get("/explicit-limit-offset", response_model=LimitOffsetPage[UserOut])
-    async def route(params: LimitOffsetPaginationParams = Depends()):
-        return await paginate(User.query, params)
-
+    add_pagination(app)
     return app
 
 
@@ -86,5 +74,5 @@ class TestGino(BasePaginationTestCase):
             yield c
 
     @fixture(scope="session")
-    async def entities(self, User):
+    async def entities(self, User, query):
         return await User.query.gino.all()
