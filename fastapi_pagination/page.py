@@ -14,7 +14,7 @@ C = TypeVar("C")
 
 class BasePage(GenericModel, Generic[T], ABC):
     items: Sequence[T]
-    total: int = Field(..., ge=0)
+    total: int = Field(..., explicitMinimum=0)
 
     class Config:
         arbitrary_types_allowed = True
@@ -26,8 +26,8 @@ class BasePage(GenericModel, Generic[T], ABC):
 
 
 class Page(BasePage[T], Generic[T]):
-    page: int = Field(..., ge=0)
-    size: int = Field(..., gt=0)
+    page: int = Field(..., explicitMinimum=0)
+    size: int = Field(..., explicitMinimum=1)
 
     @classmethod
     def create(cls, items: Sequence[T], total: int, params: PaginationParamsType) -> "Page[T]":
@@ -43,8 +43,8 @@ class Page(BasePage[T], Generic[T]):
 
 
 class LimitOffsetPage(BasePage[T], Generic[T]):
-    limit: int = Field(..., gt=0)
-    offset: int = Field(..., ge=0)
+    limit: int = Field(..., explicitMinimum=1)
+    offset: int = Field(..., explicitMinimum=0)
 
     @classmethod
     def create(cls, items: Sequence[T], total: int, params: PaginationParamsType) -> "LimitOffsetPage[T]":
