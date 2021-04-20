@@ -1,27 +1,25 @@
-from typing import Optional
+from typing import Optional, Type, TypeVar, Union, cast
 
-from django.db.models import QuerySet
-from pydantic import BaseModel
+from django.db.models import Model, QuerySet
+from django.db.models.base import ModelBase
+
+from ..api import create_page, resolve_params
+from ..bases import AbstractPage, AbstractParams
+
+T = TypeVar("T", bound=Model)
 
 
-# To convert from a django ORM model to a pydantic Model, provide a BaseModel with from_django() method to map fields
-# from django to pydantic
-from fastapi_pagination import resolve_params, create_page
-from fastapi_pagination.bases import AbstractParams, AbstractPage
-
-
-def paginate(query: QuerySet, schema: BaseModel, params: Optional[AbstractParams] = None) -> AbstractPage:
+def paginate(query: Union[Type[T], QuerySet[T]], params: Optional[AbstractParams] = None) -> AbstractPage[T]:
     params = resolve_params(params)
     raw_params = params.to_raw_params()
 
+    if isinstance(query, ModelBase):
+        query = cast(Type[T], query).objects.all()
+
     total = query.count()
-    start = raw_params.limit * raw_params.offset
-    end = start + raw_params.limit
-    rows = query.all()[start:end]
+    query = query.all()[raw_params.offset : raw_params.offset + raw_params.limit]
 
-    items = [schema.from_django(row) for row in rows]
-
-    return create_page(items, total, params)
+    return create_page([*query], total, params)
 
 
 __all__ = ["paginate"]
