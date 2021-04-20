@@ -9,7 +9,7 @@ T = TypeVar("T")
 def paginate(
     sequence: Sequence[T],
     params: Optional[AbstractParams] = None,
-    length_function: Callable[Sequence[T], int] = len,
+    length_function: Callable[[Sequence[T]], int] = len,
 ) -> AbstractPage[T]:
     params = resolve_params(params)
     raw_params = params.to_raw_params()
