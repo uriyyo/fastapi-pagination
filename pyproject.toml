@@ -33,6 +33,7 @@ orm = { version = "^0.1.5", optional = true }
 tortoise-orm = { version = ">=0.16.18,<0.18.0", extras = ["asyncpg", "aiomysql", "aiosqlite"], optional = true }
 asyncpg = { version = "0.22.0", optional = true }
 ormar = { version = ">=0.9.8,<0.11.0", optional = true}
+Django = { version = "<3.2.0", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
@@ -58,7 +59,8 @@ orm = ["orm", "databases"]
 ormar = ["ormar"]
 tortoise = ["tortoise-orm"]
 asyncpg = ["SQLAlchemy", "asyncpg"]
-all = ["gino", "SQLAlchemy", "sqlalchemy-stubs", "databases", "orm", "ormar", "tortoise-orm", "asyncpg"]
+django = ["django", "databases"]
+all = ["gino", "SQLAlchemy", "sqlalchemy-stubs", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
