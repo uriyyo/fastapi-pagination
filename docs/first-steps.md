@@ -29,7 +29,7 @@ users = [
     "/",
     response_model=Page[User],
 )
-def route(params: Params = Depends(Params)):
+def route(params: Params = Depends()):
     return paginate(users, params)
 ```
 
