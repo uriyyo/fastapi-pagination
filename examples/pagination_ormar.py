@@ -64,4 +64,4 @@ async def get_users() -> Any:
 add_pagination(app)
 
 if __name__ == "__main__":
-    uvicorn.run("pagination_orm:app")
+    uvicorn.run("pagination_ormar:app")
