@@ -9,7 +9,7 @@ functions from `fastapi_pagination`.
 
 ```python
 from fastapi_pagination import Page, Params, paginate
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 
 
@@ -20,7 +20,7 @@ class User(BaseModel):
 app = FastAPI()
 
 users = [
-    User("Yurii"),
+    User(name="Yurii"),
     # ...
 ]
 
@@ -29,7 +29,7 @@ users = [
     "/",
     response_model=Page[User],
 )
-def route(params: Params):
+def route(params: Params = Depends()):
     return paginate(users, params)
 ```
 
@@ -49,7 +49,7 @@ class User(BaseModel):
 app = FastAPI()
 
 users = [
-    User("Yurii"),
+    User(name="Yurii"),
     # ...
 ]
 
