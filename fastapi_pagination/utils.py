@@ -1,7 +1,7 @@
 import inspect
 import warnings
 from functools import wraps
-from typing import Any, Callable, TypeVar, cast, no_type_check
+from typing import Any, Callable, TypeVar, cast
 
 T = TypeVar("T", bound=Callable)
 
