@@ -35,7 +35,7 @@ class RawParams:
 class AbstractParams(ABC):
     @abstractmethod
     def to_raw_params(self) -> RawParams:
-        pass  # pragma: no cover
+        pass
 
 
 def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping[str, Any]:
@@ -57,7 +57,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
     @classmethod
     @abstractmethod
     def create(cls: Type[C], items: Sequence[T], total: int, params: AbstractParams) -> C:
-        pass  # pragma: no cover
+        pass
 
     @classmethod
     def with_custom_options(cls: Type[TAbstractPage], **kwargs: Any) -> Type[TAbstractPage]:
