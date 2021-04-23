@@ -25,6 +25,7 @@ Available integrations:
 * [ormar](http://github.com/collerek/ormar)
 * [orm](https://github.com/encode/orm)
 * [tortoise](https://github.com/tortoise/tortoise-orm)
+* [django](https://github.com/django/django)
 
 ## Example
 
