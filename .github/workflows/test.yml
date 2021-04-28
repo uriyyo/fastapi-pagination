@@ -35,7 +35,11 @@ jobs:
           pip install -U poetry
           poetry install -E all
       - name: Unit tests
-        run: poetry run pytest tests --cov-report=xml
+        run: poetry run pytest tests --cov-report=xml --ignore=tests/ext/test_async_sqlalchemy.py
+      - name: Unit tests async-sqlalchemy
+        run: |
+          poetry run pip install -U "sqlalchemy>=1.4.11"  # FIXME: dependency conflict must be solved
+          poetry run pytest tests/ext/test_async_sqlalchemy.py --cov-append --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
