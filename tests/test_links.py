@@ -1,13 +1,8 @@
 from fastapi import FastAPI, status
 from fastapi.testclient import TestClient
-from pytest import mark, raises
+from pytest import mark
 
-from fastapi_pagination import (
-    LimitOffsetParams,
-    Params,
-    add_pagination,
-    paginate,
-)
+from fastapi_pagination import add_pagination, paginate
 from fastapi_pagination.links import LimitOffsetPage, Page
 
 app = FastAPI()
@@ -97,19 +92,3 @@ def test_links(self, prev, next, first, last):
         "first": first,
         "last": last,
     }
-
-
-@mark.parametrize(
-    "cls,params,msg",
-    [
-        (Page, Params, r"^Page should be used with Params$"),
-        (LimitOffsetPage, LimitOffsetPage, r"^LimitOffsetPage should be used with LimitOffsetParams$"),
-    ],
-    ids=[
-        "default",
-        "limit-offset",
-    ],
-)
-def test_wrong_params(cls, params, msg):
-    with raises(ValueError, match=msg):
-        cls.create([], 0, params)
