@@ -16,27 +16,16 @@ class Page(BasePage[T], Generic[T]):
 
     @root_validator(pre=True)
     def __root_validator__(cls, value: Any) -> Any:
-        if "links" in value:
-            return value
+        if "links" not in value:
+            page, size, total = [value[k] for k in ("page", "size", "total")]
 
-        page = value["page"]
-        size = value["size"]
-        total = value["total"]
+            value["links"] = create_links(
+                first={"page": 0},
+                last={"page": ceil(total / size)},
+                next={"page": page + 1} if (page + 1) * size < total else None,
+                prev={"page": page - 1} if 0 <= page - 1 else None,
+            )
 
-        next_link = None
-        if (page + 1) * size < total:
-            next_link = {"page": page + 1}
-
-        prev_link = None
-        if 0 <= page - 1:
-            prev_link = {"page": page - 1}
-
-        value["links"] = create_links(
-            first={"page": 0},
-            last={"page": ceil(total / size)},
-            next=next_link,
-            prev=prev_link,
-        )
         return value
 
 
