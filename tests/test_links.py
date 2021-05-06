@@ -29,30 +29,30 @@ add_pagination(app)
         (
             "/default",
             None,
-            "/default?page=1",
-            "/default?page=0",
-            "/default?page=3",
-        ),
-        (
-            "/default?page=1",
-            "/default?page=0",
             "/default?page=2",
-            "/default?page=0",
-            "/default?page=3",
+            "/default?page=1",
+            "/default?page=5",
         ),
         (
+            "/default?page=2",
+            "/default?page=1",
+            "/default?page=3",
+            "/default?page=1",
+            "/default?page=5",
+        ),
+        (
+            "/default?page=5",
             "/default?page=4",
-            "/default?page=3",
             None,
-            "/default?page=0",
-            "/default?page=3",
+            "/default?page=1",
+            "/default?page=5",
         ),
         (
             "/default-empty",
             None,
             None,
-            "/default-empty?page=0",
-            "/default-empty?page=0",
+            "/default-empty?page=1",
+            "/default-empty?page=1",
         ),
         (
             "/limit-offset",
@@ -96,6 +96,7 @@ add_pagination(app)
 )
 def test_links(self, prev, next, first, last):
     response = client.get(self)
+
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["links"] == {
         "self": self,
