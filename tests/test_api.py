@@ -1,13 +1,20 @@
 from typing import Any
 
-from fastapi import Depends, FastAPI, Response
+from fastapi import Depends, FastAPI, Request, Response
 from fastapi.routing import APIRouter
 from fastapi.testclient import TestClient
+from pytest import raises
 
-from fastapi_pagination import Page, add_pagination, paginate, response
+from fastapi_pagination import (
+    Page,
+    add_pagination,
+    paginate,
+    request,
+    response,
+)
 
 
-def test_set_response():
+def test_set_response_request():
     app = FastAPI()
     client = TestClient(app)
 
@@ -15,12 +22,22 @@ def test_set_response():
         "/",
         response_model=Page[int],
     )
-    async def route(res: Response):
+    async def route(req: Request, res: Response):
         assert res is response()
+        assert req is request()
+
         return paginate([])
 
     add_pagination(app)
     client.get("/")
+
+
+def test_get_empty_response_request():
+    with raises(RuntimeError, match=r"^response context var must be set$"):
+        response()
+
+    with raises(RuntimeError, match=r"^request context var must be set$"):
+        request()
 
 
 def test_add_pagination():
