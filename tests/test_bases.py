@@ -35,10 +35,10 @@ def test_custom_page_invalid_values():
 )
 def test_custom_page(cls):
     page_cls = cls.with_custom_options()
-    assert page_cls.__params_type__().dict() == {"size": 50, "page": 0}
+    assert page_cls.__params_type__().dict() == {"size": 50, "page": 1}
 
     page_cls = cls.with_custom_options(size=100)
-    assert page_cls.__params_type__().dict() == {"size": 100, "page": 0}
+    assert page_cls.__params_type__().dict() == {"size": 100, "page": 1}
 
     page_cls = cls.with_custom_options(size=100, page=100)
     assert page_cls.__params_type__().dict() == {"size": 100, "page": 100}
