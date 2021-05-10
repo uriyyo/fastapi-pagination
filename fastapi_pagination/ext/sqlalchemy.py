@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, TypeVar
+from typing import Any, Optional, TypeVar
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import Select
@@ -16,11 +16,18 @@ def paginate_query(query: T, params: AbstractParams) -> T:
     return query.limit(raw_params.limit).offset(raw_params.offset)
 
 
+def _to_dict(obj: Any) -> Any:
+    try:
+        return obj._asdict()
+    except AttributeError:
+        return obj
+
+
 def paginate(query: Query, params: Optional[AbstractParams] = None) -> AbstractPage:
     params = resolve_params(params)
 
     total = query.count()
-    items = paginate_query(query, params).all()
+    items = [_to_dict(item) for item in paginate_query(query, params)]
 
     return create_page(items, total, params)
 
