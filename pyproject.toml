@@ -39,7 +39,7 @@ Django = { version = "<3.3.0", optional = true}
 pytest = "^6.2"
 pytest-cov = "^2.10.1"
 pytest-asyncio = "^0.15.1"
-black = "^21.5b0"
+black = "^21.5b1"
 pre-commit = "^2.12.1"
 Faker = "^8.1.2"
 requests = "^2.25.0"
