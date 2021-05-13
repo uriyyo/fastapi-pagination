@@ -24,23 +24,23 @@ add_pagination(app)
         (
             "/default",
             None,
-            "/default?page=2",
             "/default?page=1",
-            "/default?page=5",
-        ),
-        (
-            "/default?page=2",
-            "/default?page=1",
-            "/default?page=3",
-            "/default?page=1",
-            "/default?page=5",
-        ),
-        (
-            "/default?page=5",
+            "/default?page=0",
             "/default?page=4",
-            None,
+        ),
+        (
             "/default?page=1",
-            "/default?page=5",
+            "/default?page=0",
+            "/default?page=2",
+            "/default?page=0",
+            "/default?page=4",
+        ),
+        (
+            "/default?page=4",
+            "/default?page=3",
+            None,
+            "/default?page=0",
+            "/default?page=4",
         ),
         (
             "/limit-offset",

@@ -20,10 +20,10 @@ class Page(BasePage[T], Generic[T]):
             page, size, total = [value[k] for k in ("page", "size", "total")]
 
             value["links"] = create_links(
-                first={"page": 1},
-                last={"page": ceil(total / size) + 1},
-                next={"page": page + 1} if page * size < total else None,
-                prev={"page": page - 1} if 1 <= page - 1 else None,
+                first={"page": 0},
+                last={"page": ceil(total / size)},
+                next={"page": page + 1} if (page + 1) * size < total else None,
+                prev={"page": page - 1} if 0 <= page - 1 else None,
             )
 
         return value
