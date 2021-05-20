@@ -43,6 +43,13 @@ add_pagination(app)
             "/default?page=3",
         ),
         (
+            "/default",
+            None,
+            None,
+            "/default?page=0",
+            "/default?page=0",
+        ),
+        (
             "/limit-offset",
             None,
             "/limit-offset?offset=50",
@@ -75,6 +82,7 @@ add_pagination(app)
         "default-first",
         "default-middle",
         "default-last",
+        "default-empty",
         "limit-offset-first",
         "limit-offset-middle",
         "limit-offset-last",
