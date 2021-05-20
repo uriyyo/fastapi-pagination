@@ -15,6 +15,11 @@ async def route():
     return paginate([*range(200)])
 
 
+@app.get("/default-empty", response_model=Page[int])
+async def route():
+    return paginate([])
+
+
 add_pagination(app)
 
 
@@ -43,11 +48,11 @@ add_pagination(app)
             "/default?page=3",
         ),
         (
-            "/default",
+            "/default-empty",
             None,
             None,
-            "/default?page=0",
-            "/default?page=0",
+            "/default-empty?page=0",
+            "/default-empty?page=0",
         ),
         (
             "/limit-offset",
@@ -91,7 +96,6 @@ add_pagination(app)
 )
 def test_links(self, prev, next, first, last):
     response = client.get(self)
-
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["links"] == {
         "self": self,
