@@ -38,6 +38,26 @@ async def route():
     ...
 ```
 
+### JSON:API custom Page example
+
+To extend the default Page with additional params, like the [JSON:API](https://jsonapi.org) 
+schema, try the example below:
+
+```python
+from typing import TypeVar, Generic
+
+from fastapi_pagination.links import Page
+
+T = TypeVar("T")
+
+
+class JsonApiPage(Page[T], Generic[T]):
+    """JSON:API 1.0 specification says that result key should be a `data`."""
+
+    class Config:
+        fields = {"items": {"alias": "data"}}
+```
+
 ## Params
 
 To create a custom `Params` you should inherit from `AbstractParams` and implement
