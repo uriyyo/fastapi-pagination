@@ -1,8 +1,9 @@
-from typing import Type
+from contextlib import suppress
+from typing import Any, ClassVar, Dict, Type
 
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
-from pytest import mark
+from pytest import fixture, mark
 
 from fastapi_pagination import set_page
 from fastapi_pagination.default import Page, Params
@@ -32,20 +33,29 @@ _limit_offset_params = [
 
 
 class BasePaginationTestCase:
-    model: Type[BaseModel] = UserOut
+    model: ClassVar[Type[BaseModel]] = UserOut
+
+    page: ClassVar[Type[Page]] = Page
+    limit_offset_page: ClassVar[Type[LimitOffsetPage]] = LimitOffsetPage
+
+    @fixture
+    def additional_params(self) -> Dict[str, Any]:
+        return {}
 
     @mark.parametrize(
-        "params,cls,path",
+        "params,cls_name,path",
         [
-            *[(p, Page, "/default") for p in _default_params],
-            *[(p, LimitOffsetPage, "/limit-offset") for p in _limit_offset_params],
+            *[(p, "page", "/default") for p in _default_params],
+            *[(p, "limit_offset_page", "/limit-offset") for p in _limit_offset_params],
         ],
     )
-    def test_pagination(self, client, params, entities, cls, path):
-        response = client.get(path, params=params.dict())
+    def test_pagination(self, client, params, entities, cls_name, path, additional_params):
+        response = client.get(path, params={**params.dict(), **additional_params})
 
+        cls = getattr(self, cls_name)
         set_page(cls)
-        expected = paginate(entities, params)
+
+        expected = self._normalize_expected(paginate(entities, params))
 
         a, b = normalize(
             cls[self.model],
@@ -54,16 +64,17 @@ class BasePaginationTestCase:
         )
         assert a == b
 
+    def _normalize_expected(self, result):
+        return result
+
     def _normalize_model(self, obj):
         return obj
 
 
 class SafeTestClient(TestClient):
     def __exit__(self, *args):
-        try:
+        with suppress(BaseException):
             super().__exit__(*args)
-        except BaseException:
-            pass
 
 
 __all__ = ["BasePaginationTestCase", "UserOut", "SafeTestClient"]
