@@ -56,3 +56,6 @@ async def get_users():
 
 add_pagination(app)
 ```
+
+## Buy Me a Coffee
+[![coffee](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/uriyyo/)
