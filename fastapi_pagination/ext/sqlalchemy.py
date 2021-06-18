@@ -16,7 +16,7 @@ def paginate_query(query: T, params: AbstractParams) -> T:
     raw_params = params.to_raw_params()
     return query.limit(raw_params.limit).offset(raw_params.offset)
 
-def get_count(query: T):
+def get_count(query: Query):
     count_q = query.statement.with_only_columns([func.count()]).order_by(None)
     count = query.session.execute(count_q).scalar()
     return count
