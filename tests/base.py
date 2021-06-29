@@ -21,9 +21,9 @@ class UserOut(BaseModel):
 
 
 _default_params = [
-    *[Params(page=i) for i in range(10)],
+    *[Params(page=i) for i in range(1, 10)],
     *[Params(size=i) for i in range(1, 100, 10)],
-    *[Params(page=i, size=j) for i in range(10) for j in range(1, 50, 10)],
+    *[Params(page=i, size=j) for i in range(1, 10) for j in range(1, 50, 10)],
 ]
 _limit_offset_params = [
     *[LimitOffsetParams(offset=i) for i in range(10)],
