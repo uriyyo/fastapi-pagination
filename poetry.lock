@@ -213,7 +213,7 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "faker"
-version = "8.9.1"
+version = "8.10.0"
 description = "Faker is a Python package that generates fake data for you."
 category = "dev"
 optional = false
@@ -994,7 +994,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "023ea45d7c8ccc37dd37f83d1c3020cf9702279e7904c83dedd86c29ac5ce7e6"
+content-hash = "8ab83c2f195fa44307b0aa52d21839a5b4fc536f6bfe321a90f2274a88e5e6bc"
 
 [metadata.files]
 aiomysql = [
@@ -1133,8 +1133,8 @@ django = [
     {file = "Django-3.2.5.tar.gz", hash = "sha256:3da05fea54fdec2315b54a563d5b59f3b4e2b1e69c3a5841dda35019c01855cd"},
 ]
 faker = [
-    {file = "Faker-8.9.1-py3-none-any.whl", hash = "sha256:9d4b0f6537ad093db351f0d11cd72aef65c9e5fb0616347329919d9889c19f95"},
-    {file = "Faker-8.9.1.tar.gz", hash = "sha256:156c321953ef13a59261b08f08d514e6877c477490068470d2bea38d1c8a0f98"},
+    {file = "Faker-8.10.0-py3-none-any.whl", hash = "sha256:7df5697bc712bdd2f98051246ffd7bbac10104602727053b736e90d8adcaa5ad"},
+    {file = "Faker-8.10.0.tar.gz", hash = "sha256:198684f146590986cde75307f12f378c899379ef9f2bc962bd25ddd005b4e7c3"},
 ]
 fastapi = [
     {file = "fastapi-0.65.0-py3-none-any.whl", hash = "sha256:2e61fdda3149a4aea497137e720a008db15a935262596956825666eb60516c4a"},
