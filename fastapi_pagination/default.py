@@ -12,8 +12,8 @@ T = TypeVar("T")
 
 
 class Params(BaseModel, AbstractParams):
-    page: int = Query(1, gt=0, description="Page number")
-    size: int = Query(50, gt=0, le=100, description="Page size")
+    page: int = Query(1, ge=1, description="Page number")
+    size: int = Query(50, ge=1, le=100, description="Page size")
 
     def to_raw_params(self) -> RawParams:
         return RawParams(
@@ -29,8 +29,8 @@ class PaginationParams(Params):
 
 
 class Page(BasePage[T], Generic[T]):
-    page: conint(gt=0)  # type: ignore
-    size: conint(gt=0)  # type: ignore
+    page: conint(ge=1)  # type: ignore
+    size: conint(ge=1)  # type: ignore
 
     __params_type__ = Params
 
