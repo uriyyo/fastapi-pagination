@@ -47,7 +47,7 @@ nest-asyncio = "^1.4.3"
 psycopg2-binary = "^2.9.1"
 asynctest = "^0.13.0"
 mkdocs = "^1.1.2"
-mkdocs-material = "^7.2.0"
+mkdocs-material = "^7.2.1"
 pymdown-extensions = "^8.2"
 fontawesome-markdown = "^0.2.6"
 
