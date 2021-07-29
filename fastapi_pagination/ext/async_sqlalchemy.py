@@ -10,12 +10,12 @@ from .sqlalchemy import paginate_query
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-    from sqlalchemy.sql import Select
+    from sqlalchemy.orm import Query
 
 
 async def paginate(
     session: AsyncSession,
-    query: Select,
+    query: Query,
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage:  # pragma: no cover # FIXME: fix coverage report generation
     params = resolve_params(params)
