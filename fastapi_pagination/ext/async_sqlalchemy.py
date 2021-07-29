@@ -10,17 +10,17 @@ from .sqlalchemy import paginate_query
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-    from sqlalchemy.orm import Query
+    from sqlalchemy.sql import Select
 
 
 async def paginate(
     session: AsyncSession,
-    query: Query,
+    query: Select,
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage:  # pragma: no cover # FIXME: fix coverage report generation
     params = resolve_params(params)
 
-    total = await session.scalar(select(func.count()).select_from(query.subquery()))
+    total = await session.scalar(select(func.count()).select_from(query.subquery()))  # type: ignore
     items = await session.execute(paginate_query(query, params))
 
     return create_page([*items.scalars()], total, params)
