@@ -148,6 +148,7 @@ def using_params(
 
 
 with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
     pagination_params = using_params(Params)
 
 
