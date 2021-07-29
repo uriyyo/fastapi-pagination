@@ -20,7 +20,7 @@ async def paginate(
 ) -> AbstractPage:  # pragma: no cover # FIXME: fix coverage report generation
     params = resolve_params(params)
 
-    total = await session.scalar(select([func.count()]).select_from(query))
+    total = await session.scalar(select(func.count()).select_from(query.subquery()))
     items = await session.execute(paginate_query(query, params))
 
     return create_page([*items.scalars()], total, params)
