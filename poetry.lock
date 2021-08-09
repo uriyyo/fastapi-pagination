@@ -582,7 +582,7 @@ typesystem = "*"
 
 [[package]]
 name = "ormar"
-version = "0.10.15"
+version = "0.10.16"
 description = "A simple async ORM with fastapi in mind and pydantic validation."
 category = "main"
 optional = true
@@ -1412,8 +1412,8 @@ orm = [
     {file = "orm-0.1.5.tar.gz", hash = "sha256:37cb4757b670c1713f4e0d65874c5afe819acbd712abb9743c97e1d4b00d511c"},
 ]
 ormar = [
-    {file = "ormar-0.10.15-py3-none-any.whl", hash = "sha256:f9c5ee58f1e9f5535bb2a8e46b9652d84cd70f1fba5dbc43ba2b2c25d5d223d8"},
-    {file = "ormar-0.10.15.tar.gz", hash = "sha256:ca9825ccf933e00d13b93c2100cd7831c3cf80c9d3908839891ffb3c6e4533b6"},
+    {file = "ormar-0.10.16-py3-none-any.whl", hash = "sha256:4690dca213c4ca70bfa6755b95600a471b97fec933cbfebd78f053f639011cae"},
+    {file = "ormar-0.10.16.tar.gz", hash = "sha256:5191151cc046d9162525e14375e8af7c5a14803e2349347f60f5b16e8a13100d"},
 ]
 packaging = [
     {file = "packaging-21.0-py3-none-any.whl", hash = "sha256:c86254f9220d55e31cc94d69bade760f0847da8000def4dfe1c6b872fd14ff14"},
