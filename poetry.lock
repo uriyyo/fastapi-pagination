@@ -622,15 +622,13 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
 [[package]]
 name = "piccolo"
-version = "0.29.0"
+version = "0.30.0"
 description = "A fast, user friendly ORM and query builder which supports asyncio."
 category = "main"
 optional = true
 python-versions = ">=3.7.0"
 
 [package.dependencies]
-aiosqlite = ">=0.16.0"
-asyncpg = ">=0.21.0"
 black = "*"
 colorama = ">=0.4.0"
 inflection = ">=0.5.1"
@@ -640,6 +638,8 @@ targ = ">=0.3.3"
 [package.extras]
 orjson = ["orjson (==3.4.1)"]
 playground = ["ipython"]
+postgres = ["asyncpg (>=0.21.0)"]
+sqlite = ["aiosqlite (>=0.16.0)"]
 uvloop = ["uvloop (>=0.12.0)"]
 
 [[package]]
@@ -1105,7 +1105,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "209823594da03f30250010535c14c9de2d3a70fe82c3530382b0cacef7237ab8"
+content-hash = "6a87a367f9dd447684806241451a7117718e5ebc726b45e970d2727f4af3d7e7"
 
 [metadata.files]
 aiomysql = [
@@ -1424,8 +1424,8 @@ pathspec = [
     {file = "pathspec-0.9.0.tar.gz", hash = "sha256:e564499435a2673d586f6b2130bb5b95f04a3ba06f81b8f895b651a3c76aabb1"},
 ]
 piccolo = [
-    {file = "piccolo-0.29.0-py3-none-any.whl", hash = "sha256:67aaeb47d0018f7817371e5d7fb91a54944c73b3e29cce41a06311d786b9ef08"},
-    {file = "piccolo-0.29.0.tar.gz", hash = "sha256:388aa21bf13e115c1080cb252ae9e0d5ad6135922b1100f1adda841870115812"},
+    {file = "piccolo-0.30.0-py3-none-any.whl", hash = "sha256:8528787b7051af36650824927be24120bc482ddcb934ea21b301b8e78bd733df"},
+    {file = "piccolo-0.30.0.tar.gz", hash = "sha256:3f447b885ae804d8016c45db0474845b9bc2f3f0696177f6db03deb1b127067f"},
 ]
 platformdirs = [
     {file = "platformdirs-2.2.0-py3-none-any.whl", hash = "sha256:4666d822218db6a262bdfdc9c39d21f23b4cfdb08af331a81e92751daf6c866c"},
