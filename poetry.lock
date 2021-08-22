@@ -570,7 +570,7 @@ python-versions = "*"
 
 [[package]]
 name = "orm"
-version = "0.1.5"
+version = "0.1.6"
 description = "An async ORM."
 category = "main"
 optional = true
@@ -579,6 +579,12 @@ python-versions = "*"
 [package.dependencies]
 databases = ">=0.2.1"
 typesystem = "*"
+
+[package.extras]
+mysql = ["aiomysql"]
+postgresql = ["asyncpg"]
+postgresql_aiopg = ["aiopg"]
+sqlite = ["aiosqlite"]
 
 [[package]]
 name = "ormar"
@@ -1427,7 +1433,8 @@ nodeenv = [
     {file = "nodeenv-1.6.0.tar.gz", hash = "sha256:3ef13ff90291ba2a4a7a4ff9a979b63ffdd00a464dbe04acf0ea6471517a4c2b"},
 ]
 orm = [
-    {file = "orm-0.1.5.tar.gz", hash = "sha256:37cb4757b670c1713f4e0d65874c5afe819acbd712abb9743c97e1d4b00d511c"},
+    {file = "orm-0.1.6-py3-none-any.whl", hash = "sha256:d22ca2dd683165aa3b72d43d860fc845e86d2f4bb25d0d7d87fd7759136e69c6"},
+    {file = "orm-0.1.6.tar.gz", hash = "sha256:a052b0d276c7057709b35cb3059dfe09fd9f084736a0cd98e31dc6ac06ba74a2"},
 ]
 ormar = [
     {file = "ormar-0.10.16-py3-none-any.whl", hash = "sha256:4690dca213c4ca70bfa6755b95600a471b97fec933cbfebd78f053f639011cae"},
