@@ -570,7 +570,7 @@ python-versions = "*"
 
 [[package]]
 name = "orm"
-version = "0.1.6"
+version = "0.1.7"
 description = "An async ORM."
 category = "main"
 optional = true
@@ -1433,8 +1433,8 @@ nodeenv = [
     {file = "nodeenv-1.6.0.tar.gz", hash = "sha256:3ef13ff90291ba2a4a7a4ff9a979b63ffdd00a464dbe04acf0ea6471517a4c2b"},
 ]
 orm = [
-    {file = "orm-0.1.6-py3-none-any.whl", hash = "sha256:d22ca2dd683165aa3b72d43d860fc845e86d2f4bb25d0d7d87fd7759136e69c6"},
-    {file = "orm-0.1.6.tar.gz", hash = "sha256:a052b0d276c7057709b35cb3059dfe09fd9f084736a0cd98e31dc6ac06ba74a2"},
+    {file = "orm-0.1.7-py3-none-any.whl", hash = "sha256:bd58a4e69f3c27762c45b3643e8c91b4214d9e24d52502735ada4f79b16afb2f"},
+    {file = "orm-0.1.7.tar.gz", hash = "sha256:135e70182f88f5ee41a7b8983912e604f5b53a604da044188711a7cfbe7c1fbf"},
 ]
 ormar = [
     {file = "ormar-0.10.16-py3-none-any.whl", hash = "sha256:4690dca213c4ca70bfa6755b95600a471b97fec933cbfebd78f053f639011cae"},
