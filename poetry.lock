@@ -588,7 +588,7 @@ sqlite = ["aiosqlite"]
 
 [[package]]
 name = "ormar"
-version = "0.10.16"
+version = "0.10.17"
 description = "A simple async ORM with fastapi in mind and pydantic validation."
 category = "main"
 optional = true
@@ -1437,8 +1437,8 @@ orm = [
     {file = "orm-0.1.7.tar.gz", hash = "sha256:135e70182f88f5ee41a7b8983912e604f5b53a604da044188711a7cfbe7c1fbf"},
 ]
 ormar = [
-    {file = "ormar-0.10.16-py3-none-any.whl", hash = "sha256:4690dca213c4ca70bfa6755b95600a471b97fec933cbfebd78f053f639011cae"},
-    {file = "ormar-0.10.16.tar.gz", hash = "sha256:5191151cc046d9162525e14375e8af7c5a14803e2349347f60f5b16e8a13100d"},
+    {file = "ormar-0.10.17-py3-none-any.whl", hash = "sha256:3a3da5032d024e5177b50f47378060081195531d018f02212e2ade635464d436"},
+    {file = "ormar-0.10.17.tar.gz", hash = "sha256:06dc9c9db49adb3ddec0489c3bfd096061037ec32d0689b344f8e0f8819be2c3"},
 ]
 packaging = [
     {file = "packaging-21.0-py3-none-any.whl", hash = "sha256:c86254f9220d55e31cc94d69bade760f0847da8000def4dfe1c6b872fd14ff14"},
