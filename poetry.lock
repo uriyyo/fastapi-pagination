@@ -979,7 +979,7 @@ python-versions = ">= 3.5"
 
 [[package]]
 name = "tortoise-orm"
-version = "0.17.6"
+version = "0.17.7"
 description = "Easy async ORM for python, built with relations in mind"
 category = "main"
 optional = true
@@ -987,7 +987,7 @@ python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
 aiomysql = {version = "*", optional = true, markers = "extra == \"aiomysql\""}
-aiosqlite = ">=0.16.0,<0.17.0"
+aiosqlite = ">=0.16.0,<0.18.0"
 asyncpg = {version = "*", optional = true, markers = "extra == \"asyncpg\""}
 iso8601 = ">=0.1.13,<0.2.0"
 pypika-tortoise = ">=0.1.1,<0.2.0"
@@ -1749,8 +1749,8 @@ tornado = [
     {file = "tornado-6.1.tar.gz", hash = "sha256:33c6e81d7bd55b468d2e793517c909b139960b6c790a60b7991b9b6b76fb9791"},
 ]
 tortoise-orm = [
-    {file = "tortoise-orm-0.17.6.tar.gz", hash = "sha256:f4187cd94b838cdf16aaa4e1ec54852d773c1a37a2a510d05f648d7350ab3c6e"},
-    {file = "tortoise_orm-0.17.6-py3-none-any.whl", hash = "sha256:294b94d04d18cf85cca2a93f708be720005625b5dae3af8e8190f050ddb718d2"},
+    {file = "tortoise-orm-0.17.7.tar.gz", hash = "sha256:74d5c6341fc0e2d4ef7a321f460107715da2679a2b3e2a48e32e276ed7bd3fc0"},
+    {file = "tortoise_orm-0.17.7-py3-none-any.whl", hash = "sha256:36bb0d1f9bd800d3b91d5490cfc13a598c0e0f570a638b185bc4976abfabd135"},
 ]
 tqdm = [
     {file = "tqdm-4.62.0-py2.py3-none-any.whl", hash = "sha256:706dea48ee05ba16e936ee91cb3791cd2ea6da348a0e50b46863ff4363ff4340"},
