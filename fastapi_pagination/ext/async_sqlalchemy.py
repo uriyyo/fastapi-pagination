@@ -23,7 +23,7 @@ async def paginate(
     total = await session.scalar(select(func.count()).select_from(query.subquery()))  # type: ignore
     items = await session.execute(paginate_query(query, params))
 
-    return create_page([*items.scalars()], total, params)
+    return create_page([*items.scalars().unique()], total, params)
 
 
 __all__ = ["paginate"]
