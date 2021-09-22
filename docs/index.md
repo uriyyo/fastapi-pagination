@@ -32,7 +32,7 @@ async def get_users():
 add_pagination(app)
 ```
 
-![OpenAPI](/images/openapi_example.png)
+![OpenAPI](img/openapi_example.png)
 
 ## Available integrations
 
