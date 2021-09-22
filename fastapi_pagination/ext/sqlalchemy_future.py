@@ -1,27 +1,27 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from sqlalchemy import func, select
+from sqlalchemy.orm import Session
 
 from ..api import create_page, resolve_params
 from ..bases import AbstractPage, AbstractParams
 from .sqlalchemy import paginate_query
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
-    from sqlalchemy.sql import Select
+    from sqlalchemy.future import Connection, Engine, Select
 
 
-async def paginate(
-    session: AsyncSession,
+def paginate(
+    conn: Union[Connection, Engine, Session],
     query: Select,
     params: Optional[AbstractParams] = None,
-) -> AbstractPage:  # pragma: no cover # FIXME: fix coverage report generation
+) -> AbstractPage:
     params = resolve_params(params)
 
-    total = await session.scalar(select(func.count()).select_from(query.subquery()))  # type: ignore
-    items = await session.execute(paginate_query(query, params))
+    total = conn.scalar(select(func.count()).select_from(query.subquery()))
+    items = conn.execute(paginate_query(query, params))
 
     return create_page(items.scalars().unique().all(), total, params)
 
