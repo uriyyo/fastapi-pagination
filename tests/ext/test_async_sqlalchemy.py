@@ -1,7 +1,7 @@
 from typing import AsyncIterator
 
 from fastapi import Depends, FastAPI
-from pytest import fixture
+from pytest import fixture, mark
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -76,6 +76,7 @@ def app(Base, User, Session, engine):
     return app
 
 
+@mark.future_sqlalchemy
 class TestAsyncSQLAlchemy(BasePaginationTestCase):
     @fixture(scope="session")
     def client(self, app):
