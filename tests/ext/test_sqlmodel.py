@@ -14,7 +14,12 @@ from ..utils import faker
 
 @fixture(scope="session")
 def engine(database_url):
-    return create_engine(database_url)
+    if database_url.startswith("sqlite"):
+        connect_args = {"check_same_thread": False}
+    else:
+        connect_args = {}
+
+    return create_engine(database_url, connect_args=connect_args)
 
 
 @fixture(scope="session")
@@ -44,7 +49,7 @@ def query(request, User):
 
 
 @fixture(scope="session")
-def app(engine, User, SessionLocal, query):
+def app(query, engine, User, SessionLocal):
     app = FastAPI()
 
     @app.on_event("startup")
