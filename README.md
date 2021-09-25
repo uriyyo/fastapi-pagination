@@ -27,6 +27,7 @@ Available integrations:
 * [tortoise](https://github.com/tortoise/tortoise-orm)
 * [django](https://github.com/django/django)
 * [piccolo](https://github.com/piccolo-orm/piccolo)
+* [sqlmodel](https://github.com/tiangolo/sqlmodel)
 
 ## Example
 
