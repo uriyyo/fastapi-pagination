@@ -39,7 +39,7 @@ piccolo = { version = ">=0.29,<0.35", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
-pytest-cov = "^2.12.1"
+pytest-cov = "^3.0.0"
 pytest-asyncio = "^0.15.1"
 black = "^21.7b0"
 pre-commit = "^2.15.0"
