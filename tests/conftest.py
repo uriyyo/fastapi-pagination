@@ -14,11 +14,21 @@ def pytest_addoption(parser):
         type=str,
         required=True,
     )
+    parser.addoption(
+        "--mongodb-dsn",
+        type=str,
+        required=True,
+    )
 
 
 @fixture(scope="session")
 def postgres_url(request) -> str:
     return request.config.getoption("--postgres-dsn")
+
+
+@fixture(scope="session")
+def mongodb_url(request) -> str:
+    return request.config.getoption("--mongodb-dsn")
 
 
 @fixture(scope="session")

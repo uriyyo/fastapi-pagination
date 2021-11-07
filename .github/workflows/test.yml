@@ -28,6 +28,9 @@ jobs:
           postgresql user: 'postgres'
           postgresql password: 'postgres'
 
+      - name: Set up MongoDB
+        uses: supercharge/mongodb-github-action@1.6.0
+
       - name: Install dependencies
         run: |
           pip install -U poetry

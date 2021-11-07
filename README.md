@@ -28,6 +28,7 @@ Available integrations:
 * [django](https://github.com/django/django)
 * [piccolo](https://github.com/piccolo-orm/piccolo)
 * [sqlmodel](https://github.com/tiangolo/sqlmodel)
+* [motor](https://github.com/mongodb/motor)
 
 ## Example
 
