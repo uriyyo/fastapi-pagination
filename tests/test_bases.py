@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Generic, Sequence, TypeVar
 
 from pytest import mark, raises
 
@@ -6,6 +6,7 @@ from fastapi_pagination import Page
 from fastapi_pagination.bases import AbstractParams, RawParams
 
 T = TypeVar("T")
+C = TypeVar("C")
 
 
 def test_custom_page_invalid_params_cls():
@@ -28,10 +29,14 @@ def test_custom_page_invalid_values():
         Page.with_custom_options(a=1, b=2, c=3)
 
 
+class MultipleParamsPage(Page[T], Generic[T, C]):
+    sub_items: Sequence[C]
+
+
 @mark.parametrize(
     "cls",
-    [Page, Page[int]],
-    ids=["non-concrete", "concrete"],
+    [Page, Page[int], MultipleParamsPage],
+    ids=["non-concrete", "concrete", "non-concrete-multiple-params"],
 )
 def test_custom_page(cls):
     page_cls = cls.with_custom_options()

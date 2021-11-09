@@ -72,7 +72,8 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         if cls.__concrete__:
             bases = (cls,)
         else:
-            bases = (cls[T], Generic[T])  # type: ignore
+            params = tuple(TypeVar(f"T{i}") for i, _ in enumerate(cls.__parameters__))
+            bases = (cls[params], Generic[params])  # type: ignore
 
         @wraps(cls, updated=())
         class CustomPage(*bases):  # type: ignore
