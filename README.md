@@ -6,6 +6,7 @@
 [![Downloads](https://pepy.tech/badge/fastapi-pagination)](https://pepy.tech/project/fastapi-pagination)
 [![PYPI](https://img.shields.io/pypi/v/fastapi-pagination)](https://pypi.org/project/fastapi-pagination/)
 [![PYPI](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Duriyyo%26type%3Dpatrons&style=plastic)](https://patreon.com/uriyyo)
 
 ## Installation
 
@@ -59,6 +60,3 @@ async def get_users():
 
 add_pagination(app)
 ```
-
-## Buy Me a Coffee
-[![coffee](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/uriyyo/)
