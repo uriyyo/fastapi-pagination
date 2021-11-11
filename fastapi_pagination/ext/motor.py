@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 
@@ -22,4 +22,32 @@ async def paginate(
     return create_page(items, total, params)
 
 
-__all__ = ["paginate"]
+async def paginate_aggregate(
+    collection: AsyncIOMotorCollection,
+    aggregate_pipeline: List = [],
+    params: Optional[AbstractParams] = None,
+    **kwargs: Any,
+) -> AbstractPage:
+    params = resolve_params(params)
+
+    raw_params = params.to_raw_params()
+    cursor = collection.aggregate(
+        [
+            *aggregate_pipeline,
+            {
+                "$facet": {
+                    "metadata": [{"$count": "total"}],
+                    "data": [{"$limit": raw_params.limit + raw_params.offset}, {"$skip": raw_params.offset}],
+                }
+            },
+        ]
+    )
+
+    data = (await cursor.to_list(length=None))[0]
+    total = data["metadata"][0]["total"]
+    items = data["data"]
+
+    return create_page(items, total, params)
+
+
+__all__ = ["paginate", "paginate_aggregate"]
