@@ -45,15 +45,15 @@ pytest-asyncio = "^0.16.0"
 black = "^21.7b0"
 pre-commit = "^2.15.0"
 Faker = "^9.5.0"
-requests = "^2.26.0"
-nest-asyncio = "^1.4.3"
 psycopg2-binary = "^2.9.2"
-asynctest = "^0.13.0"
 mkdocs = "^1.1.2"
 mkdocs-material = "^7.2.3"
 pymdown-extensions = "^9.0"
 fontawesome-markdown = "^0.2.6"
 sqlalchemy-stubs = "^0.4"
+httpx = "^0.20.0"
+asgi-lifespan = "^1.0.1"
+requests = "^2.26.0"
 
 [tool.poetry.extras]
 gino = ["gino", "SQLAlchemy"]

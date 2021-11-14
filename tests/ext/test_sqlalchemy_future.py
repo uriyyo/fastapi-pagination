@@ -11,7 +11,7 @@ from sqlalchemy.orm.session import Session
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy_future import paginate
 
-from ..base import BasePaginationTestCase, SafeTestClient, UserOut
+from ..base import BasePaginationTestCase, UserOut
 from ..utils import faker
 
 
@@ -67,11 +67,6 @@ def app(Base, User, SessionLocal):
 
 @mark.future_sqlalchemy
 class TestSQLAlchemyFuture(BasePaginationTestCase):
-    @fixture(scope="session")
-    def client(self, app):
-        with SafeTestClient(app) as c:
-            yield c
-
     @fixture(scope="session")
     def entities(self, SessionLocal, User):
         with SessionLocal() as session:

@@ -7,7 +7,7 @@ from pytest import fixture
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.orm import paginate
 
-from ..base import BasePaginationTestCase, SafeTestClient, UserOut
+from ..base import BasePaginationTestCase, UserOut
 from ..utils import faker
 
 
@@ -63,11 +63,6 @@ def app(db, metadata, User):
 
 
 class TestORM(BasePaginationTestCase):
-    @fixture(scope="session")
-    async def client(self, app):
-        with SafeTestClient(app) as c:
-            yield c
-
     @fixture(scope="session")
     async def entities(self, User):
         return await User.objects.all()

@@ -1,7 +1,7 @@
-from contextlib import suppress
 from typing import Any, ClassVar, Dict, Type
 
-from fastapi.testclient import TestClient
+from asgi_lifespan import LifespanManager
+from httpx import AsyncClient
 from pydantic import BaseModel
 from pytest import fixture, mark
 
@@ -49,8 +49,9 @@ class BasePaginationTestCase:
             *[(p, "limit_offset_page", "/limit-offset") for p in _limit_offset_params],
         ],
     )
-    def test_pagination(self, client, params, entities, cls_name, path, additional_params):
-        response = client.get(path, params={**params.dict(), **additional_params})
+    @mark.asyncio
+    async def test_pagination(self, client, params, entities, cls_name, path, additional_params):
+        response = await client.get(path, params={**params.dict(), **additional_params})
 
         cls = getattr(self, cls_name)
         set_page(cls)
@@ -70,11 +71,10 @@ class BasePaginationTestCase:
     def _normalize_model(self, obj):
         return obj
 
+    @fixture(scope="session")
+    async def client(self, app):
+        async with LifespanManager(app), AsyncClient(app=app, base_url="http://testserver") as c:
+            yield c
 
-class SafeTestClient(TestClient):
-    def __exit__(self, *args):
-        with suppress(BaseException):
-            super().__exit__(*args)
 
-
-__all__ = ["BasePaginationTestCase", "UserOut", "SafeTestClient"]
+__all__ = ["BasePaginationTestCase", "UserOut"]

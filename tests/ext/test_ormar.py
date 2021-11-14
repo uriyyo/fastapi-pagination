@@ -8,7 +8,7 @@ from fastapi_pagination import Page, add_pagination
 from fastapi_pagination.ext.ormar import paginate
 from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
-from ..base import BasePaginationTestCase, SafeTestClient, UserOut
+from ..base import BasePaginationTestCase, UserOut
 from ..utils import faker
 
 
@@ -72,11 +72,6 @@ def app(db, meta, User, query):
 
 
 class TestOrmar(BasePaginationTestCase):
-    @fixture(scope="session")
-    async def client(self, app):
-        with SafeTestClient(app) as c:
-            yield c
-
     @fixture(scope="session")
     async def entities(self, User, query, client):
         await User.objects.delete(each=True)

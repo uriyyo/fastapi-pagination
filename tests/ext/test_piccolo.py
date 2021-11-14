@@ -14,7 +14,7 @@ from fastapi_pagination import Page, add_pagination
 from fastapi_pagination.ext.piccolo import paginate
 from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
-from ..base import BasePaginationTestCase, SafeTestClient, UserOut
+from ..base import BasePaginationTestCase, UserOut
 from ..utils import faker
 
 _counter = count().__next__
@@ -80,11 +80,6 @@ def app(query, _engine):
 
 
 class TestPiccolo(BasePaginationTestCase):
-    @fixture(scope="session")
-    async def client(self, app):
-        with SafeTestClient(app) as c:
-            yield c
-
     @fixture(scope="session")
     async def entities(self, query, client):
         await _User.delete(force=True)

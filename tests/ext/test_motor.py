@@ -6,7 +6,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.motor import paginate
 from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
-from ..base import BasePaginationTestCase, SafeTestClient, UserOut
+from ..base import BasePaginationTestCase, UserOut
 
 
 @fixture(scope="session")
@@ -42,11 +42,6 @@ def app(db_client):
 
 
 class TestMotor(BasePaginationTestCase):
-    @fixture(scope="session")
-    async def client(self, app):
-        with SafeTestClient(app) as c:
-            yield c
-
     @fixture(scope="session")
     async def entities(self, db_client):
         cursor = db_client.test.users.find()

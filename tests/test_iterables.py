@@ -6,7 +6,7 @@ from pytest import fixture
 from fastapi_pagination import add_pagination
 from fastapi_pagination.iterables import LimitOffsetPage, Page, paginate
 
-from .base import BasePaginationTestCase, SafeTestClient, UserOut
+from .base import BasePaginationTestCase, UserOut
 from .utils import faker
 
 app = FastAPI()
@@ -50,6 +50,5 @@ class TestIterablesPagination(BasePaginationTestCase):
         return entities
 
     @fixture(scope="session")
-    def client(self):
-        with SafeTestClient(app) as c:
-            yield c
+    def app(self):
+        return app

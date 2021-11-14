@@ -7,7 +7,7 @@ from sqlalchemy import Column, Integer, String
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.gino import paginate
 
-from ..base import BasePaginationTestCase, SafeTestClient, UserOut
+from ..base import BasePaginationTestCase, UserOut
 from ..utils import faker
 
 
@@ -68,11 +68,6 @@ def app(db, User, query):
 
 
 class TestGino(BasePaginationTestCase):
-    @fixture(scope="session")
-    async def client(self, app):
-        with SafeTestClient(app) as c:
-            yield c
-
     @fixture(scope="session")
     async def entities(self, User, query):
         return await User.query.gino.all()
