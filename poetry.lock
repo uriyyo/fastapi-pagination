@@ -1064,11 +1064,15 @@ python-versions = "*"
 
 [[package]]
 name = "typesystem"
-version = "0.2.5"
+version = "0.4.1"
 description = "A type system library for Python"
 category = "main"
 optional = true
 python-versions = ">=3.6"
+
+[package.extras]
+jinja2 = ["jinja2"]
+pyyaml = ["pyyaml"]
 
 [[package]]
 name = "typing-extensions"
@@ -1151,7 +1155,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "32f6fc30952476a262a94957e6e30f86d508eaab3b4f89953407d3fe01c24d22"
+content-hash = "317220d96054ec478e9879c36c72cbb4326138cfb716d1d4d343711339630112"
 
 [metadata.files]
 aiomysql = [
@@ -1988,8 +1992,8 @@ typed-ast = [
     {file = "typed_ast-1.4.3.tar.gz", hash = "sha256:fb1bbeac803adea29cedd70781399c99138358c26d05fcbd23c13016b7f5ec65"},
 ]
 typesystem = [
-    {file = "typesystem-0.2.5-py3-none-any.whl", hash = "sha256:08f0b2f284be7ea801dd7f2dafc711bb945e4ae33c2dd926816c40e13f303c2f"},
-    {file = "typesystem-0.2.5.tar.gz", hash = "sha256:12a727df6d06bced9cad60e171de4c56bbfc31c02b7c340e45656fb6e9c3db84"},
+    {file = "typesystem-0.4.1-py3-none-any.whl", hash = "sha256:26b2368d00fc981fbe7aef85ea1f44f90132e10a33b2f0ea3f3b5774774fee8d"},
+    {file = "typesystem-0.4.1.tar.gz", hash = "sha256:cc3f03d101fadbb60356993ce600fdfbf4bbce90ce5cb444766962be33f53ce1"},
 ]
 typing-extensions = [
     {file = "typing_extensions-3.7.4.3-py2-none-any.whl", hash = "sha256:dafc7639cde7f1b6e1acc0f457842a83e722ccca8eef5270af2d74792619a89f"},
