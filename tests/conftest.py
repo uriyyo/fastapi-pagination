@@ -1,11 +1,6 @@
-from asyncio import get_event_loop
+from asyncio import new_event_loop
 
-from nest_asyncio import apply
 from pytest import fixture
-
-apply()
-
-loop = get_event_loop()
 
 
 def pytest_addoption(parser):
@@ -46,4 +41,4 @@ def database_url(request) -> str:
 
 @fixture(scope="session")
 def event_loop():
-    return loop
+    return new_event_loop()

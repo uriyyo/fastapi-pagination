@@ -8,7 +8,7 @@ from sqlmodel import Field, Session, SQLModel, create_engine, select
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlmodel import paginate
 
-from ..base import BasePaginationTestCase, SafeTestClient, UserOut
+from ..base import BasePaginationTestCase, UserOut
 from ..utils import faker
 
 
@@ -74,11 +74,6 @@ def app(query, engine, User, SessionLocal):
 
 @mark.future_sqlalchemy
 class TestSQLModel(BasePaginationTestCase):
-    @fixture(scope="session")
-    def client(self, app):
-        with SafeTestClient(app) as c:
-            yield c
-
     @fixture(scope="session")
     def entities(self, SessionLocal, User):
         with SessionLocal() as session:

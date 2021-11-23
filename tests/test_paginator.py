@@ -3,7 +3,7 @@ from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination, paginate
 
-from .base import BasePaginationTestCase, SafeTestClient, UserOut
+from .base import BasePaginationTestCase, UserOut
 from .utils import faker
 
 app = FastAPI()
@@ -26,6 +26,5 @@ class TestPaginationParams(BasePaginationTestCase):
         return entities
 
     @fixture(scope="session")
-    def client(self):
-        with SafeTestClient(app) as c:
-            yield c
+    def app(self):
+        return app

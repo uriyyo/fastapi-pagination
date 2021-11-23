@@ -10,7 +10,7 @@ from pytest import fixture
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.django import paginate
 
-from ..base import BasePaginationTestCase, SafeTestClient, UserOut
+from ..base import BasePaginationTestCase, UserOut
 from ..utils import faker
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "True"
@@ -87,11 +87,6 @@ def app(db, User, query):
 
 
 class TestDjango(BasePaginationTestCase):
-    @fixture(scope="session")
-    async def client(self, app):
-        with SafeTestClient(app) as c:
-            yield c
-
     @fixture(scope="session")
     def entities(self, User, query):
         return [*User.objects.all()]
