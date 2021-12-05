@@ -117,7 +117,7 @@ class TestTortoiseWithRelatedObjects(BaseTortoiseTestCase):
 
     @fixture(
         scope="session",
-        params=[lambda: True, lambda: ["orders"], lambda: Prefetch("orders", Order.all())],
+        params=[lambda: True, lambda: ["orders"], lambda: [Prefetch("orders", Order.all())]],
         ids=["bool", "list", "prefetch"],
     )
     def pagination_params(self, request):
