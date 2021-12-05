@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import FastAPI
 from pytest import fixture
-from tortoise import Model
+from tortoise import Model, Tortoise
 from tortoise.backends.base.executor import EXECUTOR_CACHE
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.pydantic import PydanticModel
@@ -59,9 +59,9 @@ def database_url(database_url):
 )
 def query(request):
     if request.param:
-        return User
+        return lambda: User
     else:
-        return User.all()
+        return lambda: User.all()
 
 
 class BaseTortoiseTestCase(BasePaginationTestCase):
@@ -81,10 +81,14 @@ class BaseTortoiseTestCase(BasePaginationTestCase):
             generate_schemas=True,
         )
 
+        @app.on_event("shutdown")
+        async def on_shutdown():
+            await Tortoise._drop_databases()  # noqa
+
         @app.get("/default", response_model=Page[model_cls])
         @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
         async def route():
-            return await paginate(query, **pagination_params())
+            return await paginate(query(), **pagination_params())
 
         add_pagination(app)
         return app
