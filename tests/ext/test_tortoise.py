@@ -70,7 +70,7 @@ class BaseTortoiseTestCase(BasePaginationTestCase):
         return self.model
 
     @fixture(scope="session")
-    def app(self, database_url, query, model_cls, pagination_params):
+    async def app(self, database_url, query, model_cls, pagination_params):
         app = FastAPI()
 
         EXECUTOR_CACHE.clear()
@@ -81,17 +81,17 @@ class BaseTortoiseTestCase(BasePaginationTestCase):
             generate_schemas=True,
         )
 
-        @app.on_event("shutdown")
-        async def on_shutdown():
-            await Tortoise._drop_databases()  # noqa
-
         @app.get("/default", response_model=Page[model_cls])
         @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
         async def route():
             return await paginate(query(), **pagination_params())
 
         add_pagination(app)
-        return app
+
+        yield app
+
+        for conn in Tortoise._connections.values():
+            await conn.execute_query("DROP TABLE orders;")
 
 
 class TestTortoise(BaseTortoiseTestCase):
