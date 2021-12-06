@@ -37,7 +37,9 @@ jobs:
           poetry install -E all
 
       - name: Unit tests
-        run: poetry run pytest tests --cov-report=xml --ignore=tests/ext/test_async_sqlalchemy.py --ignore=tests/ext/test_sqlalchemy_future.py --ignore=tests/ext/test_sqlmodel.py
+        run: |
+          poetry run pytest tests --cov-report=xml --ignore=tests/ext/test_tortoise.py --ignore=tests/ext/test_async_sqlalchemy.py --ignore=tests/ext/test_sqlalchemy_future.py --ignore=tests/ext/test_sqlmodel.py
+          poetry run pytest tests/ext/test_tortoise.py --cov-append --cov-report=xml
 
       - name: Unit tests sqlalchemy 1.4
         run: |

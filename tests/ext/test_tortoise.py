@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import FastAPI
 from pytest import fixture
-from tortoise import Model, Tortoise
+from tortoise import Model
 from tortoise.backends.base.executor import EXECUTOR_CACHE
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.pydantic import PydanticModel
@@ -87,11 +87,7 @@ class BaseTortoiseTestCase(BasePaginationTestCase):
             return await paginate(query(), **pagination_params())
 
         add_pagination(app)
-
-        yield app
-
-        for conn in Tortoise._connections.values():
-            await conn.execute_query("DROP TABLE orders;")
+        return app
 
 
 class TestTortoise(BaseTortoiseTestCase):
