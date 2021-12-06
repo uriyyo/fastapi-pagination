@@ -15,9 +15,8 @@ from tortoise.fields import (
 )
 from tortoise.query_utils import Prefetch
 
-from fastapi_pagination import Page, add_pagination
+from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.tortoise import paginate
-from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
 from ..base import BasePaginationTestCase
 from ..utils import faker
@@ -43,11 +42,11 @@ class User(Model):
 
 
 @fixture(scope="session")
-def database_url(database_url):
+def database_url(database_url, sqlite_file):
     if database_url.startswith("postgresql://"):
         return database_url.replace("postgresql://", "postgres://")
     if database_url.startswith("sqlite"):
-        return "sqlite://:memory:"
+        return f"sqlite://{sqlite_file}"
 
     return database_url
 
@@ -66,10 +65,6 @@ def query(request):
 
 class BaseTortoiseTestCase(BasePaginationTestCase):
     @fixture(scope="session")
-    def model_cls(self):
-        return self.model
-
-    @fixture(scope="session")
     async def app(self, database_url, query, model_cls, pagination_params):
         app = FastAPI()
 
@@ -78,6 +73,7 @@ class BaseTortoiseTestCase(BasePaginationTestCase):
             app,
             modules={"models": [__name__]},
             db_url=database_url,
+            generate_schemas=True,
         )
 
         @app.get("/default", response_model=Page[model_cls])
@@ -85,8 +81,7 @@ class BaseTortoiseTestCase(BasePaginationTestCase):
         async def route():
             return await paginate(query(), **pagination_params())
 
-        add_pagination(app)
-        return app
+        return add_pagination(app)
 
 
 class TestTortoise(BaseTortoiseTestCase):
@@ -111,7 +106,9 @@ class UserWithRelationOut(PydanticModel):
 
 
 class TestTortoiseWithRelatedObjects(BaseTortoiseTestCase):
-    model = UserWithRelationOut
+    @fixture(scope="session")
+    def model_cls(self):
+        return UserWithRelationOut
 
     @fixture(
         scope="session",

@@ -7,7 +7,7 @@ from pytest import fixture
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.orm import paginate
 
-from ..base import BasePaginationTestCase, UserOut
+from ..base import BasePaginationTestCase
 from ..utils import faker
 
 
@@ -35,24 +35,18 @@ def User(metadata, db):
 
 
 @fixture(scope="session")
-def app(db, metadata, User):
+def app(db, metadata, User, model_cls):
     app = FastAPI()
 
-    @app.on_event("startup")
-    async def on_startup() -> None:
-        await db.connect()
+    app.add_event_handler("startup", db.connect)
+    app.add_event_handler("shutdown", db.disconnect)
 
-    @app.on_event("shutdown")
-    async def on_shutdown() -> None:
-        await db.disconnect()
-
-    @app.get("/default", response_model=Page[UserOut])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
+    @app.get("/default", response_model=Page[model_cls])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     async def route():
         return await paginate(User.objects)
 
-    add_pagination(app)
-    return app
+    return add_pagination(app)
 
 
 class TestORM(BasePaginationTestCase):

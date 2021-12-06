@@ -9,20 +9,7 @@ from fastapi_pagination.iterables import LimitOffsetPage, Page, paginate
 from .base import BasePaginationTestCase, UserOut
 from .utils import faker
 
-app = FastAPI()
-
 entities = [UserOut(name=faker.name()) for _ in range(100)]
-
-
-@app.get("/default", response_model=Page[UserOut])
-@app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
-async def route(skip_len: bool = Query(False)):
-    kwargs = {} if skip_len else {"total": len(entities)}
-
-    return paginate((entity for entity in entities), **kwargs)
-
-
-add_pagination(app)
 
 
 class TestIterablesPagination(BasePaginationTestCase):
@@ -50,5 +37,14 @@ class TestIterablesPagination(BasePaginationTestCase):
         return entities
 
     @fixture(scope="session")
-    def app(self):
-        return app
+    def app(self, model_cls):
+        app = FastAPI()
+
+        @app.get("/default", response_model=Page[model_cls])
+        @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
+        async def route(skip_len: bool = Query(False)):
+            kwargs = {} if skip_len else {"total": len(entities)}
+
+            return paginate((entity for entity in entities), **kwargs)
+
+        return add_pagination(app)

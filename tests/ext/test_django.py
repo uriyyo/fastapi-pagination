@@ -10,7 +10,7 @@ from pytest import fixture
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.django import paginate
 
-from ..base import BasePaginationTestCase, UserOut
+from ..base import BasePaginationTestCase
 from ..utils import faker
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "True"
@@ -64,20 +64,20 @@ def query(request, User):
 
 
 @fixture(scope="session")
-def app(db, User, query):
+def app(db, User, query, model_cls):
     app = FastAPI()
 
-    @app.get("/default", response_model=Page[UserOut])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
+    @app.get("/default", response_model=Page[model_cls])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     def route():
         return paginate(query)
 
-    add_pagination(app)
-    return app
+    return add_pagination(app)
 
 
 class TestDjango(BasePaginationTestCase):
     @fixture(scope="class")
     def entities(self, User, query):
         User.objects.bulk_create(User(name=faker.name()) for _ in range(100))
+
         return [*User.objects.all()]

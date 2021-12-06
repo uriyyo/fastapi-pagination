@@ -1,6 +1,8 @@
+import sqlite3
 from asyncio import new_event_loop
 
-from asyncpg import create_pool
+import aiosqlite
+import asyncpg
 from pytest import fixture
 
 
@@ -24,7 +26,7 @@ def postgres_url(request) -> str:
 
 @fixture(scope="session", autouse=True)
 async def _setup_postgres(postgres_url):
-    async with create_pool(postgres_url) as pool:
+    async with asyncpg.create_pool(postgres_url) as pool:
         await pool.fetch("DROP TABLE IF EXISTS users CASCADE;")
         await pool.fetch("DROP TABLE IF EXISTS orders CASCADE;")
         await pool.fetch(
@@ -46,13 +48,43 @@ async def _setup_postgres(postgres_url):
         )
 
 
-@fixture(scope="class")
-async def _clear_database(database_url, postgres_url):
-    if not database_url.startswith("postgres"):
-        return
+@fixture(scope="session", autouse=True)
+async def _setup_sqlite(sqlite_url, sqlite_file):
+    # sqlite3.connect(sqlite_file)
 
-    async with create_pool(postgres_url) as pool:
-        await pool.fetch("TRUNCATE TABLE users CASCADE;")
+    async with aiosqlite.connect(sqlite_file) as pool:
+        await pool.execute("DROP TABLE IF EXISTS orders;")
+        await pool.execute("DROP TABLE IF EXISTS users;")
+        await pool.execute(
+            """
+        CREATE TABLE IF NOT EXISTS "users" (
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            "name" TEXT NOT NULL
+        );
+        """
+        )
+        await pool.execute(
+            """
+        CREATE TABLE IF NOT EXISTS "orders" (
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            "name" TEXT NOT NULL,
+            "user_id" INT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
+        );
+        """
+        )
+
+
+@fixture(scope="class")
+async def clear_database(database_url, postgres_url, sqlite_file):
+    if database_url.startswith("postgres"):
+        async with asyncpg.create_pool(postgres_url) as pool:
+            await pool.fetch("TRUNCATE TABLE users CASCADE;")
+
+    if database_url.startswith("sqlite"):
+        return
+        async with aiosqlite.connect(sqlite_file) as pool:
+            await pool.execute("DELETE FROM orders;")
+            await pool.execute("DELETE FROM users;")
 
 
 @fixture(scope="session")
@@ -61,8 +93,13 @@ def mongodb_url(request) -> str:
 
 
 @fixture(scope="session")
-def sqlite_url() -> str:
-    return "sqlite:///.db"
+def sqlite_file() -> str:
+    return "./test_db.sqlite"
+
+
+@fixture(scope="session")
+def sqlite_url(sqlite_file) -> str:
+    return f"sqlite:///{sqlite_file}"
 
 
 @fixture(

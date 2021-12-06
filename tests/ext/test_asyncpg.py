@@ -6,9 +6,8 @@ from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.asyncpg import paginate
-from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
-from ..base import BasePaginationTestCase, UserOut
+from ..base import BasePaginationTestCase
 from ..utils import faker
 
 
@@ -23,7 +22,7 @@ def pool(database_url):
 
 
 @fixture(scope="session")
-def app(pool):
+def app(pool, model_cls):
     app = FastAPI()
     stack = AsyncExitStack()
 
@@ -35,14 +34,13 @@ def app(pool):
     async def on_shutdown() -> None:
         await stack.aclose()
 
-    @app.get("/default", response_model=Page[UserOut])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
+    @app.get("/default", response_model=Page[model_cls])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     async def route():
         async with pool.acquire() as conn:
             return await paginate(conn, "SELECT id, name FROM users")
 
-    add_pagination(app)
-    return app
+    return add_pagination(app)
 
 
 class TestAsyncpg(BasePaginationTestCase):

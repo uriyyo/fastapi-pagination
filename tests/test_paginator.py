@@ -6,18 +6,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination, paginate
 from .base import BasePaginationTestCase, UserOut
 from .utils import faker
 
-app = FastAPI()
-
 entities = [UserOut(name=faker.name()) for _ in range(100)]
-
-
-@app.get("/default", response_model=Page[UserOut])
-@app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
-async def route():
-    return paginate(entities)
-
-
-add_pagination(app)
 
 
 class TestPaginationParams(BasePaginationTestCase):
@@ -26,5 +15,13 @@ class TestPaginationParams(BasePaginationTestCase):
         return entities
 
     @fixture(scope="session")
-    def app(self):
+    def app(self, model_cls):
+        app = FastAPI()
+
+        @app.get("/default", response_model=Page[model_cls])
+        @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
+        async def route():
+            return paginate(entities)
+
+        add_pagination(app)
         return app

@@ -7,7 +7,7 @@ from sqlalchemy import Column, Integer, String
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.gino import paginate
 
-from ..base import BasePaginationTestCase, UserOut
+from ..base import BasePaginationTestCase
 from ..utils import faker
 
 
@@ -45,22 +45,21 @@ def query(request, User):
 
 
 @fixture(scope="session")
-def app(db, User, query):
+def app(db, User, query, model_cls):
     app = FastAPI()
     db.init_app(app)
 
-    @app.get("/default", response_model=Page[UserOut])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
+    @app.get("/default", response_model=Page[model_cls])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     async def route():
         return await paginate(query)
 
-    add_pagination(app)
-    return app
+    return add_pagination(app)
 
 
 class TestGino(BasePaginationTestCase):
     @fixture(scope="class")
     async def entities(self, User, query):
-        for _ in range(100):
-            await User.create(name=faker.name())
+        await User.insert().gino.all(*[{"name": faker.name()} for _ in range(100)])
+
         return await User.query.gino.all()
