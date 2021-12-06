@@ -1,6 +1,18 @@
 import inspect
+from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import Awaitable, Callable, Optional, Sequence, Type, TypeVar, cast
+from typing import (
+    Any,
+    AsyncIterator,
+    Callable,
+    ContextManager,
+    Iterator,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    cast,
+)
 
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.dependencies.utils import (
@@ -50,32 +62,46 @@ def request() -> Request:
         raise RuntimeError("request context var must be set")
 
 
-def set_page(page: Type[AbstractPage]) -> None:
-    page_type.set(page)
+def _ctx_var_with_reset(var: ContextVar, value: Any) -> ContextManager[None]:
+    token = var.set(value)
+
+    @contextmanager
+    def _reset_ctx() -> Iterator[None]:
+        yield
+        var.reset(token)
+
+    return _reset_ctx()
 
 
-def _create_page_dependency(page: Type[AbstractPage]) -> Callable[[], Awaitable[None]]:
-    async def _set_page_type() -> None:
-        page_type.set(page)
+def set_page(page: Type[AbstractPage]) -> ContextManager[None]:
+    return _ctx_var_with_reset(page_type, page)
+
+
+def _create_page_dependency(page: Type[AbstractPage]) -> Callable[[], AsyncIterator[None]]:
+    async def _set_page_type() -> AsyncIterator[None]:
+        with set_page(page):
+            yield
 
     return _set_page_type
 
 
 def _create_params_dependency(
     params: Type[TAbstractParams],
-) -> Callable[[TAbstractParams], Awaitable[TAbstractParams]]:
-    async def _pagination_params(*args, **kwargs) -> params:  # type: ignore
+) -> Callable[[TAbstractParams], AsyncIterator[TAbstractParams]]:
+    async def _pagination_params(*args, **kwargs) -> AsyncIterator[params]:  # type: ignore
         val = params(*args, **kwargs)  # type: ignore
-        params_value.set(val)
+        with _ctx_var_with_reset(params_value, val):
+            yield val
 
     _pagination_params.__signature__ = inspect.signature(params)  # type: ignore
 
     return _pagination_params
 
 
-async def _set_request_response(req: Request, res: Response) -> None:
-    response_value.set(res)
-    request_value.set(req)
+async def _set_request_response(req: Request, res: Response) -> AsyncIterator[None]:
+    with _ctx_var_with_reset(response_value, res):
+        with _ctx_var_with_reset(request_value, req):
+            yield
 
 
 async def _marker() -> None:
