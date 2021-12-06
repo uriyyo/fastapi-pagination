@@ -1,5 +1,7 @@
 import os
 from itertools import count
+from pathlib import Path
+from typing import cast
 
 from fastapi import FastAPI
 from piccolo.columns import Integer, Text
@@ -14,7 +16,7 @@ from fastapi_pagination.ext.piccolo import paginate
 from ..base import BasePaginationTestCase
 from ..utils import faker
 
-_counter = count(1_000_000).__next__
+_counter = count().__next__
 
 os.environ["PICCOLO_CONF"] = __name__
 
@@ -36,7 +38,7 @@ def query(request):
         return User.select()
 
 
-DB: SQLiteEngine
+DB = SQLiteEngine()
 APP_REGISTRY = AppRegistry()
 
 APP_CONFIG = AppConfig(
@@ -47,18 +49,20 @@ APP_CONFIG = AppConfig(
 
 
 @fixture(scope="session")
-def database_url(sqlite_file):
-    return sqlite_file
+def database_url():
+    return "piccolo.sqlite"
 
 
 @fixture(scope="session")
 async def engine(database_url):
-    global DB
+    engine: SQLiteEngine = cast(SQLiteEngine, engine_finder())
 
-    DB = SQLiteEngine(database_url)
+    p = Path(engine.path)
+    if p.exists():
+        os.remove(p)
 
-    engine = engine_finder()
     await engine.prep_database()
+    await User.create_table().run()
 
 
 @fixture(scope="session")
