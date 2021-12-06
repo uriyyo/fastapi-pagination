@@ -37,13 +37,19 @@ jobs:
           poetry install -E all
 
       - name: Unit tests
-        run: poetry run pytest tests --cov-report=xml --ignore=tests/ext/test_async_sqlalchemy.py --ignore=tests/ext/test_sqlalchemy_future.py --ignore=tests/ext/test_sqlmodel.py
+        run: |
+          poetry run pytest tests --cov-report=xml --ignore=tests/ext/test_tortoise.py --ignore=tests/ext/test_async_sqlalchemy.py --ignore=tests/ext/test_sqlalchemy_future.py --ignore=tests/ext/test_sqlmodel.py
 
       - name: Unit tests sqlalchemy 1.4
         run: |
           poetry run pip install -U "sqlalchemy>=1.4.11" sqlmodel  # FIXME: dependency conflict must be solved
           poetry run pytest tests/ext/test_sqlmodel.py --cov-append --cov-report=xml
           poetry run pytest tests/ext/test_async_sqlalchemy.py tests/ext/test_sqlalchemy_future.py --cov-append --cov-report=xml
+
+      - name: Test Tortoise
+        run: |
+          poetry install -E all
+          poetry run pytest tests/ext/test_tortoise.py --cov-append --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
