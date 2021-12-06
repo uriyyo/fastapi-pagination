@@ -40,14 +40,7 @@ def app(db, metadata, User):
 
     @app.on_event("startup")
     async def on_startup() -> None:
-        engine = sqlalchemy.create_engine(str(db.url))
-        metadata.drop_all(engine)
-        metadata.create_all(engine)
-
         await db.connect()
-
-        for _ in range(100):
-            await User.objects.create(name=faker.name())
 
     @app.on_event("shutdown")
     async def on_shutdown() -> None:
@@ -63,6 +56,9 @@ def app(db, metadata, User):
 
 
 class TestORM(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     async def entities(self, User):
+        for _ in range(100):
+            await User.objects.create(name=faker.name())
+
         return await User.objects.all()

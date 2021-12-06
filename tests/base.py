@@ -50,7 +50,7 @@ class BasePaginationTestCase:
         ],
     )
     @mark.asyncio
-    async def test_pagination(self, client, params, entities, cls_name, path, additional_params):
+    async def test_pagination(self, _clear_database, client, params, entities, cls_name, path, additional_params):
         response = await client.get(path, params={**params.dict(), **additional_params})
 
         cls = getattr(self, cls_name)

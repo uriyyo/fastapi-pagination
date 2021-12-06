@@ -80,7 +80,7 @@ def app(query, _engine):
 
 
 class TestPiccolo(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     async def entities(self, query, client):
         await _User.delete(force=True)
         for _ in range(100):

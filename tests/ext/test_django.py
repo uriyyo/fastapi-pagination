@@ -3,7 +3,7 @@ import sqlite3
 
 from django import setup
 from django.conf import settings
-from django.db import connection, models
+from django.db import models
 from fastapi import FastAPI
 from pytest import fixture
 
@@ -46,12 +46,7 @@ def User(db):
 
         class Meta:
             app_label = "test"
-
-    # TODO: find better way to create table
-    with connection.cursor() as cursor:
-        cursor.execute("DROP TABLE IF EXISTS test_user;")
-        cursor.execute("CREATE TABLE test_user (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL);")
-        cursor.fetchall()
+            db_table = "users"
 
     return User
 
@@ -72,11 +67,6 @@ def query(request, User):
 def app(db, User, query):
     app = FastAPI()
 
-    @app.on_event("startup")
-    def on_startup() -> None:
-        for _ in range(100):
-            User.objects.create(name=faker.name())
-
     @app.get("/default", response_model=Page[UserOut])
     @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
     def route():
@@ -87,6 +77,7 @@ def app(db, User, query):
 
 
 class TestDjango(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     def entities(self, User, query):
+        User.objects.bulk_create(User(name=faker.name()) for _ in range(100))
         return [*User.objects.all()]

@@ -78,7 +78,6 @@ class BaseTortoiseTestCase(BasePaginationTestCase):
             app,
             modules={"models": [__name__]},
             db_url=database_url,
-            generate_schemas=True,
         )
 
         @app.get("/default", response_model=Page[model_cls])
@@ -95,9 +94,8 @@ class TestTortoise(BaseTortoiseTestCase):
     def pagination_params(self):
         return lambda: {"prefetch_related": False}
 
-    @fixture(scope="session")
+    @fixture(scope="class")
     async def entities(self, query, client):
-        await User.all().delete()
         await User.bulk_create(User(name=faker.name()) for _ in range(100))
 
         return await User.all()
@@ -123,9 +121,8 @@ class TestTortoiseWithRelatedObjects(BaseTortoiseTestCase):
     def pagination_params(self, request):
         return lambda: {"prefetch_related": request.param()}
 
-    @fixture(scope="session")
+    @fixture(scope="class")
     async def entities(self, query, client):
-        await User.all().delete()
         await User.bulk_create(User(name=faker.name()) for _ in range(100))
 
         users = await User.all()

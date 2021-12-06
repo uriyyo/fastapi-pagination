@@ -55,10 +55,6 @@ def app(Base, User, Session, engine):
 
     @app.on_event("startup")
     async def on_startup():
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
-
         async with Session() as session:
             session.add_all([User(name=faker.name()) for _ in range(100)])
             await session.commit()
@@ -78,7 +74,7 @@ def app(Base, User, Session, engine):
 
 @mark.future_sqlalchemy
 class TestAsyncSQLAlchemy(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     async def entities(self, Session, User):
         async with Session() as session:
             result = await session.execute(select(User))

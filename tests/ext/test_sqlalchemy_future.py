@@ -45,13 +45,6 @@ def User(Base):
 def app(Base, User, SessionLocal):
     app = FastAPI()
 
-    @app.on_event("startup")
-    def on_startup():
-        Base.metadata.create_all()
-
-        with SessionLocal() as session:
-            session.add_all([User(name=faker.name()) for _ in range(100)])
-
     def get_db() -> Iterator[Session]:
         with SessionLocal() as db:
             yield db
@@ -67,7 +60,8 @@ def app(Base, User, SessionLocal):
 
 @mark.future_sqlalchemy
 class TestSQLAlchemyFuture(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     def entities(self, SessionLocal, User):
         with SessionLocal() as session:
+            session.add_all([User(name=faker.name()) for _ in range(100)])
             return session.execute(select(User)).unique().scalars().all()

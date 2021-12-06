@@ -49,15 +49,6 @@ def app(db, User, query):
     app = FastAPI()
     db.init_app(app)
 
-    @app.on_event("startup")
-    async def on_startup() -> None:
-        await db.gino.drop_all()
-        await db.gino.create_all()
-        await User.delete.gino.status()
-
-        for _ in range(100):
-            await User.create(name=faker.name())
-
     @app.get("/default", response_model=Page[UserOut])
     @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
     async def route():
@@ -68,6 +59,8 @@ def app(db, User, query):
 
 
 class TestGino(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     async def entities(self, User, query):
+        for _ in range(100):
+            await User.create(name=faker.name())
         return await User.query.gino.all()

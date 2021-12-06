@@ -1,5 +1,6 @@
 from asyncio import new_event_loop
 
+from asyncpg import create_pool
 from pytest import fixture
 
 
@@ -19,6 +20,39 @@ def pytest_addoption(parser):
 @fixture(scope="session")
 def postgres_url(request) -> str:
     return request.config.getoption("--postgres-dsn")
+
+
+@fixture(scope="session", autouse=True)
+async def _setup_postgres(postgres_url):
+    async with create_pool(postgres_url) as pool:
+        await pool.fetch("DROP TABLE IF EXISTS users CASCADE;")
+        await pool.fetch("DROP TABLE IF EXISTS orders CASCADE;")
+        await pool.fetch(
+            """
+        CREATE TABLE IF NOT EXISTS "users" (
+            "id" SERIAL NOT NULL PRIMARY KEY,
+            "name" TEXT NOT NULL
+        );
+        """
+        )
+        await pool.fetch(
+            """
+        CREATE TABLE IF NOT EXISTS "orders" (
+            "id" SERIAL NOT NULL PRIMARY KEY,
+            "name" TEXT NOT NULL,
+            "user_id" INT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
+        );
+        """
+        )
+
+
+@fixture(scope="class")
+async def _clear_database(database_url, postgres_url):
+    if not database_url.startswith("postgres"):
+        return
+
+    async with create_pool(postgres_url) as pool:
+        await pool.fetch("TRUNCATE TABLE users CASCADE;")
 
 
 @fixture(scope="session")

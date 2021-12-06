@@ -42,7 +42,7 @@ def app(db_client):
 
 
 class TestMotor(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     async def entities(self, db_client):
         cursor = db_client.test.users.find()
         return await cursor.to_list(length=None)

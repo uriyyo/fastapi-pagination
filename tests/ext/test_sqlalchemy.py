@@ -44,17 +44,6 @@ def User(Base):
 def app(Base, User, SessionLocal):
     app = FastAPI()
 
-    @app.on_event("startup")
-    def on_startup():
-        Base.metadata.create_all()
-
-        session = SessionLocal()
-
-        session.add_all([User(name=faker.name()) for _ in range(100)])
-
-        session.flush()
-        session.close()
-
     def get_db() -> Iterator[Session]:
         db = SessionLocal()
         try:
@@ -72,10 +61,12 @@ def app(Base, User, SessionLocal):
 
 
 class TestSQLAlchemy(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     def entities(self, SessionLocal, User):
         session = SessionLocal()
         try:
+            session.add_all([User(name=faker.name()) for _ in range(100)])
+
             return session.query(User).all()
         finally:
             session.close()

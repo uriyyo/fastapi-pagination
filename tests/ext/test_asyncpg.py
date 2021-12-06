@@ -9,6 +9,7 @@ from fastapi_pagination.ext.asyncpg import paginate
 from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
 from ..base import BasePaginationTestCase, UserOut
+from ..utils import faker
 
 
 @fixture(scope="session")
@@ -30,10 +31,6 @@ def app(pool):
     async def on_startup() -> None:
         await stack.enter_async_context(pool)
 
-        async with pool.acquire() as conn:
-            await conn.fetch("DROP TABLE IF EXISTS users CASCADE;")
-            await conn.fetch("CREATE TABLE users (id SERIAL PRIMARY KEY, name TEXT NOT NULL);")
-
     @app.on_event("shutdown")
     async def on_shutdown() -> None:
         await stack.aclose()
@@ -49,7 +46,9 @@ def app(pool):
 
 
 class TestAsyncpg(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     async def entities(self, pool):
         async with pool.acquire() as conn:
+            await conn.executemany(f"INSERT INTO users(name) VALUES ($1);", [(faker.name(),) for _ in range(100)])
+
             return [{**user} for user in await conn.fetch("SELECT id, name FROM users;")]

@@ -53,9 +53,6 @@ def app(db, meta, User, query):
 
     @app.on_event("startup")
     async def on_startup() -> None:
-        engine = sqlalchemy.create_engine(str(db.url))
-        meta.drop_all(engine)
-        meta.create_all(engine)
         await db.connect()
 
     @app.on_event("shutdown")
@@ -72,9 +69,7 @@ def app(db, meta, User, query):
 
 
 class TestOrmar(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     async def entities(self, User, query, client):
-        await User.objects.delete(each=True)
-        for _ in range(100):
-            await User.objects.create(name=faker.name())
+        await User.objects.bulk_create(User(name=faker.name()) for _ in range(100))
         return await User.objects.all()
