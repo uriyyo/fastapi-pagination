@@ -28,8 +28,8 @@ def app(db_client, model_cls):
         await db_client.drop_database("test")
 
     @app.on_event("shutdown")
-    async def on_shutdown() -> None:
-        await db_client.close()
+    def on_shutdown() -> None:
+        db_client.close()
 
     @app.get("/default", response_model=Page[model_cls])
     @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
