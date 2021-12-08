@@ -6,9 +6,9 @@ from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.asyncpg import paginate
-from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
-from ..base import BasePaginationTestCase, UserOut
+from ..base import BasePaginationTestCase
+from ..utils import faker
 
 
 @fixture(scope="session")
@@ -22,7 +22,7 @@ def pool(database_url):
 
 
 @fixture(scope="session")
-def app(pool):
+def app(pool, model_cls):
     app = FastAPI()
     stack = AsyncExitStack()
 
@@ -30,26 +30,23 @@ def app(pool):
     async def on_startup() -> None:
         await stack.enter_async_context(pool)
 
-        async with pool.acquire() as conn:
-            await conn.fetch("DROP TABLE IF EXISTS users CASCADE;")
-            await conn.fetch("CREATE TABLE users (id SERIAL PRIMARY KEY, name TEXT NOT NULL);")
-
     @app.on_event("shutdown")
     async def on_shutdown() -> None:
         await stack.aclose()
 
-    @app.get("/default", response_model=Page[UserOut])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
+    @app.get("/default", response_model=Page[model_cls])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     async def route():
         async with pool.acquire() as conn:
             return await paginate(conn, "SELECT id, name FROM users")
 
-    add_pagination(app)
-    return app
+    return add_pagination(app)
 
 
 class TestAsyncpg(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     async def entities(self, pool):
         async with pool.acquire() as conn:
+            await conn.executemany(f"INSERT INTO users(name) VALUES ($1);", [(faker.name(),) for _ in range(100)])
+
             return [{**user} for user in await conn.fetch("SELECT id, name FROM users;")]

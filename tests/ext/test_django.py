@@ -3,14 +3,14 @@ import sqlite3
 
 from django import setup
 from django.conf import settings
-from django.db import connection, models
+from django.db import models
 from fastapi import FastAPI
 from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.django import paginate
 
-from ..base import BasePaginationTestCase, UserOut
+from ..base import BasePaginationTestCase
 from ..utils import faker
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "True"
@@ -46,12 +46,7 @@ def User(db):
 
         class Meta:
             app_label = "test"
-
-    # TODO: find better way to create table
-    with connection.cursor() as cursor:
-        cursor.execute("DROP TABLE IF EXISTS test_user;")
-        cursor.execute("CREATE TABLE test_user (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL);")
-        cursor.fetchall()
+            db_table = "users"
 
     return User
 
@@ -69,24 +64,20 @@ def query(request, User):
 
 
 @fixture(scope="session")
-def app(db, User, query):
+def app(db, User, query, model_cls):
     app = FastAPI()
 
-    @app.on_event("startup")
-    def on_startup() -> None:
-        for _ in range(100):
-            User.objects.create(name=faker.name())
-
-    @app.get("/default", response_model=Page[UserOut])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
+    @app.get("/default", response_model=Page[model_cls])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     def route():
         return paginate(query)
 
-    add_pagination(app)
-    return app
+    return add_pagination(app)
 
 
 class TestDjango(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     def entities(self, User, query):
+        User.objects.bulk_create(User(name=faker.name()) for _ in range(100))
+
         return [*User.objects.all()]

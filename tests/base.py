@@ -33,14 +33,16 @@ _limit_offset_params = [
 
 
 class BasePaginationTestCase:
-    model: ClassVar[Type[BaseModel]] = UserOut
-
     page: ClassVar[Type[Page]] = Page
     limit_offset_page: ClassVar[Type[LimitOffsetPage]] = LimitOffsetPage
 
-    @fixture
+    @fixture(scope="session")
     def additional_params(self) -> Dict[str, Any]:
         return {}
+
+    @fixture(scope="session")
+    def model_cls(self):
+        return UserOut
 
     @mark.parametrize(
         "params,cls_name,path",
@@ -50,7 +52,17 @@ class BasePaginationTestCase:
         ],
     )
     @mark.asyncio
-    async def test_pagination(self, client, params, entities, cls_name, path, additional_params):
+    async def test_pagination(
+        self,
+        clear_database,
+        client,
+        params,
+        entities,
+        cls_name,
+        path,
+        additional_params,
+        model_cls,
+    ):
         response = await client.get(path, params={**params.dict(), **additional_params})
 
         cls = getattr(self, cls_name)
@@ -59,7 +71,7 @@ class BasePaginationTestCase:
         expected = self._normalize_expected(paginate(entities, params))
 
         a, b = normalize(
-            cls[self.model],
+            cls[model_cls],
             self._normalize_model(expected),
             self._normalize_model(response.json()),
         )

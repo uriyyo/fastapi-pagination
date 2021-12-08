@@ -10,7 +10,7 @@ from sqlalchemy.orm.session import Session
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy import paginate
 
-from ..base import BasePaginationTestCase, UserOut
+from ..base import BasePaginationTestCase
 from ..utils import faker
 
 
@@ -41,19 +41,8 @@ def User(Base):
 
 
 @fixture(scope="session")
-def app(Base, User, SessionLocal):
+def app(Base, User, SessionLocal, model_cls):
     app = FastAPI()
-
-    @app.on_event("startup")
-    def on_startup():
-        Base.metadata.create_all()
-
-        session = SessionLocal()
-
-        session.add_all([User(name=faker.name()) for _ in range(100)])
-
-        session.flush()
-        session.close()
 
     def get_db() -> Iterator[Session]:
         db = SessionLocal()
@@ -62,20 +51,21 @@ def app(Base, User, SessionLocal):
         finally:
             db.close()
 
-    @app.get("/default", response_model=Page[UserOut])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
+    @app.get("/default", response_model=Page[model_cls])
+    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     def route(db: Session = Depends(get_db)):
         return paginate(db.query(User))
 
-    add_pagination(app)
-    return app
+    return add_pagination(app)
 
 
 class TestSQLAlchemy(BasePaginationTestCase):
-    @fixture(scope="session")
+    @fixture(scope="class")
     def entities(self, SessionLocal, User):
         session = SessionLocal()
         try:
+            session.add_all([User(name=faker.name()) for _ in range(100)])
+
             return session.query(User).all()
         finally:
             session.close()
