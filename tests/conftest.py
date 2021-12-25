@@ -50,8 +50,6 @@ async def _setup_postgres(postgres_url):
 
 @fixture(scope="session", autouse=True)
 async def _setup_sqlite(sqlite_url, sqlite_file):
-    # sqlite3.connect(sqlite_file)
-
     async with aiosqlite.connect(sqlite_file) as pool:
         await pool.execute("DROP TABLE IF EXISTS orders;")
         await pool.execute("DROP TABLE IF EXISTS users;")
@@ -81,7 +79,6 @@ async def clear_database(database_url, postgres_url, sqlite_file):
             await pool.fetch("TRUNCATE TABLE users CASCADE;")
 
     if database_url.startswith("sqlite"):
-        return
         async with aiosqlite.connect(sqlite_file) as pool:
             await pool.execute("DELETE FROM orders;")
             await pool.execute("DELETE FROM users;")
