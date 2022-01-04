@@ -54,7 +54,7 @@ fontawesome-markdown = "^0.2.6"
 sqlalchemy-stubs = "^0.4"
 httpx = "^0.21.1"
 asgi-lifespan = "^1.0.1"
-requests = "^2.26.0"
+requests = "^2.27.0"
 
 [tool.poetry.extras]
 gino = ["gino", "SQLAlchemy"]
