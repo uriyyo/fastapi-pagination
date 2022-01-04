@@ -1,17 +1,15 @@
 from typing import Any, Generator
 
 import uvicorn
+from bson.objectid import ObjectId
 from faker import Faker
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from mongoengine import Document, connect, fields
-
 from pydantic import BaseModel
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.mongoengine import paginate
-from bson.objectid import ObjectId
-
 
 faker = Faker()
 

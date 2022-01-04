@@ -1,9 +1,10 @@
 from typing import Optional, Type, TypeVar, Union, cast
 
-from fastapi_pagination.api import create_page, resolve_params
-from fastapi_pagination.bases import AbstractPage, AbstractParams
 from mongoengine import QuerySet
 from mongoengine.base.metaclasses import TopLevelDocumentMetaclass
+
+from fastapi_pagination.api import create_page, resolve_params
+from fastapi_pagination.bases import AbstractPage, AbstractParams
 
 T = TypeVar("T", bound=TopLevelDocumentMetaclass)
 

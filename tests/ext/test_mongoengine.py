@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from mongoengine import connect, Document, fields
+from mongoengine import Document, connect, fields
 from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
