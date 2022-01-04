@@ -575,6 +575,17 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "mongoengine"
+version = "0.23.1"
+description = "MongoEngine is a Python Object-Document Mapper for working with MongoDB."
+category = "main"
+optional = true
+python-versions = ">=3.6"
+
+[package.dependencies]
+pymongo = ">=3.4,<4.0"
+
+[[package]]
 name = "motor"
 version = "2.5.1"
 description = "Non-blocking MongoDB driver for Tornado or asyncio"
@@ -1220,11 +1231,12 @@ docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [extras]
-all = ["gino", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "Django", "piccolo", "motor"]
+all = ["gino", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "Django", "piccolo", "motor", "mongoengine"]
 asyncpg = ["SQLAlchemy", "asyncpg"]
 databases = ["databases"]
 django = ["Django", "databases"]
 gino = ["gino", "SQLAlchemy"]
+mongoengine = ["mongoengine"]
 motor = ["motor"]
 orm = ["orm", "databases", "typesystem"]
 ormar = ["ormar"]
@@ -1235,7 +1247,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "78a8507a362e6aeadb7145be407119901af3cfa358dee153bea289f8ac7a5db1"
+content-hash = "8cb6ab9873985210d8d8162726dc9b40544ca2c8716a9a44ffb524cca8c7fb2c"
 
 [metadata.files]
 aiomysql = [
@@ -1553,6 +1565,10 @@ mkdocs-material = [
 mkdocs-material-extensions = [
     {file = "mkdocs-material-extensions-1.0.3.tar.gz", hash = "sha256:bfd24dfdef7b41c312ede42648f9eb83476ea168ec163b613f9abd12bbfddba2"},
     {file = "mkdocs_material_extensions-1.0.3-py3-none-any.whl", hash = "sha256:a82b70e533ce060b2a5d9eb2bc2e1be201cf61f901f93704b4acf6e3d5983a44"},
+]
+mongoengine = [
+    {file = "mongoengine-0.23.1-py3-none-any.whl", hash = "sha256:3d1c8b9f5d43144bd726a3f01e58d2831c6fb112960a4a60b3a26fa85e026ab3"},
+    {file = "mongoengine-0.23.1.tar.gz", hash = "sha256:de275e70cd58891dc46eef43369c522ce450dccb6d6f1979cbc9b93e6bdaf6cb"},
 ]
 motor = [
     {file = "motor-2.5.1-py3-none-any.whl", hash = "sha256:961fdceacaae2c7236c939166f66415be81be8bbb762da528386738de3a0f509"},

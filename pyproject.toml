@@ -37,6 +37,7 @@ piccolo = { version = ">=0.29,<0.35", optional = true}
 motor =  { version = "^2.5.1", optional = true }
 
 # sqlmodel = { version = "^0.0.4", optional = true} Should be uncommented when gino will support sqlalchemy 1.4
+mongoengine = {version = "^0.23.1", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
@@ -66,7 +67,8 @@ asyncpg = ["SQLAlchemy", "asyncpg"]
 django = ["django", "databases"]
 piccolo = ["piccolo"]
 motor = ["motor"]
-all = ["gino", "SQLAlchemy", "sqlalchemy-stubs", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor"]
+mongoengine = ["mongoengine"]
+all = ["gino", "SQLAlchemy", "sqlalchemy-stubs", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

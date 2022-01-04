@@ -30,6 +30,7 @@ Available integrations:
 * [piccolo](https://github.com/piccolo-orm/piccolo)
 * [sqlmodel](https://github.com/tiangolo/sqlmodel)
 * [motor](https://github.com/mongodb/motor)
+* [mongoengine](https://github.com/MongoEngine/mongoengine)
 
 ## Example
 
