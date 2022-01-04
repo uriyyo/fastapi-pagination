@@ -8,7 +8,7 @@ from ..api import request
 _link_field = Field(example="/api/v1/users?limit=1&offset1")
 
 
-class Links(BaseModel):  # type: ignore
+class Links(BaseModel):
     first: str = _link_field
     last: str = _link_field
     self: str = _link_field
