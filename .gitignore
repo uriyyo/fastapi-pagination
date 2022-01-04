@@ -63,6 +63,7 @@ db.sqlite3-journal
 
 # test dbs
 *.db
+test_db.sqlite
 
 # Flask stuff:
 instance/
