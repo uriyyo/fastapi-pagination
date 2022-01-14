@@ -31,9 +31,6 @@ def app(db_client):
 
     @app.on_event("shutdown")
     async def on_shutdown() -> None:
-        # await db_client.test.users.delete_many({})
-        # db_client.drop_database("test")
-
         db_client.close()
 
     @app.get("/default", response_model=Page[UserOut])
@@ -58,7 +55,5 @@ class TestMotorAggregate(BasePaginationTestCase):
         cursor = db_client.test.users.aggregate(
             [{"$group": {"_id": "$name", "name": {"$first": "$name"}}}, {"$sort": {"name": 1}}]
         )
-        # cursor = db_client.test.users.find()
         items = await cursor.to_list(length=None)
-        # return [{"name": x["name"]} for x in items]
         return items
