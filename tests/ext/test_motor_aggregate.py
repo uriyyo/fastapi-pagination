@@ -6,7 +6,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.motor import paginate_aggregate
 from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
-from ..base import BasePaginationTestCase, SafeTestClient, UserOut
+from ..base import BasePaginationTestCase, UserOut
 from ..utils import faker
 
 
@@ -37,7 +37,11 @@ def app(db_client):
     @app.get("/limit-offset", response_model=LimitOffsetPage[UserOut])
     async def route():
         return await paginate_aggregate(
-            db_client.test.users, [{"$group": {"_id": "$name", "name": {"$first": "$name"}}}, {"$sort": {"name": 1}}]
+            db_client.test.users,
+            [
+                {"$group": {"_id": "$name", "name": {"$first": "$name"}}},
+                {"$sort": {"name": 1}},
+            ],
         )
 
     add_pagination(app)
@@ -46,14 +50,12 @@ def app(db_client):
 
 class TestMotorAggregate(BasePaginationTestCase):
     @fixture(scope="session")
-    async def client(self, app):
-        with SafeTestClient(app) as c:
-            yield c
-
-    @fixture(scope="session")
     async def entities(self, db_client):
         cursor = db_client.test.users.aggregate(
-            [{"$group": {"_id": "$name", "name": {"$first": "$name"}}}, {"$sort": {"name": 1}}]
+            [
+                {"$group": {"_id": "$name", "name": {"$first": "$name"}}},
+                {"$sort": {"name": 1}},
+            ]
         )
         items = await cursor.to_list(length=None)
         return items

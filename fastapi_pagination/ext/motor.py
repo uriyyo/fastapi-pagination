@@ -1,4 +1,4 @@
-from typing import Any, Optional, List
+from typing import Any, Dict, List, Optional
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 
@@ -8,11 +8,12 @@ from ..bases import AbstractPage, AbstractParams
 
 async def paginate(
     collection: AsyncIOMotorCollection,
-    query_filter: dict = {},
+    query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     **kwargs: Any,
 ) -> AbstractPage:
     params = resolve_params(params)
+    query_filter = query_filter or {}
 
     raw_params = params.to_raw_params()
     total = await collection.count_documents(query_filter)
@@ -24,11 +25,11 @@ async def paginate(
 
 async def paginate_aggregate(
     collection: AsyncIOMotorCollection,
-    aggregate_pipeline: List = [],
+    aggregate_pipeline: Optional[List[Dict[Any, Any]]] = None,
     params: Optional[AbstractParams] = None,
-    **kwargs: Any,
 ) -> AbstractPage:
     params = resolve_params(params)
+    aggregate_pipeline = aggregate_pipeline or []
 
     raw_params = params.to_raw_params()
     cursor = collection.aggregate(
@@ -37,7 +38,10 @@ async def paginate_aggregate(
             {
                 "$facet": {
                     "metadata": [{"$count": "total"}],
-                    "data": [{"$limit": raw_params.limit + raw_params.offset}, {"$skip": raw_params.offset}],
+                    "data": [
+                        {"$limit": raw_params.limit + raw_params.offset},
+                        {"$skip": raw_params.offset},
+                    ],
                 }
             },
         ]
