@@ -89,7 +89,7 @@ def _create_params_dependency(
     params: Type[TAbstractParams],
 ) -> Callable[[TAbstractParams], AsyncIterator[TAbstractParams]]:
     async def _pagination_params(*args, **kwargs) -> AsyncIterator[params]:  # type: ignore
-        val = params(*args, **kwargs)  # type: ignore
+        val = params(*args, **kwargs)
         with _ctx_var_with_reset(params_value, val):
             yield val
 
