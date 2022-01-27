@@ -52,7 +52,7 @@ mkdocs-material = "^7.2.3"
 pymdown-extensions = "^9.1"
 fontawesome-markdown = "^0.2.6"
 sqlalchemy-stubs = "^0.4"
-httpx = "^0.21.3"
+httpx = "^0.22.0"
 asgi-lifespan = "^1.0.1"
 requests = "^2.27.1"
 
