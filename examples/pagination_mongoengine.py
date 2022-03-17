@@ -1,4 +1,4 @@
-from typing import Any, Generator
+from typing import Any, Dict, Generator
 
 import uvicorn
 from bson.objectid import ObjectId
@@ -6,7 +6,7 @@ from faker import Faker
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from mongoengine import Document, connect, fields
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.mongoengine import paginate
@@ -21,7 +21,13 @@ class PydanticObjectId(ObjectId):
 
     @classmethod
     def validate(cls, v: ObjectId) -> str:
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid objectid")
         return str(v)
+
+    @classmethod
+    def __modify_schema__(cls, field_schema: Dict[str, Any]) -> None:
+        field_schema.update(type="string")
 
 
 class User(Document):
@@ -35,7 +41,7 @@ class UserIn(BaseModel):
 
 
 class UserOut(UserIn):
-    _id: PydanticObjectId
+    id: PydanticObjectId = Field(..., alias="_id")
 
     class Config:
         orm_mode = True
