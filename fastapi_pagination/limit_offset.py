@@ -24,8 +24,8 @@ class LimitOffsetParams(BaseModel, AbstractParams):
 
 
 class LimitOffsetPage(BasePage[T], Generic[T]):
-    limit: Optional[conint(ge=1)]  # type: ignore
-    offset: Optional[conint(ge=0)]  # type: ignore
+    limit: conint(ge=1)  # type: ignore
+    offset: conint(ge=0)  # type: ignore
 
     __params_type__ = LimitOffsetParams
 

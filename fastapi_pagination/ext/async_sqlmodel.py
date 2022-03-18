@@ -4,8 +4,8 @@ from sqlmodel import SQLModel, func, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from fastapi_pagination.api import create_page, resolve_params
-from fastapi_pagination.bases import AbstractPage, AbstractParams
+from ..api import create_page, resolve_params
+from ..bases import AbstractPage, AbstractParams
 
 T = TypeVar("T", bound=SQLModel)
 
