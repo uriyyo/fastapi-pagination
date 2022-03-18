@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
-from typing import Generic, Sequence, TypeVar, Optional
+from typing import Generic, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
