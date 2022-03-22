@@ -578,14 +578,14 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "mongoengine"
-version = "0.24.0"
+version = "0.24.1"
 description = "MongoEngine is a Python Object-Document Mapper for working with MongoDB."
 category = "main"
 optional = true
 python-versions = ">=3.6"
 
 [package.dependencies]
-pymongo = ">=3.4,<=4.0"
+pymongo = ">=3.4,<5.0"
 
 [[package]]
 name = "motor"
@@ -1564,8 +1564,8 @@ mkdocs-material-extensions = [
     {file = "mkdocs_material_extensions-1.0.3-py3-none-any.whl", hash = "sha256:a82b70e533ce060b2a5d9eb2bc2e1be201cf61f901f93704b4acf6e3d5983a44"},
 ]
 mongoengine = [
-    {file = "mongoengine-0.24.0-py3-none-any.whl", hash = "sha256:cebc021cd3a4280590ffae300c8993f6b897fafc1cce8852f6c8f986d3108509"},
-    {file = "mongoengine-0.24.0.tar.gz", hash = "sha256:407a0589f7e568c7b1d9adcf5013d2d6ad9f78b2a334978cd82cd21d2cf61468"},
+    {file = "mongoengine-0.24.1-py3-none-any.whl", hash = "sha256:68878b65bcb3751debcba4342180a180161cdb5f46525027e622ad081dd44fac"},
+    {file = "mongoengine-0.24.1.tar.gz", hash = "sha256:01baac85f408f5eefb6195c0afeae631e7fc6fab5cb221a7b46646f94227d6da"},
 ]
 motor = [
     {file = "motor-2.5.1-py3-none-any.whl", hash = "sha256:961fdceacaae2c7236c939166f66415be81be8bbb762da528386738de3a0f509"},
