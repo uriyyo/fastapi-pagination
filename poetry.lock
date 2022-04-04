@@ -461,11 +461,11 @@ python-versions = "*"
 
 [[package]]
 name = "iso8601"
-version = "0.1.16"
+version = "1.0.2"
 description = "Simple module to parse ISO 8601 dates"
 category = "main"
 optional = true
-python-versions = "*"
+python-versions = ">=3.6.2,<4.0"
 
 [[package]]
 name = "jinja2"
@@ -873,7 +873,7 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pypika-tortoise"
-version = "0.1.3"
+version = "0.1.4"
 description = "Forked from pypika and streamline just for tortoise-orm"
 category = "main"
 optional = true
@@ -1116,7 +1116,7 @@ python-versions = ">= 3.5"
 
 [[package]]
 name = "tortoise-orm"
-version = "0.18.1"
+version = "0.19.0"
 description = "Easy async ORM for python, built with relations in mind"
 category = "main"
 optional = true
@@ -1126,15 +1126,16 @@ python-versions = ">=3.7,<4.0"
 aiomysql = {version = "*", optional = true, markers = "extra == \"aiomysql\""}
 aiosqlite = ">=0.16.0,<0.18.0"
 asyncpg = {version = "*", optional = true, markers = "extra == \"asyncpg\""}
-iso8601 = ">=0.1.13,<0.2.0"
-pypika-tortoise = ">=0.1.3,<0.2.0"
+iso8601 = ">=1.0.2,<2.0.0"
+pypika-tortoise = ">=0.1.4,<0.2.0"
 pytz = "*"
 
 [package.extras]
 aiomysql = ["aiomysql"]
-asyncmy = ["asyncmy"]
+asyncmy = ["asyncmy (>=0.2.4,<0.3.0)"]
 asyncpg = ["asyncpg"]
 accel = ["ciso8601", "orjson", "uvloop"]
+psycopg = ["psycopg"]
 
 [[package]]
 name = "tqdm"
@@ -1250,7 +1251,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "b316d450dc9807b56a6171c3a229b970d9c8ddd4bc6beabc72d0052a86cf86ab"
+content-hash = "a378e5a68fe8c14c4e82c0f44713ee34e3e99f0a2d0a75827d4ffde81da0cc7c"
 
 [metadata.files]
 aiomysql = [
@@ -1458,8 +1459,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 iso8601 = [
-    {file = "iso8601-0.1.16-py2.py3-none-any.whl", hash = "sha256:906714829fedbc89955d52806c903f2332e3948ed94e31e85037f9e0226b8376"},
-    {file = "iso8601-0.1.16.tar.gz", hash = "sha256:36532f77cc800594e8f16641edae7f1baf7932f05d8e508545b95fc53c6dc85b"},
+    {file = "iso8601-1.0.2-py3-none-any.whl", hash = "sha256:d7bc01b1c2a43b259570bb307f057abc578786ea734ba2b87b836c5efc5bd443"},
+    {file = "iso8601-1.0.2.tar.gz", hash = "sha256:27f503220e6845d9db954fb212b95b0362d8b7e6c1b2326a87061c3de93594b1"},
 ]
 jinja2 = [
     {file = "Jinja2-3.0.3-py3-none-any.whl", hash = "sha256:077ce6014f7b40d03b47d1f1ca4b0fc8328a692bd284016f806ed0eaca390ad8"},
@@ -1852,8 +1853,8 @@ pyparsing = [
     {file = "pyparsing-3.0.6.tar.gz", hash = "sha256:d9bdec0013ef1eb5a84ab39a3b3868911598afa494f5faa038647101504e2b81"},
 ]
 pypika-tortoise = [
-    {file = "pypika-tortoise-0.1.3.tar.gz", hash = "sha256:ecdf2d6e0aeb0e15880d9e2ead41362ec7320f37fb25a3a71664c2e1105ad218"},
-    {file = "pypika_tortoise-0.1.3-py3-none-any.whl", hash = "sha256:28fb2715a94ff2f3bc1c4ef6cc46c385c244c27d100aac760231bf612361d5ba"},
+    {file = "pypika-tortoise-0.1.4.tar.gz", hash = "sha256:f4b4e6c72fc13f49058181928e66930b59fee988823c8fd01498f95e2ff788ca"},
+    {file = "pypika_tortoise-0.1.4-py3-none-any.whl", hash = "sha256:bdc7e63c88791679a8b3f0b008582b6d3fcd21830650d274db35a7012e7b8bcd"},
 ]
 pytest = [
     {file = "pytest-7.1.1-py3-none-any.whl", hash = "sha256:92f723789a8fdd7180b6b06483874feca4c48a5c76968e03bb3e7f806a1869ea"},
@@ -2111,8 +2112,8 @@ tornado = [
     {file = "tornado-6.1.tar.gz", hash = "sha256:33c6e81d7bd55b468d2e793517c909b139960b6c790a60b7991b9b6b76fb9791"},
 ]
 tortoise-orm = [
-    {file = "tortoise-orm-0.18.1.tar.gz", hash = "sha256:537361ce2d0829741afd43afd9bc9413a314a176cb58747d88047c20ccc01db1"},
-    {file = "tortoise_orm-0.18.1-py3-none-any.whl", hash = "sha256:edc9f3b49635b1dd74f73de38f54e031377e4f02b3698322502047f2e031af8b"},
+    {file = "tortoise-orm-0.19.0.tar.gz", hash = "sha256:ad9f0c59ec2ed889c77b58857125038561cbe3846438cf20d39a7919ea62aecb"},
+    {file = "tortoise_orm-0.19.0-py3-none-any.whl", hash = "sha256:c2a8be9f8906577d47e03fcc11ce3ee9b8bd9302b29954bf1e319428b487daab"},
 ]
 tqdm = [
     {file = "tqdm-4.62.3-py2.py3-none-any.whl", hash = "sha256:8dd278a422499cd6b727e6ae4061c40b48fce8b76d1ccbf5d34fca9b7f925b0c"},
