@@ -1,5 +1,5 @@
 import inspect
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from contextvars import ContextVar
 from typing import (
     Any,
@@ -68,7 +68,9 @@ def _ctx_var_with_reset(var: ContextVar, value: Any) -> ContextManager[None]:
     @contextmanager
     def _reset_ctx() -> Iterator[None]:
         yield
-        var.reset(token)
+
+        with suppress(ValueError):
+            var.reset(token)
 
     return _reset_ctx()
 
