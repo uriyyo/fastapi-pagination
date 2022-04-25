@@ -822,14 +822,14 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "pymdown-extensions"
-version = "9.3"
+version = "9.4"
 description = "Extension pack for Python Markdown."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
-Markdown = ">=3.2"
+markdown = ">=3.2"
 
 [[package]]
 name = "pymongo"
@@ -1251,7 +1251,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "a378e5a68fe8c14c4e82c0f44713ee34e3e99f0a2d0a75827d4ffde81da0cc7c"
+content-hash = "83724a6e0b09803a400541f1fd5bd8a85080c529bbc34c47e395a71ac2b1edb9"
 
 [metadata.files]
 aiomysql = [
@@ -1732,8 +1732,8 @@ pygments = [
     {file = "Pygments-2.10.0.tar.gz", hash = "sha256:f398865f7eb6874156579fdf36bc840a03cab64d1cde9e93d68f46a425ec52c6"},
 ]
 pymdown-extensions = [
-    {file = "pymdown-extensions-9.3.tar.gz", hash = "sha256:a80553b243d3ed2d6c27723bcd64ca9887e560e6f4808baa96f36e93061eaf90"},
-    {file = "pymdown_extensions-9.3-py3-none-any.whl", hash = "sha256:b37461a181c1c8103cfe1660081726a0361a8294cbfda88e5b02cefe976f0546"},
+    {file = "pymdown_extensions-9.4-py3-none-any.whl", hash = "sha256:5b7432456bf555ce2b0ab3c2439401084cda8110f24f6b3ecef952b8313dfa1b"},
+    {file = "pymdown_extensions-9.4.tar.gz", hash = "sha256:1baa22a60550f731630474cad28feb0405c8101f1a7ddc3ec0ed86ee510bcc43"},
 ]
 pymongo = [
     {file = "pymongo-3.12.2-cp27-cp27m-macosx_10_14_intel.whl", hash = "sha256:2aae55a1eb7ede1a409e7f5705db03d2c8ff15a11da7fc32db0e6de4c395cfba"},
