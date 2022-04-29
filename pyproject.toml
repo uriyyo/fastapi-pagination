@@ -34,7 +34,7 @@ asyncpg = { version = ">=0.24.0", optional = true }
 ormar = { version = ">=0.10.5", optional = true}
 Django = { version = "<3.3.0", optional = true}
 piccolo = { version = ">=0.29,<0.35", optional = true}
-motor =  { version = "^2.5.1", optional = true }
+motor =  { version = ">=2.5.1,<4.0.0", optional = true }
 
 # sqlmodel = { version = "^0.0.4", optional = true} Should be uncommented when gino will support sqlalchemy 1.4
 mongoengine = {version = ">=0.23.1,<0.25.0", optional = true}
