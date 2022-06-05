@@ -7,6 +7,3 @@ updates:
     time: "03:00"
   open-pull-requests-limit: 10
   ignore:
-  - dependency-name: faker
-    versions:
-    - 6.5.2
