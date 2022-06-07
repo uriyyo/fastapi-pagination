@@ -62,7 +62,7 @@ Data schema of `Page`:
   "items": [
     ...
   ],
-  "page": 0,
+  "total": 0,
   "offset": 0,
   "limit": 50
 }
