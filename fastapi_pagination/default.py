@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Generic, Sequence, TypeVar
 
 from fastapi import Query
-from pydantic import BaseModel, conint
+from pydantic import BaseModel, conint, Field
 
 from .bases import AbstractParams, BasePage, RawParams
 
@@ -11,8 +11,8 @@ T = TypeVar("T")
 
 
 class Params(BaseModel, AbstractParams):
-    page: int = Query(1, ge=1, description="Page number")
-    size: int = Query(50, ge=1, le=100, description="Page size")
+    page: int = Field(Query(1, ge=1, description="Page number"))
+    size: int = Field(Query(50, ge=1, le=100, description="Page size"))
 
     def to_raw_params(self) -> RawParams:
         return RawParams(
