@@ -16,8 +16,8 @@ class Params(BaseModel, AbstractParams):
 
     def to_raw_params(self) -> RawParams:
         return RawParams(
-            limit=self.size,
-            offset=self.size * (self.page - 1),
+            limit=int(self.size),
+            offset=int(self.size) * (int(self.page) - 1),
         )
 
 
