@@ -9,7 +9,7 @@ from ..bases import AbstractPage, AbstractParams
 
 
 def paginate(
-    cnollection: Collection,
+    collection: Collection,
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     **kwargs: Any
@@ -20,6 +20,6 @@ def paginate(
     raw_params = params.to_raw_params()
     total = collection.count_documents(query_filter)
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
-    items = cursor.to_list(length=raw_params.limit)
+    items = list(cursor)
 
     return create_page(items, total, params)
