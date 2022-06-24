@@ -47,4 +47,4 @@ class TestPymongo(BasePaginationTestCase):
     @fixture(scope="class")
     async def entities(self, db_client):
         cursor = db_client.test.users.find()
-        return cursor.to_list(length=None)
+        return list(cursor)
