@@ -1,8 +1,6 @@
 from typing import Any, Dict, List, Optional
 
-
 from pymongo.collection import Collection
-
 
 from ..api import create_page, resolve_params
 from ..bases import AbstractPage, AbstractParams

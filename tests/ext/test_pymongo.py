@@ -2,11 +2,9 @@ from fastapi import FastAPI
 from pymongo import MongoClient
 from pytest import fixture
 
-
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.pymongo import paginate
 from fastapi_pagination.limit_offset import Page as LimitOffsetPage
-
 
 from ..base import BasePaginationTestCase, UserOut
 from ..utils import faker
