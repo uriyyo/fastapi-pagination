@@ -10,7 +10,7 @@ def paginate(
     collection: Collection,
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> AbstractPage:
     params = resolve_params(params)
     query_filter = query_filter or {}
