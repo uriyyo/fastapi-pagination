@@ -877,7 +877,7 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pypika-tortoise"
-version = "0.1.5"
+version = "0.1.6"
 description = "Forked from pypika and streamline just for tortoise-orm"
 category = "main"
 optional = true
@@ -1120,7 +1120,7 @@ python-versions = ">= 3.5"
 
 [[package]]
 name = "tortoise-orm"
-version = "0.19.1"
+version = "0.19.2"
 description = "Easy async ORM for python, built with relations in mind"
 category = "main"
 optional = true
@@ -1131,7 +1131,7 @@ aiomysql = {version = "*", optional = true, markers = "extra == \"aiomysql\""}
 aiosqlite = ">=0.16.0,<0.18.0"
 asyncpg = {version = "*", optional = true, markers = "extra == \"asyncpg\""}
 iso8601 = ">=1.0.2,<2.0.0"
-pypika-tortoise = ">=0.1.5,<0.2.0"
+pypika-tortoise = ">=0.1.6,<0.2.0"
 pytz = "*"
 
 [package.extras]
