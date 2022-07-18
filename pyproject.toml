@@ -42,7 +42,7 @@ mongoengine = {version = ">=0.23.1,<0.25.0", optional = true}
 [tool.poetry.dev-dependencies]
 pytest = "^7.1"
 pytest-cov = "^3.0.0"
-pytest-asyncio = "^0.18.3"
+pytest-asyncio = "^0.19.0"
 black = "^21.7b0"
 pre-commit = "^2.20.0"
 Faker = "^9.5.0"
