@@ -4,6 +4,7 @@ from asyncio import new_event_loop
 import aiosqlite
 import asyncpg
 from pytest import fixture
+from pytest_asyncio import fixture as async_fixture
 
 
 def pytest_addoption(parser):
@@ -24,7 +25,7 @@ def postgres_url(request) -> str:
     return request.config.getoption("--postgres-dsn")
 
 
-@fixture(scope="session", autouse=True)
+@async_fixture(scope="session", autouse=True)
 async def _setup_postgres(postgres_url):
     async with asyncpg.create_pool(postgres_url) as pool:
         await pool.fetch("DROP TABLE IF EXISTS users CASCADE;")
@@ -48,7 +49,7 @@ async def _setup_postgres(postgres_url):
         )
 
 
-@fixture(scope="session", autouse=True)
+@async_fixture(scope="session", autouse=True)
 async def _setup_sqlite(sqlite_url, sqlite_file):
     async with aiosqlite.connect(sqlite_file) as pool:
         await pool.execute("DROP TABLE IF EXISTS orders;")
@@ -72,7 +73,7 @@ async def _setup_sqlite(sqlite_url, sqlite_file):
         )
 
 
-@fixture(scope="class")
+@async_fixture(scope="class")
 async def clear_database(database_url, postgres_url, sqlite_file):
     if database_url.startswith("postgres"):
         async with asyncpg.create_pool(postgres_url) as pool:

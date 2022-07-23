@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from gino_starlette import Gino
 from orm import Integer, String
 from pytest import fixture
+from pytest_asyncio import fixture as async_fixture
 from sqlalchemy import Column, Integer, String
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -58,7 +59,7 @@ def app(db, User, query, model_cls):
 
 
 class TestGino(BasePaginationTestCase):
-    @fixture(scope="class")
+    @async_fixture(scope="class")
     async def entities(self, User, query):
         await User.insert().gino.all(*[{"name": faker.name()} for _ in range(100)])
 

@@ -3,6 +3,7 @@ from typing import List
 
 from fastapi import FastAPI
 from pytest import fixture
+from pytest_asyncio import fixture as async_fixture
 from tortoise import Model
 from tortoise.backends.base.executor import EXECUTOR_CACHE
 from tortoise.contrib.fastapi import register_tortoise
@@ -64,7 +65,7 @@ def query(request):
 
 
 class BaseTortoiseTestCase(BasePaginationTestCase):
-    @fixture(scope="session")
+    @async_fixture(scope="session")
     async def app(self, database_url, query, model_cls, pagination_params):
         app = FastAPI()
 
@@ -89,7 +90,7 @@ class TestTortoise(BaseTortoiseTestCase):
     def pagination_params(self):
         return lambda: {"prefetch_related": False}
 
-    @fixture(scope="class")
+    @async_fixture(scope="class")
     async def entities(self, query, client):
         await User.bulk_create(User(name=faker.name()) for _ in range(100))
 
@@ -118,7 +119,7 @@ class TestTortoiseWithRelatedObjects(BaseTortoiseTestCase):
     def pagination_params(self, request):
         return lambda: {"prefetch_related": request.param()}
 
-    @fixture(scope="class")
+    @async_fixture(scope="class")
     async def entities(self, query, client):
         await User.bulk_create(User(name=faker.name()) for _ in range(100))
 

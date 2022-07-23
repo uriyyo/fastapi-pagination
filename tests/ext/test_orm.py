@@ -3,6 +3,7 @@ from databases import Database
 from fastapi import FastAPI
 from orm import Integer, Model, String
 from pytest import fixture
+from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.orm import paginate
@@ -50,7 +51,7 @@ def app(db, metadata, User, model_cls):
 
 
 class TestORM(BasePaginationTestCase):
-    @fixture(scope="class")
+    @async_fixture(scope="class")
     async def entities(self, User):
         for _ in range(100):
             await User.objects.create(name=faker.name())

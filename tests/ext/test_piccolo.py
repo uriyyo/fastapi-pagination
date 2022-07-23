@@ -9,6 +9,7 @@ from piccolo.conf.apps import AppConfig, AppRegistry
 from piccolo.engine import SQLiteEngine, engine_finder
 from piccolo.table import Table
 from pytest import fixture
+from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.piccolo import paginate
@@ -53,7 +54,7 @@ def database_url():
     return "piccolo.sqlite"
 
 
-@fixture(scope="session")
+@async_fixture(scope="session")
 async def engine(database_url):
     engine: SQLiteEngine = cast(SQLiteEngine, engine_finder())
 
@@ -78,7 +79,7 @@ def app(query, engine, model_cls):
 
 
 class TestPiccolo(BasePaginationTestCase):
-    @fixture(scope="class")
+    @async_fixture(scope="class")
     async def entities(self, query, client):
         await User.insert(*(User(name=faker.name()) for _ in range(100))).run()
 
