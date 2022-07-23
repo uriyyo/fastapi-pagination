@@ -1,3 +1,4 @@
+import pytest_asyncio
 from fastapi import FastAPI
 from gino_starlette import Gino
 from orm import Integer, String
@@ -58,7 +59,7 @@ def app(db, User, query, model_cls):
 
 
 class TestGino(BasePaginationTestCase):
-    @fixture(scope="class")
+    @pytest_asyncio.fixture(scope="class")
     async def entities(self, User, query):
         await User.insert().gino.all(*[{"name": faker.name()} for _ in range(100)])
 

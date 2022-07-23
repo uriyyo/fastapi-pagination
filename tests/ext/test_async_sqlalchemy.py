@@ -1,5 +1,6 @@
 from typing import AsyncIterator
 
+import pytest_asyncio
 from fastapi import Depends, FastAPI
 from pytest import fixture, mark
 from sqlalchemy import Column, Integer, String
@@ -60,7 +61,7 @@ def app(Session, engine, model_cls):
 
 @mark.future_sqlalchemy
 class TestAsyncSQLAlchemy(BasePaginationTestCase):
-    @fixture(scope="class")
+    @pytest_asyncio.fixture(scope="class")
     async def entities(self, Session):
         async with Session() as session:
             session.add_all([User(name=faker.name()) for _ in range(100)])

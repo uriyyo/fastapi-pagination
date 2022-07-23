@@ -1,3 +1,4 @@
+import pytest_asyncio
 import sqlalchemy
 from databases import Database
 from fastapi import FastAPI
@@ -50,7 +51,7 @@ def app(db, metadata, User, model_cls):
 
 
 class TestORM(BasePaginationTestCase):
-    @fixture(scope="class")
+    @pytest_asyncio.fixture(scope="class")
     async def entities(self, User):
         for _ in range(100):
             await User.objects.create(name=faker.name())

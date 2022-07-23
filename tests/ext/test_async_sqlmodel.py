@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Iterator
 
+import pytest_asyncio
 from fastapi import Depends, FastAPI
 from pytest import fixture, mark
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -80,7 +81,7 @@ def app(query, engine, User, SessionLocal, model_cls):
 
 @mark.future_sqlalchemy
 class TestSQLModel(BasePaginationTestCase):
-    @fixture(scope="class")
+    @pytest_asyncio.fixture(scope="class")
     async def entities(self, engine, User):
         async with engine.begin() as conn:
             await conn.execute(insert(User).values([{"name": faker.name()} for _ in range(100)]))

@@ -1,4 +1,5 @@
 import databases
+import pytest_asyncio
 import sqlalchemy
 from fastapi import FastAPI
 from ormar import Integer, Model, ModelMeta, String
@@ -62,7 +63,7 @@ def app(db, meta, User, query, model_cls):
 
 
 class TestOrmar(BasePaginationTestCase):
-    @fixture(scope="class")
+    @pytest_asyncio.fixture(scope="class")
     async def entities(self, User, query, client):
         await User.objects.bulk_create(User(name=faker.name()) for _ in range(100))
 

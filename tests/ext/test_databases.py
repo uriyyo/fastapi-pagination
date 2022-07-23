@@ -1,3 +1,4 @@
+import pytest_asyncio
 import sqlalchemy
 from databases import Database
 from fastapi import FastAPI
@@ -39,7 +40,7 @@ def app(db, model_cls):
 
 
 class TestDatabases(BasePaginationTestCase):
-    @fixture(scope="class")
+    @pytest_asyncio.fixture(scope="class")
     async def entities(self, db):
         await db.execute_many(User.insert(), [{"name": faker.name()} for _ in range(100)])
 

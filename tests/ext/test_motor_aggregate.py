@@ -1,3 +1,4 @@
+import pytest_asyncio
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from pytest import fixture
@@ -49,7 +50,7 @@ def app(db_client):
 
 
 class TestMotorAggregate(BasePaginationTestCase):
-    @fixture(scope="session")
+    @pytest_asyncio.fixture(scope="session")
     async def entities(self, db_client):
         cursor = db_client.test.users.aggregate(
             [

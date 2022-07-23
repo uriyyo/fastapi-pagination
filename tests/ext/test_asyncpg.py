@@ -1,5 +1,6 @@
 from contextlib import AsyncExitStack
 
+import pytest_asyncio
 from asyncpg import create_pool
 from fastapi import FastAPI
 from pytest import fixture
@@ -44,7 +45,7 @@ def app(pool, model_cls):
 
 
 class TestAsyncpg(BasePaginationTestCase):
-    @fixture(scope="class")
+    @pytest_asyncio.fixture(scope="class")
     async def entities(self, pool):
         async with pool.acquire() as conn:
             await conn.executemany(f"INSERT INTO users(name) VALUES ($1);", [(faker.name(),) for _ in range(100)])
