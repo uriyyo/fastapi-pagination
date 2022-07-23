@@ -2,6 +2,7 @@ import sqlalchemy
 from databases import Database
 from fastapi import FastAPI
 from pytest import fixture
+from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.databases import paginate
@@ -39,7 +40,7 @@ def app(db, model_cls):
 
 
 class TestDatabases(BasePaginationTestCase):
-    @fixture(scope="class")
+    @async_fixture(scope="class")
     async def entities(self, db):
         await db.execute_many(User.insert(), [{"name": faker.name()} for _ in range(100)])
 

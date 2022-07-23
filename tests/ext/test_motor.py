@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from pytest import fixture
+from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.motor import paginate
@@ -40,7 +41,7 @@ def app(db_client, model_cls):
 
 
 class TestMotor(BasePaginationTestCase):
-    @fixture(scope="class")
+    @async_fixture(scope="class")
     async def entities(self, db_client):
         cursor = db_client.test.users.find()
 

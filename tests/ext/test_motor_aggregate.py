@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from pytest import fixture
+from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.motor import paginate_aggregate
@@ -49,7 +50,7 @@ def app(db_client):
 
 
 class TestMotorAggregate(BasePaginationTestCase):
-    @fixture(scope="session")
+    @async_fixture(scope="session")
     async def entities(self, db_client):
         cursor = db_client.test.users.aggregate(
             [

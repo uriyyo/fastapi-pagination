@@ -3,6 +3,7 @@ from contextlib import AsyncExitStack
 from asyncpg import create_pool
 from fastapi import FastAPI
 from pytest import fixture
+from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.asyncpg import paginate
@@ -44,7 +45,7 @@ def app(pool, model_cls):
 
 
 class TestAsyncpg(BasePaginationTestCase):
-    @fixture(scope="class")
+    @async_fixture(scope="class")
     async def entities(self, pool):
         async with pool.acquire() as conn:
             await conn.executemany(f"INSERT INTO users(name) VALUES ($1);", [(faker.name(),) for _ in range(100)])

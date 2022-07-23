@@ -2,6 +2,7 @@ from typing import AsyncIterator
 
 from fastapi import Depends, FastAPI
 from pytest import fixture, mark
+from pytest_asyncio import fixture as async_fixture
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -60,7 +61,7 @@ def app(Session, engine, model_cls):
 
 @mark.future_sqlalchemy
 class TestAsyncSQLAlchemy(BasePaginationTestCase):
-    @fixture(scope="class")
+    @async_fixture(scope="class")
     async def entities(self, Session):
         async with Session() as session:
             session.add_all([User(name=faker.name()) for _ in range(100)])
