@@ -6,7 +6,7 @@ from sqlalchemy import func, select
 
 from ..api import create_page, resolve_params
 from ..bases import AbstractPage, AbstractParams
-from .sqlalchemy import paginate_query
+from .sqlalchemy import paginate_query, _to_dict
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,9 +21,10 @@ async def paginate(
     params = resolve_params(params)
 
     total = await session.scalar(select(func.count()).select_from(query.subquery()))  # type: ignore
-    items = await session.execute(paginate_query(query, params))
+    paginated_query = await session.execute(paginate_query(query, params))
+    items = [_to_dict(item) for item in paginated_query]
 
-    return create_page(items.scalars().unique().all(), total, params)
+    return create_page([*items], total, params)
 
 
 __all__ = ["paginate"]
