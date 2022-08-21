@@ -34,18 +34,6 @@ add_pagination(app)
 
 ![OpenAPI](img/openapi_example.png)
 
-## Available integrations
-
-* [sqlalchemy](https://github.com/sqlalchemy/sqlalchemy)
-* [gino](https://github.com/python-gino/gino)
-* [databases](https://github.com/encode/databases)
-* [ormar](http://github.com/collerek/ormar)
-* [orm](https://github.com/encode/orm)
-* [tortoise](https://github.com/tortoise/tortoise-orm)
-
-To see fully working examples, please visit this
-[link](https://github.com/uriyyo/fastapi-pagination/tree/main/examples).
-
 ## Installation
 
 ```bash

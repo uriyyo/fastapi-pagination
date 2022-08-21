@@ -17,6 +17,7 @@ theme:
 
 nav:
   - "Home": index.md
+  - "Integrations": integrations.md
   - "Tutorials":
       - "First Steps": first-steps.md
       - "Limit-Offset": limit-offset.md
