@@ -1,6 +1,6 @@
 It's pretty easy to use `fastapi-pagination`.
 
-First, you need to import `Page`, `Params` and one of `paginate`
+First, you need to import `Page`, `Params` and one of the `paginate`
 functions from `fastapi_pagination`.
 
 * `Page` - is used as `response_model` in your route declaration.
