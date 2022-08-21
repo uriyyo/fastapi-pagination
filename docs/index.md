@@ -2,6 +2,20 @@
 
 FastAPI Pagination - easy to use pagination for FastAPI.
 
+## Installation
+
+```bash
+pip install fastapi-pagination
+```
+
+To install fastapi-pagination with all available integrations:
+
+```bash
+pip install fastapi-pagination[all]
+```
+
+## Minimal Example
+
 Example of code and generated OpenAPI specification.
 
 ```python
@@ -33,13 +47,3 @@ add_pagination(app)
 ```
 
 ![OpenAPI](img/openapi_example.png)
-
-## Installation
-
-```bash
-# Basic version
-pip install fastapi-pagination
-
-# All available integrations
-pip install fastapi-pagination[all]
-```
