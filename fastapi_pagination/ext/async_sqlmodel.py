@@ -1,6 +1,6 @@
 from typing import Optional, TypeVar, Union
 
-from sqlmodel import SQLModel, func, select
+from sqlmodel import SQLModel, func, literal_column, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
@@ -21,7 +21,7 @@ async def paginate(
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    total = await session.scalar(select(func.count("*")).select_from(query.subquery()))
+    total = await session.scalar(select(func.count(literal_column("*"))).select_from(query.subquery()))
     query_response = await session.exec(query.limit(raw_params.limit).offset(raw_params.offset))
     items = query_response.unique().all()
 
