@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from sqlalchemy import func, literal_column, select
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 async def paginate(
-    conn: AsyncConnectable | AsyncSession,
+    conn: Union[AsyncConnectable, AsyncSession],
     query: Select,
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage:  # pragma: no cover # FIXME: fix coverage report generation
