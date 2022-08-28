@@ -17,12 +17,14 @@ theme:
 
 nav:
   - "Home": index.md
-  - "Integrations": integrations.md
   - "Tutorials":
       - "First Steps": first-steps.md
       - "Limit-Offset": limit-offset.md
       - "Customization": customization.md
       - "Advanced": advanced.md
+  - "Integrations": integrations.md
+  - "Contributing": contributing.md
+  - "License": license.md
 
 markdown_extensions:
   - pymdownx.emoji:

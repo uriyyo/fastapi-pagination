@@ -1,5 +1,6 @@
-To use `limit-offset` pagination you should use `fastapi_pagination.LimitOffsetPage`
-instead of `fastapi_pagination.Page`:
+# Limit/ Offset
+
+In some cases, you may need to use limit/ offset pagination. For these cases, you can use `fastapi_pagination.LimitOffsetPage` instead of the default `fastapi_pagination.Page`.
 
 ```python
 from fastapi import FastAPI
@@ -31,3 +32,7 @@ async def get_users():
 
 add_pagination(app)
 ```
+
+This will be reflected in the OpenAPI schema.
+
+![OpenAPI limit/ offset screenshot](img/limit_offset_schema.png)
