@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional, Union
 
 from gino.crud import CRUDModel
-from sqlalchemy import func
+from sqlalchemy import func, literal_column
 from sqlalchemy.sql import Select
 
 from ..api import create_page, resolve_params
@@ -17,7 +17,7 @@ async def paginate(query: Union[Select, CRUDModel], params: Optional[AbstractPar
 
     params = resolve_params(params)
 
-    total = await func.count().select().select_from(query.alias()).gino.scalar()
+    total = await func.count(literal_column("*")).select().select_from(query.alias()).gino.scalar()
     items = await paginate_query(query, params).gino.all()  # type: ignore
 
     return create_page(items, total, params)

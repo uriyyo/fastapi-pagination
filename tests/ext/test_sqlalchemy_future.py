@@ -54,6 +54,11 @@ def app(Base, User, SessionLocal, model_cls):
     def route(db: Session = Depends(get_db)):
         return paginate(db, select(User))
 
+    @app.get("/non-scalar/default", response_model=Page[model_cls])
+    @app.get("/non-scalar/limit-offset", response_model=LimitOffsetPage[model_cls])
+    def route_non_scalar(db: Session = Depends(get_db)):
+        return paginate(db, select(User.id, User.name))
+
     return add_pagination(app)
 
 
@@ -65,3 +70,9 @@ class TestSQLAlchemyFuture(BasePaginationTestCase):
             session.add_all([User(name=faker.name()) for _ in range(100)])
 
             return session.execute(select(User)).unique().scalars().all()
+
+
+@mark.future_sqlalchemy
+class TestSQLAlchemyFutureNonScalar(TestSQLAlchemyFuture):
+    page_path = "/non-scalar/default"
+    limit_offset_page_path = "/non-scalar/limit-offset"

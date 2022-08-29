@@ -56,6 +56,11 @@ def app(Session, engine, model_cls):
     async def route(db: Session = Depends(get_db)):
         return await paginate(db, select(User))
 
+    @app.get("/non-scalar/default", response_model=Page[model_cls])
+    @app.get("/non-scalar/limit-offset", response_model=LimitOffsetPage[model_cls])
+    async def route(db: Session = Depends(get_db)):
+        return await paginate(db, select(User.id, User.name))
+
     return add_pagination(app)
 
 
@@ -69,3 +74,9 @@ class TestAsyncSQLAlchemy(BasePaginationTestCase):
 
             result = await session.execute(select(User))
             return [*result.scalars()]
+
+
+@mark.future_sqlalchemy
+class TestAsyncSQLAlchemyNonScalar(TestAsyncSQLAlchemy):
+    page_path = "/non-scalar/default"
+    limit_offset_page_path = "/non-scalar/limit-offset"
