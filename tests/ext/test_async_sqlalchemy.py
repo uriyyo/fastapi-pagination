@@ -1,7 +1,7 @@
 from typing import AsyncIterator
 
 from fastapi import Depends, FastAPI
-from pytest import fixture, mark
+from pytest import fixture
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 

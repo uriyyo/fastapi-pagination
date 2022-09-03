@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 
 from pytest import fixture
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
