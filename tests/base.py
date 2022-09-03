@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Type
+from typing import Any, ClassVar, Dict, List, Optional, Type
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
@@ -14,11 +14,24 @@ from fastapi_pagination.paginator import paginate
 from .utils import normalize
 
 
-class UserOut(BaseModel):
+class OrderOut(BaseModel):
+    id: Optional[int] = None
     name: str
 
     class Config:
         orm_mode = True
+
+
+class UserOut(BaseModel):
+    id: Optional[int] = None
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class UserWithOrderOut(UserOut):
+    orders: List[OrderOut]
 
 
 _default_params = [
@@ -47,6 +60,10 @@ class BasePaginationTestCase:
     @fixture(scope="session")
     def model_cls(self):
         return UserOut
+
+    @fixture(scope="session")
+    def model_with_rel_cls(self):
+        return UserWithOrderOut
 
     @mark.parametrize(
         "params,cls_name",
@@ -94,4 +111,9 @@ class BasePaginationTestCase:
             yield c
 
 
-__all__ = ["BasePaginationTestCase", "UserOut"]
+__all__ = [
+    "BasePaginationTestCase",
+    "UserOut",
+    "OrderOut",
+    "UserWithOrderOut",
+]

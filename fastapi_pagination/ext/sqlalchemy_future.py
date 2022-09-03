@@ -2,11 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Union
 
-from sqlalchemy import func, literal_column, select
-
 from ..api import create_page, resolve_params
 from ..bases import AbstractPage, AbstractParams
-from .sqlalchemy import paginate_query
+from .sqlalchemy import count_query, paginate_query
 from .utils import unwrap_scalars
 
 if TYPE_CHECKING:
@@ -21,7 +19,7 @@ def paginate(
 ) -> AbstractPage:
     params = resolve_params(params)
 
-    total = conn.scalar(select(func.count(literal_column("*"))).select_from(query.subquery()))
+    total = conn.scalar(count_query(query))
     items = conn.execute(paginate_query(query, params))
 
     return create_page(unwrap_scalars(items.unique().all()), total, params)

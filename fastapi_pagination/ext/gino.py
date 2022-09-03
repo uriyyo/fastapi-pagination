@@ -17,7 +17,7 @@ async def paginate(query: Union[Select, CRUDModel], params: Optional[AbstractPar
 
     params = resolve_params(params)
 
-    total = await func.count(literal_column("*")).select().select_from(query.alias()).gino.scalar()
+    total = await func.count(literal_column("*")).select().select_from(query.order_by(None).alias()).gino.scalar()
     items = await paginate_query(query, params).gino.all()  # type: ignore
 
     return create_page(items, total, params)
