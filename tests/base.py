@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, List, Type
+from typing import Any, ClassVar, Dict, List, Optional, Type
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
@@ -15,7 +15,7 @@ from .utils import normalize
 
 
 class OrderOut(BaseModel):
-    id: int
+    id: Optional[int] = None
     name: str
 
     class Config:
@@ -23,7 +23,7 @@ class OrderOut(BaseModel):
 
 
 class UserOut(BaseModel):
-    id: int
+    id: Optional[int] = None
     name: str
 
     class Config:
