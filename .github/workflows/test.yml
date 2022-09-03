@@ -42,13 +42,7 @@ jobs:
 
       - name: Unit tests
         run: |
-          poetry run pytest tests -m "not sqlalchemy_future and not gino and not sqlmodel" --cov-report=xml
-
-      - name: Unit tests SQLModel and SQLAlchemyFuture
-        run: |
-          pip install -U sqlalchemy sqlmodel
-          poetry run pytest -m sqlmodel --cov-append --cov-report=xml
-          poetry run pytest -m sqlalchemy_future --cov-append --cov-report=xml
+          poetry run pytest tests -m "not gino" --cov-report=xml
 
       - name: Unit tests gino
         run: |

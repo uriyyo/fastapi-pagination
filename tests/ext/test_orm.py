@@ -1,7 +1,6 @@
-import sqlalchemy
 from databases import Database
 from fastapi import FastAPI
-from orm import Integer, Model, String
+from orm import Integer, Model, ModelRegistry, String
 from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -16,25 +15,22 @@ def db(database_url):
 
 
 @fixture(scope="session")
-def metadata(database_url):
-    return sqlalchemy.MetaData()
+def user(db):
+    models = ModelRegistry(database=db)
 
-
-@fixture(scope="session")
-def User(metadata, db):
     class User(Model):
-        __tablename__ = "users"
-        __database__ = db
-        __metadata__ = metadata
-
-        id = Integer(primary_key=True)
-        name = String(max_length=100)
+        tablename = "users"
+        registry = models
+        fields = {
+            "id": Integer(primary_key=True),
+            "name": String(max_length=100),
+        }
 
     return User
 
 
 @fixture(scope="session")
-def app(db, metadata, User, model_cls):
+def app(db, user, model_cls):
     app = FastAPI()
 
     app.add_event_handler("startup", db.connect)
@@ -43,7 +39,7 @@ def app(db, metadata, User, model_cls):
     @app.get("/default", response_model=Page[model_cls])
     @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     async def route():
-        return await paginate(User.objects)
+        return await paginate(user.objects)
 
     return add_pagination(app)
 

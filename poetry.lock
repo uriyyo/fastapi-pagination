@@ -996,6 +996,30 @@ mypy = ">=0.790"
 typing-extensions = ">=3.7.4"
 
 [[package]]
+name = "sqlalchemy2-stubs"
+version = "0.0.2a27"
+description = "Typing Stubs for SQLAlchemy 1.4"
+category = "main"
+optional = true
+python-versions = ">=3.6"
+
+[package.dependencies]
+typing-extensions = ">=3.7.4"
+
+[[package]]
+name = "sqlmodel"
+version = "0.0.8"
+description = "SQLModel, SQL databases in Python, designed for simplicity, compatibility, and robustness."
+category = "main"
+optional = true
+python-versions = ">=3.6.1,<4.0.0"
+
+[package.dependencies]
+pydantic = ">=1.8.2,<2.0.0"
+SQLAlchemy = ">=1.4.17,<=1.4.41"
+sqlalchemy2-stubs = "*"
+
+[[package]]
 name = "sqlparse"
 version = "0.4.2"
 description = "A non-validating SQL parser."
@@ -1174,13 +1198,13 @@ orm = ["orm", "databases"]
 ormar = ["ormar"]
 piccolo = ["piccolo"]
 sqlalchemy = ["SQLAlchemy"]
-sqlmodel = []
+sqlmodel = ["sqlmodel"]
 tortoise = ["tortoise-orm"]
 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "6b5a75154c79e5b2df9624d28bb8bf6948ed3bda551051d947a3ad80de1f9f5f"
+content-hash = "74b02d51e8426cc80112447467ff76439d52a6671f3c9c4e903dced02463f23e"
 
 [metadata.files]
 aiosqlite = [
@@ -1562,6 +1586,8 @@ sqlalchemy-stubs = [
     {file = "sqlalchemy-stubs-0.4.tar.gz", hash = "sha256:c665d6dd4482ef642f01027fa06c3d5e91befabb219dc71fc2a09e7d7695f7ae"},
     {file = "sqlalchemy_stubs-0.4-py3-none-any.whl", hash = "sha256:5eec7aa110adf9b957b631799a72fef396b23ff99fe296df726645d01e312aa5"},
 ]
+sqlalchemy2-stubs = []
+sqlmodel = []
 sqlparse = [
     {file = "sqlparse-0.4.2-py3-none-any.whl", hash = "sha256:48719e356bb8b42991bdbb1e8b83223757b93789c00910a616a071910ca4a64d"},
     {file = "sqlparse-0.4.2.tar.gz", hash = "sha256:0c00730c74263a94e5a9919ade150dfc3b19c574389985446148402998287dae"},

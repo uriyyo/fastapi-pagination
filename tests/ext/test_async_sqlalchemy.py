@@ -16,9 +16,6 @@ except ImportError:
     AsyncSession = None
 
 
-pytestmark = mark.sqlalchemy_future
-
-
 @fixture(scope="session")
 def is_async_db():
     return True

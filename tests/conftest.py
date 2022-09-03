@@ -192,3 +192,7 @@ def database_url(db_type, postgres_url, sqlite_url, is_async_db) -> str:
 @fixture(scope="session")
 def event_loop():
     return new_event_loop()
+
+
+def pytest_collection_modifyitems(items):
+    items.sort(key=lambda it: (it.path, it.name))

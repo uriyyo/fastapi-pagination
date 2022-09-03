@@ -16,10 +16,6 @@ except ImportError:
     Session = None
     select = None
 
-from pytest import mark
-
-pytestmark = mark.sqlmodel
-
 
 @fixture(scope="session")
 def session(sa_engine):
