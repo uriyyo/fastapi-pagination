@@ -11,7 +11,6 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.django import paginate
 
 from ..base import BasePaginationTestCase
-from ..utils import faker
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "True"
 
@@ -76,8 +75,4 @@ def app(db, User, query, model_cls):
 
 
 class TestDjango(BasePaginationTestCase):
-    @fixture(scope="class")
-    def entities(self, User, query):
-        User.objects.bulk_create(User(name=faker.name()) for _ in range(100))
-
-        return [*User.objects.all()]
+    pass

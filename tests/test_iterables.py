@@ -1,5 +1,3 @@
-from functools import partial
-from itertools import count
 from typing import Any, Dict
 
 from fastapi import FastAPI, Query
@@ -8,12 +6,7 @@ from pytest import fixture
 from fastapi_pagination import add_pagination
 from fastapi_pagination.iterables import LimitOffsetPage, Page, paginate
 
-from .base import BasePaginationTestCase, UserOut
-from .utils import faker
-
-id_seq = partial(next, iter(count(1)))
-
-entities = [UserOut(id=id_seq(), name=faker.name()) for _ in range(100)]
+from .base import BasePaginationTestCase
 
 
 class TestIterablesPagination(BasePaginationTestCase):
@@ -37,11 +30,7 @@ class TestIterablesPagination(BasePaginationTestCase):
         return {"skip_len": True} if request.param else {}
 
     @fixture(scope="session")
-    def entities(self):
-        return entities
-
-    @fixture(scope="session")
-    def app(self, model_cls):
+    def app(self, model_cls, entities):
         app = FastAPI()
 
         @app.get("/default", response_model=Page[model_cls])
