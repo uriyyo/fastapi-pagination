@@ -20,7 +20,7 @@ async def paginate(
 ) -> AbstractPage:
     params = resolve_params(params)
 
-    total = await db.fetch_val(select([func.count()]).select_from(query.alias()))
+    total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))
     items = await db.fetch_all(paginate_query(query, params))
 
     if convert_to_mapping:

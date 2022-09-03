@@ -1,5 +1,6 @@
 from typing import Optional, TypeVar, Union
 
+from sqlalchemy.orm import noload
 from sqlmodel import Session, SQLModel, func, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
@@ -20,7 +21,7 @@ def paginate(
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    total = session.scalar(select(func.count("*")).select_from(query.subquery()))
+    total = session.scalar(select(func.count("*")).select_from(query.order_by(None).options(noload("*")).subquery()))
     items = session.exec(query.limit(raw_params.limit).offset(raw_params.offset)).unique().all()
 
     return create_page(items, total, params)
