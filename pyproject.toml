@@ -66,7 +66,7 @@ django = ["django", "databases"]
 piccolo = ["piccolo"]
 motor = ["motor"]
 mongoengine = ["mongoengine"]
-all = ["SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine"]
+all = ["sqlmodel", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
