@@ -46,7 +46,7 @@ jobs:
 
       - name: Unit tests gino
         run: |
-          poetry run pip install -U gino
+          poetry run pip install -U "gino[starlette]"
           poetry run pytest -m gino --cov-append --cov-report=xml
 
       - name: Upload coverage to Codecov
