@@ -1,15 +1,25 @@
 from functools import partial
 
 from fastapi import FastAPI
-from pytest import fixture
+from pytest import fixture, mark
 from sqlalchemy.orm import selectinload
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.async_sqlmodel import paginate
 
 from ..base import BasePaginationTestCase
+
+try:
+    from sqlmodel import select
+    from sqlmodel.ext.asyncio.session import AsyncSession
+
+    from fastapi_pagination.ext.async_sqlmodel import paginate
+except ImportError:
+    AsyncSession = None
+    select = None
+    paginate = None
+
+
+pytestmark = mark.sqlmodel
 
 
 @fixture(scope="session")

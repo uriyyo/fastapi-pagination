@@ -1,8 +1,8 @@
 from typing import Iterator
 
 from fastapi import Depends, FastAPI
-from pytest import fixture
-from sqlalchemy.future import select
+from pytest import fixture, mark
+from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.session import Session
 
@@ -10,6 +10,8 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy_future import paginate
 
 from ..base import BasePaginationTestCase
+
+pytestmark = mark.sqlalchemy_future
 
 
 @fixture(scope="session")

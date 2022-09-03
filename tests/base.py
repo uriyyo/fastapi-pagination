@@ -14,14 +14,14 @@ from .schemas import UserOut, UserWithOrderOut
 from .utils import normalize
 
 _default_params = [
-    *[Params(page=i) for i in range(1, 10)],
-    *[Params(size=i) for i in range(1, 100, 10)],
-    *[Params(page=i, size=j) for i in range(1, 10) for j in range(1, 50, 10)],
+    *[Params(page=i) for i in range(1, 10, 5)],
+    # *[Params(size=i) for i in range(1, 100, 10)],
+    # *[Params(page=i, size=j) for i in range(1, 10) for j in range(1, 50, 10)],
 ]
 _limit_offset_params = [
-    *[LimitOffsetParams(offset=i) for i in range(10)],
-    *[LimitOffsetParams(limit=i) for i in range(1, 100, 10)],
-    *[LimitOffsetParams(offset=i, limit=j) for i in range(10) for j in range(1, 50, 10)],
+    *[LimitOffsetParams(offset=i) for i in range(10, 5)],
+    # *[LimitOffsetParams(limit=i) for i in range(1, 100, 10)],
+    # *[LimitOffsetParams(offset=i, limit=j) for i in range(10) for j in range(1, 50, 10)],
 ]
 
 

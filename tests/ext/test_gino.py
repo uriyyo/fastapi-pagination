@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from orm import Integer, String
-from pytest import fixture
+from pytest import fixture, mark
 from sqlalchemy import Column, Integer, String
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 
 from ..base import BasePaginationTestCase
+
+pytestmark = mark.gino
 
 
 @fixture(scope="session")

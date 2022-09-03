@@ -3,12 +3,22 @@ from functools import partial
 from fastapi import FastAPI
 from pytest import fixture
 from sqlalchemy.orm import selectinload
-from sqlmodel import Session, select
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.sqlmodel import paginate
 
 from ..base import BasePaginationTestCase
+
+try:
+    from sqlmodel import Session, select
+
+    from fastapi_pagination.ext.sqlmodel import paginate
+except ImportError:
+    Session = None
+    select = None
+
+from pytest import mark
+
+pytestmark = mark.sqlmodel
 
 
 @fixture(scope="session")
