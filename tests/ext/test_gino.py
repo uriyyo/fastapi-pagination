@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from orm import Integer, String
 from pytest import fixture, mark
 from sqlalchemy import Column, Integer, String
 

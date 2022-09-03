@@ -1,12 +1,21 @@
 from databases import Database
 from fastapi import FastAPI
-from orm import Integer, Model, ModelRegistry, String
 from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.orm import paginate
 
 from ..base import BasePaginationTestCase
+
+try:
+    from orm import Integer, Model, ModelRegistry, String
+
+    from fastapi_pagination.ext.orm import paginate
+except ImportError:
+    Integer = None
+    String = None
+    Model = None
+    ModelRegistry = None
+    paginate = None
 
 
 @fixture(scope="session")
