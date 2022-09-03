@@ -1,15 +1,18 @@
 from typing import Any, List, Type, TypeVar
 
 from faker import Faker
-from pydantic import parse_obj_as
+from pydantic import BaseModel
 
 faker = Faker()
 
-T = TypeVar("T")
+T = TypeVar("T", bound=BaseModel)
 
 
 def normalize(model: Type[T], *models: Any) -> List[T]:
-    return [parse_obj_as(model, m) for m in models]
+    return [model.parse_obj(m) for m in models]
 
 
-__all__ = ["normalize", "faker"]
+__all__ = [
+    "normalize",
+    "faker",
+]

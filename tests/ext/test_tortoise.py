@@ -1,9 +1,7 @@
-from random import choice
 from typing import List
 
 from fastapi import FastAPI
 from pytest import fixture
-from pytest_asyncio import fixture as async_fixture
 from tortoise import Model
 from tortoise.backends.base.executor import EXECUTOR_CACHE
 from tortoise.contrib.fastapi import register_tortoise
@@ -20,7 +18,6 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.tortoise import paginate
 
 from ..base import BasePaginationTestCase
-from ..utils import faker
 
 
 class Order(Model):
@@ -42,14 +39,15 @@ class User(Model):
         table = "users"
 
 
-@fixture(scope="session")
-def database_url(database_url, sqlite_file):
-    if database_url.startswith("postgresql://"):
-        return database_url.replace("postgresql://", "postgres://")
-    if database_url.startswith("sqlite"):
-        return f"sqlite://{sqlite_file}"
+class OrderOut(PydanticModel):
+    id: int
+    name: str
 
-    return database_url
+
+class UserWithRelationOut(PydanticModel):
+    id: int
+    name: str
+    orders: List[OrderOut]
 
 
 @fixture(
@@ -64,66 +62,67 @@ def query(request):
         return lambda: User.all()
 
 
-class BaseTortoiseTestCase(BasePaginationTestCase):
-    @async_fixture(scope="session")
-    async def app(self, database_url, query, model_cls, pagination_params):
-        app = FastAPI()
+@fixture(scope="session")
+def database_url(database_url, sqlite_file):
+    if database_url.startswith("postgresql://"):
+        database_url = database_url.replace("postgresql://", "postgres://")
+    if database_url.startswith("sqlite"):
+        database_url = f"sqlite://{sqlite_file}"
 
-        EXECUTOR_CACHE.clear()
-        register_tortoise(
-            app,
-            modules={"models": [__name__]},
-            db_url=database_url,
-            generate_schemas=True,
-        )
+    return database_url
 
+
+@fixture(scope="session")
+def app(database_url, query):
+    app = FastAPI()
+
+    EXECUTOR_CACHE.clear()
+    register_tortoise(
+        app,
+        modules={"models": [__name__]},
+        db_url=database_url,
+    )
+
+    return app
+
+
+class TestTortoiseDefault(BasePaginationTestCase):
+    pagination_types = ["default"]
+
+    @fixture(scope="session")
+    def app(self, query, app, model_cls):
         @app.get("/default", response_model=Page[model_cls])
         @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
+        async def route():
+            return await paginate(query(), prefetch_related=False)
+
+        return add_pagination(app)
+
+
+class TestTortoiseRelationship(BasePaginationTestCase):
+    pagination_types = ["relationship"]
+
+    @fixture(scope="session")
+    def model_with_rel_cls(self):
+        return UserWithRelationOut
+
+    @fixture(scope="session")
+    def app(self, app, query, model_with_rel_cls, pagination_params):
+        @app.get("/relationship/default", response_model=Page[model_with_rel_cls])
+        @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[model_with_rel_cls])
         async def route():
             return await paginate(query(), **pagination_params())
 
         return add_pagination(app)
 
-
-class TestTortoise(BaseTortoiseTestCase):
-    @fixture(scope="session")
-    def pagination_params(self):
-        return lambda: {"prefetch_related": False}
-
-    @async_fixture(scope="class")
-    async def entities(self, query, client):
-        await User.bulk_create(User(name=faker.name()) for _ in range(100))
-
-        return await User.all()
-
-
-class OrderOut(PydanticModel):
-    name: str
-
-
-class UserWithRelationOut(PydanticModel):
-    name: str
-    orders: List[OrderOut]
-
-
-class TestTortoiseWithRelatedObjects(BaseTortoiseTestCase):
-    @fixture(scope="session")
-    def model_cls(self):
-        return UserWithRelationOut
-
     @fixture(
         scope="session",
-        params=[lambda: True, lambda: ["orders"], lambda: [Prefetch("orders", Order.all())]],
+        params=[
+            lambda: True,
+            lambda: ["orders"],
+            lambda: [Prefetch("orders", Order.all())],
+        ],
         ids=["bool", "list", "prefetch"],
     )
     def pagination_params(self, request):
         return lambda: {"prefetch_related": request.param()}
-
-    @async_fixture(scope="class")
-    async def entities(self, query, client):
-        await User.bulk_create(User(name=faker.name()) for _ in range(100))
-
-        users = await User.all()
-        await Order.bulk_create(Order(name=faker.name(), user=choice(users)) for _ in range(300))
-
-        return await User.all().prefetch_related("orders")

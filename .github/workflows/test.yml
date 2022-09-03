@@ -42,19 +42,12 @@ jobs:
 
       - name: Unit tests
         run: |
-          poetry run pytest tests    \
-                    --cov-report=xml \
-                    --ignore=tests/ext/test_async_sqlalchemy.py  \
-                    --ignore=tests/ext/test_sqlalchemy_future.py \
-                    --ignore=tests/ext/test_sqlmodel.py          \
-                    --ignore=tests/ext/test_async_sqlmodel.py
+          poetry run pytest tests -m "not gino" --cov-report=xml
 
-      - name: Unit tests sqlalchemy 1.4
+      - name: Unit tests gino
         run: |
-          poetry run pip install -U "sqlalchemy>=1.4.11" sqlmodel  # FIXME: dependency conflict must be solved
-          poetry run pytest tests/ext/test_sqlmodel.py --cov-append --cov-report=xml
-          poetry run pytest tests/ext/test_async_sqlmodel.py --cov-append --cov-report=xml
-          poetry run pytest tests/ext/test_async_sqlalchemy.py tests/ext/test_sqlalchemy_future.py --cov-append --cov-report=xml
+          poetry run pip install -U "gino[starlette]"
+          poetry run pytest -m gino --cov-append --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

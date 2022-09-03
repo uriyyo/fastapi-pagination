@@ -21,3 +21,6 @@ def paginate(
     items = list(cursor)
 
     return create_page(items, total, params)
+
+
+__all__ = ["paginate"]

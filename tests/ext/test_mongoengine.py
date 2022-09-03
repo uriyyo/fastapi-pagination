@@ -6,7 +6,6 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.mongoengine import paginate
 
 from ..base import BasePaginationTestCase
-from ..utils import faker
 
 
 @fixture(scope="session")
@@ -20,18 +19,18 @@ def db_connect(database_url):
 
 
 @fixture(scope="session")
-def User(db_connect):
+def user(db_connect):
     class User(Document):
+        id = fields.IntField()
         name = fields.StringField()
 
+        meta = {
+            "collection": "users",
+            "strict": False,
+            "id_field": "id",
+        }
+
     return User
-
-
-@fixture(scope="session", autouse=True)
-def clear_database(User):
-    User.drop_collection()
-    yield
-    User.drop_collection()
 
 
 @fixture(
@@ -39,15 +38,15 @@ def clear_database(User):
     params=[True, False],
     ids=["model", "query"],
 )
-def query(request, User):
+def query(request, user):
     if request.param:
-        return User
+        return user
     else:
-        return User.objects.all()
+        return user.objects.all()
 
 
 @fixture(scope="session")
-def app(db_connect, User, query, model_cls):
+def app(db_connect, query, model_cls):
     app = FastAPI()
 
     @app.get("/default", response_model=Page[model_cls])
@@ -59,8 +58,4 @@ def app(db_connect, User, query, model_cls):
 
 
 class TestMongoEngine(BasePaginationTestCase):
-    @fixture(scope="class")
-    def entities(self, User, query):
-        User.objects.insert([User(name=faker.name()) for _ in range(100)])
-
-        return list(User.objects.all())
+    pass

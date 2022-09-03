@@ -17,38 +17,36 @@ classifiers = [
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3 :: Only',
 ]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-pydantic = ">=1.7.2"
-fastapi = ">=0.61.2"
-gino = { version = ">=1.0.1", extras = ["starlette"], optional = true }
+pydantic = ">=1.9.1"
+fastapi = ">=0.80.0"
 SQLAlchemy = { version = ">=1.3.20", optional = true }
-databases = { version = ">=0.4.0", extras = ["postgresql", "sqlite", "mysql"], optional = true }
-orm = { version = ">=0.1.5", optional = true }
-typesystem = { version = "^0.2.0", optional = true }
-tortoise-orm = { version = ">=0.16.18,<0.20.0", extras = ["asyncpg", "aiomysql", "aiosqlite"], optional = true }
+databases = { version = ">=0.6.0", optional = true }
+orm = { version = ">=0.3.1", optional = true }
+tortoise-orm = { version = ">=0.16.18,<0.20.0", optional = true }
 asyncpg = { version = ">=0.24.0", optional = true }
-ormar = { version = ">=0.10.5", optional = true}
+ormar = { version = ">=0.11.2", optional = true}
 Django = { version = "<3.3.0", optional = true}
-piccolo = { version = ">=0.29,<0.35", optional = true}
+piccolo = { version = "^0.89.0", optional = true}
 motor =  { version = ">=2.5.1,<4.0.0", optional = true }
-
-# sqlmodel = { version = "^0.0.4", optional = true} Should be uncommented when gino will support sqlalchemy 1.4
 mongoengine = {version = ">=0.23.1,<0.25.0", optional = true}
+sqlmodel = { version = "^0.0.8", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1"
 pytest-cov = "^3.0.0"
 pytest-asyncio = "^0.19.0"
-black = "^21.7b0"
+black = "^22.0.8"
 pre-commit = "^2.20.0"
 Faker = "^14.2.0"
 psycopg2-binary = "^2.9.3"
 mkdocs = "^1.1.2"
-mkdocs-material = "^7.2.3"
+mkdocs-material = "^8.4.2"
 pymdown-extensions = "^9.5"
 fontawesome-markdown = "^0.2.6"
 sqlalchemy-stubs = "^0.4"
@@ -57,7 +55,7 @@ asgi-lifespan = "^1.0.1"
 requests = "^2.28.1"
 
 [tool.poetry.extras]
-gino = ["gino", "SQLAlchemy"]
+sqlmodel = ["sqlmodel"]
 sqlalchemy = ["SQLAlchemy"]
 databases = ["databases"]
 orm = ["orm", "databases", "typesystem"]
@@ -68,7 +66,7 @@ django = ["django", "databases"]
 piccolo = ["piccolo"]
 motor = ["motor"]
 mongoengine = ["mongoengine"]
-all = ["gino", "SQLAlchemy", "sqlalchemy-stubs", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine"]
+all = ["sqlmodel", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

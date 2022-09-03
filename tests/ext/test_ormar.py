@@ -3,13 +3,11 @@ import sqlalchemy
 from fastapi import FastAPI
 from ormar import Integer, Model, ModelMeta, String
 from pytest import fixture
-from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.ormar import paginate
 
 from ..base import BasePaginationTestCase
-from ..utils import faker
 
 
 @fixture(scope="session")
@@ -63,8 +61,4 @@ def app(db, meta, User, query, model_cls):
 
 
 class TestOrmar(BasePaginationTestCase):
-    @async_fixture(scope="class")
-    async def entities(self, User, query, client):
-        await User.objects.bulk_create(User(name=faker.name()) for _ in range(100))
-
-        return await User.objects.all()
+    pass

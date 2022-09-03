@@ -13,11 +13,11 @@ from .limit_offset import LimitOffsetParams
 T = TypeVar("T")
 
 
-class Page(DefaultPage, Generic[T]):
+class Page(DefaultPage[T], Generic[T]):
     total: Optional[conint(ge=0)]  # type: ignore
 
 
-class LimitOffsetPage(DefaultLimitOffsetPage, Generic[T]):
+class LimitOffsetPage(DefaultLimitOffsetPage[T], Generic[T]):
     total: Optional[conint(ge=0)]  # type: ignore
 
 

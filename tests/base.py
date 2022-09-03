@@ -1,8 +1,7 @@
-from typing import Any, ClassVar, Dict, List, Optional, Type
+from typing import Any, ClassVar, Dict, List, Type
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
-from pydantic import BaseModel
 from pytest import fixture, mark
 from pytest_asyncio import fixture as async_fixture
 
@@ -11,28 +10,8 @@ from fastapi_pagination.default import Page, Params
 from fastapi_pagination.limit_offset import LimitOffsetPage, LimitOffsetParams
 from fastapi_pagination.paginator import paginate
 
+from .schemas import UserOut, UserWithOrderOut
 from .utils import normalize
-
-
-class OrderOut(BaseModel):
-    id: Optional[int] = None
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
-class UserOut(BaseModel):
-    id: Optional[int] = None
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
-class UserWithOrderOut(UserOut):
-    orders: List[OrderOut]
-
 
 _default_params = [
     *[Params(page=i) for i in range(1, 10)],
@@ -40,30 +19,60 @@ _default_params = [
     *[Params(page=i, size=j) for i in range(1, 10) for j in range(1, 50, 10)],
 ]
 _limit_offset_params = [
-    *[LimitOffsetParams(offset=i) for i in range(10)],
+    *[LimitOffsetParams(offset=i) for i in range(1, 10)],
     *[LimitOffsetParams(limit=i) for i in range(1, 100, 10)],
     *[LimitOffsetParams(offset=i, limit=j) for i in range(10) for j in range(1, 50, 10)],
 ]
 
 
+@mark.usefixtures("db_type")
 class BasePaginationTestCase:
+    pagination_types: ClassVar[List[str]] = ["default"]
+
     page: ClassVar[Type[Page]] = Page
     limit_offset_page: ClassVar[Type[LimitOffsetPage]] = LimitOffsetPage
 
-    page_path = "/default"
-    limit_offset_page_path = "/limit-offset"
+    def __init_subclass__(cls, **kwargs):
+        if cls.pagination_types is not BasePaginationTestCase.pagination_types:
+            mark.parametrize("pagination_type", cls.pagination_types, scope="session")(cls)
+
+    @fixture(scope="session")
+    def pagination_type(self):
+        return "default"
+
+    @fixture
+    def path(self, cls_name, pagination_type):
+        base = "default" if cls_name == "page" else "limit-offset"
+
+        if pagination_type == "default":
+            prefix = "/"
+        elif pagination_type == "non-scalar":
+            prefix = f"/non-scalar/"
+        elif pagination_type == "relationship":
+            prefix = f"/relationship/"
+        else:
+            raise ValueError(f"Unknown suite type {pagination_type}")
+
+        return prefix + base
 
     @fixture(scope="session")
     def additional_params(self) -> Dict[str, Any]:
         return {}
 
     @fixture(scope="session")
-    def model_cls(self):
+    def model_cls(self, pagination_type):
         return UserOut
 
     @fixture(scope="session")
     def model_with_rel_cls(self):
         return UserWithOrderOut
+
+    @fixture(scope="session")
+    def result_model_cls(self, model_cls, model_with_rel_cls, pagination_type):
+        if pagination_type == "relationship":
+            return model_with_rel_cls
+
+        return model_cls
 
     @mark.parametrize(
         "params,cls_name",
@@ -75,35 +84,27 @@ class BasePaginationTestCase:
     @mark.asyncio
     async def test_pagination(
         self,
-        clear_database,
         client,
         params,
         entities,
         cls_name,
         additional_params,
-        model_cls,
+        result_model_cls,
+        path,
     ):
-        path = getattr(self, f"{cls_name}_path")
-
         response = await client.get(path, params={**params.dict(), **additional_params})
+        response.raise_for_status()
 
         cls = getattr(self, cls_name)
-        set_page(cls)
 
-        expected = self._normalize_expected(paginate(entities, params))
+        with set_page(cls):
+            expected = self._normalize_expected(paginate(entities, params))
 
-        a, b = normalize(
-            cls[model_cls],
-            self._normalize_model(expected),
-            self._normalize_model(response.json()),
-        )
+        a, b = normalize(cls[result_model_cls], expected, response.json())
         assert a == b
 
     def _normalize_expected(self, result):
         return result
-
-    def _normalize_model(self, obj):
-        return obj
 
     @async_fixture(scope="session")
     async def client(self, app):
@@ -113,7 +114,4 @@ class BasePaginationTestCase:
 
 __all__ = [
     "BasePaginationTestCase",
-    "UserOut",
-    "OrderOut",
-    "UserWithOrderOut",
 ]
