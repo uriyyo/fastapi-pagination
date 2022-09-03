@@ -11,7 +11,7 @@ from ..base import BasePaginationTestCase
 
 
 @fixture(scope="session")
-def app(user, sa_session, model_cls):
+def app(sa_user, sa_session, model_cls):
     app = FastAPI()
 
     def get_db() -> Iterator[Session]:
@@ -24,7 +24,7 @@ def app(user, sa_session, model_cls):
     @app.get("/default", response_model=Page[model_cls])
     @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     def route(db: Session = Depends(get_db)):
-        return paginate(db.query(user))
+        return paginate(db.query(sa_user))
 
     return add_pagination(app)
 

@@ -29,6 +29,9 @@ _limit_offset_params = [
 class BasePaginationTestCase:
     pagination_types: ClassVar[List[str]] = ["default"]
 
+    page: ClassVar[Type[Page]] = Page
+    limit_offset_page: ClassVar[Type[LimitOffsetPage]] = LimitOffsetPage
+
     def __init_subclass__(cls, **kwargs):
         if cls.pagination_types is not BasePaginationTestCase.pagination_types:
             mark.parametrize("pagination_type", cls.pagination_types, scope="session")(cls)
@@ -92,7 +95,7 @@ class BasePaginationTestCase:
         response = await client.get(path, params={**params.dict(), **additional_params})
         response.raise_for_status()
 
-        cls = Page if cls_name == "page" else LimitOffsetPage
+        cls = getattr(self, cls_name)
 
         with set_page(cls):
             expected = self._normalize_expected(paginate(entities, params))
