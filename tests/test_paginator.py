@@ -1,3 +1,6 @@
+from functools import partial
+from itertools import count
+
 from fastapi import FastAPI
 from pytest import fixture
 
@@ -6,7 +9,9 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination, paginate
 from .base import BasePaginationTestCase, UserOut
 from .utils import faker
 
-entities = [UserOut(name=faker.name()) for _ in range(100)]
+id_seq = partial(next, iter(count(1)))
+
+entities = [UserOut(id=id_seq(), name=faker.name()) for _ in range(100)]
 
 
 class TestPaginationParams(BasePaginationTestCase):

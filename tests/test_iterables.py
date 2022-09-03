@@ -1,3 +1,5 @@
+from functools import partial
+from itertools import count
 from typing import Any, Dict
 
 from fastapi import FastAPI, Query
@@ -9,7 +11,9 @@ from fastapi_pagination.iterables import LimitOffsetPage, Page, paginate
 from .base import BasePaginationTestCase, UserOut
 from .utils import faker
 
-entities = [UserOut(name=faker.name()) for _ in range(100)]
+id_seq = partial(next, iter(count(1)))
+
+entities = [UserOut(id=id_seq(), name=faker.name()) for _ in range(100)]
 
 
 class TestIterablesPagination(BasePaginationTestCase):
