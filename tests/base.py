@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Type
+from typing import Any, ClassVar, Dict, List, Type
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
@@ -31,7 +31,7 @@ class UserOut(BaseModel):
 
 
 class UserWithOrderOut(UserOut):
-    orders: list[OrderOut]
+    orders: List[OrderOut]
 
 
 _default_params = [
