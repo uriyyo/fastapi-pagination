@@ -11,7 +11,8 @@
 
 ## Introduction
 
-`fastapi-pagination` is a library that provides pagination feature for [FastAPI](https://fastapi.tiangolo.com/) applications.
+`fastapi-pagination` is a library that provides pagination feature for [FastAPI](https://fastapi.tiangolo.com/)
+applications.
 
 ----
 
@@ -83,22 +84,28 @@ def get_users(db: Session = Depends(get_db)):
 ```
 
 Currently, `fastapi-pagination` supports:
-* `SQLAlchemy`
-* `SQLAlchemy 2.0 style`
-* `SQLModel`
-* `Django ORM`
-* `GINO`
-* `ORM`
-* `Ormar`
-* `Asyncpg`
-* `Piccolo`
-* `Databases` 
-* `Tortoise ORM`
-* `MongoEngine`
-* `Motor`
-* `PyMongo`
 
-## Example
+| Library                                                                                     | `paginate` function                                 | 
+|---------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| [SQLAlchemy](https://docs.sqlalchemy.org/en/14/orm/quickstart.html)                         | `fastapi_pagination.ext.sqlalchemy.paginate`        |
+| [SQLAlchemy 2.0 style](https://docs.sqlalchemy.org/en/14/changelog/migration_20.html)       | `fastapi_pagination.ext.sqlalchemy_future.paginate` |
+| [Async SQLAlchemy 2.0 style](https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html) | `fastapi_pagination.ext.async_sqlalchemy.paginate`  |
+| [SQLModel](https://sqlmodel.tiangolo.com/)                                                  | `fastapi_pagination.ext.sqlmodel.paginate`          |
+| [Async SQLModel](https://sqlmodel.tiangolo.com/)                                            | `fastapi_pagination.ext.async_sqlmodel.paginate`    |
+| [AsyncPG](https://magicstack.github.io/asyncpg/current/)                                    | `fastapi_pagination.ext.asyncpg.paginate`           |
+| [Databases](https://www.encode.io/databases/)                                               | `fastapi_pagination.ext.databases.paginate`         |
+| [Django ORM](https://docs.djangoproject.com/en/3.2/topics/db/queries/)                      | `fastapi_pagination.ext.django.paginate`            |
+| [GINO](https://python-gino.org/)                                                            | `fastapi_pagination.ext.gino.paginate`              |
+| [MongoEngine](https://docs.mongoengine.org/)                                                | `fastapi_pagination.ext.mongoengine.paginate`       |
+| [Motor](https://motor.readthedocs.io/en/stable/)                                            | `fastapi_pagination.ext.motor.paginate`             |
+| [ORM](https://www.encode.io/orm/)                                                           | `fastapi_pagination.ext.orm.paginate`               |
+| [ormar](https://collerek.github.io/ormar/)                                                  | `fastapi_pagination.ext.ormar.paginate`             |
+| [Piccolo](https://piccolo-orm.readthedocs.io/en/latest/)                                    | `fastapi_pagination.ext.piccolo.paginate`           |
+| [PyMongo](https://pymongo.readthedocs.io/en/stable/)                                        | `fastapi_pagination.ext.pymongo.paginate`           |
+| [Tortoise ORM](https://tortoise-orm.readthedocs.io/en/latest/)                              | `fastapi_pagination.ext.tortoise.paginate`          |
+
+
+---
 
 Code from `Quickstart` will generate OpenAPI schema as bellow:
 
