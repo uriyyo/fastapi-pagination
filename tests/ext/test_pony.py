@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from fastapi import FastAPI
 from pony.orm import Database, Required, Set, db_session, select
 from pydantic import validator
@@ -47,9 +49,10 @@ def pony_order(pony_db, pony_user):
 def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
     app = FastAPI()
 
-    pony_db.generate_mapping(create_tables=False)
+    with suppress(Exception):
+        pony_db.generate_mapping(create_tables=False)
 
-    class pony_with_rel_cls(model_with_rel_cls):
+    class model_pony_with_rel_cls(model_with_rel_cls):
         @validator("orders", pre=True, allow_reuse=True)
         def pony_set_to_list(cls, values):
             if not isinstance(values, list):
@@ -59,8 +62,8 @@ def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
 
     @app.get("/default", response_model=Page[model_cls])
     @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    @app.get("/relationship/default", response_model=Page[pony_with_rel_cls])
-    @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[pony_with_rel_cls])
+    @app.get("/relationship/default", response_model=Page[model_pony_with_rel_cls])
+    @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[model_pony_with_rel_cls])
     def route():
         with db_session:
             return paginate(select(p for p in pony_user))
