@@ -9,7 +9,10 @@ from ..api import create_page, resolve_params
 from ..bases import AbstractPage, AbstractParams
 
 
-async def paginate(query: Union[Select, Type[Table]], params: Optional[AbstractParams] = None) -> AbstractPage:
+async def paginate(
+    query: Union[Select, Type[Table]],
+    params: Optional[AbstractParams] = None,
+) -> AbstractPage:
     if not isinstance(query, Select):
         query = query.select()
 
@@ -21,7 +24,7 @@ async def paginate(query: Union[Select, Type[Table]], params: Optional[AbstractP
 
     # need another copy for count query
     count_query = deepcopy(query)
-    count_query.columns_delegate.selected_columns.clear()
+    count_query.columns_delegate.selected_columns.clear()  # type: ignore
 
     total = (await count_query.columns(Count()).first())["count"]
     items = await query.offset(raw_params.offset).limit(raw_params.limit)
@@ -29,4 +32,6 @@ async def paginate(query: Union[Select, Type[Table]], params: Optional[AbstractP
     return create_page(items, total, params)
 
 
-__all__ = ["paginate"]
+__all__ = [
+    "paginate",
+]

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, List, Optional
 
 from databases import Database
 from sqlalchemy import func, select
@@ -17,11 +17,11 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     convert_to_mapping: bool = True,
-) -> AbstractPage:
+) -> AbstractPage[Any]:
     params = resolve_params(params)
 
     total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))
-    items = await db.fetch_all(paginate_query(query, params))
+    items: List[Any] = await db.fetch_all(paginate_query(query, params))
 
     if convert_to_mapping:
         items = [{**item} for item in items]
@@ -29,4 +29,6 @@ async def paginate(
     return create_page(items, total, params)
 
 
-__all__ = ["paginate"]
+__all__ = [
+    "paginate",
+]

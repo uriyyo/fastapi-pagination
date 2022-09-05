@@ -54,4 +54,7 @@ async def paginate_aggregate(
     return create_page(items, total, params)
 
 
-__all__ = ["paginate", "paginate_aggregate"]
+__all__ = [
+    "paginate",
+    "paginate_aggregate",
+]

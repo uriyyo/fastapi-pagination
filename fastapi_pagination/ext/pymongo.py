@@ -1,26 +1,30 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Mapping, Optional, TypeVar
 
 from pymongo.collection import Collection
 
 from ..api import create_page, resolve_params
 from ..bases import AbstractPage, AbstractParams
 
+T = TypeVar("T", bound=Mapping[str, Any])
+
 
 def paginate(
-    collection: Collection,
+    collection: Collection[T],
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     **kwargs: Any,
-) -> AbstractPage:
+) -> AbstractPage[T]:
     params = resolve_params(params)
+    raw_params = params.to_raw_params()
+
     query_filter = query_filter or {}
 
-    raw_params = params.to_raw_params()
     total = collection.count_documents(query_filter)
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
-    items = list(cursor)
 
-    return create_page(items, total, params)
+    return create_page([*cursor], total, params)
 
 
-__all__ = ["paginate"]
+__all__ = [
+    "paginate",
+]

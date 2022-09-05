@@ -9,7 +9,10 @@ from ..bases import AbstractPage, AbstractParams
 T = TypeVar("T", bound=Model)
 
 
-def paginate(query: Union[Type[T], QuerySet[T]], params: Optional[AbstractParams] = None) -> AbstractPage[T]:
+def paginate(
+    query: Union[Type[T], QuerySet[T]],
+    params: Optional[AbstractParams] = None,
+) -> AbstractPage[T]:
     params = resolve_params(params)
     raw_params = params.to_raw_params()
 
@@ -22,4 +25,6 @@ def paginate(query: Union[Type[T], QuerySet[T]], params: Optional[AbstractParams
     return create_page([*query], total, params)
 
 
-__all__ = ["paginate"]
+__all__ = [
+    "paginate",
+]
