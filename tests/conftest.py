@@ -1,5 +1,6 @@
 from asyncio import new_event_loop
 from itertools import count
+from pathlib import Path
 from random import randint
 
 import aiosqlite
@@ -154,7 +155,7 @@ def postgres_url(request) -> str:
 
 @fixture(scope="session")
 def sqlite_file() -> str:
-    return "./test_db.sqlite"
+    return str(Path("./test_db.sqlite").resolve().absolute())
 
 
 @fixture(scope="session")
