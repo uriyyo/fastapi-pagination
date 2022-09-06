@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, TypeVar
+from typing import Any, Optional, TypeVar, cast
 
 from sqlalchemy import func, literal_column, select
 from sqlalchemy.orm import Query, noload
@@ -18,7 +18,7 @@ def paginate_query(query: T, params: AbstractParams) -> T:
 
 
 def count_query(query: Select) -> Select:
-    count_subquery = query.order_by(None).options(noload("*")).subquery()
+    count_subquery = cast(Any, query.order_by(None)).options(noload("*")).subquery()
     return select(func.count(literal_column("*"))).select_from(count_subquery)
 
 
