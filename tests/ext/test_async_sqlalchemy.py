@@ -6,14 +6,16 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.async_sqlalchemy import paginate
 
 from ..base import BasePaginationTestCase
 
 try:
     from sqlalchemy.ext.asyncio import AsyncSession
+
+    from fastapi_pagination.ext.async_sqlalchemy import paginate
 except ImportError:
     AsyncSession = None
+    paginate = None
 
 
 @fixture(scope="session")
