@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional, TypeVar
+from typing import Any, Optional, TypeVar, cast
 
-from sqlalchemy import func, select
+from sqlalchemy import func, literal_column, select
 from sqlalchemy.orm import Query, noload
 from sqlalchemy.sql import Select
 
@@ -18,11 +18,14 @@ def paginate_query(query: T, params: AbstractParams) -> T:
 
 
 def count_query(query: Select) -> Select:
-    count_subquery = query.order_by(None).options(noload("*")).subquery()  # type: ignore
-    return select(func.count("*")).select_from(count_subquery)
+    count_subquery = cast(Any, query.order_by(None)).options(noload("*")).subquery()
+    return select(func.count(literal_column("*"))).select_from(count_subquery)
 
 
-def paginate(query: Query, params: Optional[AbstractParams] = None) -> AbstractPage:
+def paginate(
+    query: Query,
+    params: Optional[AbstractParams] = None,
+) -> AbstractPage:
     params = resolve_params(params)
 
     total = query.count()
@@ -31,4 +34,8 @@ def paginate(query: Query, params: Optional[AbstractParams] = None) -> AbstractP
     return create_page(items, total, params)
 
 
-__all__ = ["paginate_query", "count_query", "paginate"]
+__all__ = [
+    "paginate_query",
+    "count_query",
+    "paginate",
+]

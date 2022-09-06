@@ -18,11 +18,10 @@ repos:
         additional_dependencies:
           - flake8-bugbear
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.971
+  - repo: local
     hooks:
       - id: mypy
-        exclude: tests
-        additional_dependencies:
-          - pydantic
-          - sqlalchemy-stubs
+        language: python
+        name: mypy
+        pass_filenames: false
+        entry: poetry run mypy fastapi_pagination --show-error-codes

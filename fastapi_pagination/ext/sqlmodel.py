@@ -1,30 +1,60 @@
-from typing import Optional, TypeVar, Union
+from typing import Any, Optional, Type, TypeVar, no_type_check, overload
 
-from sqlalchemy.orm import noload
-from sqlmodel import Session, SQLModel, func, select
+from sqlmodel import Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from ..api import create_page, resolve_params
 from ..bases import AbstractPage, AbstractParams
+from .sqlalchemy import count_query, paginate_query
 
-T = TypeVar("T", bound=SQLModel)
+T = TypeVar("T")
+TSQLModel = TypeVar("TSQLModel", bound=SQLModel)
 
 
+@overload
 def paginate(
     session: Session,
-    query: Union[T, Select[T], SelectOfScalar[T]],
+    query: Select[TSQLModel],
+    params: Optional[AbstractParams] = None,
+) -> AbstractPage[TSQLModel]:
+    pass
+
+
+@overload
+def paginate(
+    session: Session,
+    query: SelectOfScalar[T],
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage[T]:
+    pass
+
+
+@overload
+def paginate(
+    session: Session,
+    query: Type[TSQLModel],
+    params: Optional[AbstractParams] = None,
+) -> AbstractPage[TSQLModel]:
+    pass
+
+
+@no_type_check
+def paginate(
+    session: Session,
+    query: Any,
+    params: Optional[AbstractParams] = None,
+) -> AbstractPage[Any]:
     params = resolve_params(params)
-    raw_params = params.to_raw_params()
 
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    total = session.scalar(select(func.count("*")).select_from(query.order_by(None).options(noload("*")).subquery()))
-    items = session.exec(query.limit(raw_params.limit).offset(raw_params.offset)).unique().all()
+    total = session.scalar(count_query(query))
+    items = session.exec(paginate_query(query, params))
 
-    return create_page(items, total, params)
+    return create_page(items.unique().all(), total, params)
 
 
-__all__ = ["paginate"]
+__all__ = [
+    "paginate",
+]

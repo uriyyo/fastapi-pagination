@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import Any, Optional, Union, no_type_check
 
 from gino.crud import CRUDModel
 from sqlalchemy import func, literal_column
@@ -11,16 +11,22 @@ from ..bases import AbstractPage, AbstractParams
 from .sqlalchemy import paginate_query
 
 
-async def paginate(query: Union[Select, CRUDModel], params: Optional[AbstractParams] = None) -> AbstractPage:
+@no_type_check
+async def paginate(
+    query: Union[Select, CRUDModel],
+    params: Optional[AbstractParams] = None,
+) -> AbstractPage[Any]:
     if isinstance(query, type) and issubclass(query, CRUDModel):
-        query = query.query  # type: ignore
+        query = query.query
 
     params = resolve_params(params)
 
     total = await func.count(literal_column("*")).select().select_from(query.order_by(None).alias()).gino.scalar()
-    items = await paginate_query(query, params).gino.all()  # type: ignore
+    items = await paginate_query(query, params).gino.all()
 
     return create_page(items, total, params)
 
 
-__all__ = ["paginate"]
+__all__ = [
+    "paginate",
+]

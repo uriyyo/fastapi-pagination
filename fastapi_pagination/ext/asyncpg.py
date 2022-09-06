@@ -12,7 +12,7 @@ async def paginate(
     query: str,
     *args: Any,
     params: Optional[AbstractParams] = None,
-) -> AbstractPage:
+) -> AbstractPage[Any]:
     params = resolve_params(params)
 
     total = await conn.fetchval(
@@ -33,4 +33,6 @@ async def paginate(
     )
 
 
-__all__ = ["paginate"]
+__all__ = [
+    "paginate",
+]

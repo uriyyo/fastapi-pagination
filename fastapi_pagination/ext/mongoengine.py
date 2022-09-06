@@ -26,4 +26,6 @@ def paginate(
     return create_page(items, total, params)
 
 
-__all__ = ["paginate"]
+__all__ = [
+    "paginate",
+]

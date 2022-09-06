@@ -8,4 +8,6 @@ def unwrap_scalars(items: Sequence[Sequence[T]]) -> Union[Sequence[T], Sequence[
     return [item[0] if len(item) == 1 else item for item in items]
 
 
-__all__ = ["unwrap_scalars"]
+__all__ = [
+    "unwrap_scalars",
+]
