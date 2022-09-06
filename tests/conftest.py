@@ -1,3 +1,4 @@
+from . import patch  # noqa  # isort: skip  # DO NOT REMOVE THIS LINE.
 from asyncio import new_event_loop
 from itertools import count
 from pathlib import Path

@@ -7,9 +7,13 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.session import Session
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.sqlalchemy_future import paginate
 
 from ..base import BasePaginationTestCase
+
+try:
+    from fastapi_pagination.ext.sqlalchemy_future import paginate
+except ImportError:
+    paginate = None
 
 
 @fixture(scope="session")
