@@ -615,27 +615,27 @@ sqlite = ["aiosqlite"]
 
 [[package]]
 name = "ormar"
-version = "0.11.2"
+version = "0.11.3"
 description = "A simple async ORM with fastapi in mind and pydantic validation."
 category = "main"
 optional = true
 python-versions = ">=3.7.0,<4.0.0"
 
 [package.dependencies]
-databases = ">=0.3.2,<0.5.0 || >0.5.0,<0.5.1 || >0.5.1,<0.5.2 || >0.5.2,<0.5.3 || >0.5.3,<0.6.1"
+databases = ">=0.3.2,<0.5.0 || >0.5.0,<0.5.1 || >0.5.1,<0.5.2 || >0.5.2,<0.5.3 || >0.5.3,<0.6.2"
 importlib-metadata = {version = ">=3.1", markers = "python_version < \"3.8\""}
-pydantic = ">=1.6.1,<1.7 || >1.7,<1.7.1 || >1.7.1,<1.7.2 || >1.7.2,<1.7.3 || >1.7.3,<1.8 || >1.8,<1.8.1 || >1.8.1,<=1.9.1"
-SQLAlchemy = ">=1.3.18,<1.4.39"
-typing-extensions = {version = ">=3.7,<4.0", markers = "python_version < \"3.8\""}
+pydantic = ">=1.6.1,<1.7 || >1.7,<1.7.1 || >1.7.1,<1.7.2 || >1.7.2,<1.7.3 || >1.7.3,<1.8 || >1.8,<1.8.1 || >1.8.1,<1.10.3"
+SQLAlchemy = ">=1.3.18,<1.4.42"
+typing-extensions = {version = ">=3.7,<=5.0", markers = "python_version < \"3.8\""}
 
 [package.extras]
 aiopg = ["aiopg (>=1.3.3,<2.0.0)", "psycopg2-binary (>=2.9.1,<3.0.0)"]
-all = ["PyMySQL (>=0.9,<=0.9.3)", "aiomysql (>=0.0.21,<0.0.23)", "aiopg (>=1.3.3,<2.0.0)", "aiosqlite (>=0.17.0,<0.18.0)", "asyncpg (>=0.24,<0.26)", "cryptography (>=35,<38)", "mysqlclient (>=2.1.0,<3.0.0)", "orjson (>=3.6.4)", "psycopg2-binary (>=2.9.1,<3.0.0)"]
-crypto = ["cryptography (>=35,<38)"]
-mysql = ["PyMySQL (>=0.9,<=0.9.3)", "aiomysql (>=0.0.21,<0.0.23)"]
+all = ["PyMySQL (>=0.9)", "aiomysql (>=0.1.0)", "aiopg (>=1.3.3,<2.0.0)", "aiosqlite (>=0.17.0,<0.18.0)", "asyncpg (>=0.24,<0.27)", "cryptography (>=35,<39)", "mysqlclient (>=2.1.0,<3.0.0)", "orjson (>=3.6.4)", "psycopg2-binary (>=2.9.1,<3.0.0)"]
+crypto = ["cryptography (>=35,<39)"]
+mysql = ["PyMySQL (>=0.9)", "aiomysql (>=0.1.0)"]
 orjson = ["orjson (>=3.6.4)"]
-postgres = ["asyncpg (>=0.24,<0.26)", "psycopg2-binary (>=2.9.1,<3.0.0)"]
-postgresql = ["asyncpg (>=0.24,<0.26)", "psycopg2-binary (>=2.9.1,<3.0.0)"]
+postgres = ["asyncpg (>=0.24,<0.27)", "psycopg2-binary (>=2.9.1,<3.0.0)"]
+postgresql = ["asyncpg (>=0.24,<0.27)", "psycopg2-binary (>=2.9.1,<3.0.0)"]
 sqlite = ["aiosqlite (>=0.17.0,<0.18.0)"]
 
 [[package]]
@@ -1638,8 +1638,8 @@ orm = [
     {file = "orm-0.3.1.tar.gz", hash = "sha256:5b41cccdd55d50f90d207f9cb66a379e6d0fefbae434af7992fddea9aa74572a"},
 ]
 ormar = [
-    {file = "ormar-0.11.2-py3-none-any.whl", hash = "sha256:22f8c561bf9991c59eecb3a88d7acde10bfe5380cb36211f2e987fd7fedcd7b0"},
-    {file = "ormar-0.11.2.tar.gz", hash = "sha256:f0fefade9e3650184343de48ef3b90763bb4ba576359a26177ca78e66c529c70"},
+    {file = "ormar-0.11.3-py3-none-any.whl", hash = "sha256:649e922d70d2bda4e079d93c31accd74583f547dcf7e4eb652120d95e39e5308"},
+    {file = "ormar-0.11.3.tar.gz", hash = "sha256:b82994d8db000685a9bbc4ed53bbbef33811f9fcfd3ae1a0318dff6b1a634f86"},
 ]
 packaging = [
     {file = "packaging-21.3-py3-none-any.whl", hash = "sha256:ef103e05f519cdc783ae24ea4e2e0f508a9c99b2d4969652eed6a2e1ea5bd522"},
