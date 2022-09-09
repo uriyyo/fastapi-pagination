@@ -62,12 +62,12 @@ def test_add_pagination():
     add_pagination(app)
 
     assert len(r1.dependencies) == 0
-    assert len(r2.dependencies) == 4
+    assert len(r2.dependencies) == 1
 
     add_pagination(app)
 
     assert len(r1.dependencies) == 0
-    assert len(r2.dependencies) == 4
+    assert len(r2.dependencies) == 1
 
 
 def test_add_pagination_include_router():
@@ -85,7 +85,7 @@ def test_add_pagination_include_router():
 
     add_pagination(router1)
 
-    assert len(r1.dependencies) == 4
+    assert len(r1.dependencies) == 1
 
     router2 = APIRouter()
 
@@ -105,13 +105,13 @@ def test_add_pagination_include_router():
 
     *_, r1, r2 = app.routes
 
-    assert len(r1.dependencies) == 4
+    assert len(r1.dependencies) == 1
     assert len(r2.dependencies) == 0
 
     add_pagination(app)
 
-    assert len(r1.dependencies) == 4
-    assert len(r2.dependencies) == 4
+    assert len(r1.dependencies) == 1
+    assert len(r2.dependencies) == 1
 
 
 def test_add_pagination_additional_dependencies():
@@ -134,5 +134,5 @@ def test_add_pagination_additional_dependencies():
 
     add_pagination(app)
 
-    assert len(r.dependencies) == 5
-    assert len(r.dependant.dependencies) == 6
+    assert len(r.dependencies) == 2
+    assert len(r.dependant.dependencies) == 3

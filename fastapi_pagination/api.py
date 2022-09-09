@@ -1,5 +1,5 @@
 import inspect
-from contextlib import contextmanager, suppress
+from contextlib import ExitStack, contextmanager, suppress
 from contextvars import ContextVar
 from typing import (
     Any,
@@ -44,7 +44,11 @@ def resolve_params(params: Optional[AbstractParams] = None) -> AbstractParams:
     return params
 
 
-def create_page(items: Sequence[T], total: int, params: AbstractParams) -> AbstractPage[T]:
+def create_page(
+    items: Sequence[T],
+    total: int,
+    params: AbstractParams,
+) -> AbstractPage[T]:
     return page_type.get().create(items, total, params)
 
 
@@ -79,18 +83,10 @@ def set_page(page: Type[AbstractPage]) -> ContextManager[None]:
     return _ctx_var_with_reset(page_type, page)
 
 
-def _create_page_dependency(page: Type[AbstractPage]) -> Callable[[], AsyncIterator[None]]:
-    async def _set_page_type() -> AsyncIterator[None]:
-        with set_page(page):
-            yield
-
-    return _set_page_type
-
-
 def _create_params_dependency(
     params: Type[TAbstractParams],
 ) -> Callable[[TAbstractParams], AsyncIterator[TAbstractParams]]:
-    async def _pagination_params(*args, **kwargs) -> AsyncIterator[params]:  # type: ignore
+    async def _pagination_params(*args: Any, **kwargs: Any) -> AsyncIterator[TAbstractParams]:
         val = params(*args, **kwargs)
         with _ctx_var_with_reset(params_value, val):
             yield val
@@ -100,42 +96,43 @@ def _create_params_dependency(
     return _pagination_params
 
 
-async def _set_request_response(req: Request, res: Response) -> AsyncIterator[None]:
-    with _ctx_var_with_reset(response_value, res):
-        with _ctx_var_with_reset(request_value, req):
-            yield
+def pagination_ctx(page: Type[AbstractPage]) -> Callable[..., AsyncIterator[AbstractParams]]:
+    async def _page_ctx_dependency(
+        req: Request,
+        res: Response,
+        _params: Any = Depends(_create_params_dependency(page.__params_type__)),
+    ) -> AsyncIterator[AbstractParams]:
+        with ExitStack() as stack:
+            stack.enter_context(set_page(page))
+            stack.enter_context(_ctx_var_with_reset(response_value, res))
+            stack.enter_context(_ctx_var_with_reset(request_value, req))
 
+            yield cast(AbstractParams, _params)
 
-async def _marker() -> None:
-    pass
+    _page_ctx_dependency.__page_ctx_dep__ = True  # type: ignore
+
+    return _page_ctx_dependency
 
 
 ParentT = TypeVar("ParentT", APIRouter, FastAPI)
 
 
 def _update_route(route: APIRoute) -> None:
-    if any(d.call is _marker for d in route.dependant.dependencies):
+    if any(hasattr(d.call, "__page_ctx_dep__") for d in route.dependant.dependencies):
         return
 
     if not lenient_issubclass(route.response_model, AbstractPage):
         return
 
     cls = cast(Type[AbstractPage], route.response_model)
+    dep = Depends(pagination_ctx(cls))
 
-    dependencies = [
-        Depends(_marker),
-        Depends(_set_request_response),
-        Depends(_create_params_dependency(cls.__params_type__)),
-        Depends(_create_page_dependency(cls)),
-    ]
-
-    route.dependencies.extend(dependencies)
-    route.dependant.dependencies.extend(
+    route.dependencies.append(dep)
+    route.dependant.dependencies.append(
         get_parameterless_sub_dependant(
-            depends=d,
+            depends=dep,
             path=route.path_format,
         )
-        for d in dependencies
     )
 
 
@@ -154,4 +151,5 @@ __all__ = [
     "response",
     "request",
     "set_page",
+    "pagination_ctx",
 ]
