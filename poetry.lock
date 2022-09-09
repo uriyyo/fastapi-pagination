@@ -168,7 +168,7 @@ toml = ["tomli"]
 
 [[package]]
 name = "databases"
-version = "0.6.0"
+version = "0.6.1"
 description = "Async database support for Python."
 category = "main"
 optional = true
@@ -1393,8 +1393,8 @@ coverage = [
     {file = "coverage-6.4.4.tar.gz", hash = "sha256:e16c45b726acb780e1e6f88b286d3c10b3914ab03438f32117c4aa52d7f30d58"},
 ]
 databases = [
-    {file = "databases-0.6.0-py3-none-any.whl", hash = "sha256:c36468d9e00f47a825669a73158e6745e0401a169186fdefbb2fb7d43276320a"},
-    {file = "databases-0.6.0.tar.gz", hash = "sha256:abf088900e6665952fede331cb126a1810a097fb3aad54e02a4f58521419dabf"},
+    {file = "databases-0.6.1-py3-none-any.whl", hash = "sha256:47fae85d82d8227049f08b154019913c3ad2f6057ceb0b5ebb36703be6f5666b"},
+    {file = "databases-0.6.1.tar.gz", hash = "sha256:0a69c6983a27e10a5b75ffa094486f1febadd9d5a8db016e69b8c2f6a354dc30"},
 ]
 distlib = [
     {file = "distlib-0.3.6-py2.py3-none-any.whl", hash = "sha256:f35c4b692542ca110de7ef0bea44d73981caeb34ca0b9b6b2e6d7790dda8f80e"},
@@ -1777,6 +1777,7 @@ pymdown-extensions = [
     {file = "pymdown_extensions-9.5.tar.gz", hash = "sha256:3ef2d998c0d5fa7eb09291926d90d69391283561cf6306f85cd588a5eb5befa0"},
 ]
 pymongo = [
+    {file = "pymongo-4.2.0-cp310-cp310-macosx_10_15_universal2.whl", hash = "sha256:b9e4981a65f8500a3a46bb3a1e81b9feb45cf0b2115ad9c4f8d517326d026940"},
     {file = "pymongo-4.2.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:1c81414b706627f15e921e29ae2403aab52e33e36ed92ed989c602888d7c3b90"},
     {file = "pymongo-4.2.0-cp310-cp310-manylinux1_i686.whl", hash = "sha256:c549bb519456ee230e92f415c5b4d962094caac0fdbcc4ed22b576f66169764e"},
     {file = "pymongo-4.2.0-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:70216ec4c248213ae95ea499b6314c385ce01a5946c448fb22f6c8395806e740"},
