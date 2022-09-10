@@ -1,8 +1,5 @@
 <h1 align="center">
-<div style="display: flex; align-items: center">
-<img alt="logo" src="https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png">
-<span style="font-size: 600%">📖</span>
-</div>
+<img alt="logo" src="https://raw.githubusercontent.com/uriyyo/fastapi-pagination/main/docs/img/logo.png">
 </h1>
 
 <div align="center">
