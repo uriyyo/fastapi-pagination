@@ -1,4 +1,9 @@
-<h1 align="center">FastAPI Pagination</h1>
+<h1 align="center">
+<div style="display: flex; align-items: center">
+<img alt="logo" src="https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png">
+<span style="font-size: 600%">📖</span>
+</div>
+</h1>
 
 <div align="center">
 <img alt="license" src="https://img.shields.io/badge/License-MIT-lightgrey">
