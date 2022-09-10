@@ -27,21 +27,30 @@ from .default import Page
 T = TypeVar("T")
 TAbstractParams = TypeVar("TAbstractParams", covariant=True, bound=AbstractParams)
 
-params_value: ContextVar[AbstractParams] = ContextVar("params_value")
-page_type: ContextVar[Type[AbstractPage]] = ContextVar("page_type", default=Page)
+_params_val: ContextVar[AbstractParams] = ContextVar("_params_val")
+_page_val: ContextVar[Type[AbstractPage]] = ContextVar("_page_val", default=Page)
 
-response_value: ContextVar[Response] = ContextVar("response_value")
-request_value: ContextVar[Request] = ContextVar("request_value")
+_rsp_val: ContextVar[Response] = ContextVar("_rsp_val")
+_req_val: ContextVar[Request] = ContextVar("_req_val")
+
+_items_val: ContextVar[Sequence[Any]] = ContextVar("_items_val")
 
 
 def resolve_params(params: Optional[AbstractParams] = None) -> AbstractParams:
     if params is None:
         try:
-            return params_value.get()
+            return _params_val.get()
         except LookupError:
             raise RuntimeError("Use params or add_pagination")
 
     return params
+
+
+def pagination_items() -> Sequence[Any]:
+    try:
+        return _items_val.get()
+    except LookupError:
+        raise RuntimeError("pagination_items must be called inside create_page")
 
 
 def create_page(
@@ -49,19 +58,20 @@ def create_page(
     total: int,
     params: AbstractParams,
 ) -> AbstractPage[T]:
-    return page_type.get().create(items, total, params)
+    with _ctx_var_with_reset(_items_val, items):
+        return _page_val.get().create(items, total, params)
 
 
 def response() -> Response:
     try:
-        return response_value.get()
+        return _rsp_val.get()
     except LookupError:
         raise RuntimeError("response context var must be set")
 
 
 def request() -> Request:
     try:
-        return request_value.get()
+        return _req_val.get()
     except LookupError:
         raise RuntimeError("request context var must be set")
 
@@ -80,7 +90,7 @@ def _ctx_var_with_reset(var: ContextVar, value: Any) -> ContextManager[None]:
 
 
 def set_page(page: Type[AbstractPage]) -> ContextManager[None]:
-    return _ctx_var_with_reset(page_type, page)
+    return _ctx_var_with_reset(_page_val, page)
 
 
 def _create_params_dependency(
@@ -88,7 +98,7 @@ def _create_params_dependency(
 ) -> Callable[[TAbstractParams], AsyncIterator[TAbstractParams]]:
     async def _pagination_params(*args: Any, **kwargs: Any) -> AsyncIterator[TAbstractParams]:
         val = params(*args, **kwargs)
-        with _ctx_var_with_reset(params_value, val):
+        with _ctx_var_with_reset(_params_val, val):
             yield val
 
     _pagination_params.__signature__ = inspect.signature(params)  # type: ignore
@@ -96,16 +106,22 @@ def _create_params_dependency(
     return _pagination_params
 
 
-def pagination_ctx(page: Type[AbstractPage]) -> Callable[..., AsyncIterator[AbstractParams]]:
+def pagination_ctx(
+    page: Type[AbstractPage],
+    params: Optional[Type[AbstractParams]] = None,
+) -> Callable[..., AsyncIterator[AbstractParams]]:
+    if params is None:
+        params = page.__params_type__
+
     async def _page_ctx_dependency(
         req: Request,
         res: Response,
-        _params: Any = Depends(_create_params_dependency(page.__params_type__)),
+        _params: Any = Depends(_create_params_dependency(params)),  # type: ignore[arg-type]
     ) -> AsyncIterator[AbstractParams]:
         with ExitStack() as stack:
             stack.enter_context(set_page(page))
-            stack.enter_context(_ctx_var_with_reset(response_value, res))
-            stack.enter_context(_ctx_var_with_reset(request_value, req))
+            stack.enter_context(_ctx_var_with_reset(_rsp_val, res))
+            stack.enter_context(_ctx_var_with_reset(_req_val, req))
 
             yield cast(AbstractParams, _params)
 
@@ -152,4 +168,5 @@ __all__ = [
     "request",
     "set_page",
     "pagination_ctx",
+    "pagination_items",
 ]
