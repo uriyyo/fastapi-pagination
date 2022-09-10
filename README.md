@@ -35,7 +35,8 @@ on data you want to paginate.
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from fastapi_pagination import Page, add_pagination, paginate  # import all you need from fastapi-pagination
+# import all you need from fastapi-pagination
+from fastapi_pagination import Page, add_pagination, paginate
 
 app = FastAPI()  # create FastAPI app
 
@@ -102,6 +103,7 @@ Currently, `fastapi-pagination` supports:
 | [ormar](https://collerek.github.io/ormar/)                                                  | `fastapi_pagination.ext.ormar.paginate`             |
 | [Piccolo](https://piccolo-orm.readthedocs.io/en/latest/)                                    | `fastapi_pagination.ext.piccolo.paginate`           |
 | [PyMongo](https://pymongo.readthedocs.io/en/stable/)                                        | `fastapi_pagination.ext.pymongo.paginate`           |
+| [Pony ORM](https://docs.ponyorm.org/)                                                       | `fastapi_pagination.ext.pony.paginate`              |
 | [Tortoise ORM](https://tortoise-orm.readthedocs.io/en/latest/)                              | `fastapi_pagination.ext.tortoise.paginate`          |
 
 
