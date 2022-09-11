@@ -1,4 +1,4 @@
-from typing import Optional, TypeVar, Union, cast
+from typing import Optional, TypeVar, Union
 
 from beanie import Document
 from beanie.odm.queries.find import FindMany
@@ -15,9 +15,6 @@ async def paginate(
 ) -> AbstractPage[TDocument]:
     params = resolve_params(params)
     raw_params = params.to_raw_params()
-
-    if isinstance(query, Document):
-        query = cast(FindMany[TDocument], query.find_all())
 
     items = await query.find_many(limit=raw_params.limit, skip=raw_params.offset).to_list()
     total = await query.count()
