@@ -27,7 +27,7 @@ async def paginate_aggregate(
     collection: AsyncIOMotorCollection,
     aggregate_pipeline: Optional[List[Dict[Any, Any]]] = None,
     params: Optional[AbstractParams] = None,
-) -> AbstractPage:
+) -> AbstractPage:  # pragma: no cover
     params = resolve_params(params)
     aggregate_pipeline = aggregate_pipeline or []
 
