@@ -22,7 +22,8 @@ async def paginate(
     params = resolve_params(params)
 
     total = await func.count(literal_column("*")).select().select_from(query.order_by(None).alias()).gino.scalar()
-    items = await paginate_query(query, params).gino.all()
+    query, _ = paginate_query(query, params)
+    items = await query.gino.all()
 
     return create_page(items, total, params)
 

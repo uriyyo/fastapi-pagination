@@ -3,10 +3,10 @@ from typing import Any, Optional, Type, TypeVar, no_type_check, overload
 from sqlmodel import Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
-from ..api import create_page, resolve_params
+from ..api import resolve_params
 from ..bases import AbstractPage, AbstractParams
 from ..types import PaginationQueryType
-from .sqlalchemy import count_query, paginate_query
+from .sqlalchemy_future import exec_pagination
 
 T = TypeVar("T")
 TSQLModel = TypeVar("TSQLModel", bound=SQLModel)
@@ -58,10 +58,7 @@ def paginate(
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    total = session.scalar(count_query(query))
-    items = session.exec(paginate_query(query, params, query_type))
-
-    return create_page(items.unique().all(), total, params)
+    return exec_pagination(query, params, session.exec, query_type, unwrap=False)
 
 
 __all__ = [

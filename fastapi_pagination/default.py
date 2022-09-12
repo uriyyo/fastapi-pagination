@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Generic, Sequence, TypeVar
+from typing import Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel, conint
@@ -31,7 +31,7 @@ class Page(BasePage[T], Generic[T]):
     def create(
         cls,
         items: Sequence[T],
-        total: int,
+        total: Optional[int],
         params: AbstractParams,
     ) -> Page[T]:
         if not isinstance(params, Params):

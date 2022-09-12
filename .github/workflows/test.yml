@@ -44,7 +44,7 @@ jobs:
         with:
           path: |
             ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+          key: ${{ runner.os }}-py${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         run: |

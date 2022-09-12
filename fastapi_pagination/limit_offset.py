@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
-from typing import Generic, Sequence, TypeVar
+from typing import Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
@@ -33,7 +33,7 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
     def create(
         cls,
         items: Sequence[T],
-        total: int,
+        total: Optional[int],
         params: AbstractParams,
     ) -> LimitOffsetPage[T]:
         return cls(

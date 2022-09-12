@@ -38,6 +38,7 @@ mongoengine = {version = ">=0.23.1,<0.25.0", optional = true}
 sqlmodel = { version = "^0.0.8", optional = true}
 pony = { version = "^0.7.16", optional = true}
 beanie = { version = "^1.11.9", optional = true}
+sqlakeyset = { version = "^1.0.1659142803", optional = true }
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1"
@@ -58,8 +59,8 @@ requests = "^2.28.1"
 uvicorn = "^0.18.3"
 
 [tool.poetry.extras]
-sqlmodel = ["sqlmodel"]
-sqlalchemy = ["SQLAlchemy"]
+sqlmodel = ["sqlmodel", "sqlakeyset"]
+sqlalchemy = ["SQLAlchemy", "sqlakeyset"]
 databases = ["databases"]
 orm = ["orm", "databases", "typesystem"]
 ormar = ["ormar"]
@@ -70,7 +71,7 @@ piccolo = ["piccolo"]
 motor = ["motor"]
 mongoengine = ["mongoengine"]
 beanie =  ["beanie"]
-all = ["sqlmodel", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine", "pony", "beanie"]
+all = ["sqlmodel", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine", "pony", "beanie", "sqlakeyset"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

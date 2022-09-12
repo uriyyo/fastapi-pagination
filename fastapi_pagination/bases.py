@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import ChainMap
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import wraps
 from typing import (
     Any,
@@ -8,6 +8,7 @@ from typing import (
     Dict,
     Generic,
     Mapping,
+    Optional,
     Sequence,
     Type,
     TypeVar,
@@ -28,12 +29,18 @@ TAbstractPage = TypeVar("TAbstractPage", bound="AbstractPage")
 class RawParams:
     limit: int
     offset: int
+    need_total: bool = True
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 class AbstractParams(ABC):
     @abstractmethod
     def to_raw_params(self) -> RawParams:
         pass
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        return {}
 
 
 def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping[str, Any]:
@@ -54,7 +61,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
 
     @classmethod
     @abstractmethod
-    def create(cls: Type[C], items: Sequence[T], total: int, params: AbstractParams) -> C:
+    def create(cls: Type[C], items: Sequence[T], total: Optional[int], params: AbstractParams) -> C:
         pass
 
     @classmethod

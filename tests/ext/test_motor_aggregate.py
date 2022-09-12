@@ -31,11 +31,6 @@ def db_client(database_url):
 def app(db_client, model_cls, raw_data):
     app = FastAPI()
 
-    @app.on_event("startup")
-    async def on_startup() -> None:
-        await db_client.test_agg.users.delete_many({})
-        await db_client.test_agg.users.insert_many(raw_data)
-
     @app.get("/default", response_model=Page[model_cls])
     @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     async def route():
@@ -56,7 +51,10 @@ class TestMotorAggregate(BasePaginationTestCase):
         return Model
 
     @async_fixture(scope="session")
-    async def entities(self, db_client):
+    async def entities(self, db_client, raw_data):
+        await db_client.test_agg.users.delete_many({})
+        await db_client.test_agg.users.insert_many(raw_data)
+
         cursor = db_client.test_agg.users.aggregate(
             [
                 {"$group": {"_id": "$name", "name": {"$first": "$name"}}},

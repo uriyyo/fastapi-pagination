@@ -21,7 +21,8 @@ async def paginate(
     params = resolve_params(params)
 
     total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))
-    items: List[Any] = await db.fetch_all(paginate_query(query, params))
+    query, _ = paginate_query(query, params)
+    items: List[Any] = await db.fetch_all(query)
 
     if convert_to_mapping:
         items = [{**item} for item in items]

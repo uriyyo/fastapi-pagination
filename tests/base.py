@@ -1,9 +1,6 @@
 from typing import Any, ClassVar, Dict, List, Type
 
-from asgi_lifespan import LifespanManager
-from httpx import AsyncClient
 from pytest import fixture, mark
-from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import set_page
 from fastapi_pagination.default import Page, Params
@@ -132,11 +129,6 @@ class BasePaginationTestCase:
 
     def _normalize_expected(self, result):
         return result
-
-    @async_fixture(scope="session")
-    async def client(self, app):
-        async with LifespanManager(app), AsyncClient(app=app, base_url="http://testserver") as c:
-            yield c
 
 
 __all__ = [

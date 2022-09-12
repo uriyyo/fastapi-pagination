@@ -6,6 +6,8 @@ from random import randint
 
 import aiosqlite
 import asyncpg
+from asgi_lifespan import LifespanManager
+from httpx import AsyncClient
 from motor.motor_asyncio import AsyncIOMotorClient
 from pytest import fixture
 from pytest_asyncio import fixture as async_fixture
@@ -198,3 +200,9 @@ def event_loop():
 
 def pytest_collection_modifyitems(items):
     items.sort(key=lambda it: (it.path, it.name))
+
+
+@async_fixture(scope="class")
+async def client(app):
+    async with LifespanManager(app), AsyncClient(app=app, base_url="http://testserver") as c:
+        yield c

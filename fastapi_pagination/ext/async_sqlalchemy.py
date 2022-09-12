@@ -5,11 +5,10 @@ from typing import Any, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import Select
 
-from ..api import create_page, resolve_params
+from ..api import resolve_params
 from ..bases import AbstractPage, AbstractParams
 from ..types import PaginationQueryType
-from .sqlalchemy import count_query, paginate_query
-from .utils import unwrap_scalars
+from .sqlalchemy_future import async_exec_pagination
 
 
 async def paginate(
@@ -20,11 +19,7 @@ async def paginate(
     query_type: PaginationQueryType = None,
 ) -> AbstractPage[Any]:
     params = resolve_params(params)
-
-    total = await conn.scalar(count_query(query))
-    items = await conn.execute(paginate_query(query, params, query_type))
-
-    return create_page(unwrap_scalars(items.unique().all()), total, params)
+    return await async_exec_pagination(query, params, conn.execute, query_type)
 
 
 __all__ = [
