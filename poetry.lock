@@ -28,14 +28,6 @@ test = ["coverage[toml] (>=4.5)", "hypothesis (>=4.0)", "pytest (>=7.0)", "pytes
 trio = ["trio (>=0.16)"]
 
 [[package]]
-name = "argparse"
-version = "1.4.0"
-description = "Python command-line parsing library"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "asgi-lifespan"
 version = "1.0.1"
 description = "Programmatic startup/shutdown of ASGI apps."
@@ -459,17 +451,6 @@ optional = true
 python-versions = ">=3.6.2,<4.0"
 
 [[package]]
-name = "isodate"
-version = "0.6.1"
-description = "An ISO 8601 date/time/duration parser and formatter"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-six = "*"
-
-[[package]]
 name = "jinja2"
 version = "3.1.2"
 description = "A very fast and expressive template engine."
@@ -482,18 +463,6 @@ MarkupSafe = ">=2.0"
 
 [package.extras]
 i18n = ["Babel (>=2.7)"]
-
-[[package]]
-name = "mark"
-version = "0.2"
-description = "RDF Bookmarking Utilities"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-argparse = "*"
-rdflib = "*"
 
 [[package]]
 name = "markdown"
@@ -550,7 +519,7 @@ i18n = ["babel (>=2.9.0)"]
 
 [[package]]
 name = "mkdocs-material"
-version = "8.4.3"
+version = "8.4.4"
 description = "Documentation that simply works"
 category = "dev"
 optional = false
@@ -965,27 +934,6 @@ python-versions = ">=3.6"
 pyyaml = "*"
 
 [[package]]
-name = "rdflib"
-version = "6.2.0"
-description = "RDFLib is a Python library for working with RDF, a simple yet powerful language for representing information."
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-importlib-metadata = {version = "*", markers = "python_version < \"3.8.0\""}
-isodate = "*"
-pyparsing = "*"
-
-[package.extras]
-berkeleydb = ["berkeleydb"]
-dev = ["black (==22.6.0)", "flake8", "isort", "mypy", "pep8-naming", "types-setuptools", "flakeheaven"]
-docs = ["myst-parser", "sphinx (<6)", "sphinxcontrib-apidoc", "sphinxcontrib-kroki", "sphinx-autodoc-typehints"]
-html = ["html5lib"]
-networkx = ["networkx"]
-tests = ["html5lib", "pytest", "pytest-cov"]
-
-[[package]]
 name = "requests"
 version = "2.28.1"
 description = "Python HTTP for Humans."
@@ -1330,7 +1278,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "5bcf0a45e33291d8f09977fa4970afbbec8e0e705e5066ebae3d8aa4782bc692"
+content-hash = "d1876209fed7c42dfa3e37fbdca9ee300b0ef196485143cc1266f2048484ee28"
 
 [metadata.files]
 aiosqlite = [
@@ -1340,10 +1288,6 @@ aiosqlite = [
 anyio = [
     {file = "anyio-3.6.1-py3-none-any.whl", hash = "sha256:cb29b9c70620506a9a8f87a309591713446953302d7d995344d0d7c6c0c9a7be"},
     {file = "anyio-3.6.1.tar.gz", hash = "sha256:413adf95f93886e442aea925f3ee43baa5a765a64a0f52c6081894f9992fdd0b"},
-]
-argparse = [
-    {file = "argparse-1.4.0-py2.py3-none-any.whl", hash = "sha256:c31647edb69fd3d465a847ea3157d37bed1f95f19760b11a47aa91c04b666314"},
-    {file = "argparse-1.4.0.tar.gz", hash = "sha256:62b089a55be1d8949cd2bc7e0df0bddb9e028faefc8c32038cc84862aefdd6e4"},
 ]
 asgi-lifespan = [
     {file = "asgi-lifespan-1.0.1.tar.gz", hash = "sha256:9a33e7da2073c4764bc79bd6136501d6c42f60e3d2168ba71235e84122eadb7f"},
@@ -1424,13 +1368,9 @@ iso8601 = [
     {file = "iso8601-1.0.2-py3-none-any.whl", hash = "sha256:d7bc01b1c2a43b259570bb307f057abc578786ea734ba2b87b836c5efc5bd443"},
     {file = "iso8601-1.0.2.tar.gz", hash = "sha256:27f503220e6845d9db954fb212b95b0362d8b7e6c1b2326a87061c3de93594b1"},
 ]
-isodate = []
 jinja2 = [
     {file = "Jinja2-3.1.2-py3-none-any.whl", hash = "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"},
     {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
-]
-mark = [
-    {file = "mark-0.2.tar.gz", hash = "sha256:8763c5d7f0c4b1a3e8344f1254d1bbb0f334dcc9d81417eb0b8f4a86f5f03945"},
 ]
 markdown = []
 markupsafe = [
@@ -1633,7 +1573,6 @@ pyyaml = [
     {file = "PyYAML-6.0.tar.gz", hash = "sha256:68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"},
 ]
 pyyaml-env-tag = []
-rdflib = []
 requests = []
 rfc3986 = [
     {file = "rfc3986-1.5.0-py2.py3-none-any.whl", hash = "sha256:a86d6e1f5b1dc238b218b012df0aa79409667bb209e58da56d0b94704e712a97"},
