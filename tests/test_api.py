@@ -1,17 +1,22 @@
-from typing import Any
+from typing import Any, Generic, Sequence, TypeVar
 
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.routing import APIRouter
 from fastapi.testclient import TestClient
+from pydantic import Field
+from pydantic.generics import GenericModel
 from pytest import raises
 
 from fastapi_pagination import (
     Page,
+    Params,
     add_pagination,
     paginate,
     request,
     response,
 )
+from fastapi_pagination.api import pagination_items
+from fastapi_pagination.bases import AbstractPage
 
 
 def test_set_response_request():
@@ -136,3 +141,43 @@ def test_add_pagination_additional_dependencies():
 
     assert len(r.dependencies) == 2
     assert len(r.dependant.dependencies) == 3
+
+
+def test_pagination_items_outside_create_page():
+    with raises(
+        RuntimeError,
+        match=r"^pagination_items must be called inside create_page$",
+    ):
+        pagination_items()
+
+
+T = TypeVar("T")
+
+
+def test_pagination_items():
+    app = FastAPI()
+    client = TestClient(app)
+
+    class InnerModel(GenericModel, Generic[T]):
+        items: Sequence[T] = Field(default_factory=pagination_items)
+
+    class CustomPage(AbstractPage[T], Generic[T]):
+        inner: InnerModel[T]
+
+        __params_type__ = Params
+
+        @classmethod
+        def create(cls, items, total, params):
+            return cls.parse_obj({"inner": {}})
+
+    @app.get(
+        "/",
+        response_model=CustomPage[int],
+    )
+    async def route():
+        return paginate([1, 2, 3])
+
+    add_pagination(app)
+
+    rsp = client.get("/")
+    assert rsp.json() == {"inner": {"items": [1, 2, 3]}}
