@@ -15,7 +15,7 @@ class CursorParams(BaseModel, AbstractParams):
     cursor: Optional[str] = Query(None, description="Cursor for the next page")
     size: int = Query(50, ge=0, description="Page offset")
 
-    _metadata: dict[str, Any] = PrivateAttr(default_factory=dict)
+    _metadata: Dict[str, Any] = PrivateAttr(default_factory=dict)
 
     def to_raw_params(self) -> RawParams:
         return RawParams(
