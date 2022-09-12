@@ -61,7 +61,7 @@ def paginate_using_cursor(q: Select, raw_params: RawParams) -> Any:
     if place:
         condition = where_condition_for_page(order_cols, place, dialect)
         groupby = group_by_clauses(selectable)
-        if groupby is not None and len(groupby) > 0:
+        if groupby:
             q = q.having(condition)
         else:
             q = q.where(condition)
