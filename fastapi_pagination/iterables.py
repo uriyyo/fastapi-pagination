@@ -30,7 +30,7 @@ def paginate(
     raw_params = params.to_raw_params()
 
     items = [*islice(iterable, raw_params.offset, raw_params.offset + raw_params.limit)]
-    return create_page(items, total, params)  # type: ignore
+    return create_page(items, total, params)
 
 
 __all__ = [

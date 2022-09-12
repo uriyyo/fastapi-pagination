@@ -55,7 +55,7 @@ def pagination_items() -> Sequence[Any]:
 
 def create_page(
     items: Sequence[T],
-    total: int,
+    total: Optional[int],
     params: AbstractParams,
 ) -> AbstractPage[T]:
     with _ctx_var_with_reset(_items_val, items):
