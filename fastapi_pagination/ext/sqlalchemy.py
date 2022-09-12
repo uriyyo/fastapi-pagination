@@ -129,6 +129,9 @@ def paginate_query(
     raw_params = params.to_raw_params()
 
     if params.metadata.get("type") == "cursor":
+        if isinstance(query, Query):
+            raise ValueError("Cursor pagination is not supported for old ORM Query queries")
+
         warnings.warn("Cursor pagination is experimental", ExperimentalWarning)
         return paginate_using_cursor(query, raw_params), _cursor_pagination_process_items
 

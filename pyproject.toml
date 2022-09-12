@@ -39,6 +39,7 @@ sqlmodel = { version = "^0.0.8", optional = true}
 pony = { version = "^0.7.16", optional = true}
 beanie = { version = "^1.11.9", optional = true}
 sqlakeyset = { version = "^1.0.1659142803", optional = true }
+mark = "^0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1"
