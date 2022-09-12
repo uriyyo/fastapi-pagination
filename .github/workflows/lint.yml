@@ -24,9 +24,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.1
+
+      - name: Setup cache
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+
       - name: Install dependencies
         run: |
-          pip install -U poetry
           poetry install -E all
 
       - name: Lint
