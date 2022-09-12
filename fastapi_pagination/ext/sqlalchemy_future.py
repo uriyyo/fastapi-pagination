@@ -18,6 +18,7 @@ def exec_pagination(
     params: AbstractParams,
     db_exec: Callable[..., Any],
     query_type: PaginationQueryType = None,
+    unwrap: bool = True,
 ) -> AbstractPage[Any]:
     raw_params = params.to_raw_params()
 
@@ -30,7 +31,7 @@ def exec_pagination(
     items = db_exec(query)
     items = process_items(items.unique().all(), params)
 
-    return create_page(unwrap_scalars(items), total, params)
+    return create_page(unwrap_scalars(items) if unwrap else items, total, params)
 
 
 async def async_exec_pagination(
@@ -38,6 +39,7 @@ async def async_exec_pagination(
     params: AbstractParams,
     db_exec: Callable[..., Awaitable[Any]],
     query_type: PaginationQueryType = None,
+    unwrap: bool = True,
 ) -> AbstractPage[Any]:
     raw_params = params.to_raw_params()
 
@@ -50,7 +52,7 @@ async def async_exec_pagination(
     res = await db_exec(query)
     items = process_items(res.unique().all(), params)
 
-    return create_page(unwrap_scalars(items), total, params)
+    return create_page(unwrap_scalars(items) if unwrap else items, total, params)
 
 
 def paginate(

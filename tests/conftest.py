@@ -202,7 +202,7 @@ def pytest_collection_modifyitems(items):
     items.sort(key=lambda it: (it.path, it.name))
 
 
-@async_fixture(scope="session")
+@async_fixture(scope="class")
 async def client(app):
     async with LifespanManager(app), AsyncClient(app=app, base_url="http://testserver") as c:
         yield c

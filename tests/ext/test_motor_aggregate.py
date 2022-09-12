@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
-from pytest import fixture
+from pytest import fixture, mark
 from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -50,6 +50,7 @@ def app(db_client, model_cls, raw_data):
     return add_pagination(app)
 
 
+@mark.skip(reason="Flaky")
 class TestMotorAggregate(BasePaginationTestCase):
     @fixture(scope="session")
     def model_cls(self):
