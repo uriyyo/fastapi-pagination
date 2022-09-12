@@ -14,14 +14,37 @@ from .schemas import UserOut, UserWithOrderOut
 from .utils import normalize
 
 _default_params = [
-    *[Params(page=i) for i in range(1, 10)],
-    *[Params(size=i) for i in range(1, 100, 10)],
-    *[Params(page=i, size=j) for i in range(1, 10) for j in range(1, 50, 10)],
+    Params(page=1),
+    Params(page=2),
+    Params(page=3),
+    Params(size=100),
+    Params(page=1, size=10),
+    Params(page=9, size=10),
+    Params(page=10, size=10),
+    Params(page=2, size=25),
+    Params(size=31),
 ]
 _limit_offset_params = [
-    *[LimitOffsetParams(offset=i) for i in range(1, 10)],
-    *[LimitOffsetParams(limit=i) for i in range(1, 100, 10)],
-    *[LimitOffsetParams(offset=i, limit=j) for i in range(10) for j in range(1, 50, 10)],
+    LimitOffsetParams(limit=50),
+    LimitOffsetParams(limit=50, offset=50),
+    LimitOffsetParams(limit=50, offset=100),
+    LimitOffsetParams(limit=100),
+    LimitOffsetParams(limit=10),
+    LimitOffsetParams(limit=10, offset=80),
+    LimitOffsetParams(limit=10, offset=90),
+    LimitOffsetParams(limit=25, offset=25),
+    LimitOffsetParams(limit=31),
+]
+_params_desc = [
+    "first",
+    "second",
+    "third-empty",
+    "full-page",
+    "first-10-items",
+    "last-10-items",
+    "after-last-10-items-empty",
+    "second-25-items",
+    "31-items",
 ]
 
 
@@ -79,6 +102,10 @@ class BasePaginationTestCase:
         [
             *[(p, "page") for p in _default_params],
             *[(p, "limit_offset_page") for p in _limit_offset_params],
+        ],
+        ids=[
+            *[f"default-{key}" for key in _params_desc],
+            *[f"limit-offset-{key}" for key in _params_desc],
         ],
     )
     @mark.asyncio
