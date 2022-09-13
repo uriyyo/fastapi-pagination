@@ -3,9 +3,9 @@ from typing import Any, Optional, Type, TypeVar, no_type_check, overload
 from sqlmodel import Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
-from ..api import resolve_params
 from ..bases import AbstractPage, AbstractParams
 from ..types import PaginationQueryType
+from ..utils import verify_params
 from .sqlalchemy_future import exec_pagination
 
 T = TypeVar("T")
@@ -53,7 +53,7 @@ def paginate(
     *,
     query_type: PaginationQueryType = None,
 ) -> AbstractPage[Any]:
-    params = resolve_params(params)
+    params = verify_params(params, "limit-offset", "cursor")
 
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)

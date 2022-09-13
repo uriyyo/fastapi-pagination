@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import warnings
-from typing import Any, Callable, Optional, Tuple, TypeVar, cast, no_type_check
+from typing import Any, Optional, Sequence, Tuple, TypeVar, cast, no_type_check
 
 from fastapi import HTTPException
 from sqlakeyset.paging import (
@@ -18,9 +17,10 @@ from sqlalchemy import func, literal, literal_column, select
 from sqlalchemy.orm import Query, noload
 from sqlalchemy.sql import Select
 
-from ..api import create_page, resolve_params
-from ..bases import AbstractPage, AbstractParams, RawParams
+from ..api import create_page
+from ..bases import AbstractPage, AbstractParams, CursorRawParams, RawParams
 from ..types import PaginationQueryType
+from ..utils import verify_params
 
 T = TypeVar("T", Select, Query)
 
@@ -31,9 +31,12 @@ class ExperimentalWarning(Warning):
 
 # adapted from  sqlakeyset.paging.perform_paging
 @no_type_check
-def paginate_using_cursor(q: Select, raw_params: RawParams) -> Any:
+def paginate_using_cursor(
+    q: Select,
+    raw_params: CursorRawParams,
+) -> Tuple[Any, Tuple[Any, ...]]:
     try:
-        place, backwards = process_args(page=raw_params.metadata.get("cursor"))
+        place, backwards = process_args(page=raw_params.cursor)
     except InvalidPage:
         raise HTTPException(status_code=400, detail="Invalid cursor")
 
@@ -66,41 +69,35 @@ def paginate_using_cursor(q: Select, raw_params: RawParams) -> Any:
         else:
             q = q.where(condition)
 
-    raw_params.metadata.update(
-        order_cols=order_cols,
-        mapped_ocols=mapped_ocols,
-        extra_columns=extra_columns,
-        keys=keys,
-        backwards=backwards,
-        current_place=place,
-    )
-
-    return q.limit(raw_params.limit + 1)  # 1 extra to check if there's a further page
+    pagination_info = order_cols, mapped_ocols, extra_columns, keys, backwards, place
+    return q.limit(raw_params.size + 1), pagination_info  # 1 extra to check if there's a further page
 
 
-def _cursor_pagination_process_items(items: Any, params: AbstractParams) -> Any:
-    raw_params = params.to_raw_params()
+def paginate_cursor_process_items(
+    items: Sequence[Any],
+    pagination_info: Tuple[Any, ...],
+    raw_params: CursorRawParams,
+) -> Tuple[Sequence[Any], Optional[str], Optional[str]]:
+    order_cols, mapped_ocols, extra_columns, keys, backwards, current_place = pagination_info
 
     page = core_page_from_rows(
         (
-            raw_params.metadata["order_cols"],
-            raw_params.metadata["mapped_ocols"],
-            raw_params.metadata["extra_columns"],
+            order_cols,
+            mapped_ocols,
+            extra_columns,
             items,
             None,
         ),
         None,
-        raw_params.limit,
-        raw_params.metadata["backwards"],
-        raw_params.metadata["current_place"],
+        raw_params.size,
+        backwards,
+        current_place,
     )
 
-    raw_params.metadata.update(
-        next=page.paging.bookmark_next if page.paging.has_next else None,
-        previous=page.paging.bookmark_previous if page.paging.has_previous else None,
-    )
+    next_ = page.paging.bookmark_next if page.paging.has_next else None
+    previous = page.paging.bookmark_previous if page.paging.has_previous else None
 
-    return [*page]
+    return [*page], previous, next_
 
 
 @no_type_check
@@ -117,28 +114,17 @@ def paginate_using_row_number(query: Select, raw_params: RawParams) -> T:
     )
 
 
-def _noop(items: Any, _: AbstractParams) -> Any:
-    return items
-
-
 def paginate_query(
     query: T,
     params: AbstractParams,
     query_type: PaginationQueryType = None,
-) -> Tuple[T, Callable[[Any, AbstractParams], Any]]:
-    raw_params = params.to_raw_params()
-
-    if params.metadata.get("type") == "cursor":
-        if isinstance(query, Query):
-            raise ValueError("Cursor pagination is not supported for old ORM Query queries")
-
-        warnings.warn("Cursor pagination is experimental", ExperimentalWarning)
-        return paginate_using_cursor(query, raw_params), _cursor_pagination_process_items
+) -> T:
+    raw_params = params.to_raw_params().as_limit_offset()
 
     if query_type == "row-number":
-        return paginate_using_row_number(query, raw_params), _noop
+        return paginate_using_row_number(query, raw_params)  # type: ignore
 
-    return query.limit(raw_params.limit).offset(raw_params.offset), _noop
+    return query.limit(raw_params.limit).offset(raw_params.offset)
 
 
 def count_query(query: Select) -> Select:
@@ -152,12 +138,10 @@ def paginate(
     *,
     query_type: PaginationQueryType = None,
 ) -> AbstractPage:
-    params = resolve_params(params)
-    raw_params = params.to_raw_params()
+    params = verify_params(params, "limit-offset")
 
-    total = query.count() if raw_params.need_total else None
-    query, process_items = paginate_query(query, params, query_type)
-    items = process_items(query.all(), params)
+    total = query.count()
+    items = paginate_query(query, params, query_type).all()
 
     return create_page(items, total, params)
 
@@ -167,4 +151,6 @@ __all__ = [
     "count_query",
     "paginate",
     "paginate_using_row_number",
+    "paginate_using_cursor",
+    "paginate_cursor_process_items",
 ]

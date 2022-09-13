@@ -6,10 +6,16 @@ from sqlalchemy.future import Connection, Engine
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import Select
 
-from ..api import create_page, resolve_params
+from ..api import create_page
 from ..bases import AbstractPage, AbstractParams
 from ..types import PaginationQueryType
-from .sqlalchemy import count_query, paginate_query
+from ..utils import verify_params
+from .sqlalchemy import (
+    count_query,
+    paginate_cursor_process_items,
+    paginate_query,
+    paginate_using_cursor,
+)
 from .utils import unwrap_scalars
 
 
@@ -22,16 +28,25 @@ def exec_pagination(
 ) -> AbstractPage[Any]:
     raw_params = params.to_raw_params()
 
-    if raw_params.need_total:
+    if raw_params.type == "limit-offset":
         (total,) = db_exec(count_query(query)).scalars()
+        query = paginate_query(query, params, query_type)
+        items = db_exec(query).unique().all()
+
+        return create_page(unwrap_scalars(items) if unwrap else items, total, params)
     else:
-        total = None
+        raw_params = raw_params.as_cursor()
+        query, info = paginate_using_cursor(query, raw_params)
 
-    query, process_items = paginate_query(query, params, query_type)
-    items = db_exec(query)
-    items = process_items(items.unique().all(), params)
+        items = db_exec(query).unique().all()
+        items, previous, next_ = paginate_cursor_process_items(items, info, raw_params)
 
-    return create_page(unwrap_scalars(items) if unwrap else items, total, params)
+        return create_page(
+            unwrap_scalars(items) if unwrap else items,
+            params=params,
+            previous=previous,
+            next_=next_,
+        )
 
 
 async def async_exec_pagination(
@@ -40,19 +55,27 @@ async def async_exec_pagination(
     db_exec: Callable[..., Awaitable[Any]],
     query_type: PaginationQueryType = None,
     unwrap: bool = True,
-) -> AbstractPage[Any]:
+) -> AbstractPage[Any]:  # pragma: no cover
     raw_params = params.to_raw_params()
 
-    if raw_params.need_total:
+    if raw_params.type == "limit-offset":
         (total,) = (await db_exec(count_query(query))).scalars()
+        items = (await db_exec(paginate_query(query, params, query_type))).unique().all()
+
+        return create_page(unwrap_scalars(items) if unwrap else items, total, params)
     else:
-        total = None
+        raw_params = raw_params.as_cursor()
+        query, info = paginate_using_cursor(query, raw_params)
 
-    query, process_items = paginate_query(query, params, query_type)
-    res = await db_exec(query)
-    items = process_items(res.unique().all(), params)
+        items = (await db_exec(query)).unique().all()
+        items, previous, next_ = paginate_cursor_process_items(items, info, raw_params)
 
-    return create_page(unwrap_scalars(items) if unwrap else items, total, params)
+        return create_page(
+            unwrap_scalars(items) if unwrap else items,
+            params=params,
+            previous=previous,
+            next_=next_,
+        )
 
 
 def paginate(
@@ -62,7 +85,7 @@ def paginate(
     *,
     query_type: PaginationQueryType = None,
 ) -> AbstractPage[Any]:
-    params = resolve_params(params)
+    params = verify_params(params, "limit-offset", "cursor")
     return exec_pagination(query, params, conn.execute, query_type)
 
 

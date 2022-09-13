@@ -6,8 +6,9 @@ from gino.crud import CRUDModel
 from sqlalchemy import func, literal_column
 from sqlalchemy.sql import Select
 
-from ..api import create_page, resolve_params
+from ..api import create_page
 from ..bases import AbstractPage, AbstractParams
+from ..utils import verify_params
 from .sqlalchemy import paginate_query
 
 
@@ -16,13 +17,13 @@ async def paginate(
     query: Union[Select, CRUDModel],
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage[Any]:
+    params = verify_params(params, "limit-offset")
+
     if isinstance(query, type) and issubclass(query, CRUDModel):
         query = query.query
 
-    params = resolve_params(params)
-
     total = await func.count(literal_column("*")).select().select_from(query.order_by(None).alias()).gino.scalar()
-    query, _ = paginate_query(query, params)
+    query = paginate_query(query, params)
     items = await query.gino.all()
 
     return create_page(items, total, params)

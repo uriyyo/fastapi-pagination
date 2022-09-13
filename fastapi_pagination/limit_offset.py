@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
-from typing import Generic, Optional, Sequence, TypeVar
+from typing import Any, Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
@@ -33,22 +33,23 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
     def create(
         cls,
         items: Sequence[T],
-        total: Optional[int],
         params: AbstractParams,
+        *,
+        total: Optional[int] = None,
+        **kwargs: Any,
     ) -> LimitOffsetPage[T]:
+        raw_params = params.to_raw_params().as_limit_offset()
+
         return cls(
             total=total,
             items=items,
-            **asdict(params.to_raw_params()),
+            limit=raw_params.limit,
+            offset=raw_params.offset,
+            **kwargs,
         )
 
 
-Page = LimitOffsetPage
-Params = LimitOffsetParams
-
 __all__ = [
-    "Page",
-    "Params",
     "LimitOffsetPage",
     "LimitOffsetParams",
 ]

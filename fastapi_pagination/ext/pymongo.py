@@ -2,8 +2,9 @@ from typing import Any, Dict, Mapping, Optional, TypeVar
 
 from pymongo.collection import Collection
 
-from ..api import create_page, resolve_params
+from ..api import create_page
 from ..bases import AbstractPage, AbstractParams
+from ..utils import verify_params
 
 T = TypeVar("T", bound=Mapping[str, Any])
 
@@ -14,8 +15,8 @@ def paginate(
     params: Optional[AbstractParams] = None,
     **kwargs: Any,
 ) -> AbstractPage[T]:
-    params = resolve_params(params)
-    raw_params = params.to_raw_params()
+    params = verify_params(params, "limit-offset")
+    raw_params = params.to_raw_params().as_limit_offset()
 
     query_filter = query_filter or {}
 

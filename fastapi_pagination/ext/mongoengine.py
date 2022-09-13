@@ -3,8 +3,9 @@ from typing import Optional, Type, TypeVar, Union, cast
 from mongoengine import QuerySet
 from mongoengine.base.metaclasses import TopLevelDocumentMetaclass
 
-from fastapi_pagination.api import create_page, resolve_params
-from fastapi_pagination.bases import AbstractPage, AbstractParams
+from ..api import create_page
+from ..bases import AbstractPage, AbstractParams
+from ..utils import verify_params
 
 T = TypeVar("T", bound=TopLevelDocumentMetaclass)
 
@@ -13,8 +14,8 @@ def paginate(
     query: Union[Type[T], QuerySet],
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage[T]:
-    params = resolve_params(params)
-    raw_params = params.to_raw_params()
+    params = verify_params(params, "limit-offset")
+    raw_params = params.to_raw_params().as_limit_offset()
 
     if isinstance(query, TopLevelDocumentMetaclass):
         query = cast(Type[T], query).objects().all()

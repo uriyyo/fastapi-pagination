@@ -2,8 +2,9 @@ from typing import Any, Dict, List, Optional
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 
-from ..api import create_page, resolve_params
+from ..api import create_page
 from ..bases import AbstractPage, AbstractParams
+from ..utils import verify_params
 
 
 async def paginate(
@@ -12,10 +13,10 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     **kwargs: Any,
 ) -> AbstractPage:
-    params = resolve_params(params)
+    params = verify_params(params, "limit-offset")
     query_filter = query_filter or {}
 
-    raw_params = params.to_raw_params()
+    raw_params = params.to_raw_params().as_limit_offset()
     total = await collection.count_documents(query_filter)
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
     items = await cursor.to_list(length=raw_params.limit)
@@ -28,10 +29,10 @@ async def paginate_aggregate(
     aggregate_pipeline: Optional[List[Dict[Any, Any]]] = None,
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage:
-    params = resolve_params(params)
+    params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []
 
-    raw_params = params.to_raw_params()
+    raw_params = params.to_raw_params().as_limit_offset()
     cursor = collection.aggregate(
         [
             *aggregate_pipeline,

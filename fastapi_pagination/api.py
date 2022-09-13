@@ -55,11 +55,17 @@ def pagination_items() -> Sequence[Any]:
 
 def create_page(
     items: Sequence[T],
-    total: Optional[int],
-    params: AbstractParams,
+    total: Optional[int] = None,
+    params: Optional[AbstractParams] = None,
+    **kwargs: Any,
 ) -> AbstractPage[T]:
+    kwargs["params"] = params
+
+    if total is not None:  # temporary to support old signature
+        kwargs["total"] = total
+
     with _ctx_var_with_reset(_items_val, items):
-        return _page_val.get().create(items, total, params)
+        return _page_val.get().create(items, **kwargs)
 
 
 def response() -> Response:
