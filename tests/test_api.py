@@ -17,6 +17,7 @@ from fastapi_pagination import (
 )
 from fastapi_pagination.api import pagination_items
 from fastapi_pagination.bases import AbstractPage
+from fastapi_pagination.cursor import CursorParams
 
 
 def test_set_response_request():

@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from collections import ChainMap
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import wraps
 from typing import (
     Any,
@@ -19,28 +21,50 @@ from pydantic import BaseModel, create_model
 from pydantic.generics import GenericModel
 from pydantic.types import conint
 
+from fastapi_pagination.types import ParamsType
+
 T = TypeVar("T")
 C = TypeVar("C")
 
 TAbstractPage = TypeVar("TAbstractPage", bound="AbstractPage")
 
 
+class BaseRawParams:
+    type: ClassVar[ParamsType]
+
+    def as_limit_offset(self) -> RawParams:
+        if self.type != "limit-offset":
+            raise ValueError("Not a 'limit-offset' params")
+
+        return cast(RawParams, self)
+
+    def as_cursor(self) -> CursorRawParams:
+        if self.type != "cursor":
+            raise ValueError("Not a 'cursor' params")
+
+        return cast(CursorRawParams, self)
+
+
 @dataclass
-class RawParams:
+class RawParams(BaseRawParams):
     limit: int
     offset: int
-    need_total: bool = True
-    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    type: ClassVar[ParamsType] = "limit-offset"
+
+
+@dataclass
+class CursorRawParams(BaseRawParams):
+    cursor: Optional[str]
+    size: int
+
+    type: ClassVar[ParamsType] = "cursor"
 
 
 class AbstractParams(ABC):
     @abstractmethod
-    def to_raw_params(self) -> RawParams:
+    def to_raw_params(self) -> BaseRawParams:
         pass
-
-    @property
-    def metadata(self) -> Dict[str, Any]:
-        return {}
 
 
 def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping[str, Any]:
@@ -61,7 +85,12 @@ class AbstractPage(GenericModel, Generic[T], ABC):
 
     @classmethod
     @abstractmethod
-    def create(cls: Type[C], items: Sequence[T], total: Optional[int], params: AbstractParams) -> C:
+    def create(
+        cls: Type[C],
+        items: Sequence[T],
+        params: AbstractParams,
+        **kwargs: Any,
+    ) -> C:
         pass
 
     @classmethod
@@ -99,5 +128,7 @@ __all__ = [
     "AbstractPage",
     "AbstractParams",
     "BasePage",
+    "BaseRawParams",
     "RawParams",
+    "CursorRawParams",
 ]

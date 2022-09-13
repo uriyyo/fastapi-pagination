@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Generic, Optional, Sequence, TypeVar
+from typing import Any, Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel, conint
@@ -31,8 +31,10 @@ class Page(BasePage[T], Generic[T]):
     def create(
         cls,
         items: Sequence[T],
-        total: Optional[int],
         params: AbstractParams,
+        *,
+        total: Optional[int] = None,
+        **kwargs: Any,
     ) -> Page[T]:
         if not isinstance(params, Params):
             raise ValueError("Page should be used with Params")
@@ -42,6 +44,7 @@ class Page(BasePage[T], Generic[T]):
             items=items,
             page=params.page,
             size=params.size,
+            **kwargs,
         )
 
 

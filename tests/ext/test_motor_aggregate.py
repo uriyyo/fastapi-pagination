@@ -6,7 +6,6 @@ from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.motor import paginate_aggregate
-from fastapi_pagination.limit_offset import Page as LimitOffsetPage
 
 from ..base import BasePaginationTestCase
 

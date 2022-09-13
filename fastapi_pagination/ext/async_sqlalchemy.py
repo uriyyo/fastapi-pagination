@@ -5,9 +5,9 @@ from typing import Any, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import Select
 
-from ..api import resolve_params
 from ..bases import AbstractPage, AbstractParams
 from ..types import PaginationQueryType
+from ..utils import verify_params
 from .sqlalchemy_future import async_exec_pagination
 
 
@@ -18,7 +18,7 @@ async def paginate(
     *,
     query_type: PaginationQueryType = None,
 ) -> AbstractPage[Any]:
-    params = resolve_params(params)
+    params = verify_params(params, "limit-offset", "cursor")
     return await async_exec_pagination(query, params, conn.execute, query_type)
 
 

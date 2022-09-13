@@ -4,9 +4,9 @@ from sqlmodel import SQLModel, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
-from ..api import resolve_params
 from ..bases import AbstractPage, AbstractParams
 from ..types import PaginationQueryType
+from ..utils import verify_params
 from .sqlalchemy_future import async_exec_pagination
 
 T = TypeVar("T")
@@ -54,7 +54,7 @@ async def paginate(
     *,
     query_type: PaginationQueryType = None,
 ) -> AbstractPage[Any]:
-    params = resolve_params(params)
+    params = verify_params(params, "limit-offset", "cursor")
 
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)

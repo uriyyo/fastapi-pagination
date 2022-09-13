@@ -2,8 +2,9 @@ from typing import Generic, Sequence, TypeVar
 
 from pytest import mark, raises
 
-from fastapi_pagination import Page
+from fastapi_pagination import Page, Params
 from fastapi_pagination.bases import AbstractParams, RawParams
+from fastapi_pagination.cursor import CursorParams
 
 T = TypeVar("T")
 C = TypeVar("C")
@@ -47,3 +48,11 @@ def test_custom_page(cls):
 
     page_cls = cls.with_custom_options(size=100, page=100)
     assert page_cls.__params_type__().dict() == {"size": 100, "page": 100}
+
+
+def test_invalid_params_cast():
+    with raises(ValueError, match="^Not a 'limit-offset' params$"):
+        CursorParams().to_raw_params().as_limit_offset()
+
+    with raises(ValueError, match="^Not a 'cursor' params$"):
+        Params().to_raw_params().as_cursor()

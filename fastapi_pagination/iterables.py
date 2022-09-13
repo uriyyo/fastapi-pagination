@@ -3,12 +3,13 @@ from typing import Generic, Iterable, Optional, TypeVar
 
 from pydantic import conint
 
-from .api import create_page, resolve_params
+from .api import create_page
 from .bases import AbstractPage, AbstractParams
 from .default import Page as DefaultPage
 from .default import Params
 from .limit_offset import LimitOffsetPage as DefaultLimitOffsetPage
 from .limit_offset import LimitOffsetParams
+from .utils import verify_params
 
 T = TypeVar("T")
 
@@ -26,8 +27,8 @@ def paginate(
     params: Optional[AbstractParams] = None,
     total: Optional[int] = None,
 ) -> AbstractPage[T]:
-    params = resolve_params(params)
-    raw_params = params.to_raw_params()
+    params = verify_params(params, "limit-offset")
+    raw_params = params.to_raw_params().as_limit_offset()
 
     items = [*islice(iterable, raw_params.offset, raw_params.offset + raw_params.limit)]
     return create_page(items, total, params)

@@ -4,8 +4,9 @@ from tortoise.models import Model
 from tortoise.query_utils import Prefetch
 from tortoise.queryset import QuerySet
 
-from ..api import create_page, resolve_params
+from ..api import create_page
 from ..bases import AbstractPage, AbstractParams
+from ..utils import verify_params
 
 TModel = TypeVar("TModel", bound=Model)
 
@@ -28,8 +29,8 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     prefetch_related: Union[bool, List[Union[str, Prefetch]]] = False,
 ) -> AbstractPage[TModel]:
-    params = resolve_params(params)
-    raw_params = params.to_raw_params()
+    params = verify_params(params, "limit-offset")
+    raw_params = params.to_raw_params().as_limit_offset()
 
     if not isinstance(query, QuerySet):
         query = query.all()

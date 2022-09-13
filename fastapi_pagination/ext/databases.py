@@ -6,8 +6,9 @@ from databases import Database
 from sqlalchemy import func, select
 from sqlalchemy.sql import Select
 
-from ..api import create_page, resolve_params
+from ..api import create_page
 from ..bases import AbstractPage, AbstractParams
+from ..utils import verify_params
 from .sqlalchemy import paginate_query
 
 
@@ -18,10 +19,10 @@ async def paginate(
     *,
     convert_to_mapping: bool = True,
 ) -> AbstractPage[Any]:
-    params = resolve_params(params)
+    params = verify_params(params, "limit-offset")
 
     total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))
-    query, _ = paginate_query(query, params)
+    query = paginate_query(query, params)
     items: List[Any] = await db.fetch_all(query)
 
     if convert_to_mapping:
