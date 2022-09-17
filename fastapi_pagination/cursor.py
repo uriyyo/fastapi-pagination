@@ -80,8 +80,8 @@ class CursorPage(AbstractPage[T], Generic[T]):
         items: Sequence[T],
         params: AbstractParams,
         *,
-        next_: Optional[str] = None,
-        previous: Optional[str] = None,
+        next_: Optional[Cursor] = None,
+        previous: Optional[Cursor] = None,
         **kwargs: Any,
     ) -> CursorPage[T]:
         return cls(
