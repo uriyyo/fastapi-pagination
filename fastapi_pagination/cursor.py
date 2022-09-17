@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from base64 import b64decode, b64encode
 from typing import Any, Generic, Optional, Sequence, TypeVar
+from urllib.parse import quote, unquote
 
 from fastapi import Query
 from pydantic import BaseModel, Field
@@ -24,14 +25,14 @@ class CursorParams(BaseModel, AbstractParams):
 
 def decode_cursor(cursor: Optional[str]) -> Optional[str]:
     if cursor:
-        return b64decode(cursor.encode("utf-8")).decode("utf-8")
+        return unquote(b64decode(cursor.encode("utf-8")).decode("utf-8"))
 
     return None
 
 
 def encode_cursor(cursor: Optional[str]) -> Optional[str]:
     if cursor:
-        return b64encode(cursor.encode("utf-8")).decode("utf-8")
+        return b64encode(quote(cursor).encode("utf-8")).decode("utf-8")
 
     return None
 
