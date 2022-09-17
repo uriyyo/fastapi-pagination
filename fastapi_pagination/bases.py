@@ -21,7 +21,7 @@ from pydantic import BaseModel, create_model
 from pydantic.generics import GenericModel
 from pydantic.types import conint
 
-from fastapi_pagination.types import ParamsType
+from .types import Cursor, ParamsType
 
 T = TypeVar("T")
 C = TypeVar("C")
@@ -55,7 +55,7 @@ class RawParams(BaseRawParams):
 
 @dataclass
 class CursorRawParams(BaseRawParams):
-    cursor: Optional[str]
+    cursor: Optional[Cursor]
     size: int
 
     type: ClassVar[ParamsType] = "cursor"
