@@ -63,6 +63,23 @@ def test_with_custom_options_class_vars():
     assert customized_page.__params_type__.class_var is True
 
 
+def test_with_custom_options_items_casted():
+    page_cls = Page.with_custom_options(size=10, page=2)
+
+    res = page_cls[int].create(
+        [1, 2.0, "3", b"4", 5],
+        page_cls.__params_type__(),
+        total=100,
+    )
+
+    assert res.dict() == {
+        "items": [1, 2, 3, 4, 5],
+        "page": 2,
+        "size": 10,
+        "total": 100,
+    }
+
+
 def test_invalid_params_cast():
     with raises(ValueError, match="^Not a 'limit-offset' params$"):
         CursorParams().to_raw_params().as_limit_offset()
