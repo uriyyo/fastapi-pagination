@@ -1,40 +1,69 @@
 from __future__ import annotations
 
 from base64 import b64decode, b64encode
-from typing import Any, Generic, Optional, Sequence, TypeVar
+from typing import (
+    Any,
+    ClassVar,
+    Generic,
+    Optional,
+    Sequence,
+    TypeVar,
+    overload,
+)
 from urllib.parse import quote, unquote
 
 from fastapi import Query
 from pydantic import BaseModel, Field
+from typing_extensions import Literal
 
 from .bases import AbstractPage, AbstractParams, CursorRawParams
+from .types import Cursor
 
 T = TypeVar("T")
+
+
+@overload
+def decode_cursor(cursor: Optional[str], *, to_str: Literal[True] = True) -> Optional[str]:
+    pass
+
+
+@overload
+def decode_cursor(cursor: Optional[str], *, to_str: Literal[False]) -> Optional[bytes]:
+    pass
+
+
+@overload
+def decode_cursor(cursor: Optional[str], *, to_str: bool) -> Optional[Cursor]:
+    pass
+
+
+def decode_cursor(cursor: Optional[str], *, to_str: bool = True) -> Optional[Cursor]:
+    if cursor:
+        res = b64decode(unquote(cursor).encode())
+        return res.decode() if to_str else res
+
+    return None
+
+
+def encode_cursor(cursor: Optional[Cursor]) -> Optional[str]:
+    if cursor:
+        cursor = cursor.encode() if isinstance(cursor, str) else cursor
+        return quote(b64encode(cursor).decode())
+
+    return None
 
 
 class CursorParams(BaseModel, AbstractParams):
     cursor: Optional[str] = Query(None, description="Cursor for the next page")
     size: int = Query(50, ge=0, description="Page offset")
 
+    str_cursor: ClassVar[bool] = True
+
     def to_raw_params(self) -> CursorRawParams:
         return CursorRawParams(
-            cursor=decode_cursor(self.cursor),
+            cursor=decode_cursor(self.cursor, to_str=self.str_cursor),
             size=self.size,
         )
-
-
-def decode_cursor(cursor: Optional[str]) -> Optional[str]:
-    if cursor:
-        return unquote(b64decode(cursor.encode("utf-8")).decode("utf-8"))
-
-    return None
-
-
-def encode_cursor(cursor: Optional[str]) -> Optional[str]:
-    if cursor:
-        return b64encode(quote(cursor).encode("utf-8")).decode("utf-8")
-
-    return None
 
 
 class CursorPage(AbstractPage[T], Generic[T]):
