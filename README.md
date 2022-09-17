@@ -99,14 +99,15 @@ Currently, `fastapi-pagination` supports:
 | [Databases](https://www.encode.io/databases/)                                               | `fastapi_pagination.ext.databases.paginate`         |
 | [Django ORM](https://docs.djangoproject.com/en/3.2/topics/db/queries/)                      | `fastapi_pagination.ext.django.paginate`            |
 | [GINO](https://python-gino.org/)                                                            | `fastapi_pagination.ext.gino.paginate`              |
-| [MongoEngine](https://docs.mongoengine.org/)                                                | `fastapi_pagination.ext.mongoengine.paginate`       |
-| [Motor](https://motor.readthedocs.io/en/stable/)                                            | `fastapi_pagination.ext.motor.paginate`             |
 | [ORM](https://www.encode.io/orm/)                                                           | `fastapi_pagination.ext.orm.paginate`               |
 | [ormar](https://collerek.github.io/ormar/)                                                  | `fastapi_pagination.ext.ormar.paginate`             |
 | [Piccolo](https://piccolo-orm.readthedocs.io/en/latest/)                                    | `fastapi_pagination.ext.piccolo.paginate`           |
-| [PyMongo](https://pymongo.readthedocs.io/en/stable/)                                        | `fastapi_pagination.ext.pymongo.paginate`           |
 | [Pony ORM](https://docs.ponyorm.org/)                                                       | `fastapi_pagination.ext.pony.paginate`              |
 | [Tortoise ORM](https://tortoise-orm.readthedocs.io/en/latest/)                              | `fastapi_pagination.ext.tortoise.paginate`          |
+| [Beanie](https://roman-right.github.io/beanie/)                                             | `fastapi_pagination.ext.beanie.paginate`            |
+| [PyMongo](https://pymongo.readthedocs.io/en/stable/)                                        | `fastapi_pagination.ext.pymongo.paginate`           |
+| [MongoEngine](https://docs.mongoengine.org/)                                                | `fastapi_pagination.ext.mongoengine.paginate`       |
+| [Motor](https://motor.readthedocs.io/en/stable/)                                            | `fastapi_pagination.ext.motor.paginate`             |
 
 
 ---
