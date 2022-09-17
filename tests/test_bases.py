@@ -1,4 +1,4 @@
-from typing import Generic, Sequence, TypeVar
+from typing import ClassVar, Generic, Sequence, TypeVar
 
 from pytest import mark, raises
 
@@ -48,6 +48,19 @@ def test_custom_page(cls):
 
     page_cls = cls.with_custom_options(size=100, page=100)
     assert page_cls.__params_type__().dict() == {"size": 100, "page": 100}
+
+
+def test_with_custom_options_class_vars():
+    class CustomParams(Params):
+        class_var: ClassVar[bool] = False
+
+    class CustomPage(Page[T], Generic[T]):
+        __params_type__ = CustomParams
+
+    assert CustomPage.__params_type__.class_var is False
+
+    customized_page = CustomPage.with_custom_options(class_var=True)
+    assert customized_page.__params_type__.class_var is True
 
 
 def test_invalid_params_cast():
