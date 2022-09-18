@@ -86,3 +86,13 @@ def test_invalid_params_cast():
 
     with raises(ValueError, match="^Not a 'cursor' params$"):
         Params().to_raw_params().as_cursor()
+
+
+def test_params_cast():
+    p = CursorParams().to_raw_params()
+
+    assert p.as_cursor() is p
+
+    p = Params().to_raw_params()
+
+    assert p.as_limit_offset() is p
