@@ -40,7 +40,11 @@ def paginate_using_cursor(
     except InvalidPage:
         raise HTTPException(status_code=400, detail="Invalid cursor")
 
-    dialect = q.bind.dialect
+    try:
+        dialect = q.bind.dialect
+    except AttributeError:
+        dialect = None
+
     selectable = q.selectable
     column_descriptions = q.column_descriptions
     keys = orm_query_keys(q)
