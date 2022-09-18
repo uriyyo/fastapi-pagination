@@ -8,7 +8,6 @@ from sqlalchemy.sql import Select
 
 from ..api import create_page
 from ..bases import AbstractPage, AbstractParams
-from ..types import PaginationQueryType
 from ..utils import verify_params
 from .sqlalchemy import (
     count_query,
@@ -23,13 +22,12 @@ def exec_pagination(
     query: Select,
     params: AbstractParams,
     db_exec: Callable[..., Any],
-    query_type: PaginationQueryType = None,
 ) -> AbstractPage[Any]:
     raw_params = params.to_raw_params()
 
     if raw_params.type == "limit-offset":
         (total,) = db_exec(count_query(query)).scalars()
-        query = paginate_query(query, params, query_type)
+        query = paginate_query(query, params)
         items = db_exec(query).unique().all()
 
         return create_page(unwrap_scalars(items), total, params)
@@ -52,13 +50,12 @@ async def async_exec_pagination(
     query: Select,
     params: AbstractParams,
     db_exec: Callable[..., Awaitable[Any]],
-    query_type: PaginationQueryType = None,
 ) -> AbstractPage[Any]:  # pragma: no cover
     raw_params = params.to_raw_params()
 
     if raw_params.type == "limit-offset":
         (total,) = (await db_exec(count_query(query))).scalars()
-        items = (await db_exec(paginate_query(query, params, query_type))).unique().all()
+        items = (await db_exec(paginate_query(query, params))).unique().all()
 
         return create_page(unwrap_scalars(items), total, params)
     else:
@@ -80,11 +77,9 @@ def paginate(
     conn: Union[Connection, Engine, Session],
     query: Select,
     params: Optional[AbstractParams] = None,
-    *,
-    query_type: PaginationQueryType = None,
 ) -> AbstractPage[Any]:
     params = verify_params(params, "limit-offset", "cursor")
-    return exec_pagination(query, params, conn.execute, query_type)
+    return exec_pagination(query, params, conn.execute)
 
 
 __all__ = [
