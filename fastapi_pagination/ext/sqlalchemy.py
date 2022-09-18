@@ -117,7 +117,7 @@ def paginate(
     query: Query,
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage:
-    params = verify_params(params, "limit-offset")
+    params, _ = verify_params(params, "limit-offset")
 
     total = query.count()
     items = paginate_query(query, params).all()

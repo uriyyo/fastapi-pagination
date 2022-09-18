@@ -14,8 +14,7 @@ def paginate(
     query: Union[Type[T], QuerySet],
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage[T]:
-    params = verify_params(params, "limit-offset")
-    raw_params = params.to_raw_params().as_limit_offset()
+    params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, TopLevelDocumentMetaclass):
         query = cast(Type[T], query).objects().all()

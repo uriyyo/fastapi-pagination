@@ -13,10 +13,9 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     **kwargs: Any,
 ) -> AbstractPage:
-    params = verify_params(params, "limit-offset")
+    params, raw_params = verify_params(params, "limit-offset")
     query_filter = query_filter or {}
 
-    raw_params = params.to_raw_params().as_limit_offset()
     total = await collection.count_documents(query_filter)
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
     items = await cursor.to_list(length=raw_params.limit)
@@ -29,10 +28,9 @@ async def paginate_aggregate(
     aggregate_pipeline: Optional[List[Dict[Any, Any]]] = None,
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage:
-    params = verify_params(params, "limit-offset")
+    params, raw_params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []
 
-    raw_params = params.to_raw_params().as_limit_offset()
     cursor = collection.aggregate(
         [
             *aggregate_pipeline,

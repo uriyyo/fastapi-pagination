@@ -36,10 +36,10 @@ _req_val: ContextVar[Request] = ContextVar("_req_val")
 _items_val: ContextVar[Sequence[Any]] = ContextVar("_items_val")
 
 
-def resolve_params(params: Optional[AbstractParams] = None) -> AbstractParams:
+def resolve_params(params: Optional[TAbstractParams] = None) -> TAbstractParams:
     if params is None:
         try:
-            return _params_val.get()
+            return cast(TAbstractParams, _params_val.get())
         except LookupError:
             raise RuntimeError("Use params or add_pagination")
 

@@ -14,14 +14,13 @@ async def paginate(
     *args: Any,
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage[Any]:
-    params = verify_params(params, "limit-offset")
+    params, raw_params = verify_params(params, "limit-offset")
 
     total = await conn.fetchval(
         f"SELECT count(*) FROM ({query}) AS _pagination_query",
         *args,
     )
 
-    raw_params = params.to_raw_params().as_limit_offset()
     items = await conn.fetch(
         f"{query} LIMIT {raw_params.limit} OFFSET {raw_params.offset}",
         *args,

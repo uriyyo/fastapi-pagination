@@ -20,6 +20,7 @@ from typing import (
 from pydantic import BaseModel, create_model
 from pydantic.generics import GenericModel
 from pydantic.types import conint
+from typing_extensions import TypeGuard
 
 from .types import Cursor, ParamsType
 
@@ -33,16 +34,24 @@ class BaseRawParams:
     type: ClassVar[ParamsType]
 
     def as_limit_offset(self) -> RawParams:
-        if self.type != "limit-offset":
-            raise ValueError("Not a 'limit-offset' params")
+        if is_limit_offset(self):
+            return self
 
-        return cast(RawParams, self)
+        raise ValueError("Not a 'limit-offset' params")
 
     def as_cursor(self) -> CursorRawParams:
-        if self.type != "cursor":
-            raise ValueError("Not a 'cursor' params")
+        if is_cursor(self):
+            return self
 
-        return cast(CursorRawParams, self)
+        raise ValueError("Not a 'cursor' params")
+
+
+def is_limit_offset(params: BaseRawParams) -> TypeGuard[RawParams]:
+    return params.type == "limit-offset"
+
+
+def is_cursor(params: BaseRawParams) -> TypeGuard[CursorRawParams]:
+    return params.type == "cursor"
 
 
 @dataclass
@@ -131,4 +140,6 @@ __all__ = [
     "BaseRawParams",
     "RawParams",
     "CursorRawParams",
+    "is_cursor",
+    "is_limit_offset",
 ]

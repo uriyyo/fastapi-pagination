@@ -12,8 +12,7 @@ def paginate(
     params: Optional[AbstractParams] = None,
     length_function: Callable[[Sequence[T]], int] = len,
 ) -> AbstractPage[T]:
-    params = verify_params(params, "limit-offset")
-    raw_params = params.to_raw_params().as_limit_offset()
+    params, raw_params = verify_params(params, "limit-offset")
 
     return create_page(
         items=sequence[raw_params.offset : raw_params.offset + raw_params.limit],
