@@ -14,14 +14,13 @@ async def paginate(
     query: Union[Select, Type[Table]],
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage:
-    params = verify_params(params, "limit-offset")
+    params, raw_params = verify_params(params, "limit-offset")
 
     if not isinstance(query, Select):
         query = query.select()
 
     # query object is mutable, so we need deepcopy of it
     query = deepcopy(query)
-    raw_params = params.to_raw_params().as_limit_offset()
 
     # need another copy for count query
     count_query = deepcopy(query)

@@ -27,8 +27,7 @@ def paginate(
     params: Optional[AbstractParams] = None,
     total: Optional[int] = None,
 ) -> AbstractPage[T]:
-    params = verify_params(params, "limit-offset")
-    raw_params = params.to_raw_params().as_limit_offset()
+    params, raw_params = verify_params(params, "limit-offset")
 
     items = [*islice(iterable, raw_params.offset, raw_params.offset + raw_params.limit)]
     return create_page(items, total, params)

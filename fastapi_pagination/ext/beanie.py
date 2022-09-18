@@ -14,8 +14,7 @@ async def paginate(
     query: Union[TDocument, FindMany[TDocument]],
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage[TDocument]:
-    params = verify_params(params, "limit-offset")
-    raw_params = params.to_raw_params().as_limit_offset()
+    params, raw_params = verify_params(params, "limit-offset")
 
     items = await query.find_many(limit=raw_params.limit, skip=raw_params.offset).to_list()
     total = await query.count()

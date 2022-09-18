@@ -45,7 +45,7 @@ async def paginate(
     query: Any,
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage[Any]:
-    params = verify_params(params, "limit-offset", "cursor")
+    params, _ = verify_params(params, "limit-offset", "cursor")
 
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)

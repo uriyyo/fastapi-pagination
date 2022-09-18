@@ -19,7 +19,7 @@ async def paginate(
     *,
     convert_to_mapping: bool = True,
 ) -> AbstractPage[Any]:
-    params = verify_params(params, "limit-offset")
+    params, _ = verify_params(params, "limit-offset")
 
     total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))
     query = paginate_query(query, params)

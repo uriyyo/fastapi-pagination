@@ -17,7 +17,7 @@ async def paginate(
     query: Union[Select, CRUDModel],
     params: Optional[AbstractParams] = None,
 ) -> AbstractPage[Any]:
-    params = verify_params(params, "limit-offset")
+    params, _ = verify_params(params, "limit-offset")
 
     if isinstance(query, type) and issubclass(query, CRUDModel):
         query = query.query
