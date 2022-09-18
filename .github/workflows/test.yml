@@ -35,6 +35,16 @@ jobs:
       - name: Set up MongoDB
         uses: supercharge/mongodb-github-action@1.6.0
 
+      - name: Set up Scylla
+        run: |
+          export DOCKER_ID=$(docker run -d scylladb/scylla:latest --cluster-name test )
+          export CQL_TEST_HOST=$(docker inspect --format='{{ .NetworkSettings.IPAddress }}' ${DOCKER_ID})
+          while ! nc -z ${CQL_TEST_HOST} 9042; do   
+            sleep 0.1 # wait for 1/10 of the second before check again
+          done
+
+          echo "CQL_TEST_HOST=${CQL_TEST_HOST}" >> $GITHUB_ENV
+
       - name: Install Poetry
         uses: snok/install-poetry@v1.3.1
 
@@ -52,7 +62,7 @@ jobs:
 
       - name: Unit tests
         run: |
-          poetry run pytest tests -m "not gino" --cov-report=xml
+          poetry run pytest tests -m "not gino" --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
       - name: Unit tests gino
         run: |
