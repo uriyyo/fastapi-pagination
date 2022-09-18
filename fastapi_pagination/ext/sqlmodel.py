@@ -4,7 +4,6 @@ from sqlmodel import Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from ..bases import AbstractPage, AbstractParams
-from ..types import PaginationQueryType
 from ..utils import verify_params
 from .sqlalchemy_future import exec_pagination
 
@@ -17,8 +16,6 @@ def paginate(
     session: Session,
     query: Select[TSQLModel],
     params: Optional[AbstractParams] = None,
-    *,
-    query_type: PaginationQueryType = None,
 ) -> AbstractPage[TSQLModel]:
     pass
 
@@ -28,8 +25,6 @@ def paginate(
     session: Session,
     query: SelectOfScalar[T],
     params: Optional[AbstractParams] = None,
-    *,
-    query_type: PaginationQueryType = None,
 ) -> AbstractPage[T]:
     pass
 
@@ -39,8 +34,6 @@ def paginate(
     session: Session,
     query: Type[TSQLModel],
     params: Optional[AbstractParams] = None,
-    *,
-    query_type: PaginationQueryType = None,
 ) -> AbstractPage[TSQLModel]:
     pass
 
@@ -50,15 +43,13 @@ def paginate(
     session: Session,
     query: Any,
     params: Optional[AbstractParams] = None,
-    *,
-    query_type: PaginationQueryType = None,
 ) -> AbstractPage[Any]:
     params = verify_params(params, "limit-offset", "cursor")
 
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    return exec_pagination(query, params, session.exec, query_type)
+    return exec_pagination(query, params, session.exec)
 
 
 __all__ = [

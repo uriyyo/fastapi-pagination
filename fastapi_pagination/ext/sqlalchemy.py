@@ -13,13 +13,12 @@ from sqlakeyset.paging import (
     process_args,
     where_condition_for_page,
 )
-from sqlalchemy import func, literal, literal_column, select
+from sqlalchemy import func, literal_column, select
 from sqlalchemy.orm import Query, noload
 from sqlalchemy.sql import Select
 
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams, CursorRawParams, RawParams
-from ..types import PaginationQueryType
+from ..bases import AbstractPage, AbstractParams, CursorRawParams
 from ..utils import verify_params
 
 T = TypeVar("T", Select, Query)
@@ -104,30 +103,8 @@ def paginate_cursor_process_items(
     return [*page], previous, next_
 
 
-@no_type_check
-def paginate_using_row_number(query: Select, raw_params: RawParams) -> T:
-    subquery = query.add_columns(func.row_number().over().label("__row_number__")).subquery()
-
-    return query.from_statement(
-        select(subquery).where(
-            subquery.c.__row_number__.between(
-                literal(raw_params.offset + 1),
-                literal(raw_params.offset + raw_params.limit),
-            )
-        )
-    )
-
-
-def paginate_query(
-    query: T,
-    params: AbstractParams,
-    query_type: PaginationQueryType = None,
-) -> T:
+def paginate_query(query: T, params: AbstractParams) -> T:
     raw_params = params.to_raw_params().as_limit_offset()
-
-    if query_type == "row-number":
-        return paginate_using_row_number(query, raw_params)  # type: ignore
-
     return query.limit(raw_params.limit).offset(raw_params.offset)
 
 
@@ -139,13 +116,11 @@ def count_query(query: Select) -> Select:
 def paginate(
     query: Query,
     params: Optional[AbstractParams] = None,
-    *,
-    query_type: PaginationQueryType = None,
 ) -> AbstractPage:
     params = verify_params(params, "limit-offset")
 
     total = query.count()
-    items = paginate_query(query, params, query_type).all()
+    items = paginate_query(query, params).all()
 
     return create_page(items, total, params)
 
@@ -154,7 +129,6 @@ __all__ = [
     "paginate_query",
     "count_query",
     "paginate",
-    "paginate_using_row_number",
     "paginate_using_cursor",
     "paginate_cursor_process_items",
 ]
