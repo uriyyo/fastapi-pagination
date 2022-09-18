@@ -16,7 +16,7 @@ from .sqlalchemy import (
     paginate_query,
     paginate_using_cursor,
 )
-from .utils import unwrap_scalars
+from .utils import unwrap_scalars, wrap_scalars
 
 
 def exec_pagination(
@@ -24,7 +24,6 @@ def exec_pagination(
     params: AbstractParams,
     db_exec: Callable[..., Any],
     query_type: PaginationQueryType = None,
-    unwrap: bool = True,
 ) -> AbstractPage[Any]:
     raw_params = params.to_raw_params()
 
@@ -33,16 +32,16 @@ def exec_pagination(
         query = paginate_query(query, params, query_type)
         items = db_exec(query).unique().all()
 
-        return create_page(unwrap_scalars(items) if unwrap else items, total, params)
+        return create_page(unwrap_scalars(items), total, params)
     else:
         raw_params = raw_params.as_cursor()
         query, info = paginate_using_cursor(query, raw_params)
 
-        items = db_exec(query).unique().all()
+        items = wrap_scalars(db_exec(query).unique().all())
         items, previous, next_ = paginate_cursor_process_items(items, info, raw_params)
 
         return create_page(
-            unwrap_scalars(items) if unwrap else items,
+            unwrap_scalars(items),
             params=params,
             previous=previous,
             next_=next_,
@@ -54,7 +53,6 @@ async def async_exec_pagination(
     params: AbstractParams,
     db_exec: Callable[..., Awaitable[Any]],
     query_type: PaginationQueryType = None,
-    unwrap: bool = True,
 ) -> AbstractPage[Any]:  # pragma: no cover
     raw_params = params.to_raw_params()
 
@@ -62,16 +60,16 @@ async def async_exec_pagination(
         (total,) = (await db_exec(count_query(query))).scalars()
         items = (await db_exec(paginate_query(query, params, query_type))).unique().all()
 
-        return create_page(unwrap_scalars(items) if unwrap else items, total, params)
+        return create_page(unwrap_scalars(items), total, params)
     else:
         raw_params = raw_params.as_cursor()
         query, info = paginate_using_cursor(query, raw_params)
 
-        items = (await db_exec(query)).unique().all()
+        items = wrap_scalars((await db_exec(query)).unique().all())
         items, previous, next_ = paginate_cursor_process_items(items, info, raw_params)
 
         return create_page(
-            unwrap_scalars(items) if unwrap else items,
+            unwrap_scalars(items),
             params=params,
             previous=previous,
             next_=next_,

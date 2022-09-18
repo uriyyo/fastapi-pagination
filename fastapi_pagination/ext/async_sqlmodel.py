@@ -59,7 +59,7 @@ async def paginate(
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    return await async_exec_pagination(query, params, session.exec, query_type, unwrap=False)
+    return await async_exec_pagination(query, params, session.exec, query_type)
 
 
 __all__ = [

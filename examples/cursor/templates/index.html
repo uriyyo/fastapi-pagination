@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div class="container pt-4">
+    <div class="pb-4 d-flex justify-content-between">
+        <div>
+            <a class="btn btn-dark" id="go-prev" onclick="goPrev()">Previous</a>
+            <a class="btn btn-dark" id="go-next" onclick="goNext()">Next</a>
+        </div>
+
+        <div class="w-25">
+            <select id="select-size" class="form-select" onchange="onSelect()">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover table-striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>Picture</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in page.items %}
+        <tr >
+            <td><img alt="profile-pic" src={{ item.profile_pic | tojson }}/></td>
+            <td class="text-center">{{ item.first_name }}</td>
+            <td class="text-center">{{ item.last_name }}</td>
+            <td class="text-center">{{ item.email }}</td>
+            <td class="text-center">{{ item.created_at }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<script type="text/javascript">
+    const size = {{ params.size | tojson }}
+    const cursor = {{ params.cursor | tojson }}
+    const nextPage = {{ page.next_page | tojson }}
+    const prevPage = {{ page.previous_page | tojson }}
+
+    const goTo = (newCursor=cursor, newSize=size) => {
+        location.href = `?cursor=${newCursor}&size=${newSize}`
+    }
+
+    const goNext = () => goTo(nextPage)
+    const goPrev = () => goTo(prevPage)
+    const onSelect = () => {
+        goTo(cursor,  document.getElementById('select-size').value)
+    }
+
+    (() => {
+        if (nextPage === null) document.getElementById('go-next').classList.add('d-none')
+        if (prevPage === null) document.getElementById('go-prev').classList.add('d-none')
+
+        document.getElementById('select-size').value = size
+    })()
+</script>
+</body>
+</html>
