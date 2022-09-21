@@ -7,6 +7,7 @@ from random import randint
 import aiosqlite
 import asyncpg
 from asgi_lifespan import LifespanManager
+from cassandra.cluster import Cluster
 from httpx import AsyncClient
 from motor.motor_asyncio import AsyncIOMotorClient
 from pytest import fixture
@@ -24,6 +25,11 @@ def pytest_addoption(parser):
     )
     parser.addoption(
         "--mongodb-dsn",
+        type=str,
+        required=True,
+    )
+    parser.addoption(
+        "--cassandra-dsn",
         type=str,
         required=True,
     )
@@ -56,6 +62,24 @@ def raw_data():
 @fixture(scope="session")
 def entities(raw_data):
     return [UserWithOrderOut(**data) for data in raw_data]
+
+
+@fixture(scope="session")
+def cassandra_session(cassandra_address):
+    with Cluster(
+        [
+            cassandra_address,
+        ]
+    ).connect() as session:
+        ddl = "DROP KEYSPACE IF EXISTS  ks"
+        session.execute(ddl)
+
+        ddl = (
+            "CREATE KEYSPACE IF NOT EXISTS ks WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}"
+        )
+        session.execute(ddl)
+
+        yield session
 
 
 @async_fixture(scope="session", autouse=True)
@@ -154,6 +178,11 @@ def mongodb_url(request) -> str:
 @fixture(scope="session")
 def postgres_url(request) -> str:
     return request.config.getoption("--postgres-dsn")
+
+
+@fixture(scope="session")
+def cassandra_address(request) -> str:
+    return request.config.getoption("--cassandra-dsn")
 
 
 @fixture(scope="session")
