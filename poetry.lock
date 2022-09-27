@@ -84,7 +84,7 @@ tests_no_zope = ["cloudpickle", "coverage[toml] (>=5.0.2)", "hypothesis", "mypy 
 
 [[package]]
 name = "beanie"
-version = "1.11.10"
+version = "1.11.11"
 description = "Asynchronous Python ODM for MongoDB"
 category = "main"
 optional = true
@@ -1376,8 +1376,8 @@ attrs = [
     {file = "attrs-22.1.0.tar.gz", hash = "sha256:29adc2665447e5191d0e7c568fde78b21f9672d344281d0c6e1ab085429b22b6"},
 ]
 beanie = [
-    {file = "beanie-1.11.10-py3-none-any.whl", hash = "sha256:adc304ccc2efd4d97e12afe9edc6a3b3bb7d41e098a99bc6e9320d933d7f4268"},
-    {file = "beanie-1.11.10.tar.gz", hash = "sha256:9842e38e5bb16c7a030c3c0a39486d5840e1b55bfb26f1e7144270ed0b0a49b4"},
+    {file = "beanie-1.11.11-py3-none-any.whl", hash = "sha256:def2c563068994ec0d09682c1d2340986989572486869409d4117eb5f3dd64d5"},
+    {file = "beanie-1.11.11.tar.gz", hash = "sha256:a4e16d2cbb0ba0cd2609e213401a5dfd1bf1ed608451aee9327038d28bef93e2"},
 ]
 black = [
     {file = "black-22.8.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:ce957f1d6b78a8a231b18e0dd2d94a33d2ba738cd88a7fe64f53f659eea49fdd"},
