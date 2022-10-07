@@ -45,7 +45,7 @@ scylla-driver = {version = "^3.25.6", optional = true}
 pytest = "^7.1"
 pytest-cov = "^4.0.0"
 pytest-asyncio = "^0.19.0"
-black = "^22.0.8"
+black = "^22.10.0"
 pre-commit = "^2.20.0"
 Faker = "^15.0.0"
 psycopg2-binary = "^2.9.3"
