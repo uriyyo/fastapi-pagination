@@ -57,7 +57,7 @@ sqlalchemy-stubs = "^0.4"
 httpx = "^0.23.0"
 asgi-lifespan = "^1.0.1"
 requests = "^2.28.1"
-uvicorn = "^0.18.3"
+uvicorn = "^0.19.0"
 Jinja2 = "^3.1.2"
 
 [tool.poetry.extras]
