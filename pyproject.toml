@@ -14,10 +14,10 @@ classifiers = [
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3 :: Only',
 ]
 
@@ -42,13 +42,13 @@ sqlakeyset = { version = "^1.0.1659142803", optional = true }
 scylla-driver = {version = "^3.25.6", optional = true}
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.1"
+pytest = "^7.2.0"
 pytest-cov = "^4.0.0"
 pytest-asyncio = "^0.20.1"
 black = "^22.10.0"
 pre-commit = "^2.20.0"
 Faker = "^15.1.1"
-psycopg2-binary = "^2.9.4"
+psycopg2-binary = "^2.9.5"
 mkdocs = "^1.4.1"
 mkdocs-material = "^8.5.7"
 pymdown-extensions = "^9.7"
