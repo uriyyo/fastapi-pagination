@@ -107,7 +107,7 @@ def _create_params_dependency(
         with _ctx_var_with_reset(_params_val, val):
             yield val
 
-    _pagination_params.__signature__ = inspect.signature(params)  # type: ignore
+    _pagination_params.__signature__ = inspect.signature(params)  # type: ignore[attr-defined]
 
     return _pagination_params
 
@@ -131,7 +131,7 @@ def pagination_ctx(
 
             yield cast(AbstractParams, _params)
 
-    _page_ctx_dependency.__page_ctx_dep__ = True  # type: ignore
+    _page_ctx_dependency.__page_ctx_dep__ = True  # type: ignore[attr-defined]
 
     return _page_ctx_dependency
 

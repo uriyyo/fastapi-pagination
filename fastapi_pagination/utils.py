@@ -1,22 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Tuple, TypeVar, overload
+from typing import Optional, Tuple, TypeVar, overload
 
 from typing_extensions import Literal
 
 from .api import resolve_params
+from .bases import AbstractParams, BaseRawParams, CursorRawParams, RawParams
+from .types import ParamsType
 
-if TYPE_CHECKING:
-    from .bases import (
-        AbstractParams,
-        BaseRawParams,
-        CursorRawParams,
-        RawParams,
-    )
-    from .types import ParamsType
-
-T = TypeVar("T")
-TParams = TypeVar("TParams", bound="AbstractParams")
+TParams = TypeVar("TParams", bound=AbstractParams)
 
 
 @overload
