@@ -3,9 +3,10 @@ from __future__ import annotations
 from typing import Any, Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
-from pydantic import BaseModel, conint
+from pydantic import BaseModel
 
 from .bases import AbstractParams, BasePage, RawParams
+from .types import GreaterEqualOne
 
 T = TypeVar("T")
 
@@ -22,8 +23,8 @@ class Params(BaseModel, AbstractParams):
 
 
 class Page(BasePage[T], Generic[T]):
-    page: conint(ge=1)  # type: ignore
-    size: conint(ge=1)  # type: ignore
+    page: GreaterEqualOne
+    size: GreaterEqualOne
 
     __params_type__ = Params
 

@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import asdict
 from typing import Any, Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
-from pydantic.types import conint
 
 from .bases import AbstractParams, BasePage, RawParams
+from .types import GreaterEqualOne, GreaterEqualZero
 
 T = TypeVar("T")
 
@@ -24,8 +23,8 @@ class LimitOffsetParams(BaseModel, AbstractParams):
 
 
 class LimitOffsetPage(BasePage[T], Generic[T]):
-    limit: conint(ge=1)  # type: ignore
-    offset: conint(ge=0)  # type: ignore
+    limit: GreaterEqualOne
+    offset: GreaterEqualZero
 
     __params_type__ = LimitOffsetParams
 

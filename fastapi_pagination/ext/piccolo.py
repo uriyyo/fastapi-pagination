@@ -24,7 +24,7 @@ async def paginate(
 
     # need another copy for count query
     count_query = deepcopy(query)
-    count_query.columns_delegate.selected_columns.clear()  # type: ignore
+    count_query.columns_delegate.selected_columns = []
 
     total = (await count_query.columns(Count()).first())["count"]
     items = await query.offset(raw_params.offset).limit(raw_params.limit)
