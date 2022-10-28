@@ -5,6 +5,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from ..bases import AbstractPage, AbstractParams
+from ..types import AdditionalData
 from ..utils import verify_params
 from .sqlalchemy_future import async_exec_pagination
 
@@ -17,6 +18,8 @@ async def paginate(
     session: AsyncSession,
     query: Select[TSQLModel],
     params: Optional[AbstractParams] = None,
+    *,
+    additional_data: AdditionalData = None,
 ) -> AbstractPage[TSQLModel]:
     pass
 
@@ -26,6 +29,8 @@ async def paginate(
     session: AsyncSession,
     query: SelectOfScalar[T],
     params: Optional[AbstractParams] = None,
+    *,
+    additional_data: AdditionalData = None,
 ) -> AbstractPage[T]:
     pass
 
@@ -35,6 +40,8 @@ async def paginate(
     session: AsyncSession,
     query: Type[TSQLModel],
     params: Optional[AbstractParams] = None,
+    *,
+    additional_data: AdditionalData = None,
 ) -> AbstractPage[TSQLModel]:
     pass
 
@@ -44,13 +51,15 @@ async def paginate(
     session: AsyncSession,
     query: Any,
     params: Optional[AbstractParams] = None,
+    *,
+    additional_data: AdditionalData = None,
 ) -> AbstractPage[Any]:
     params, _ = verify_params(params, "limit-offset", "cursor")
 
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    return await async_exec_pagination(query, params, session.exec)
+    return await async_exec_pagination(query, params, session.exec, additional_data)
 
 
 __all__ = [

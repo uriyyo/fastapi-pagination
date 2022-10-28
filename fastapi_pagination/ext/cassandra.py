@@ -6,6 +6,7 @@ from cassandra.cqlengine.models import Model
 
 from ..api import create_page
 from ..bases import AbstractPage
+from ..types import AdditionalData
 from ..utils import TParams, verify_params
 
 T = TypeVar("T", bound=Mapping[str, Any])
@@ -15,6 +16,8 @@ def paginate(
     model: Type[Model],
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[TParams] = None,
+    *,
+    additional_data: AdditionalData = None,
 ) -> AbstractPage[Any]:
     params, raw_params = verify_params(params, "cursor")
 
@@ -30,7 +33,7 @@ def paginate(
     )
     items = cursor.current_rows
 
-    return create_page(items, params=params, next_=cursor.paging_state)
+    return create_page(items, params=params, next_=cursor.paging_state, **(additional_data or {}))
 
 
 __all__ = [

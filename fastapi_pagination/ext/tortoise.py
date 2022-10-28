@@ -6,6 +6,7 @@ from tortoise.queryset import QuerySet
 
 from ..api import create_page
 from ..bases import AbstractPage, AbstractParams
+from ..types import AdditionalData
 from ..utils import verify_params
 
 TModel = TypeVar("TModel", bound=Model)
@@ -28,6 +29,8 @@ async def paginate(
     query: Union[QuerySet[TModel], Type[TModel]],
     params: Optional[AbstractParams] = None,
     prefetch_related: Union[bool, List[Union[str, Prefetch]]] = False,
+    *,
+    additional_data: AdditionalData = None,
 ) -> AbstractPage[TModel]:
     params, raw_params = verify_params(params, "limit-offset")
 
@@ -37,7 +40,7 @@ async def paginate(
     total = await query.count()
     items = await _generate_query(query, prefetch_related).offset(raw_params.offset).limit(raw_params.limit).all()
 
-    return create_page(items, total, params)
+    return create_page(items, total, params, **(additional_data or {}))
 
 
 __all__ = [
