@@ -158,10 +158,21 @@ def _update_route(route: APIRoute) -> None:
     )
 
 
-def add_pagination(parent: ParentT) -> ParentT:
+def _add_pagination(parent: ParentT) -> None:
+    if hasattr(parent, "openapi_schema"):
+        parent.openapi_schema = None  # type: ignore[attr-defined]
+
     for route in parent.routes:
         if isinstance(route, APIRoute):
             _update_route(route)
+
+
+def add_pagination(parent: ParentT) -> ParentT:
+    _add_pagination(parent)
+
+    @parent.on_event("startup")
+    def on_startup() -> None:
+        _add_pagination(parent)
 
     return parent
 

@@ -1,9 +1,10 @@
+import sys
 from contextlib import suppress
 
 from fastapi import FastAPI
 from pony.orm import Database, Required, Set, db_session, select
 from pydantic import validator
-from pytest import fixture
+from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.pony import paginate
@@ -71,5 +72,9 @@ def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
     return add_pagination(app)
 
 
+@mark.skipif(
+    sys.version_info >= (3, 11),
+    reason="skip pony tests for python 3.11",
+)
 class TestPony(BasePaginationTestCase):
     pagination_types = ["default", "relationship"]
