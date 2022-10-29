@@ -1,10 +1,11 @@
-from typing import Union
+from typing import Any, Dict, Optional, Union
 
 from pydantic import conint
 from typing_extensions import TYPE_CHECKING, Literal, TypeAlias
 
-Cursor = Union[str, bytes]
+Cursor: TypeAlias = Union[str, bytes]
 ParamsType: TypeAlias = Literal["cursor", "limit-offset"]
+AdditionalData: TypeAlias = Optional[Dict[str, Any]]
 
 if TYPE_CHECKING:
     GreaterEqualZero: TypeAlias = int
@@ -16,6 +17,7 @@ else:
 __all__ = [
     "Cursor",
     "ParamsType",
+    "AdditionalData",
     "GreaterEqualZero",
     "GreaterEqualOne",
 ]

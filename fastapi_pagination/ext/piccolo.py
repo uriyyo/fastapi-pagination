@@ -7,12 +7,15 @@ from piccolo.table import Table
 
 from ..api import create_page
 from ..bases import AbstractPage, AbstractParams
+from ..types import AdditionalData
 from ..utils import verify_params
 
 
 async def paginate(
     query: Union[Select, Type[Table]],
     params: Optional[AbstractParams] = None,
+    *,
+    additional_data: AdditionalData = None,
 ) -> AbstractPage:
     params, raw_params = verify_params(params, "limit-offset")
 
@@ -29,7 +32,7 @@ async def paginate(
     total = (await count_query.columns(Count()).first())["count"]
     items = await query.offset(raw_params.offset).limit(raw_params.limit)
 
-    return create_page(items, total, params)
+    return create_page(items, total, params, **(additional_data or {}))
 
 
 __all__ = [

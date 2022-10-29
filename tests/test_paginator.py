@@ -1,7 +1,16 @@
+from typing import Generic, TypeVar
+
 from fastapi import FastAPI
 from pytest import fixture
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination, paginate
+from fastapi_pagination import (
+    LimitOffsetPage,
+    Page,
+    Params,
+    add_pagination,
+    paginate,
+    set_page,
+)
 
 from .base import BasePaginationTestCase
 
@@ -17,3 +26,17 @@ class TestPaginationParams(BasePaginationTestCase):
             return paginate(entities)
 
         return add_pagination(app)
+
+
+T = TypeVar("T")
+
+
+class CustomPage(Page[T], Generic[T]):
+    new_field: int
+
+
+def test_paginator_additional_data():
+    with set_page(CustomPage):
+        page = paginate([], Params(), additional_data={"new_field": 10})
+
+    assert page == CustomPage(items=[], total=0, page=1, size=50, new_field=10)

@@ -4,6 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorCollection
 
 from ..api import create_page
 from ..bases import AbstractPage, AbstractParams
+from ..types import AdditionalData
 from ..utils import verify_params
 
 
@@ -11,6 +12,7 @@ async def paginate(
     collection: AsyncIOMotorCollection,
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
+    additional_data: AdditionalData = None,
     **kwargs: Any,
 ) -> AbstractPage:
     params, raw_params = verify_params(params, "limit-offset")
@@ -20,13 +22,15 @@ async def paginate(
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
     items = await cursor.to_list(length=raw_params.limit)
 
-    return create_page(items, total, params)
+    return create_page(items, total, params, **(additional_data or {}))
 
 
 async def paginate_aggregate(
     collection: AsyncIOMotorCollection,
     aggregate_pipeline: Optional[List[Dict[Any, Any]]] = None,
     params: Optional[AbstractParams] = None,
+    *,
+    additional_data: AdditionalData = None,
 ) -> AbstractPage:
     params, raw_params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []
@@ -50,7 +54,7 @@ async def paginate_aggregate(
     total = data["metadata"][0]["total"]
     items = data["data"]
 
-    return create_page(items, total, params)
+    return create_page(items, total, params, **(additional_data or {}))
 
 
 __all__ = [
