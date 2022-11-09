@@ -88,8 +88,8 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "beanie"
-version = "1.13.1"
-description = "Python ODM for MongoDB"
+version = "1.15.1"
+description = "Asynchronous Python ODM for MongoDB"
 category = "main"
 optional = true
 python-versions = ">=3.7,<4.0"
@@ -1386,8 +1386,8 @@ attrs = [
     {file = "backports.zoneinfo-0.2.1.tar.gz", hash = "sha256:fadbfe37f74051d024037f223b8e001611eac868b5c5b06144ef4d8b799862f2"},
 ]
 beanie = [
-    {file = "beanie-1.13.1-py3-none-any.whl", hash = "sha256:954e33ffc7b6b79eec87b61a20c36e296dab98fe021e6798f3f2de752f35f9a6"},
-    {file = "beanie-1.13.1.tar.gz", hash = "sha256:3aae32ba6bd40c3768ca1126a07725577d45133d240cca50ef1e6a35699f6063"},
+    {file = "beanie-1.15.1-py3-none-any.whl", hash = "sha256:eff222702db1f81eef1b41b448a38c5e7f0692bc3b542a056bbaecfa127bb1ce"},
+    {file = "beanie-1.15.1.tar.gz", hash = "sha256:2faf20b7070d78fe3bae5387d439bdabe521d67b79a89066ef7543da5497167d"},
 ]
 black = [
     {file = "black-22.10.0-1fixedarch-cp310-cp310-macosx_11_0_x86_64.whl", hash = "sha256:5cc42ca67989e9c3cf859e84c2bf014f6633db63d1cbdf8fdb666dcd9e77e3fa"},
