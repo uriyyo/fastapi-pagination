@@ -333,6 +333,14 @@ python-versions = "*"
 markdown = "*"
 
 [[package]]
+name = "futures"
+version = "3.0.5"
+description = "Backport of the concurrent.futures package from Python 3.2"
+category = "main"
+optional = true
+python-versions = "*"
+
+[[package]]
 name = "geomet"
 version = "0.2.1.post1"
 description = "GeoJSON <-> WKT/WKB conversion utilities"
@@ -982,13 +990,14 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "scylla-driver"
-version = "3.25.6"
+version = "3.25.7"
 description = "Scylla Driver for Apache Cassandra"
 category = "main"
 optional = true
 python-versions = "*"
 
 [package.dependencies]
+futures = "*"
 geomet = ">=0.1,<0.3"
 pyyaml = ">5.0"
 six = ">=1.9"
@@ -1525,6 +1534,10 @@ filelock = [
 ]
 fontawesome-markdown = [
     {file = "fontawesome-markdown-0.2.6.tar.gz", hash = "sha256:95a12f1629a595afc4aabc886ffdb8b5fa0ae8f77e8f3437b7b1942d91f91f4b"},
+]
+futures = [
+    {file = "futures-3.0.5-py2-none-any.whl", hash = "sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b"},
+    {file = "futures-3.0.5.tar.gz", hash = "sha256:0542525145d5afc984c88f914a0c85c77527f65946617edb5274f72406f981df"},
 ]
 geomet = [
     {file = "geomet-0.2.1.post1-py3-none-any.whl", hash = "sha256:a41a1e336b381416d6cbed7f1745c848e91defaa4d4c1bdc1312732e46ffad2b"},
@@ -2121,39 +2134,47 @@ rfc3986 = [
     {file = "rfc3986-1.5.0.tar.gz", hash = "sha256:270aaf10d87d0d4e095063c65bf3ddbc6ee3d0b226328ce21e036f946e421835"},
 ]
 scylla-driver = [
-    {file = "scylla-driver-3.25.6.tar.gz", hash = "sha256:72b5e3dd1f52cabe1d6e50011c6457f81ac7ecef42c4a0b609ae521badd3b0d1"},
-    {file = "scylla_driver-3.25.6-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d9cbdcf21dfb60fa4122b0b824b8896b26bdf1e166c21af27a6c77e8a31988d3"},
-    {file = "scylla_driver-3.25.6-cp310-cp310-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:e07a1aeac5c11983f702df02561065bd27b167c16fc802e9b6e136dc15412e29"},
-    {file = "scylla_driver-3.25.6-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:0a80a2d5a58fb228759731db026de160c70ea8fa9936aad62ef4aa071db1cc11"},
-    {file = "scylla_driver-3.25.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9f17e45f83f755eb98ebf8415cee197b6476a7bd87ccfa399e1e1dbf695bd9de"},
-    {file = "scylla_driver-3.25.6-cp310-cp310-win32.whl", hash = "sha256:c21fb83d5cb0a209506ff8411803f3f78cba3be547272e029cdb6f72fad47296"},
-    {file = "scylla_driver-3.25.6-cp310-cp310-win_amd64.whl", hash = "sha256:183e5693705c1a97e44f270d74625e99ac7daf70162307c56109b92a56f341c7"},
-    {file = "scylla_driver-3.25.6-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:709067dad33af6351535e1f89eb9a012736d1d5a9f0db8564b56c03cc3350fd3"},
-    {file = "scylla_driver-3.25.6-cp37-cp37m-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:142f4b454274144e278ed97a1ec7949aaf72595f647dec23e89ff4c45ada2a5f"},
-    {file = "scylla_driver-3.25.6-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1e4831b0a30608ab3e08335934ff0c783d66a0cce71615d29fa977d828e3f4c9"},
-    {file = "scylla_driver-3.25.6-cp37-cp37m-win32.whl", hash = "sha256:abdbb30cec6af24a03cd47dd26f40f345bd7d678020e695815c5b2018d6c2d0e"},
-    {file = "scylla_driver-3.25.6-cp37-cp37m-win_amd64.whl", hash = "sha256:ac26f98bdc235eddb9e6075a7dc5187edc0d18e71af68424ffc3dbb5ddd27291"},
-    {file = "scylla_driver-3.25.6-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:15449e47d82a7b362ab718c22b42fce2a280393aa1499d1312e1dd7dc3858364"},
-    {file = "scylla_driver-3.25.6-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ad9b19155d9750b0ffa536809b5f48115748d0846e7e966c56fbbd4a1fe45eae"},
-    {file = "scylla_driver-3.25.6-cp38-cp38-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:c6d48529fe201ba484cbffe3741c627a829ab29ad765eb5a07e4aea98e63bca9"},
-    {file = "scylla_driver-3.25.6-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:44d21be8b9f7c49fe08713787f11f80b5c1acd2953ad2616b317d2e097f42aef"},
-    {file = "scylla_driver-3.25.6-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:14d8c366356236898ae17f99aeca723c8f49d2e7536e2ae11ff5ba7d0abc1e20"},
-    {file = "scylla_driver-3.25.6-cp38-cp38-win32.whl", hash = "sha256:0ea883f7f393ce89d24ab0f329166dfa7beac3ce6583aa12a893a940e51945ae"},
-    {file = "scylla_driver-3.25.6-cp38-cp38-win_amd64.whl", hash = "sha256:051d7d2933e778f92a53bb41960b7a541f04f5b5dd04d14b091729dbcf5d5069"},
-    {file = "scylla_driver-3.25.6-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:6968b70cd9f7e92d37fc9e2870005cbeab8f340e8579d32648fb0f13b633a0c1"},
-    {file = "scylla_driver-3.25.6-cp39-cp39-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:6389859ecf7d3f98df0e380623f691803d26b4f2ad17c9d5bebfed3bd333fe20"},
-    {file = "scylla_driver-3.25.6-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:5a2e97e812d19a05a526a2cf8bd88a77ea9259a7fbbe2a9ed4fc4008bfeaeba2"},
-    {file = "scylla_driver-3.25.6-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:69fe89b581e724fb59e1e2ff43949a51af3bada3d35dec6bc0a82f17d8809fcd"},
-    {file = "scylla_driver-3.25.6-cp39-cp39-win32.whl", hash = "sha256:11061420bbf12bc000d3a078e63598f1fe6e9f99f5f3c945e56722c37c15e0e7"},
-    {file = "scylla_driver-3.25.6-cp39-cp39-win_amd64.whl", hash = "sha256:b07be34bef0730c5aa9d10d3cc4fb685186d2aa3cc9b8674de24254ee01ab991"},
-    {file = "scylla_driver-3.25.6-pp37-pypy37_pp73-macosx_10_9_x86_64.whl", hash = "sha256:0e1047dcb7ab26c209da179317c9d8f8e6a10572669808d400e5d2d7944cfdb3"},
-    {file = "scylla_driver-3.25.6-pp37-pypy37_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:553d93b2805bc3864d099055933b5f0d1340eb154f21dafee60a2e80b68e699b"},
-    {file = "scylla_driver-3.25.6-pp37-pypy37_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:857ad0f5217dcdf79089aaae957b79fe7dcb9efe7ec81d30c8f0cf5db9b6022f"},
-    {file = "scylla_driver-3.25.6-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:e72a32d4ccb85c6400a0353d6c93884440dc68389a6a9a5e6756d6a48294fe63"},
-    {file = "scylla_driver-3.25.6-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:45611177454432b8241c3b3d0e70738c713c3870da4fba37d3ff081370b71d16"},
-    {file = "scylla_driver-3.25.6-pp38-pypy38_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:25e5b42396779f9af4af61bee28cc043500eb0548cd0997d99b607c5d9eb0e82"},
-    {file = "scylla_driver-3.25.6-pp38-pypy38_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6cb4afe76e9ad7a0bc16b69a7b1eec2a1e2b83da802546b98869af2422025ca8"},
-    {file = "scylla_driver-3.25.6-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:5d2ea8e67dce3c9ad03b585c77f24b428d10961bb5348e33a1561b8c1d87e2a9"},
+    {file = "scylla-driver-3.25.7.tar.gz", hash = "sha256:7867cdaf73fd31f09030fc20691c6368bd06a497abf434f1ade812c2d70342e8"},
+    {file = "scylla_driver-3.25.7-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5f00be3063b707a20895d3bb8f152bdefea0265010a957441fae79855d749d67"},
+    {file = "scylla_driver-3.25.7-cp310-cp310-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:dda46113649d70dfcdbe6bd7f68adc592d4bf0dafe775a32fed3c59c58609a58"},
+    {file = "scylla_driver-3.25.7-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:ab8df1ffb1a48afb0f7d7ca55272824c2c0439d742815beea8c20ac7a350355e"},
+    {file = "scylla_driver-3.25.7-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cfd1f727e151ea01b6f2c5207fa7c73ba6d6be5a1aecd940a241ead32f5f33bd"},
+    {file = "scylla_driver-3.25.7-cp310-cp310-win32.whl", hash = "sha256:52fc97c38c8426284f586eb08b03e030e95ea8295fa321511c46968944a71440"},
+    {file = "scylla_driver-3.25.7-cp310-cp310-win_amd64.whl", hash = "sha256:738653ebcd0d74a143f79e9ae5446de4e7aca6a778a5ead01937b1331e9a7e18"},
+    {file = "scylla_driver-3.25.7-cp311-cp311-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:1597d2ebee7a905db93869df5f69c1729422e047618b76ebc3b89dc720e7dc04"},
+    {file = "scylla_driver-3.25.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:47835984e8f1aa389499dc9d95f216d80296ab6d7655ad63c4c078d24225d38a"},
+    {file = "scylla_driver-3.25.7-cp311-cp311-win32.whl", hash = "sha256:fa1a00f54934d42e3f977b08f648f096e3f82ecf4581bb06836af21c112398d1"},
+    {file = "scylla_driver-3.25.7-cp311-cp311-win_amd64.whl", hash = "sha256:242a8ab59343203906ffcf9ede7fac2b514aeafa60006bfd4fe5cf27a62e7cf4"},
+    {file = "scylla_driver-3.25.7-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:f2143605fb9fbfa146c3ec70d4e86f08634511dca59352aeca4710405e1ab4b0"},
+    {file = "scylla_driver-3.25.7-cp37-cp37m-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:07f1796076c6611d42d60b48371d3c53d36d3dd5497b800852fdccd17f338ed1"},
+    {file = "scylla_driver-3.25.7-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b2d777ae643e01331ee43a1d1ab84eb7c4d2dbb542e040252759c85779344cd0"},
+    {file = "scylla_driver-3.25.7-cp37-cp37m-win32.whl", hash = "sha256:c7349da2c932521c71abb35a6e526551c5159e5e6885a06f76346190b727d444"},
+    {file = "scylla_driver-3.25.7-cp37-cp37m-win_amd64.whl", hash = "sha256:98adf88c3c8a9d02636e1f6ffc2cd4e17eb8cf0f65648cb87d739624510de373"},
+    {file = "scylla_driver-3.25.7-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:fbf0d8fc655f4e89aa9ca513b21f46cf7d8705d236925b71c909f86403cbe9da"},
+    {file = "scylla_driver-3.25.7-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:fd7921efbc4b081f436098fa0052e44657a4683dbf3a0e5469d0a7d12ecd7483"},
+    {file = "scylla_driver-3.25.7-cp38-cp38-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:f1b9e4524ea90b78999a3046b844e4abf31b08d6b5366be8bd1b769950bddb3b"},
+    {file = "scylla_driver-3.25.7-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:23f4704a1ed2e936dad5f18367e0dc5b7ed09bba53baed2914ba06fc9cea719a"},
+    {file = "scylla_driver-3.25.7-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:82ec197ebb29f53528dd06b43cf5a6adf6c290fb9811ed7670f8671bbbe56a15"},
+    {file = "scylla_driver-3.25.7-cp38-cp38-win32.whl", hash = "sha256:9b94d09dd4f8938fda25d7fe8f144ecb1c8a9e42318dae38c5f632f3751a4067"},
+    {file = "scylla_driver-3.25.7-cp38-cp38-win_amd64.whl", hash = "sha256:b3bbe2623c7ea8fb802c8331b1b934a73b39778fe1ab80aa92cafb94833211be"},
+    {file = "scylla_driver-3.25.7-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ef134495ae094b1cf308cda79ae0d465c9c4874fb50aed430fdcd3cd3e6506fb"},
+    {file = "scylla_driver-3.25.7-cp39-cp39-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:4eae24d1a6933faed8c78ada83466ce267727f53eb4e82c32240ab42338149c4"},
+    {file = "scylla_driver-3.25.7-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:af9e3d1b5a5a45c385738e83eb5ec79c0aa07e88fc8319e2b6db7a81d8b38354"},
+    {file = "scylla_driver-3.25.7-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:16e99cf6f5993cdf42e01ca7e12374e05ed784741a7702cb0dd6f62addc5d1c2"},
+    {file = "scylla_driver-3.25.7-cp39-cp39-win32.whl", hash = "sha256:c7401410a05ab089c70d041f381218afc06c4fab7741f03852259769918355fe"},
+    {file = "scylla_driver-3.25.7-cp39-cp39-win_amd64.whl", hash = "sha256:848602f13b9060b5b217529c1f6629aa9df858ae17d2666eaf8109e2bef156c6"},
+    {file = "scylla_driver-3.25.7-pp37-pypy37_pp73-macosx_10_9_x86_64.whl", hash = "sha256:1268ad8ae4e4683d41ba3dcc1149df63a8bcfc68cc7b9527870430605ede0a6e"},
+    {file = "scylla_driver-3.25.7-pp37-pypy37_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:6e5f64a39d057bea318b562644903747169d72977bf31354ef809afe423f77fb"},
+    {file = "scylla_driver-3.25.7-pp37-pypy37_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6873385d13c41c14a6849bc1a5d037c721c1f522c73473be48810436a5791bc2"},
+    {file = "scylla_driver-3.25.7-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:b21b8ec6c5572f7219c976b95507b86648f84bf9e52633ae9496cbec4ee9ea51"},
+    {file = "scylla_driver-3.25.7-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:247b2e7fa98fcfee11b8f2b0e3619c5b58fd5bf56adf85579446a217e90f3049"},
+    {file = "scylla_driver-3.25.7-pp38-pypy38_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:8fba6c73c3ba13bd8c53c12679b8450239ba6a5c18e2cc8f30c3e7c2a00b187a"},
+    {file = "scylla_driver-3.25.7-pp38-pypy38_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:da36f21949c80403212bd679fad4af8c7f20f79473e8930895b96a531ec09d84"},
+    {file = "scylla_driver-3.25.7-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:078d3ce7401669510410b2ea6c80f807c586a04b6a676d4ba416ef571768133a"},
+    {file = "scylla_driver-3.25.7-pp39-pypy39_pp73-macosx_10_9_x86_64.whl", hash = "sha256:858d11289d18214c8629b03464da25bbb375ceb8ceba2b64860f5fcbfb5f2fa1"},
+    {file = "scylla_driver-3.25.7-pp39-pypy39_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:2fd8fcafdd49dce2f1f28cb89ec5361cebf8584186d85dd76a5b2dfafd678ac4"},
+    {file = "scylla_driver-3.25.7-pp39-pypy39_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b2898934357817a3eb8043a1641e9b86391d046d4661081d4c5fc030f00d4a7f"},
+    {file = "scylla_driver-3.25.7-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:18e5a293a7093e5226ec3a0153f317f7dabfb68439976f0965d66b8499ce0a9b"},
 ]
 setuptools = [
     {file = "setuptools-65.5.0-py3-none-any.whl", hash = "sha256:f62ea9da9ed6289bfe868cd6845968a2c854d1427f8548d52cae02a42b4f0356"},
