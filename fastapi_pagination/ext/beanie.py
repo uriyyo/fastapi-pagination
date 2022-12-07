@@ -16,11 +16,12 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
+    fetch_links: bool = False,
 ) -> AbstractPage[TDocument]:
     params, raw_params = verify_params(params, "limit-offset")
 
-    items = await query.find_many(limit=raw_params.limit, skip=raw_params.offset).to_list()
-    total = await query.count()
+    items = await query.find_many(limit=raw_params.limit, skip=raw_params.offset, fetch_links=fetch_links).to_list()
+    total = await query.find({}, fetch_links=fetch_links).count()
 
     return create_page(items, total, params, **(additional_data or {}))
 
