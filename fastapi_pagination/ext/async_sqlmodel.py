@@ -20,6 +20,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
+    unique: bool = True,
 ) -> AbstractPage[TSQLModel]:
     pass
 
@@ -31,6 +32,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
+    unique: bool = True,
 ) -> AbstractPage[T]:
     pass
 
@@ -53,13 +55,14 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
+    unique: bool = True,
 ) -> AbstractPage[Any]:
     params, _ = verify_params(params, "limit-offset", "cursor")
 
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    return await async_exec_pagination(query, params, session.exec, additional_data)
+    return await async_exec_pagination(query, params, session.exec, additional_data, unique)
 
 
 __all__ = [
