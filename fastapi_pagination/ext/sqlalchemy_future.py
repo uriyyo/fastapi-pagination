@@ -19,18 +19,23 @@ from .sqlalchemy import (
 from .utils import unwrap_scalars, wrap_scalars
 
 
+def _maybe_unique(result: Any, unique: bool) -> Any:
+    return (result.unique() if unique else result).all()
+
+
 def exec_pagination(
     query: Select,
     params: AbstractParams,
     db_exec: Callable[..., Any],
     additional_data: AdditionalData = None,
+    unique: bool = True,
 ) -> AbstractPage[Any]:
     raw_params = params.to_raw_params()
 
     if is_cursor(raw_params):
         query, info = paginate_using_cursor(query, raw_params)
 
-        items = wrap_scalars(db_exec(query).unique().all())
+        items = wrap_scalars(_maybe_unique(db_exec(query), unique))
         items, previous, next_ = paginate_cursor_process_items(items, info, raw_params)
 
         return create_page(
@@ -43,7 +48,7 @@ def exec_pagination(
     else:
         (total,) = db_exec(count_query(query)).scalars()
         query = paginate_query(query, params)
-        items = db_exec(query).unique().all()
+        items = _maybe_unique(db_exec(query), unique)
 
         return create_page(unwrap_scalars(items), total, params, **(additional_data or {}))
 
@@ -53,13 +58,14 @@ async def async_exec_pagination(
     params: AbstractParams,
     db_exec: Callable[..., Awaitable[Any]],
     additional_data: AdditionalData = None,
+    unique: bool = True,
 ) -> AbstractPage[Any]:  # pragma: no cover
     raw_params = params.to_raw_params()
 
     if is_cursor(raw_params):
         query, info = paginate_using_cursor(query, raw_params)
 
-        items = wrap_scalars((await db_exec(query)).unique().all())
+        items = wrap_scalars(_maybe_unique(await db_exec(query), unique))
         items, previous, next_ = paginate_cursor_process_items(items, info, raw_params)
 
         return create_page(
@@ -71,7 +77,7 @@ async def async_exec_pagination(
         )
     else:
         (total,) = (await db_exec(count_query(query))).scalars()
-        items = (await db_exec(paginate_query(query, params))).unique().all()
+        items = _maybe_unique(await db_exec(paginate_query(query, params)), unique)
 
         return create_page(unwrap_scalars(items), total, params, **(additional_data or {}))
 
@@ -82,9 +88,10 @@ def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
+    unique: bool = True,
 ) -> AbstractPage[Any]:
     params, _ = verify_params(params, "limit-offset", "cursor")
-    return exec_pagination(query, params, conn.execute, additional_data)
+    return exec_pagination(query, params, conn.execute, additional_data, unique)
 
 
 __all__ = [
