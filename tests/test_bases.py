@@ -1,6 +1,6 @@
-from typing import ClassVar, Generic, Sequence, TypeVar
+from typing import ClassVar, Generic, Optional, Sequence, TypeVar
 
-from pytest import mark, raises
+from pytest import mark, raises, warns
 
 from fastapi_pagination import Page, Params
 from fastapi_pagination.bases import AbstractParams, RawParams
@@ -96,3 +96,103 @@ def test_params_cast():
     p = Params().to_raw_params()
 
     assert p.as_limit_offset() is p
+
+
+def test_deprecated_signature():
+    massage = (
+        r"^The signature of the `AbstractPage\.create` method has changed\. Please, update it to the new one\. "
+        r"\(items: 'Sequence\[T\]', params: 'AbstractParams', \*\*kwargs: 'Any'\) \-\> 'Type'$"
+    )
+
+    # old signature
+    with warns(DeprecationWarning, match=massage):
+
+        class P1(Page[T], Generic[T]):
+            @classmethod
+            def create(  # noqa
+                cls,
+                items: Sequence[T],
+                total: Optional[int],
+                params: AbstractParams,
+            ) -> Page[T]:
+                pass
+
+    # no kwargs
+    with warns(DeprecationWarning, match=massage):
+
+        class P2(Page[T], Generic[T]):
+            @classmethod
+            def create(  # noqa
+                cls,
+                items: Sequence[T],
+                params: AbstractParams,
+            ) -> Page[T]:
+                pass
+
+    # positional only
+    with warns(DeprecationWarning, match=massage):
+
+        class P3(Page[T], Generic[T]):
+            @classmethod
+            def create(  # noqa
+                cls,
+                items: Sequence[T],
+                /,
+                params: AbstractParams,
+                **kwargs,
+            ) -> Page[T]:
+                pass
+
+    # positional var
+    with warns(DeprecationWarning, match=massage):
+
+        class P4(Page[T], Generic[T]):
+            @classmethod
+            def create(  # noqa
+                cls,
+                items: Sequence[T],
+                params: AbstractParams,
+                *args,
+                **kwargs,
+            ) -> Page[T]:
+                pass
+
+    # keyword only no default
+    with warns(DeprecationWarning, match=massage):
+
+        class P5(Page[T], Generic[T]):
+            @classmethod
+            def create(  # noqa
+                cls,
+                items: Sequence[T],
+                params: AbstractParams,
+                *,
+                total: int,
+                **kwargs,
+            ) -> Page[T]:
+                pass
+
+    # wrong params
+    with warns(DeprecationWarning, match=massage):
+
+        class P6(Page[T], Generic[T]):
+            @classmethod
+            def create(  # noqa
+                cls,
+                data: Sequence[T],
+                params: AbstractParams,
+                **kwargs,
+            ) -> Page[T]:
+                pass
+
+    # not a classmethod
+    with warns(DeprecationWarning, match=massage):
+
+        class P7(Page[T], Generic[T]):
+            def create(  # noqa
+                cls,
+                data: Sequence[T],
+                params: AbstractParams,
+                **kwargs,
+            ) -> Page[T]:
+                pass

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import inspect
+import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import update_wrapper
@@ -90,15 +92,58 @@ def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping
     return {name: (anns[name], val) for name, val in fields.items()}
 
 
+def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type:  # noqa
+    return int
+
+
+_NEW_SIGNATURE = inspect.signature(_new_page_signature)
+
+
+def _check_for_old_sign(func: Any) -> bool:
+    sign = inspect.signature(func)
+
+    try:
+        sign.bind([], None)
+    except TypeError:
+        return True
+
+    has_kwargs = False
+    pos_params = []
+    for param in sign.parameters.values():
+        if param.kind == param.POSITIONAL_OR_KEYWORD:
+            pos_params.append(param.name)
+        elif param.kind == param.VAR_KEYWORD:
+            has_kwargs = True
+        elif param.kind == param.KEYWORD_ONLY and param.default is inspect.Parameter.empty:
+            return True
+        elif param.kind in {param.POSITIONAL_ONLY, param.VAR_POSITIONAL}:
+            return True
+
+    return not (pos_params == ["items", "params"] and has_kwargs)
+
+
 class AbstractPage(GenericModel, Generic[T], ABC):
     __params_type__: ClassVar[Type[AbstractParams]]
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        try:
+            is_same = cls.create.__func__ is AbstractPage.create.__func__  # type: ignore[attr-defined]
+        except AttributeError:
+            is_same = False
+
+        if not is_same and _check_for_old_sign(cls.create):
+            warnings.warn(
+                "The signature of the `AbstractPage.create` method has changed. "
+                f"Please, update it to the new one. {_NEW_SIGNATURE}",
+                DeprecationWarning,
+                stacklevel=3,
+            )
 
     @classmethod
     @abstractmethod
     def create(
         cls: Type[C],
-        items: Sequence[T],
-        params: AbstractParams,
+        *args: Any,
         **kwargs: Any,
     ) -> C:
         pass
