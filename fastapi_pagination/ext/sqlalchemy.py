@@ -3,16 +3,6 @@ from __future__ import annotations
 from typing import Any, Optional, Sequence, Tuple, TypeVar, cast, no_type_check
 
 from fastapi import HTTPException
-from sqlakeyset.paging import (
-    InvalidPage,
-    core_page_from_rows,
-    find_order_key,
-    group_by_clauses,
-    orm_query_keys,
-    parse_ob_clause,
-    process_args,
-    where_condition_for_page,
-)
 from sqlalchemy import func, literal_column, select
 from sqlalchemy.orm import Query, noload
 from sqlalchemy.sql import Select
@@ -22,11 +12,13 @@ from ..bases import AbstractPage, AbstractParams, CursorRawParams
 from ..types import AdditionalData
 from ..utils import verify_params
 
+try:
+    from sqlakeyset import paging
+except ImportError:
+    paging = None
+
+
 T = TypeVar("T", Select, Query)
-
-
-class ExperimentalWarning(Warning):
-    pass
 
 
 # adapted from  sqlakeyset.paging.perform_paging
@@ -35,9 +27,12 @@ def paginate_using_cursor(
     q: Select,
     raw_params: CursorRawParams,
 ) -> Tuple[Any, Tuple[Any, ...]]:
+    if paging is None:
+        raise ImportError("sqlakeyset is not installed")
+
     try:
-        place, backwards = process_args(page=raw_params.cursor)
-    except InvalidPage:
+        place, backwards = paging.process_args(page=raw_params.cursor)
+    except paging.InvalidPage:
         raise HTTPException(status_code=400, detail="Invalid cursor")
 
     try:
@@ -47,13 +42,13 @@ def paginate_using_cursor(
 
     selectable = q.selectable
     column_descriptions = q.column_descriptions
-    keys = orm_query_keys(q)
+    keys = paging.orm_query_keys(q)
 
-    order_cols = parse_ob_clause(selectable)
+    order_cols = paging.parse_ob_clause(selectable)
     if backwards:
         order_cols = [c.reversed for c in order_cols]
 
-    mapped_ocols = [find_order_key(ocol, column_descriptions) for ocol in order_cols]
+    mapped_ocols = [paging.find_order_key(ocol, column_descriptions) for ocol in order_cols]
 
     clauses = [col.ob_clause for col in mapped_ocols]
 
@@ -66,8 +61,8 @@ def paginate_using_cursor(
     q = q.add_columns(*extra_columns)
 
     if place:
-        condition = where_condition_for_page(order_cols, place, dialect)
-        groupby = group_by_clauses(selectable)
+        condition = paging.where_condition_for_page(order_cols, place, dialect)
+        groupby = paging.group_by_clauses(selectable)
         if groupby:
             q = q.having(condition)
         else:
@@ -84,7 +79,7 @@ def paginate_cursor_process_items(
 ) -> Tuple[Sequence[Any], Optional[str], Optional[str]]:
     order_cols, mapped_ocols, extra_columns, keys, backwards, current_place = pagination_info
 
-    page = core_page_from_rows(
+    page = paging.core_page_from_rows(
         (
             order_cols,
             mapped_ocols,
