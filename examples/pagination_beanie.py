@@ -1,11 +1,11 @@
 from typing import Any
 
 import uvicorn
+from beanie import Document, init_beanie
 from faker import Faker
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import Field
-from beanie import Document, init_beanie
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.beanie import paginate
@@ -34,7 +34,7 @@ async def on_startup() -> None:
     global client
     client = AsyncIOMotorClient("mongodb://localhost:27017")
     await init_beanie(client.test, document_models=[UserIn])
-    
+
     users = [UserIn(name=faker.name(), email=faker.email()) for _ in range(100)]
     await UserIn.insert_many(users)
 
