@@ -25,10 +25,11 @@ async def paginate(
 
     total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))
     query = paginate_query(query, params)
-    items: List[Any] = await db.fetch_all(query)
+    raw_items = await db.fetch_all(query)
 
+    items: List[Any] = raw_items
     if convert_to_mapping:
-        items = [{**item} for item in items]
+        items = [{**item._mapping} for item in raw_items]
 
     return create_page(items, total, params, **(additional_data or {}))
 
