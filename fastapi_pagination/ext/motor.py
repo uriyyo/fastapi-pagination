@@ -51,8 +51,12 @@ async def paginate_aggregate(
     )
 
     data = (await cursor.to_list(length=None))[0]
-    total = data["metadata"][0]["total"]
+
     items = data["data"]
+    try:
+        total = data["metadata"][0]["total"]
+    except IndexError:
+        total = 0
 
     return create_page(items, total, params, **(additional_data or {}))
 
