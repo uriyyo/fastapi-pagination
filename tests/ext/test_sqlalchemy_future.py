@@ -26,17 +26,17 @@ def app(sa_user, sa_order, sa_session, model_cls, model_with_rel_cls):
 
     @app.get("/default", response_model=Page[model_cls])
     @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    def route(db: Session = Depends(get_db)):
+    def route_1(db: Session = Depends(get_db)):
         return paginate(db, select(sa_user))
 
     @app.get("/relationship/default", response_model=Page[model_with_rel_cls])
     @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[model_with_rel_cls])
-    def route(db: Session = Depends(get_db)):
+    def route_2(db: Session = Depends(get_db)):
         return paginate(db, select(sa_user).options(selectinload(sa_user.orders)))
 
     @app.get("/non-scalar/default", response_model=Page[model_cls])
     @app.get("/non-scalar/limit-offset", response_model=LimitOffsetPage[model_cls])
-    def route(db: Session = Depends(get_db)):
+    def route_3(db: Session = Depends(get_db)):
         return paginate(db, select(sa_user.id, sa_user.name))
 
     return add_pagination(app)

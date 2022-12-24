@@ -34,7 +34,7 @@ async def on_startup() -> None:
     global client
     client = AsyncIOMotorClient("mongodb://localhost:27017")
 
-    result = await client.test.users.insert_many([{"name": faker.name(), "email": faker.email()} for i in range(100)])
+    await client.test.users.insert_many([{"name": faker.name(), "email": faker.email()} for _ in range(100)])
 
 
 @app.post("/users", response_model=UserOut)

@@ -1,2 +1,2 @@
-from .default import Page
-from .limmit_offset import LimitOffsetPage
+from .default import Page as Page
+from .limmit_offset import LimitOffsetPage as LimitOffsetPage

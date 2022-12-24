@@ -17,7 +17,6 @@ from fastapi_pagination import (
 )
 from fastapi_pagination.api import pagination_items
 from fastapi_pagination.bases import AbstractPage
-from fastapi_pagination.cursor import CursorParams
 
 
 def test_set_response_request():
@@ -50,14 +49,14 @@ def test_add_pagination():
     app = FastAPI()
 
     @app.get("/first")
-    async def route():
+    async def route_1():
         pass
 
     @app.get(
         "/second",
         response_model=Page[int],
     )
-    async def route():
+    async def route_2():
         pass
 
     *_, r1, r2 = app.routes
@@ -83,7 +82,7 @@ def test_add_pagination_include_router():
         "/first",
         response_model=Page[int],
     )
-    async def route():
+    async def route_1():
         pass
 
     (r1,) = router1.routes
@@ -99,7 +98,7 @@ def test_add_pagination_include_router():
         "/second",
         response_model=Page[int],
     )
-    async def route():
+    async def route_2():
         pass
 
     (r2,) = router2.routes
