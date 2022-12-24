@@ -23,7 +23,7 @@ from ..base import BasePaginationTestCase
 class Order(Model):
     id = IntField(pk=True)
     name = TextField(null=False)
-    user = ForeignKeyField(f"models.User", related_name="orders")
+    user = ForeignKeyField("models.User", related_name="orders")
 
     class Meta:
         table = "orders"

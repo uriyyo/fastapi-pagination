@@ -33,17 +33,17 @@ def app(sa_session, sa_user, model_cls, model_with_rel_cls):
 
     @app.get("/default", response_model=Page[model_cls])
     @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    async def route(db: AsyncSession = Depends(get_db)):
+    async def route_1(db: AsyncSession = Depends(get_db)):
         return await paginate(db, select(sa_user))
 
     @app.get("/non-scalar/default", response_model=Page[model_cls])
     @app.get("/non-scalar/limit-offset", response_model=LimitOffsetPage[model_cls])
-    async def route(db: AsyncSession = Depends(get_db)):
+    async def route_2(db: AsyncSession = Depends(get_db)):
         return await paginate(db, select(sa_user.id, sa_user.name))
 
     @app.get("/relationship/default", response_model=Page[model_with_rel_cls])
     @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[model_with_rel_cls])
-    async def route(db: AsyncSession = Depends(get_db)):
+    async def route_3(db: AsyncSession = Depends(get_db)):
         return await paginate(db, select(sa_user).options(selectinload(sa_user.orders)))
 
     return add_pagination(app)

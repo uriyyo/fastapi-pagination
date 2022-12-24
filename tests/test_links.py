@@ -11,12 +11,12 @@ client = TestClient(app)
 
 @app.get("/default", response_model=Page[int])
 @app.get("/limit-offset", response_model=LimitOffsetPage[int])
-async def route():
+async def route_1():
     return paginate([*range(200)])
 
 
 @app.get("/default-empty", response_model=Page[int])
-async def route():
+async def route_2():
     return paginate([])
 
 

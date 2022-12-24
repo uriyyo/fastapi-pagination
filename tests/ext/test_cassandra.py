@@ -55,7 +55,7 @@ async def test_cursor(app, client, entities):
     while True:
         params = {"cursor": cursor} if cursor else {}
 
-        resp = await client.get(f"/", params={**params, "size": 10})
+        resp = await client.get("/", params={**params, "size": 10})
         assert resp.status_code == status.HTTP_200_OK
         data = resp.json()
 

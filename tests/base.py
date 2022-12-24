@@ -67,9 +67,9 @@ class BasePaginationTestCase:
         if pagination_type == "default":
             prefix = "/"
         elif pagination_type == "non-scalar":
-            prefix = f"/non-scalar/"
+            prefix = "/non-scalar/"
         elif pagination_type == "relationship":
-            prefix = f"/relationship/"
+            prefix = "/relationship/"
         else:
             raise ValueError(f"Unknown suite type {pagination_type}")
 
