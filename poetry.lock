@@ -590,11 +590,11 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "mongoengine"
-version = "0.24.2"
+version = "0.25.0"
 description = "MongoEngine is a Python Object-Document Mapper for working with MongoDB."
 category = "main"
 optional = true
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
 pymongo = ">=3.4,<5.0"
@@ -1308,7 +1308,7 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "292a73e0f450615169443926964e878e9b8eae4cc711da3d78d698312699f15e"
+content-hash = "a03b1ecd03bb374a64c9c01bfa8014aeb2935c26ae37a746765e6d0617570e02"
 
 [metadata.files]
 aiosqlite = [
@@ -1701,8 +1701,8 @@ mkdocs-material-extensions = [
     {file = "mkdocs_material_extensions-1.1.1.tar.gz", hash = "sha256:9c003da71e2cc2493d910237448c672e00cefc800d3d6ae93d2fc69979e3bd93"},
 ]
 mongoengine = [
-    {file = "mongoengine-0.24.2-py3-none-any.whl", hash = "sha256:f5c4e1b206b2ccffe4adc7a6283ed26dd799bd115a5fb1d2e885a075132cdb88"},
-    {file = "mongoengine-0.24.2.tar.gz", hash = "sha256:c76d49658575bb995682e2e77c8ef7cda63faf939415b32ee923745d120f8b02"},
+    {file = "mongoengine-0.25.0-py3-none-any.whl", hash = "sha256:29882b732d1e139d9a9e82be349a56d772ff1154e3ab2716dbb093a7cb9c76fa"},
+    {file = "mongoengine-0.25.0.tar.gz", hash = "sha256:e7a3c97704beaf56ecf7bdbf7eacaa7cd1a8723821a0b270521dab17671cc045"},
 ]
 motor = [
     {file = "motor-3.1.1-py3-none-any.whl", hash = "sha256:01d93d7c512810dcd85f4d634a7244ba42ff6be7340c869791fe793561e734da"},
