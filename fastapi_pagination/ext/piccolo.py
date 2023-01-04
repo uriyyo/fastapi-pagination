@@ -29,7 +29,7 @@ async def paginate(
     count_query = deepcopy(query)
     count_query.columns_delegate.selected_columns = []
 
-    total = (await count_query.columns(Count()).first())["count"]
+    total = (await count_query.columns(Count()).first())["count"]  # type: ignore
     items = await query.offset(raw_params.offset).limit(raw_params.limit)
 
     return create_page(items, total, params, **(additional_data or {}))
