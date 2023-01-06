@@ -28,7 +28,7 @@ T = TypeVar("T")
 TAbstractParams = TypeVar("TAbstractParams", covariant=True, bound=AbstractParams)
 
 _params_val: ContextVar[AbstractParams] = ContextVar("_params_val")
-_page_val: ContextVar[Type[AbstractPage]] = ContextVar("_page_val", default=Page)
+_page_val: ContextVar[Type[AbstractPage[Any]]] = ContextVar("_page_val", default=Page)
 
 _rsp_val: ContextVar[Response] = ContextVar("_rsp_val")
 _req_val: ContextVar[Request] = ContextVar("_req_val")
@@ -82,7 +82,7 @@ def request() -> Request:
         raise RuntimeError("request context var must be set")
 
 
-def _ctx_var_with_reset(var: ContextVar, value: Any) -> ContextManager[None]:
+def _ctx_var_with_reset(var: ContextVar[T], value: T) -> ContextManager[None]:
     token = var.set(value)
 
     @contextmanager
@@ -95,7 +95,7 @@ def _ctx_var_with_reset(var: ContextVar, value: Any) -> ContextManager[None]:
     return _reset_ctx()
 
 
-def set_page(page: Type[AbstractPage]) -> ContextManager[None]:
+def set_page(page: Type[AbstractPage[Any]]) -> ContextManager[None]:
     return _ctx_var_with_reset(_page_val, page)
 
 
@@ -104,7 +104,7 @@ def _create_params_dependency(
 ) -> Callable[[TAbstractParams], AsyncIterator[TAbstractParams]]:
     async def _pagination_params(*args: Any, **kwargs: Any) -> AsyncIterator[TAbstractParams]:
         val = params(*args, **kwargs)
-        with _ctx_var_with_reset(_params_val, val):
+        with _ctx_var_with_reset(_params_val, cast(AbstractParams, val)):
             yield val
 
     _pagination_params.__signature__ = inspect.signature(params)  # type: ignore[attr-defined]
@@ -113,7 +113,7 @@ def _create_params_dependency(
 
 
 def pagination_ctx(
-    page: Type[AbstractPage],
+    page: Type[AbstractPage[Any]],
     params: Optional[Type[AbstractParams]] = None,
 ) -> Callable[..., AsyncIterator[AbstractParams]]:
     if params is None:
@@ -146,7 +146,7 @@ def _update_route(route: APIRoute) -> None:
     if not lenient_issubclass(route.response_model, AbstractPage):
         return
 
-    cls = cast(Type[AbstractPage], route.response_model)
+    cls = cast(Type[AbstractPage[Any]], route.response_model)
     dep = Depends(pagination_ctx(cls))
 
     route.dependencies.append(dep)

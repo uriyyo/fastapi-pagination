@@ -18,7 +18,7 @@ except ImportError:
     paging = None
 
 
-T = TypeVar("T", Select, Query)
+T = TypeVar("T", Select, "Query[Any]")
 
 
 # adapted from  sqlakeyset.paging.perform_paging
@@ -110,11 +110,11 @@ def count_query(query: Select) -> Select:
 
 
 def paginate(
-    query: Query,
+    query: Query[Any],
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage:
+) -> AbstractPage[Any]:
     params, _ = verify_params(params, "limit-offset")
 
     total = query.count()

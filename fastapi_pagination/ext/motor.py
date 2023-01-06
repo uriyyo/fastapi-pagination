@@ -14,7 +14,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     additional_data: AdditionalData = None,
     **kwargs: Any,
-) -> AbstractPage:
+) -> AbstractPage[Any]:
     params, raw_params = verify_params(params, "limit-offset")
     query_filter = query_filter or {}
 
@@ -31,7 +31,7 @@ async def paginate_aggregate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage:
+) -> AbstractPage[Any]:
     params, raw_params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []
 

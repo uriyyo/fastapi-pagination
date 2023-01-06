@@ -139,17 +139,12 @@ max-complexity = 10
 
 [tool.mypy]
 python_version = 3.8
-plugins = "pydantic.mypy,sqlalchemy.ext.mypy.plugin"
-show_column_numbers = true
+strict = true
 follow_imports = "normal"
 ignore_missing_imports = true
-warn_return_any = true
-strict_optional = true
-warn_no_return = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-disallow_untyped_defs = true
-check_untyped_defs = true
+no_implicit_reexport = false
+show_column_numbers= true
+show_error_codes= true
 
 [tool.coverage.paths]
 source = ["fastapi_pagination"]

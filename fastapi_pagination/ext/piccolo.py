@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional, Type, Union
+from typing import Optional, Type, Union, Any
 
 from piccolo.query import Select
 from piccolo.query.methods.select import Count
@@ -16,7 +16,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage:
+) -> AbstractPage[Any]:
     params, raw_params = verify_params(params, "limit-offset")
 
     if not isinstance(query, Select):
@@ -29,7 +29,7 @@ async def paginate(
     count_query = deepcopy(query)
     count_query.columns_delegate.selected_columns = []
 
-    total = (await count_query.columns(Count()).first())["count"]  # type: ignore
+    total = (await count_query.columns(Count()).first())["count"]
     items = await query.offset(raw_params.offset).limit(raw_params.limit)
 
     return create_page(items, total, params, **(additional_data or {}))

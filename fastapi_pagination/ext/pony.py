@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 
 from pony.orm.core import Query
 
@@ -14,7 +14,7 @@ def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage:
+) -> AbstractPage[Any]:
     params, raw_params = verify_params(params, "limit-offset")
 
     total = query.count()

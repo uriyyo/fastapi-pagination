@@ -30,7 +30,7 @@ from .types import Cursor, GreaterEqualZero, ParamsType
 T = TypeVar("T")
 C = TypeVar("C")
 
-TAbstractPage = TypeVar("TAbstractPage", bound="AbstractPage")
+TAbstractPage = TypeVar("TAbstractPage", bound="AbstractPage[Any]")
 
 
 class BaseRawParams:
@@ -92,7 +92,7 @@ def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping
     return {name: (anns[name], val) for name, val in fields.items()}
 
 
-def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type:  # noqa
+def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type[Any]:  # noqa
     return int
 
 
@@ -158,7 +158,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             **_create_params(params_cls, kwargs),
         )
 
-        bases: Tuple[Type, ...]
+        bases: Tuple[Type[Any], ...]
         if cls.__concrete__:
             bases = (cls,)
         else:
