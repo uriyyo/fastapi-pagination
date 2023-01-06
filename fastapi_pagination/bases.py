@@ -92,7 +92,7 @@ def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping
     return {name: (anns[name], val) for name, val in fields.items()}
 
 
-def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type[Any]:  # noqa
+def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type:  # type: ignore  # noqa
     return int
 
 

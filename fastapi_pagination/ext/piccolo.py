@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional, Type, Union, Any
+from typing import Optional, Type, Union, TypeVar, cast, List
 
 from piccolo.query import Select
 from piccolo.query.methods.select import Count
@@ -11,12 +11,15 @@ from ..types import AdditionalData
 from ..utils import verify_params
 
 
+T = TypeVar("T", bound=Table, covariant=True)
+
+
 async def paginate(
-    query: Union[Select, Type[Table]],
+    query: Union[Select[T], Type[T]],
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[Any]:
+) -> AbstractPage[T]:
     params, raw_params = verify_params(params, "limit-offset")
 
     if not isinstance(query, Select):
@@ -29,10 +32,13 @@ async def paginate(
     count_query = deepcopy(query)
     count_query.columns_delegate.selected_columns = []
 
-    total = (await count_query.columns(Count()).first())["count"]
+    total = 0
+    if row := await count_query.columns(Count()).first():
+        total = row["count"]
+
     items = await query.offset(raw_params.offset).limit(raw_params.limit)
 
-    return create_page(items, total, params, **(additional_data or {}))
+    return create_page(cast(List[T], items), total, params, **(additional_data or {}))
 
 
 __all__ = [
