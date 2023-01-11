@@ -40,7 +40,11 @@ class CustomPage(BasePage[T], Generic[T]):
         if not isinstance(params, CustomPageParams):
             raise ValueError("Page should be used with Params")
 
-        pages = ceil(total / params.size)
+        if params.size is not None and params.size != 0:
+            pages = ceil(total / params.size)
+        else:
+            pages = 0
+
         return cls(
             total=total,
             items=items,
@@ -48,7 +52,7 @@ class CustomPage(BasePage[T], Generic[T]):
             size=params.size,
             pages=pages,
             next_page=params.page + 1 if params.page < pages else None,
-            previous_page=params.page - 1 if params.page > 1 else None,            
+            previous_page=params.page - 1 if params.page > 1 else None,
             **kwargs,
         )
 
