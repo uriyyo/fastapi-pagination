@@ -9,6 +9,7 @@ from .api import (
 )
 from .default import Page, Params
 from .limit_offset import LimitOffsetPage, LimitOffsetParams
+from .custom_page import CustomPage, CustomPageParams
 from .paginator import paginate
 
 __all__ = [
@@ -20,6 +21,8 @@ __all__ = [
     "set_page",
     "Page",
     "Params",
+    "CustomPage",
+    "CustomPageParams",
     "LimitOffsetPage",
     "LimitOffsetParams",
     "paginate",

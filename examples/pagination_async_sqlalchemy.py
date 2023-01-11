@@ -10,7 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
+from fastapi_pagination import LimitOffsetPage, CustomPage, Page, add_pagination
 from fastapi_pagination.ext.async_sqlalchemy import paginate
 
 faker = Faker()
@@ -71,6 +71,7 @@ async def create_user(user_in: UserIn, db: AsyncSession = Depends(get_db)) -> Us
 
 @app.get("/users/default", response_model=Page[UserOut])
 @app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
+@app.get("/users/custom-page", response_model=CustomPage[UserOut])
 async def get_users(db: AsyncSession = Depends(get_db)) -> Any:
     return await paginate(db, select(User))
 
