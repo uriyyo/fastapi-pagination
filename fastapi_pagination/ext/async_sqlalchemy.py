@@ -18,7 +18,7 @@ async def paginate(
     *,
     additional_data: AdditionalData = None,
     unique: bool = True,
-) -> AbstractPage[Any]:
+) -> TAbstractPage[Any]:
     params, _ = verify_params(params, "limit-offset", "cursor")
     return await async_exec_pagination(query, params, conn.execute, additional_data, unique)
 
