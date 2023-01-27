@@ -5,7 +5,7 @@ from typing import Any, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import Select
 
-from ..bases import AbstractPage, AbstractParams
+from ..bases import AbstractPage, AbstractParams, TAbstractPage
 from ..types import AdditionalData
 from ..utils import verify_params
 from .sqlalchemy_future import async_exec_pagination
