@@ -353,18 +353,18 @@ toml = ["tomli"]
 
 [[package]]
 name = "databases"
-version = "0.6.1"
+version = "0.6.2"
 description = "Async database support for Python."
 category = "main"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "databases-0.6.1-py3-none-any.whl", hash = "sha256:47fae85d82d8227049f08b154019913c3ad2f6057ceb0b5ebb36703be6f5666b"},
-    {file = "databases-0.6.1.tar.gz", hash = "sha256:0a69c6983a27e10a5b75ffa094486f1febadd9d5a8db016e69b8c2f6a354dc30"},
+    {file = "databases-0.6.2-py3-none-any.whl", hash = "sha256:ff4010136ac2bb9da2322a2ffda4ef9185ae1c365e5891e52924dd9499d33dc4"},
+    {file = "databases-0.6.2.tar.gz", hash = "sha256:b09c370ad7c2f64c7f4316c096e265dc2e28304732639889272390decda2f893"},
 ]
 
 [package.dependencies]
-sqlalchemy = ">=1.4,<1.5"
+sqlalchemy = ">=1.4,<=1.4.41"
 
 [package.extras]
 aiomysql = ["aiomysql"]
