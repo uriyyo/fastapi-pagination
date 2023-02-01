@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Any, Dict, Mapping, Optional, Type, TypeVar
 
 from cassandra.cluster import SimpleStatement
@@ -34,8 +36,3 @@ def paginate(
     items = cursor.current_rows
 
     return create_page(items, params=params, next_=cursor.paging_state, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

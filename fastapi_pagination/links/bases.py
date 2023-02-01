@@ -1,3 +1,5 @@
+__all__ = ["Links", "create_links"]
+
 from typing import Any, Mapping, Optional
 
 from pydantic import BaseModel, Field
@@ -46,6 +48,3 @@ def create_links(
         next=_update_path(url, next),
         prev=_update_path(url, prev),
     )
-
-
-__all__ = ["Links", "create_links"]

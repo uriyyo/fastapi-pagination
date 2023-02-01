@@ -1,5 +1,16 @@
 from __future__ import annotations
 
+__all__ = [
+    "AbstractPage",
+    "AbstractParams",
+    "BasePage",
+    "BaseRawParams",
+    "RawParams",
+    "CursorRawParams",
+    "is_cursor",
+    "is_limit_offset",
+]
+
 import inspect
 import warnings
 from abc import ABC, abstractmethod
@@ -127,7 +138,8 @@ class AbstractPage(GenericModel, Generic[T], ABC):
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         try:
-            is_same = cls.create.__func__ is AbstractPage.create.__func__  # type: ignore[attr-defined]
+            # type: ignore[attr-defined]
+            is_same = cls.create.__func__ is AbstractPage.create.__func__
         except AttributeError:
             is_same = False
 
@@ -163,7 +175,8 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             bases = (cls,)
         else:
             params = tuple(cls.__parameters__)
-            bases = (cls[params], Generic[params])  # type: ignore[assignment, index]
+            # type: ignore[assignment, index]
+            bases = (cls[params], Generic[params])
 
         new_cls = new_class("CustomPage", bases, exec_body=lambda ns: setitem(ns, "__params_type__", custom_params))
         new_cls = update_wrapper(new_cls, cls, updated=())
@@ -177,15 +190,3 @@ class AbstractPage(GenericModel, Generic[T], ABC):
 class BasePage(AbstractPage[T], Generic[T], ABC):
     items: Sequence[T]
     total: GreaterEqualZero
-
-
-__all__ = [
-    "AbstractPage",
-    "AbstractParams",
-    "BasePage",
-    "BaseRawParams",
-    "RawParams",
-    "CursorRawParams",
-    "is_cursor",
-    "is_limit_offset",
-]

@@ -1,3 +1,14 @@
+__all__ = [
+    "add_pagination",
+    "create_page",
+    "resolve_params",
+    "response",
+    "request",
+    "set_page",
+    "pagination_ctx",
+    "pagination_items",
+]
+
 import inspect
 from contextlib import ExitStack, contextmanager, suppress
 from contextvars import ContextVar
@@ -175,15 +186,3 @@ def add_pagination(parent: ParentT) -> ParentT:
         _add_pagination(parent)
 
     return parent
-
-
-__all__ = [
-    "add_pagination",
-    "create_page",
-    "resolve_params",
-    "response",
-    "request",
-    "set_page",
-    "pagination_ctx",
-    "pagination_items",
-]

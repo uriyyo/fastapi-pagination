@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ["paginate"]
+
 from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,8 +23,3 @@ async def paginate(
 ) -> AbstractPage[Any]:
     params, _ = verify_params(params, "limit-offset", "cursor")
     return await async_exec_pagination(query, params, conn.execute, additional_data, unique)
-
-
-__all__ = [
-    "paginate",
-]

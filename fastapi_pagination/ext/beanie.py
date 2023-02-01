@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Optional, TypeVar, Union
 
 from beanie import Document
@@ -24,8 +26,3 @@ async def paginate(
     total = await query.find({}, fetch_links=fetch_links).count()
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

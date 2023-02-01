@@ -1,5 +1,7 @@
 from typing import Callable, Optional, Sequence, TypeVar
 
+__all__ = ["paginate"]
+
 from .api import create_page
 from .bases import AbstractPage, AbstractParams
 from .types import AdditionalData
@@ -23,6 +25,3 @@ def paginate(
         params,
         **(additional_data or {}),
     )
-
-
-__all__ = ["paginate"]

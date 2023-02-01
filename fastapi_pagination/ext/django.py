@@ -1,5 +1,7 @@
 from typing import Optional, Type, TypeVar, Union, cast
 
+__all__ = ["paginate"]
+
 from django.db.models import Model, QuerySet
 from django.db.models.base import ModelBase
 
@@ -26,8 +28,3 @@ def paginate(
     query = query.all()[raw_params.offset : raw_params.offset + raw_params.limit]
 
     return create_page([*query], total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

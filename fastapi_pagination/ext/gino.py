@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ["paginate"]
+
 from typing import Any, Optional, Union, no_type_check
 
 from gino.crud import CRUDModel
@@ -30,8 +32,3 @@ async def paginate(
     items = await query.gino.all()
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import List, Optional, Type, TypeVar, Union
 
 from tortoise.models import Model
@@ -41,8 +43,3 @@ async def paginate(
     items = await _generate_query(query, prefetch_related).offset(raw_params.offset).limit(raw_params.limit).all()
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

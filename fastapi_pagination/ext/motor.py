@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Any, Dict, List, Optional
 
 from motor.motor_asyncio import AsyncIOMotorCollection
@@ -59,9 +61,3 @@ async def paginate_aggregate(
         total = 0
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-    "paginate_aggregate",
-]

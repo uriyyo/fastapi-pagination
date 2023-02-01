@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+__all__ = [
+    "LimitOffsetPage",
+    "LimitOffsetParams",
+]
+
 from typing import Any, Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
@@ -46,9 +51,3 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
             offset=raw_params.offset,
             **kwargs,
         )
-
-
-__all__ = [
-    "LimitOffsetPage",
-    "LimitOffsetParams",
-]

@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+__all__ = [
+    "paginate_query",
+    "count_query",
+    "paginate",
+    "paginate_using_cursor",
+    "paginate_cursor_process_items",
+]
+
 from typing import Any, Optional, Sequence, Tuple, TypeVar, cast, no_type_check
 
 from fastapi import HTTPException
@@ -69,7 +77,8 @@ def paginate_using_cursor(
             q = q.where(condition)
 
     pagination_info = order_cols, mapped_ocols, extra_columns, keys, backwards, place
-    return q.limit(raw_params.size + 1), pagination_info  # 1 extra to check if there's a further page
+    # 1 extra to check if there's a further page
+    return q.limit(raw_params.size + 1), pagination_info
 
 
 def paginate_cursor_process_items(
@@ -121,12 +130,3 @@ def paginate(
     items = paginate_query(query, params).all()
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate_query",
-    "count_query",
-    "paginate",
-    "paginate_using_cursor",
-    "paginate_cursor_process_items",
-]

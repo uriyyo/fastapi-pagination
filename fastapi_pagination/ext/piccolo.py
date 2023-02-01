@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from copy import deepcopy
 from typing import Optional, Type, Union, TypeVar, cast, List
 
@@ -39,8 +41,3 @@ async def paginate(
     items = await query.offset(raw_params.offset).limit(raw_params.limit)
 
     return create_page(cast(List[T], items), total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+__all__ = [
+    "Params",
+    "Page",
+]
+
 from typing import Any, Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
@@ -47,9 +52,3 @@ class Page(BasePage[T], Generic[T]):
             size=params.size,
             **kwargs,
         )
-
-
-__all__ = [
-    "Params",
-    "Page",
-]

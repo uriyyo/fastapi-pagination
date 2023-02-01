@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Any, Optional, Type, TypeVar, no_type_check, overload
 
 from sqlmodel import Session, SQLModel, select
@@ -63,8 +65,3 @@ def paginate(
         query = select(query)
 
     return exec_pagination(query, params, session.exec, additional_data, unique)
-
-
-__all__ = [
-    "paginate",
-]
