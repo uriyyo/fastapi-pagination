@@ -77,8 +77,7 @@ def paginate_using_cursor(
             q = q.where(condition)
 
     pagination_info = order_cols, mapped_ocols, extra_columns, keys, backwards, place
-    # 1 extra to check if there's a further page
-    return q.limit(raw_params.size + 1), pagination_info
+    return q.limit(raw_params.size + 1), pagination_info  # 1 extra to check if there's a further page
 
 
 def paginate_cursor_process_items(

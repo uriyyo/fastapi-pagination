@@ -138,8 +138,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         try:
-            # type: ignore[attr-defined]
-            is_same = cls.create.__func__ is AbstractPage.create.__func__
+            is_same = cls.create.__func__ is AbstractPage.create.__func__  # type: ignore[attr-defined]
         except AttributeError:
             is_same = False
 
@@ -175,8 +174,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             bases = (cls,)
         else:
             params = tuple(cls.__parameters__)
-            # type: ignore[assignment, index]
-            bases = (cls[params], Generic[params])
+            bases = (cls[params], Generic[params])  # type: ignore[assignment, index]
 
         new_cls = new_class("CustomPage", bases, exec_body=lambda ns: setitem(ns, "__params_type__", custom_params))
         new_cls = update_wrapper(new_cls, cls, updated=())
