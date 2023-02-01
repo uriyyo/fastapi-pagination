@@ -1,4 +1,4 @@
-from typing import Optional, Type, TypeVar, Union, cast
+from typing import Optional, Type, TypeVar, Union, cast, Any
 
 __all__ = ["paginate"]
 
@@ -6,7 +6,7 @@ from django.db.models import Model, QuerySet
 from django.db.models.base import ModelBase
 
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams
+from ..bases import AbstractParams
 from ..types import AdditionalData
 from ..utils import verify_params
 
@@ -18,7 +18,7 @@ def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[T]:
+) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, ModelBase):

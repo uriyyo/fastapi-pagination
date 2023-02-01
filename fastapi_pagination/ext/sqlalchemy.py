@@ -16,7 +16,7 @@ from sqlalchemy.orm import Query, noload
 from sqlalchemy.sql import Select
 
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams, CursorRawParams
+from ..bases import AbstractParams, CursorRawParams
 from ..types import AdditionalData
 from ..utils import verify_params
 
@@ -122,7 +122,7 @@ def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[Any]:
+) -> Any:
     params, _ = verify_params(params, "limit-offset")
 
     total = query.count()

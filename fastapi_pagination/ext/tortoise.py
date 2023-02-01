@@ -1,13 +1,13 @@
 __all__ = ["paginate"]
 
-from typing import List, Optional, Type, TypeVar, Union
+from typing import List, Optional, Type, TypeVar, Union, Any
 
 from tortoise.models import Model
 from tortoise.query_utils import Prefetch
 from tortoise.queryset import QuerySet
 
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams
+from ..bases import AbstractParams
 from ..types import AdditionalData
 from ..utils import verify_params
 
@@ -33,7 +33,7 @@ async def paginate(
     prefetch_related: Union[bool, List[Union[str, Prefetch]]] = False,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[TModel]:
+) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     if not isinstance(query, QuerySet):

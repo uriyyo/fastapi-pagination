@@ -8,11 +8,11 @@ from gino.crud import CRUDModel
 from sqlalchemy import func, literal_column
 from sqlalchemy.sql import Select
 
+from .sqlalchemy import paginate_query
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams
+from ..bases import AbstractParams
 from ..types import AdditionalData
 from ..utils import verify_params
-from .sqlalchemy import paginate_query
 
 
 @no_type_check
@@ -21,7 +21,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[Any]:
+) -> Any:
     params, _ = verify_params(params, "limit-offset")
 
     if isinstance(query, type) and issubclass(query, CRUDModel):

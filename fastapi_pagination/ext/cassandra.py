@@ -7,7 +7,6 @@ from cassandra.cqlengine import connection
 from cassandra.cqlengine.models import Model
 
 from ..api import create_page
-from ..bases import AbstractPage
 from ..types import AdditionalData
 from ..utils import TParams, verify_params
 
@@ -20,7 +19,7 @@ def paginate(
     params: Optional[TParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[Any]:
+) -> Any:
     params, raw_params = verify_params(params, "cursor")
 
     query_filter = query_filter or {}

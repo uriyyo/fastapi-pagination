@@ -1,11 +1,11 @@
 __all__ = ["paginate"]
 
-from typing import Optional, Type, TypeVar, Union
+from typing import Optional, Type, TypeVar, Union, Any
 
 from ormar import Model, QuerySet
 
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams
+from ..bases import AbstractParams
 from ..types import AdditionalData
 from ..utils import verify_params
 
@@ -17,7 +17,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[TModel]:
+) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     if not isinstance(query, QuerySet):

@@ -1,12 +1,12 @@
 __all__ = ["paginate"]
 
-from typing import Optional, Type, TypeVar, Union, cast
+from typing import Optional, Type, TypeVar, Union, cast, Any
 
 from mongoengine import QuerySet
 from mongoengine.base.metaclasses import TopLevelDocumentMetaclass
 
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams
+from ..bases import AbstractParams
 from ..types import AdditionalData
 from ..utils import verify_params
 
@@ -18,7 +18,7 @@ def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[T]:
+) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, TopLevelDocumentMetaclass):
