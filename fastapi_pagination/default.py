@@ -9,9 +9,10 @@ from typing import Any, Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
+from math import ceil
 
 from .bases import AbstractParams, BasePage, RawParams
-from .types import GreaterEqualOne
+from .types import GreaterEqualOne, GreaterEqualZero
 
 T = TypeVar("T")
 
@@ -30,6 +31,7 @@ class Params(BaseModel, AbstractParams):
 class Page(BasePage[T], Generic[T]):
     page: GreaterEqualOne
     size: GreaterEqualOne
+    pages: Optional[GreaterEqualZero] = None
 
     __params_type__ = Params
 
@@ -45,10 +47,13 @@ class Page(BasePage[T], Generic[T]):
         if not isinstance(params, Params):
             raise ValueError("Page should be used with Params")
 
+        pages = ceil(total / params.size) if total is not None else None
+
         return cls(
             total=total,
             items=items,
             page=params.page,
             size=params.size,
+            pages=pages,
             **kwargs,
         )
