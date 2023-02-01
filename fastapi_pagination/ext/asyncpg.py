@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Any, Optional
 
 from asyncpg import Connection
@@ -34,8 +36,3 @@ async def paginate(
         params,
         **(additional_data or {}),
     )
-
-
-__all__ = [
-    "paginate",
-]

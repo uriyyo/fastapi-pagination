@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Optional, Type, TypeVar, Union
 
 from ormar import Model, QuerySet
@@ -25,8 +27,3 @@ async def paginate(
     items = await query.offset(raw_params.offset).limit(raw_params.limit).all()
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

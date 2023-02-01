@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Any, Optional
 
 from orm.models import QuerySet
@@ -20,8 +22,3 @@ async def paginate(
     items = await query.limit(raw_params.limit).offset(raw_params.offset).all()
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

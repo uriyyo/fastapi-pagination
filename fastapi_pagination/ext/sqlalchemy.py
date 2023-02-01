@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+__all__ = [
+    "paginate_query",
+    "count_query",
+    "paginate",
+    "paginate_using_cursor",
+    "paginate_cursor_process_items",
+]
+
 from typing import Any, Optional, Sequence, Tuple, TypeVar, cast, no_type_check
 
 from fastapi import HTTPException
@@ -121,12 +129,3 @@ def paginate(
     items = paginate_query(query, params).all()
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate_query",
-    "count_query",
-    "paginate",
-    "paginate_using_cursor",
-    "paginate_cursor_process_items",
-]

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ["paginate"]
+
 from typing import Any, List, Optional
 
 from databases import Database
@@ -32,8 +34,3 @@ async def paginate(
         items = [{**item._mapping} for item in raw_items]
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

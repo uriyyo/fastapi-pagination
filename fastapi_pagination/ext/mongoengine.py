@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Optional, Type, TypeVar, Union, cast
 
 from mongoengine import QuerySet
@@ -27,8 +29,3 @@ def paginate(
     items = [item.to_mongo() for item in cursor]
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

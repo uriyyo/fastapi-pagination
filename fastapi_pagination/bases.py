@@ -1,5 +1,16 @@
 from __future__ import annotations
 
+__all__ = [
+    "AbstractPage",
+    "AbstractParams",
+    "BasePage",
+    "BaseRawParams",
+    "RawParams",
+    "CursorRawParams",
+    "is_cursor",
+    "is_limit_offset",
+]
+
 import inspect
 import warnings
 from abc import ABC, abstractmethod
@@ -177,15 +188,3 @@ class AbstractPage(GenericModel, Generic[T], ABC):
 class BasePage(AbstractPage[T], Generic[T], ABC):
     items: Sequence[T]
     total: GreaterEqualZero
-
-
-__all__ = [
-    "AbstractPage",
-    "AbstractParams",
-    "BasePage",
-    "BaseRawParams",
-    "RawParams",
-    "CursorRawParams",
-    "is_cursor",
-    "is_limit_offset",
-]

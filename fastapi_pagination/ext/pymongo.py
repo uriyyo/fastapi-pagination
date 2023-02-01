@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Any, Dict, Mapping, Optional, TypeVar
 
 from pymongo.collection import Collection
@@ -26,8 +28,3 @@ def paginate(
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
 
     return create_page([*cursor], total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "paginate",
-]

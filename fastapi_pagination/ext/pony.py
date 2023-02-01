@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Optional, Any
 
 from pony.orm.core import Query
@@ -21,6 +23,3 @@ def paginate(
     items = query.fetch(raw_params.limit, raw_params.offset).to_list()
 
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = ["paginate"]

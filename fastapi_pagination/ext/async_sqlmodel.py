@@ -1,3 +1,5 @@
+__all__ = ["paginate"]
+
 from typing import Any, Optional, Type, TypeVar, no_type_check, overload
 
 from sqlmodel import SQLModel, select
@@ -63,8 +65,3 @@ async def paginate(
         query = select(query)
 
     return await async_exec_pagination(query, params, session.exec, additional_data, unique)
-
-
-__all__ = [
-    "paginate",
-]

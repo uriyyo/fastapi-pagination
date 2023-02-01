@@ -1,6 +1,14 @@
 from itertools import islice
 from typing import Generic, Iterable, Optional, TypeVar
 
+__all__ = [
+    "Page",
+    "Params",
+    "LimitOffsetPage",
+    "LimitOffsetParams",
+    "paginate",
+]
+
 from .api import create_page
 from .bases import AbstractPage, AbstractParams
 from .default import Page as DefaultPage
@@ -32,12 +40,3 @@ def paginate(
 
     items = [*islice(iterable, raw_params.offset, raw_params.offset + raw_params.limit)]
     return create_page(items, total, params, **(additional_data or {}))
-
-
-__all__ = [
-    "Page",
-    "Params",
-    "LimitOffsetPage",
-    "LimitOffsetParams",
-    "paginate",
-]

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ["verify_params"]
+
 from typing import Optional, Tuple, TypeVar, overload
 
 from typing_extensions import Literal
@@ -34,8 +36,3 @@ def verify_params(params: Optional[TParams], *params_types: ParamsType) -> Tuple
         raise ValueError(f"{raw_params.type!r} params not supported")
 
     return params, raw_params
-
-
-__all__ = [
-    "verify_params",
-]

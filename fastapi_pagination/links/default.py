@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ["Page"]
+
 from math import ceil
 from typing import Any, Generic, TypeVar
 
@@ -27,6 +29,3 @@ class Page(BasePage[T], Generic[T]):
             )
 
         return value
-
-
-__all__ = ["Page"]

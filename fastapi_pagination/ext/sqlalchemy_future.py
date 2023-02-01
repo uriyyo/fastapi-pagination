@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+__all__ = [
+    "paginate",
+    "exec_pagination",
+    "async_exec_pagination",
+]
+
 from typing import Any, Awaitable, Callable, Optional, Union
 
 from sqlalchemy.future import Connection, Engine
@@ -92,10 +98,3 @@ def paginate(
 ) -> AbstractPage[Any]:
     params, _ = verify_params(params, "limit-offset", "cursor")
     return exec_pagination(query, params, conn.execute, additional_data, unique)
-
-
-__all__ = [
-    "paginate",
-    "exec_pagination",
-    "async_exec_pagination",
-]

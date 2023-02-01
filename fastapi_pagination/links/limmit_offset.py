@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ["LimitOffsetPage", "Page"]
+
 from math import floor
 from typing import Any, Generic, TypeVar
 
@@ -37,5 +39,3 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
 
 
 Page = LimitOffsetPage
-
-__all__ = ["LimitOffsetPage", "Page"]

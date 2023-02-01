@@ -1,5 +1,13 @@
 from typing import Any, Dict, Optional, Union
 
+__all__ = [
+    "Cursor",
+    "ParamsType",
+    "AdditionalData",
+    "GreaterEqualZero",
+    "GreaterEqualOne",
+]
+
 from pydantic import conint
 from typing_extensions import TYPE_CHECKING, Literal, TypeAlias
 
@@ -13,11 +21,3 @@ if TYPE_CHECKING:
 else:
     GreaterEqualZero: TypeAlias = conint(ge=0)
     GreaterEqualOne: TypeAlias = conint(ge=1)
-
-__all__ = [
-    "Cursor",
-    "ParamsType",
-    "AdditionalData",
-    "GreaterEqualZero",
-    "GreaterEqualOne",
-]

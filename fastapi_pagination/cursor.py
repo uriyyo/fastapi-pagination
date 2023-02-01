@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+__all__ = [
+    "CursorPage",
+    "CursorParams",
+]
+
 from base64 import b64decode, b64encode
 from typing import (
     Any,
@@ -90,9 +95,3 @@ class CursorPage(AbstractPage[T], Generic[T]):
             previous_page=encode_cursor(previous),
             **kwargs,
         )
-
-
-__all__ = [
-    "CursorPage",
-    "CursorParams",
-]
