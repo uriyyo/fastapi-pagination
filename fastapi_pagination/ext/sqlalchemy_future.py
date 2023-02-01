@@ -12,10 +12,6 @@ from sqlalchemy.future import Connection, Engine
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import Select
 
-from ..api import create_page
-from ..bases import AbstractPage, AbstractParams, is_cursor
-from ..types import AdditionalData
-from ..utils import verify_params
 from .sqlalchemy import (
     count_query,
     paginate_cursor_process_items,
@@ -23,6 +19,10 @@ from .sqlalchemy import (
     paginate_using_cursor,
 )
 from .utils import unwrap_scalars, wrap_scalars
+from ..api import create_page
+from ..bases import AbstractPage, AbstractParams, is_cursor
+from ..types import AdditionalData
+from ..utils import verify_params
 
 
 def _maybe_unique(result: Any, unique: bool) -> Any:
@@ -95,6 +95,6 @@ def paginate(
     *,
     additional_data: AdditionalData = None,
     unique: bool = True,
-) -> AbstractPage[Any]:
+) -> Any:
     params, _ = verify_params(params, "limit-offset", "cursor")
     return exec_pagination(query, params, conn.execute, additional_data, unique)

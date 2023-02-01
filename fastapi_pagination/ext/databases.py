@@ -8,11 +8,11 @@ from databases import Database
 from sqlalchemy import func, select
 from sqlalchemy.sql import Select
 
+from .sqlalchemy import paginate_query
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams
+from ..bases import AbstractParams
 from ..types import AdditionalData
 from ..utils import verify_params
-from .sqlalchemy import paginate_query
 
 
 async def paginate(
@@ -22,7 +22,7 @@ async def paginate(
     *,
     additional_data: AdditionalData = None,
     convert_to_mapping: bool = True,
-) -> AbstractPage[Any]:
+) -> Any:
     params, _ = verify_params(params, "limit-offset")
 
     total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))

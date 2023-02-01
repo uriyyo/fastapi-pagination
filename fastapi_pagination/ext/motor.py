@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 from motor.motor_asyncio import AsyncIOMotorCollection
 
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams
+from ..bases import AbstractParams
 from ..types import AdditionalData
 from ..utils import verify_params
 
@@ -16,7 +16,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     additional_data: AdditionalData = None,
     **kwargs: Any,
-) -> AbstractPage[Any]:
+) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
     query_filter = query_filter or {}
 
@@ -33,7 +33,7 @@ async def paginate_aggregate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[Any]:
+) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []
 

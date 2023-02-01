@@ -1,9 +1,9 @@
-from typing import Callable, Optional, Sequence, TypeVar
+from typing import Callable, Optional, Sequence, TypeVar, Any
 
 __all__ = ["paginate"]
 
 from .api import create_page
-from .bases import AbstractPage, AbstractParams
+from .bases import AbstractParams
 from .types import AdditionalData
 from .utils import verify_params
 
@@ -16,7 +16,7 @@ def paginate(
     length_function: Callable[[Sequence[T]], int] = len,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[T]:
+) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     return create_page(

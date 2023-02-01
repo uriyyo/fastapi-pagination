@@ -1,17 +1,16 @@
 __all__ = ["paginate"]
 
 from copy import deepcopy
-from typing import Optional, Type, Union, TypeVar, cast, List
+from typing import Optional, Type, Union, TypeVar, cast, List, Any
 
 from piccolo.query import Select
 from piccolo.query.methods.select import Count
 from piccolo.table import Table
 
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams
+from ..bases import AbstractParams
 from ..types import AdditionalData
 from ..utils import verify_params
-
 
 T = TypeVar("T", bound=Table, covariant=True)
 
@@ -21,7 +20,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> AbstractPage[T]:
+) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     if not isinstance(query, Select):

@@ -5,10 +5,10 @@ from typing import Any, Optional, Type, TypeVar, no_type_check, overload
 from sqlmodel import Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
-from ..bases import AbstractPage, AbstractParams
+from .sqlalchemy_future import exec_pagination
+from ..bases import AbstractParams
 from ..types import AdditionalData
 from ..utils import verify_params
-from .sqlalchemy_future import exec_pagination
 
 T = TypeVar("T")
 TSQLModel = TypeVar("TSQLModel", bound=SQLModel)
@@ -22,7 +22,7 @@ def paginate(
     *,
     additional_data: AdditionalData = None,
     unique: bool = True,
-) -> AbstractPage[TSQLModel]:
+) -> Any:
     pass
 
 
@@ -34,7 +34,7 @@ def paginate(
     *,
     additional_data: AdditionalData = None,
     unique: bool = True,
-) -> AbstractPage[T]:
+) -> Any:
     pass
 
 
@@ -46,7 +46,7 @@ def paginate(
     *,
     additional_data: AdditionalData = None,
     unique: bool = True,
-) -> AbstractPage[TSQLModel]:
+) -> Any:
     pass
 
 
@@ -58,7 +58,7 @@ def paginate(
     *,
     additional_data: AdditionalData = None,
     unique: bool = True,
-) -> AbstractPage[Any]:
+) -> Any:
     params, _ = verify_params(params, "limit-offset", "cursor")
 
     if not isinstance(query, (Select, SelectOfScalar)):

@@ -5,7 +5,7 @@ from typing import Any, Optional
 from asyncpg import Connection
 
 from ..api import create_page
-from ..bases import AbstractPage, AbstractParams
+from ..bases import AbstractParams
 from ..types import AdditionalData
 from ..utils import verify_params
 
@@ -17,7 +17,7 @@ async def paginate(
     *args: Any,
     params: Optional[AbstractParams] = None,
     additional_data: AdditionalData = None,
-) -> AbstractPage[Any]:
+) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     total = await conn.fetchval(
