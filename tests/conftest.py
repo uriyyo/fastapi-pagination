@@ -33,6 +33,16 @@ def pytest_addoption(parser):
         type=str,
         required=True,
     )
+    parser.addoption(
+        "--unit-tests",
+        action="store_true",
+        default=False,
+    )
+
+
+@fixture(scope="session")
+def is_unit_tests_run(request):
+    return request.config.getoption("--unit-tests")
 
 
 @fixture(scope="session")
@@ -65,7 +75,10 @@ def entities(raw_data):
 
 
 @fixture(scope="session")
-def cassandra_session(cassandra_address):
+def cassandra_session(cassandra_address, is_unit_tests_run):
+    if is_unit_tests_run:
+        return
+
     with Cluster(
         [
             cassandra_address,
@@ -83,7 +96,10 @@ def cassandra_session(cassandra_address):
 
 
 @async_fixture(scope="session", autouse=True)
-async def _setup_postgres(postgres_url, raw_data):
+async def _setup_postgres(postgres_url, raw_data, is_unit_tests_run):
+    if is_unit_tests_run:
+        return
+
     async with asyncpg.create_pool(postgres_url) as pool:
         await pool.fetch("DROP TABLE IF EXISTS users CASCADE;")
         await pool.fetch("DROP TABLE IF EXISTS orders CASCADE;")
@@ -122,7 +138,10 @@ async def _setup_postgres(postgres_url, raw_data):
 
 
 @async_fixture(scope="session", autouse=True)
-async def _setup_sqlite(sqlite_file, raw_data):
+async def _setup_sqlite(sqlite_file, raw_data, is_unit_tests_run):
+    if is_unit_tests_run:
+        return
+
     async with aiosqlite.connect(sqlite_file) as pool:
         await pool.execute("DROP TABLE IF EXISTS orders;")
         await pool.execute("DROP TABLE IF EXISTS users;")
@@ -161,7 +180,10 @@ async def _setup_sqlite(sqlite_file, raw_data):
 
 
 @async_fixture(scope="session", autouse=True)
-async def _setup_mongodb(mongodb_url, raw_data):
+async def _setup_mongodb(mongodb_url, raw_data, is_unit_tests_run):
+    if is_unit_tests_run:
+        return
+
     client = AsyncIOMotorClient(mongodb_url)
 
     await client.test.users.delete_many({})
