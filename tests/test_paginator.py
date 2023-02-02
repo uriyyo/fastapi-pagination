@@ -39,4 +39,4 @@ def test_paginator_additional_data():
     with set_page(CustomPage):
         page = paginate([], Params(), additional_data={"new_field": 10})
 
-    assert page == CustomPage(items=[], total=0, page=1, size=50, new_field=10)
+    assert page == CustomPage(items=[], total=0, page=1, pages=0, size=50, new_field=10)
