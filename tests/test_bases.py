@@ -75,6 +75,7 @@ def test_with_custom_options_items_casted():
     assert res.dict() == {
         "items": [1, 2, 3, 4, 5],
         "page": 2,
+        "pages": 10,
         "size": 10,
         "total": 100,
     }

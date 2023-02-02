@@ -1,3 +1,4 @@
+from contextlib import suppress
 from typing import Any, Dict
 
 from fastapi import FastAPI, Query
@@ -18,6 +19,9 @@ class TestIterablesPagination(BasePaginationTestCase):
     def _normalize_expected(self, result):
         if self._should_normalize_expected:
             result.total = None
+
+            with suppress(ValueError):
+                result.pages = None
 
         return result
 
