@@ -18,6 +18,7 @@ class TestIterablesPagination(BasePaginationTestCase):
     def _normalize_expected(self, result):
         if self._should_normalize_expected:
             result.total = None
+            result.pages = None
 
         return result
 
