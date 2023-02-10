@@ -23,6 +23,6 @@ async def paginate(
     params, raw_params = verify_params(params, "limit-offset")
 
     items = await query.find_many(limit=raw_params.limit, skip=raw_params.offset, fetch_links=fetch_links).to_list()
-    total = await query.find({}, fetch_links=fetch_links).count()
+    total = await query.find({}, fetch_links=False).count()
 
     return create_page(items, total, params, **(additional_data or {}))
