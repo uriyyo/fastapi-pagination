@@ -59,7 +59,7 @@ asgi-lifespan = "^2.0.0"
 requests = "^2.28.2"
 uvicorn = "^0.20.0"
 Jinja2 = "^3.1.2"
-mypy = "^1.0.0"
+mypy = "^1.0.1"
 
 [tool.poetry.extras]
 sqlmodel = ["sqlmodel", "sqlakeyset"]
