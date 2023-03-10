@@ -45,7 +45,7 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
         raw_params = params.to_raw_params().as_limit_offset()
 
         return cls(
-            total=total,
+            total=total,  # type: ignore[arg-type]
             items=items,
             limit=raw_params.limit,
             offset=raw_params.offset,

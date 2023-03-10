@@ -50,7 +50,7 @@ class Page(BasePage[T], Generic[T]):
         pages = ceil(total / params.size) if total is not None else None
 
         return cls(
-            total=total,
+            total=total,  # type: ignore[arg-type]
             items=items,
             page=params.page,
             size=params.size,
