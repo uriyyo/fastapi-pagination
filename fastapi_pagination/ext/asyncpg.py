@@ -25,10 +25,13 @@ async def paginate(
         *args,
     )
 
-    items = await conn.fetch(
-        f"{query} LIMIT {raw_params.limit} OFFSET {raw_params.offset}",
-        *args,
-    )
+    limit_offset_str = ""
+    if raw_params.limit is not None:
+        limit_offset_str += f" LIMIT {raw_params.limit}"
+    if raw_params.offset is not None:
+        limit_offset_str += f" OFFSET {raw_params.offset}"
+
+    items = await conn.fetch(f"{query} {limit_offset_str}", *args)
 
     return create_page(
         [{**r} for r in items],

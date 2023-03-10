@@ -2,6 +2,7 @@ from __future__ import annotations
 
 __all__ = [
     "Params",
+    "OptionalParams",
     "Page",
 ]
 
@@ -28,9 +29,20 @@ class Params(BaseModel, AbstractParams):
         )
 
 
+class OptionalParams(Params):
+    page: Optional[int] = Query(None, ge=1, description="Page number")  # type: ignore[assignment]
+    size: Optional[int] = Query(None, ge=1, le=100, description="Page size")  # type: ignore[assignment]
+
+    def to_raw_params(self) -> RawParams:
+        return RawParams(
+            limit=self.size if self.size is not None else None,
+            offset=self.size * (self.page - 1) if self.page is not None and self.size is not None else None,
+        )
+
+
 class Page(BasePage[T], Generic[T]):
-    page: GreaterEqualOne
-    size: GreaterEqualOne
+    page: Optional[GreaterEqualOne]
+    size: Optional[GreaterEqualOne]
     pages: Optional[GreaterEqualZero] = None
 
     __params_type__ = Params
