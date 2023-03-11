@@ -31,10 +31,10 @@ def wrap_scalars(items: Sequence[Any]) -> Sequence[Sequence[Any]]:
 
 
 class AbstractQuery(Protocol):
-    def limit(self, *_: Any, **__: Any) -> Self:
+    def limit(self, *_: Any, **__: Any) -> Self:  # pragma: no cover
         pass
 
-    def offset(self, *_: Any, **__: Any) -> Self:
+    def offset(self, *_: Any, **__: Any) -> Self:  # pragma: no cover
         pass
 
 
