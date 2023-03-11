@@ -34,7 +34,7 @@ from typing import (
 
 from pydantic import BaseModel, create_model
 from pydantic.generics import GenericModel
-from typing_extensions import TypeGuard
+from typing_extensions import TypeGuard, Self
 
 from .types import Cursor, GreaterEqualZero, ParamsType
 
@@ -70,10 +70,16 @@ def is_cursor(params: BaseRawParams) -> TypeGuard[CursorRawParams]:
 
 @dataclass
 class RawParams(BaseRawParams):
-    limit: int
-    offset: int
+    limit: Optional[int] = None
+    offset: Optional[int] = None
 
     type: ClassVar[ParamsType] = "limit-offset"
+
+    def as_slice(self) -> slice:
+        return slice(
+            self.offset,
+            (self.offset or 0) + self.limit if self.limit is not None else None,
+        )
 
 
 @dataclass
@@ -160,7 +166,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         pass
 
     @classmethod
-    def with_custom_options(cls: Type[TAbstractPage], **kwargs: Any) -> Type[TAbstractPage]:
+    def with_custom_options(cls, **kwargs: Any) -> Type[Self]:
         params_cls = cls.__params_type__
 
         custom_params: Any = create_model(  # noqa
@@ -169,6 +175,10 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             **_create_params(params_cls, kwargs),
         )
 
+        return cls.with_params(custom_params)
+
+    @classmethod
+    def with_params(cls, custom_params: Type[AbstractParams]) -> Type[Self]:
         bases: Tuple[Type[Any], ...]
         if cls.__concrete__:
             bases = (cls,)

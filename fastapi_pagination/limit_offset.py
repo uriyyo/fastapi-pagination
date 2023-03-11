@@ -3,6 +3,7 @@ from __future__ import annotations
 __all__ = [
     "LimitOffsetPage",
     "LimitOffsetParams",
+    "OptionalLimitOffsetParams",
 ]
 
 from typing import Any, Generic, Optional, Sequence, TypeVar
@@ -27,9 +28,14 @@ class LimitOffsetParams(BaseModel, AbstractParams):
         )
 
 
+class OptionalLimitOffsetParams(LimitOffsetParams):
+    limit: Optional[int] = Query(None, ge=1, le=100, description="Page size limit")  # type: ignore[assignment]
+    offset: Optional[int] = Query(None, ge=0, description="Page offset")  # type: ignore[assignment]
+
+
 class LimitOffsetPage(BasePage[T], Generic[T]):
-    limit: GreaterEqualOne
-    offset: GreaterEqualZero
+    limit: Optional[GreaterEqualOne]
+    offset: Optional[GreaterEqualZero]
 
     __params_type__ = LimitOffsetParams
 
