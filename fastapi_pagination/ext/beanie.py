@@ -26,7 +26,6 @@ async def paginate(
     session: Optional[ClientSession] = None,
     ignore_cache: bool = False,
     fetch_links: bool = False,
-    with_children: bool = False,
     lazy_parse: bool = False,
     **pymongo_kwargs: Any,
 ) -> Any:
@@ -60,7 +59,6 @@ async def paginate(
             session=session,
             ignore_cache=ignore_cache,
             fetch_links=fetch_links,
-            with_children=with_children,
             lazy_parse=lazy_parse,
             **pymongo_kwargs,
         ).to_list()
