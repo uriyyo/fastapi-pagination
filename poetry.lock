@@ -1045,14 +1045,14 @@ min-versions = ["babel (==2.9.0)", "click (==7.0)", "colorama (==0.4)", "ghp-imp
 
 [[package]]
 name = "mkdocs-material"
-version = "9.1.2"
+version = "9.1.3"
 description = "Documentation that simply works"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mkdocs_material-9.1.2-py3-none-any.whl", hash = "sha256:344a1c66f0e217e5ceaf67739d274e51c61ac9f9d7af55a5b4805a4a2ab54184"},
-    {file = "mkdocs_material-9.1.2.tar.gz", hash = "sha256:9ca8c980c30aab3b70e3bfbec691f9ffcbea8319873911c86e8af145147e2a9d"},
+    {file = "mkdocs_material-9.1.3-py3-none-any.whl", hash = "sha256:a8d14d03569008afb0f5a5785c253249b5ff038e3a5509f96a393b8596bf5062"},
+    {file = "mkdocs_material-9.1.3.tar.gz", hash = "sha256:0be1b5d76c00efc9b2ecbd2d71014be950351e710f5947f276264878afc82ca0"},
 ]
 
 [package.dependencies]
@@ -2431,4 +2431,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "19f3db68668e9a326f021c27b1ddcf440d7b2b443d93f672c736f82d03be80dd"
+content-hash = "1535c086d35952d1cad7e300f803700b0b3ee2ce0dce07354ab135d330cbf2b3"
