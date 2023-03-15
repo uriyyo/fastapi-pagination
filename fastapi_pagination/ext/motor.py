@@ -37,16 +37,19 @@ async def paginate_aggregate(
     params, raw_params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []
 
+    paginate_data = []
+    if raw_params.limit is not None:
+        paginate_data.append({"$limit": raw_params.limit + (raw_params.offset or 0)})
+    if raw_params.offset is not None:
+        paginate_data.append({"$skip": raw_params.offset})
+
     cursor = collection.aggregate(
         [
             *aggregate_pipeline,
             {
                 "$facet": {
                     "metadata": [{"$count": "total"}],
-                    "data": [
-                        {"$limit": raw_params.limit + raw_params.offset},
-                        {"$skip": raw_params.offset},
-                    ],
+                    "data": paginate_data,
                 }
             },
         ]

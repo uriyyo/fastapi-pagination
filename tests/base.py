@@ -8,7 +8,7 @@ from fastapi_pagination.limit_offset import LimitOffsetPage, LimitOffsetParams
 from fastapi_pagination.paginator import paginate
 
 from .schemas import UserOut, UserWithOrderOut
-from .utils import normalize
+from .utils import normalize, OptionalPage, OptionalLimitOffsetPage
 
 _default_params = [
     Params(page=1),
@@ -52,6 +52,9 @@ class BasePaginationTestCase:
     page: ClassVar[Type[Page]] = Page
     limit_offset_page: ClassVar[Type[LimitOffsetPage]] = LimitOffsetPage
 
+    optional_page: ClassVar[Type[Page]] = OptionalPage
+    optional_limit_offset_page: ClassVar[Type[LimitOffsetPage]] = OptionalLimitOffsetPage
+
     def __init_subclass__(cls, **kwargs):
         if cls.pagination_types is not BasePaginationTestCase.pagination_types:
             mark.parametrize("pagination_type", cls.pagination_types, scope="session")(cls)
@@ -70,6 +73,8 @@ class BasePaginationTestCase:
             prefix = "/non-scalar/"
         elif pagination_type == "relationship":
             prefix = "/relationship/"
+        elif pagination_type == "optional":
+            prefix = "/optional/"
         else:
             raise ValueError(f"Unknown suite type {pagination_type}")
 
@@ -94,6 +99,27 @@ class BasePaginationTestCase:
 
         return model_cls
 
+    async def run_pagination_test(
+        self,
+        client,
+        path,
+        params,
+        entities,
+        cls_name,
+        additional_params,
+        result_model_cls,
+    ):
+        response = await client.get(path, params={**params.dict(), **additional_params})
+        response.raise_for_status()
+
+        cls = getattr(self, cls_name)
+
+        with set_page(cls):
+            expected = self._normalize_expected(paginate(entities, params))
+
+        a, b = normalize(cls[result_model_cls], expected, response.json())
+        assert a == b
+
     @mark.parametrize(
         "params,cls_name",
         [
@@ -116,16 +142,15 @@ class BasePaginationTestCase:
         result_model_cls,
         path,
     ):
-        response = await client.get(path, params={**params.dict(), **additional_params})
-        response.raise_for_status()
-
-        cls = getattr(self, cls_name)
-
-        with set_page(cls):
-            expected = self._normalize_expected(paginate(entities, params))
-
-        a, b = normalize(cls[result_model_cls], expected, response.json())
-        assert a == b
+        await self.run_pagination_test(
+            client,
+            path,
+            params,
+            entities,
+            cls_name,
+            additional_params,
+            result_model_cls,
+        )
 
     def _normalize_expected(self, result):
         return result

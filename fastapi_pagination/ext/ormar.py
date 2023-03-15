@@ -4,6 +4,7 @@ from typing import Optional, Type, TypeVar, Union, Any
 
 from ormar import Model, QuerySet
 
+from .utils import generic_query_apply_params
 from ..api import create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData
@@ -24,6 +25,6 @@ async def paginate(
         query = query.objects
 
     total = await query.count()
-    items = await query.offset(raw_params.offset).limit(raw_params.limit).all()
+    items = await generic_query_apply_params(query, raw_params).all()
 
     return create_page(items, total, params, **(additional_data or {}))

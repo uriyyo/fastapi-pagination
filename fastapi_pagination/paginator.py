@@ -20,7 +20,7 @@ def paginate(
     params, raw_params = verify_params(params, "limit-offset")
 
     return create_page(
-        sequence[raw_params.offset : raw_params.offset + raw_params.limit],
+        sequence[raw_params.as_slice()],
         length_function(sequence),
         params,
         **(additional_data or {}),

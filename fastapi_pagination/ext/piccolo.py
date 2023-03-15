@@ -7,6 +7,7 @@ from piccolo.query import Select
 from piccolo.query.methods.select import Count
 from piccolo.table import Table
 
+from .utils import generic_query_apply_params
 from ..api import create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData
@@ -37,6 +38,6 @@ async def paginate(
     if row := await count_query.columns(Count()).first():
         total = row["count"]
 
-    items = await query.offset(raw_params.offset).limit(raw_params.limit)
+    items = await generic_query_apply_params(query, raw_params)
 
     return create_page(cast(List[T], items), total, params, **(additional_data or {}))

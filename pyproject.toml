@@ -32,9 +32,9 @@ tortoise-orm = { version = ">=0.16.18,<0.20.0", optional = true }
 asyncpg = { version = ">=0.24.0", optional = true }
 ormar = { version = ">=0.11.2", optional = true}
 django = { version = "<5.0.0", optional = true}
-piccolo = { version = ">=0.89,<0.109", optional = true}
+piccolo = { version = ">=0.89,<0.110", optional = true}
 motor =  { version = ">=2.5.1,<4.0.0", optional = true }
-mongoengine = {version = ">=0.23.1,<0.27.0", optional = true}
+mongoengine = {version = ">=0.23.1,<0.28.0", optional = true}
 sqlmodel = { version = "^0.0.8", optional = true}
 pony = { version = "^0.7.16", optional = true}
 beanie = { version = "^1.11.9", optional = true}
@@ -47,19 +47,19 @@ pytest-cov = "^4.0.0"
 pytest-asyncio = "^0.20.3"
 black = "^23.1.0"
 pre-commit = "^3.1.1"
-Faker = "^17.5.0"
+Faker = "^17.6.0"
 psycopg2-binary = "^2.9.5"
 mkdocs = "^1.4.1"
-mkdocs-material = "^9.1.0"
-pymdown-extensions = "^9.7"
+mkdocs-material = "^9.1.2"
+pymdown-extensions = "^9.10"
 fontawesome-markdown = "^0.2.6"
 sqlalchemy-stubs = "^0.4"
 httpx = "^0.23.3"
 asgi-lifespan = "^2.0.0"
 requests = "^2.28.2"
-uvicorn = "^0.20.0"
+uvicorn = "^0.21.0"
 Jinja2 = "^3.1.2"
-mypy = "^1.0.1"
+mypy = "^1.1.1"
 
 [tool.poetry.extras]
 sqlmodel = ["sqlmodel", "sqlakeyset"]

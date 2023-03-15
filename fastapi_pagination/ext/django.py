@@ -25,6 +25,6 @@ def paginate(
         query = cast(Type[T], query).objects.all()
 
     total = query.count()
-    query = query.all()[raw_params.offset : raw_params.offset + raw_params.limit]
+    query = query.all()[raw_params.as_slice()]
 
     return create_page([*query], total, params, **(additional_data or {}))

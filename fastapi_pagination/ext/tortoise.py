@@ -6,6 +6,7 @@ from tortoise.models import Model
 from tortoise.query_utils import Prefetch
 from tortoise.queryset import QuerySet
 
+from .utils import generic_query_apply_params
 from ..api import create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData
@@ -40,6 +41,6 @@ async def paginate(
         query = query.all()
 
     total = await query.count()
-    items = await _generate_query(query, prefetch_related).offset(raw_params.offset).limit(raw_params.limit).all()
+    items = await generic_query_apply_params(_generate_query(query, prefetch_related), raw_params).all()
 
     return create_page(items, total, params, **(additional_data or {}))

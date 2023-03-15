@@ -15,6 +15,7 @@ from sqlalchemy import func, literal_column, select
 from sqlalchemy.orm import Query, noload
 from sqlalchemy.sql import Select
 
+from .utils import generic_query_apply_params
 from ..api import create_page
 from ..bases import AbstractParams, CursorRawParams
 from ..types import AdditionalData
@@ -108,8 +109,7 @@ def paginate_cursor_process_items(
 
 
 def paginate_query(query: T, params: AbstractParams) -> T:
-    raw_params = params.to_raw_params().as_limit_offset()
-    return query.limit(raw_params.limit).offset(raw_params.offset)
+    return generic_query_apply_params(query, params.to_raw_params().as_limit_offset())
 
 
 def count_query(query: Select) -> Select:

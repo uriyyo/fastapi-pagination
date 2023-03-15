@@ -4,6 +4,7 @@ from typing import Any, Optional
 
 from orm.models import QuerySet
 
+from .utils import generic_query_apply_params
 from ..api import create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData
@@ -19,6 +20,6 @@ async def paginate(
     params, raw_params = verify_params(params, "limit-offset")
 
     total = await query.count()
-    items = await query.limit(raw_params.limit).offset(raw_params.offset).all()
+    items = await generic_query_apply_params(query, raw_params).all()
 
     return create_page(items, total, params, **(additional_data or {}))

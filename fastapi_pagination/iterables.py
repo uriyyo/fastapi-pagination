@@ -38,5 +38,7 @@ def paginate(
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
-    items = [*islice(iterable, raw_params.offset, raw_params.offset + raw_params.limit)]
+    params_slice = raw_params.as_slice()
+
+    items = [*islice(iterable, params_slice.start, params_slice.stop)]
     return create_page(items, total, params, **(additional_data or {}))

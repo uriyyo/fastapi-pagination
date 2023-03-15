@@ -1,7 +1,7 @@
 from typing import Generic, TypeVar
 
 from fastapi import FastAPI
-from pytest import fixture
+from pytest import fixture, mark
 
 from fastapi_pagination import (
     LimitOffsetPage,
@@ -11,8 +11,11 @@ from fastapi_pagination import (
     paginate,
     set_page,
 )
+from fastapi_pagination.default import OptionalParams
+from fastapi_pagination.limit_offset import OptionalLimitOffsetParams
 
 from .base import BasePaginationTestCase
+from .utils import OptionalPage, OptionalLimitOffsetPage
 
 
 class TestPaginationParams(BasePaginationTestCase):
@@ -22,10 +25,43 @@ class TestPaginationParams(BasePaginationTestCase):
 
         @app.get("/default", response_model=Page[model_cls])
         @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
+        @app.get("/optional/default", response_model=OptionalPage[model_cls])
+        @app.get("/optional/limit-offset", response_model=OptionalLimitOffsetPage[model_cls])
         async def route():
             return paginate(entities)
 
         return add_pagination(app)
+
+    @mark.parametrize(
+        "path,cls_name,params",
+        [
+            ("/optional/default", "optional_page", OptionalParams()),
+            ("/optional/limit-offset", "optional_limit_offset_page", OptionalLimitOffsetParams()),
+        ],
+        ids=[
+            "default",
+            "limit-offset",
+        ],
+    )
+    async def test_optional_params(
+        self,
+        client,
+        params,
+        entities,
+        cls_name,
+        additional_params,
+        result_model_cls,
+        path,
+    ):
+        await self.run_pagination_test(
+            client,
+            path,
+            params,
+            entities,
+            cls_name,
+            additional_params,
+            result_model_cls,
+        )
 
 
 T = TypeVar("T")
