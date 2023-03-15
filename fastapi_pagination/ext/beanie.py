@@ -28,23 +28,21 @@ async def paginate(
     fetch_links: bool = False,
     with_children: bool = False,
     lazy_parse: bool = False,
-    **pymongo_kwargs,
+    **pymongo_kwargs: Any,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, AggregationQuery):
-        aggregation_query = query.clone()
+        aggregation_query = query.clone()  # type: ignore
+        paginate_data = []
+        if raw_params.limit is not None:
+            paginate_data.append({"$limit": raw_params.limit + (raw_params.offset or 0)})
+        if raw_params.offset is not None:
+            paginate_data.append({"$skip": raw_params.offset})
+
         aggregation_query.aggregation_pipeline.extend(
             [
-                {
-                    "$facet": {
-                        "metadata": [{"$count": "total"}],
-                        "data": [
-                            {"$limit": raw_params.limit + raw_params.offset},
-                            {"$skip": raw_params.offset},
-                        ],
-                    }
-                },
+                {"$facet": {"metadata": [{"$count": "total"}], "data": paginate_data}},
             ]
         )
         data = (await aggregation_query.to_list())[0]
