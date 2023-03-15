@@ -16,7 +16,6 @@ from ..utils import verify_params
 TDocument = TypeVar("TDocument", bound=Document)
 
 
-
 async def paginate(
     query: Union[TDocument, FindMany[TDocument], AggregationQuery[TDocument]],
     params: Optional[AbstractParams] = None,
@@ -29,23 +28,25 @@ async def paginate(
     fetch_links: bool = False,
     with_children: bool = False,
     lazy_parse: bool = False,
-    **pymongo_kwargs
+    **pymongo_kwargs,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, AggregationQuery):
         aggregation_query = query.clone()
-        aggregation_query.aggregation_pipeline.extend([
-            {
-                "$facet": {
-                    "metadata": [{"$count": "total"}],
-                    "data": [
-                        {"$limit": raw_params.limit + raw_params.offset},
-                        {"$skip": raw_params.offset},
-                    ],
-                }
-            },
-        ])
+        aggregation_query.aggregation_pipeline.extend(
+            [
+                {
+                    "$facet": {
+                        "metadata": [{"$count": "total"}],
+                        "data": [
+                            {"$limit": raw_params.limit + raw_params.offset},
+                            {"$skip": raw_params.offset},
+                        ],
+                    }
+                },
+            ]
+        )
         data = (await aggregation_query.to_list())[0]
         items = data["data"]
         try:
@@ -63,13 +64,10 @@ async def paginate(
             fetch_links=fetch_links,
             with_children=with_children,
             lazy_parse=lazy_parse,
-            **pymongo_kwargs
+            **pymongo_kwargs,
         ).to_list()
-        total = await query.find({},
-            session=session,
-            ignore_cache=ignore_cache,
-            fetch_links=False,
-            **pymongo_kwargs
+        total = await query.find(
+            {}, session=session, ignore_cache=ignore_cache, fetch_links=False, **pymongo_kwargs
         ).count()
 
     return create_page(items, total, params, **(additional_data or {}))
