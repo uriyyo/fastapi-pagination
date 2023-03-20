@@ -3,8 +3,6 @@ name: Dependabot auto-merge
 on: 
   workflow_dispatch:
   pull_request_target:
-      branches:
-        - 'dependabot/**'
 
 permissions:
   contents: write
