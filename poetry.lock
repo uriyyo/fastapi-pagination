@@ -592,14 +592,14 @@ python-dateutil = ">=2.4"
 
 [[package]]
 name = "fastapi"
-version = "0.94.1"
+version = "0.95.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "fastapi-0.94.1-py3-none-any.whl", hash = "sha256:451387550c2d25a972193f22e408a82e75a8e7867c834a03076704fe20df3256"},
-    {file = "fastapi-0.94.1.tar.gz", hash = "sha256:4a75936dbf9eb74be5eb0d41a793adefe9f3fc6ba66dbdabd160120fd3c2d9cd"},
+    {file = "fastapi-0.95.0-py3-none-any.whl", hash = "sha256:daf73bbe844180200be7966f68e8ec9fd8be57079dff1bacb366db32729e6eb5"},
+    {file = "fastapi-0.95.0.tar.gz", hash = "sha256:99d4fdb10e9dd9a24027ac1d0bd4b56702652056ca17a6c8721eec4ad2f14e18"},
 ]
 
 [package.dependencies]
