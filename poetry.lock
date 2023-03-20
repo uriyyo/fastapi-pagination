@@ -2023,20 +2023,20 @@ files = [
 
 [[package]]
 name = "sqlakeyset"
-version = "1.0.1659142803"
+version = "1.0.1679209451"
 description = "offset-free paging for sqlalchemy"
 category = "main"
 optional = true
-python-versions = ">=3.4"
+python-versions = ">=3.7,<4.0"
 files = [
-    {file = "sqlakeyset-1.0.1659142803-py3-none-any.whl", hash = "sha256:4a6e6ee68d3a3b1b2cac358ef8c7a914ab375b242da89a543b92150abd2df523"},
-    {file = "sqlakeyset-1.0.1659142803.tar.gz", hash = "sha256:fc9c7b0509f8eadb3e686b643c8a8ac178d6d1e13d3e0110bc73a59d98cf0695"},
+    {file = "sqlakeyset-1.0.1679209451-py3-none-any.whl", hash = "sha256:9e5c2b0dcc3bcfab7449179320f31769254c1c5b320db901c60f4d2265c1712b"},
+    {file = "sqlakeyset-1.0.1679209451.tar.gz", hash = "sha256:55578b12455a0e38b48d93291f103732d75e9483fbbf1d7ffdf4792fec96c561"},
 ]
 
 [package.dependencies]
 packaging = ">=20.0"
 python-dateutil = "*"
-sqlalchemy = ">=1.3.11"
+sqlalchemy = ">=1.3.11,<2.0"
 
 [[package]]
 name = "sqlalchemy"
