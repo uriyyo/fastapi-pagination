@@ -44,7 +44,7 @@ scylla-driver = {version = "^3.25.6", optional = true}
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
-pytest-asyncio = "^0.20.3"
+pytest-asyncio = "^0.21.0"
 black = "^23.1.0"
 pre-commit = "^3.2.0"
 Faker = "^17.6.0"
