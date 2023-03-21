@@ -7,8 +7,6 @@ on:
       - "opened"
       - "synchronize"
       - "reopened"
-    branches:
-      - "dependabot/**"
 
 permissions:
   contents: write
