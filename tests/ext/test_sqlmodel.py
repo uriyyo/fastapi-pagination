@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 
 from ..base import BasePaginationTestCase
+from .utils import sqlalchemy20
 
 try:
     from sqlmodel import Session, select
@@ -27,6 +28,7 @@ def app():
     return FastAPI()
 
 
+@sqlalchemy20
 class TestSQLModelDefault(BasePaginationTestCase):
     @fixture(
         scope="session",
@@ -50,6 +52,7 @@ class TestSQLModelDefault(BasePaginationTestCase):
         return add_pagination(app)
 
 
+@sqlalchemy20
 class TestSQLModelRelationship(BasePaginationTestCase):
     pagination_types = ["relationship"]
 

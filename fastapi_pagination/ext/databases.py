@@ -17,7 +17,7 @@ from ..utils import verify_params
 
 async def paginate(
     db: Database,
-    query: Select,
+    query: Select[Any],
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
@@ -25,7 +25,7 @@ async def paginate(
 ) -> Any:
     params, _ = verify_params(params, "limit-offset")
 
-    total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))
+    total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))  # type: ignore
     query = paginate_query(query, params)
     raw_items = await db.fetch_all(query)
 
