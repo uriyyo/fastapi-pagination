@@ -18,7 +18,7 @@ from .sqlalchemy import paginate as _paginate
 
 def paginate(
     conn: Union[Connection, Session],
-    query: Select[Any],
+    query: Select,
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,

@@ -11,7 +11,6 @@ from typing import Any, Optional, TypeVar, cast, Union, overload, Tuple, TYPE_CH
 
 from sqlalchemy import func, literal_column, select
 from sqlalchemy.orm import Query, noload, Session
-from sqlalchemy.util import greenlet_spawn
 
 from .utils import generic_query_apply_params, unwrap_scalars
 from ..api import create_page
@@ -27,19 +26,27 @@ if TYPE_CHECKING:
 
 
 try:
+    from sqlalchemy.util import greenlet_spawn
+except ImportError:  # pragma: no cover
+
+    async def greenlet_spawn(*_: Any, **__: Any) -> Any:  # type: ignore
+        raise ImportError("greenlet is not installed")
+
+
+try:
     from sqlakeyset import paging
 except ImportError:  # pragma: no cover
     paging = None
 
 
-T = TypeVar("T", "Select[Any]", "Query[Any]")
+T = TypeVar("T", "Select", "Query[Any]")
 
 
 def paginate_query(query: T, params: AbstractParams) -> T:
     return generic_query_apply_params(query, params.to_raw_params().as_limit_offset())
 
 
-def count_query(query: Select[Any]) -> Select[Any]:
+def count_query(query: Select) -> Select:
     count_subquery = cast(Any, query.order_by(None)).options(noload("*")).subquery()
     return select(func.count(literal_column("*"))).select_from(count_subquery)
 
@@ -49,7 +56,7 @@ def _maybe_unique(result: Any, unique: bool) -> Any:
 
 
 def exec_pagination(
-    query: Select[Any],
+    query: Select,
     params: AbstractParams,
     conn: Union[Connection, Session],
     additional_data: AdditionalData = None,
@@ -111,7 +118,7 @@ def paginate(
 @overload
 def paginate(
     conn: Union[Connection, Session],
-    query: Select[Any],
+    query: Select,
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
@@ -123,7 +130,7 @@ def paginate(
 @overload
 async def paginate(
     conn: Union[AsyncConnection, AsyncSession],
-    query: Select[Any],
+    query: Select,
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
@@ -154,7 +161,7 @@ def _old_paginate_sign(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> Tuple[Select[Any], Session, Optional[AbstractParams], AdditionalData, bool]:
+) -> Tuple[Select, Session, Optional[AbstractParams], AdditionalData, bool]:
     if query.session is None:
         raise ValueError("query.session is None")
 
@@ -169,10 +176,10 @@ def _old_paginate_sign(
 
 def _new_paginate_sign(
     conn: Union[Connection, Session],
-    query: Select[Any],
+    query: Select,
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
     unique: bool = True,
-) -> Tuple[Select[Any], Session, Optional[AbstractParams], AdditionalData, bool]:
+) -> Tuple[Select, Session, Optional[AbstractParams], AdditionalData, bool]:
     return query, conn, params, additional_data, unique  # type: ignore
