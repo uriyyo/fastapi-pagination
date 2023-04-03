@@ -64,4 +64,4 @@ def paginate(
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    return exec_pagination(query, params, session.exec, additional_data, unique)
+    return exec_pagination(query, params, session, session.exec, additional_data, unique)

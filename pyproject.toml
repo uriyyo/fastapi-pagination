@@ -38,7 +38,7 @@ mongoengine = {version = ">=0.23.1,<0.28.0", optional = true}
 sqlmodel = { version = "^0.0.8", optional = true}
 pony = { version = "^0.7.16", optional = true}
 beanie = { version = "^1.11.9", optional = true}
-sqlakeyset = { version = "^1.0.1659142803", optional = true }
+sqlakeyset = { version = "^2.0.1680321678", optional = true }
 scylla-driver = {version = "^3.25.6", optional = true}
 
 [tool.poetry.dev-dependencies]
@@ -53,7 +53,6 @@ mkdocs = "^1.4.1"
 mkdocs-material = "^9.1.5"
 pymdown-extensions = "^9.10"
 fontawesome-markdown = "^0.2.6"
-sqlalchemy-stubs = "^0.4"
 httpx = "^0.23.3"
 asgi-lifespan = "^2.1.0"
 requests = "^2.28.2"

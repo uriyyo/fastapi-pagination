@@ -64,4 +64,4 @@ async def paginate(
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    return await async_exec_pagination(query, params, session.exec, additional_data, unique)
+    return await async_exec_pagination(query, params, session, additional_data, unique)

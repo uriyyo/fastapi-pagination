@@ -2,9 +2,9 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from sqlalchemy.sql import Select
 
 from .sqlalchemy_future import async_exec_pagination
@@ -14,7 +14,7 @@ from ..utils import verify_params
 
 
 async def paginate(
-    conn: AsyncSession,
+    conn: Union[AsyncSession, AsyncConnection],
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
@@ -22,4 +22,4 @@ async def paginate(
     unique: bool = True,
 ) -> Any:
     params, _ = verify_params(params, "limit-offset", "cursor")
-    return await async_exec_pagination(query, params, conn.execute, additional_data, unique)
+    return await async_exec_pagination(query, params, conn, additional_data, unique)
