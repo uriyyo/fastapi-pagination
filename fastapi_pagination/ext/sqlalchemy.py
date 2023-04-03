@@ -10,8 +10,6 @@ import warnings
 from typing import Any, Optional, TypeVar, cast, Union, overload, Tuple, TYPE_CHECKING
 
 from sqlalchemy import func, literal_column, select
-from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from sqlalchemy.orm import Query, noload, Session
 from sqlalchemy.util import greenlet_spawn
 
@@ -24,6 +22,9 @@ from ..utils import verify_params
 
 if TYPE_CHECKING:
     from sqlalchemy.sql import Select
+    from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
+    from sqlalchemy.engine import Connection
+
 
 try:
     from sqlakeyset import paging
