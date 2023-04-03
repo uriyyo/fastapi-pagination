@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Any, Iterator
+from typing import Any, Iterator, Dict
 
 from faker import Faker
 from fastapi import Depends, FastAPI, Request
@@ -37,7 +37,7 @@ def get_db() -> Iterator[Session]:
         yield session
 
 
-def user_data(id_: int) -> dict[str, Any]:
+def user_data(id_: int) -> Dict[str, Any]:
     return {
         "id": id_ + 1,
         "profile_pic": f"https://avatars.dicebear.com/api/croodles/{id_}.svg",
