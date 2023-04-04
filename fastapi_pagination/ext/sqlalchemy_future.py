@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import Select
 
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, ItemsTransformer
 from .sqlalchemy import paginate as _paginate
 
 
@@ -21,6 +21,7 @@ def paginate(
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
@@ -31,4 +32,11 @@ def paginate(
         stacklevel=2,
     )
 
-    return _paginate(conn, query, params, additional_data=additional_data, unique=unique)
+    return _paginate(
+        conn,
+        query,
+        params,
+        transformer=transformer,
+        additional_data=additional_data,
+        unique=unique,
+    )

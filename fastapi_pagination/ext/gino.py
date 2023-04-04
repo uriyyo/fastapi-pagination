@@ -11,7 +11,7 @@ from sqlalchemy.sql import Select
 from .sqlalchemy import paginate_query
 from ..api import create_page
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, ItemsTransformer
 from ..utils import verify_params
 
 
@@ -20,6 +20,7 @@ async def paginate(
     query: Union[Select, CRUDModel],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
     params, _ = verify_params(params, "limit-offset")
@@ -31,4 +32,10 @@ async def paginate(
     query = paginate_query(query, params)
     items = await query.gino.all()
 
-    return create_page(items, total, params, **(additional_data or {}))
+    return create_page(
+        items,
+        total,
+        params,
+        transformer=transformer,
+        **(additional_data or {}),
+    )

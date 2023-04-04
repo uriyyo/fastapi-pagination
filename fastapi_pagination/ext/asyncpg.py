@@ -6,7 +6,7 @@ from asyncpg import Connection
 
 from ..api import create_page
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, ItemsTransformer
 from ..utils import verify_params
 
 
@@ -15,6 +15,7 @@ async def paginate(
     conn: Connection,
     query: str,
     *args: Any,
+    transformer: Optional[ItemsTransformer] = None,
     params: Optional[AbstractParams] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
@@ -37,5 +38,6 @@ async def paginate(
         [{**r} for r in items],
         total,
         params,
+        transformer=transformer,
         **(additional_data or {}),
     )

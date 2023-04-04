@@ -10,7 +10,7 @@ from beanie.odm.queries.find import FindMany
 
 from ..api import create_page
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, ItemsTransformer
 from ..utils import verify_params
 
 TDocument = TypeVar("TDocument", bound=Document)
@@ -20,6 +20,7 @@ async def paginate(
     query: Union[TDocument, FindMany[TDocument], AggregationQuery[TDocument]],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
     projection_model: Optional[Type[DocumentProjectionType]] = None,
     sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
@@ -66,4 +67,10 @@ async def paginate(
             {}, session=session, ignore_cache=ignore_cache, fetch_links=False, **pymongo_kwargs
         ).count()
 
-    return create_page(items, total, params, **(additional_data or {}))
+    return create_page(
+        items,
+        total,
+        params,
+        transformer=transformer,
+        **(additional_data or {}),
+    )

@@ -6,7 +6,7 @@ from pymongo.collection import Collection
 
 from ..api import create_page
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, ItemsTransformer
 from ..utils import verify_params
 
 T = TypeVar("T", bound=Mapping[str, Any])
@@ -17,6 +17,7 @@ def paginate(
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
     **kwargs: Any,
 ) -> Any:
@@ -27,4 +28,10 @@ def paginate(
     total = collection.count_documents(query_filter)
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
 
-    return create_page([*cursor], total, params, **(additional_data or {}))
+    return create_page(
+        [*cursor],
+        total,
+        params,
+        transformer=transformer,
+        **(additional_data or {}),
+    )
