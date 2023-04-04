@@ -40,8 +40,8 @@ except ImportError:  # pragma: no cover
     paging = None
 
 
-AsyncConn: TypeAlias = Union[AsyncSession, AsyncConnection]
-SyncConn: TypeAlias = Union[Session, Connection]
+AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection]"
+SyncConn: TypeAlias = "Union[Session, Connection]"
 
 
 def paginate_query(query: Select, params: AbstractParams) -> Select:
