@@ -7,10 +7,11 @@ __all__ = [
 ]
 
 import warnings
-from typing import Any, Optional, TypeVar, cast, Union, overload, Tuple, TYPE_CHECKING
+from typing import Any, Optional, Union, overload, Tuple, TYPE_CHECKING
 
 from sqlalchemy import func, literal_column, select
 from sqlalchemy.orm import Query, noload, Session
+from typing_extensions import TypeAlias
 
 from .utils import generic_query_apply_params, unwrap_scalars
 from ..api import create_page
@@ -39,15 +40,16 @@ except ImportError:  # pragma: no cover
     paging = None
 
 
-T = TypeVar("T", "Select", "Query[Any]")
+AsyncConn: TypeAlias = Union[AsyncSession, AsyncConnection]
+SyncConn: TypeAlias = Union[Session, Connection]
 
 
-def paginate_query(query: T, params: AbstractParams) -> T:
+def paginate_query(query: Select, params: AbstractParams) -> Select:
     return generic_query_apply_params(query, params.to_raw_params().as_limit_offset())
 
 
 def count_query(query: Select) -> Select:
-    count_subquery = cast(Any, query.order_by(None)).options(noload("*")).subquery()
+    count_subquery = query.order_by(None).options(noload("*")).subquery()
     return select(func.count(literal_column("*"))).select_from(count_subquery)
 
 
@@ -58,7 +60,7 @@ def _maybe_unique(result: Any, unique: bool) -> Any:
 def exec_pagination(
     query: Select,
     params: AbstractParams,
-    conn: Union[Connection, Session],
+    conn: SyncConn,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> AbstractPage[Any]:
@@ -83,14 +85,14 @@ def exec_pagination(
             **(additional_data or {}),
         )
     else:
-        (total,) = conn.execute(count_query(query)).scalars()
+        total = conn.scalar(count_query(query))
         query = paginate_query(query, params)
         items = _maybe_unique(conn.execute(query), unique)
 
         return create_page(unwrap_scalars(items), total, params, **(additional_data or {}))
 
 
-def _get_sync_conn_from_async(conn: Any) -> Union[Session, Connection]:  # pragma: no cover
+def _get_sync_conn_from_async(conn: Any) -> SyncConn:  # pragma: no cover
     try:
         return conn.sync_session  # type: ignore
     except AttributeError:
@@ -104,7 +106,7 @@ def _get_sync_conn_from_async(conn: Any) -> Union[Session, Connection]:  # pragm
     raise TypeError("conn must be an AsyncConnection or AsyncSession")
 
 
-# old deprecated paginate function that use orm.Query
+# old deprecated paginate function that use sqlalchemy.orm.Query
 @overload
 def paginate(
     query: Query[Any],
@@ -117,7 +119,7 @@ def paginate(
 
 @overload
 def paginate(
-    conn: Union[Connection, Session],
+    conn: SyncConn,
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
@@ -129,7 +131,7 @@ def paginate(
 
 @overload
 async def paginate(
-    conn: Union[AsyncConnection, AsyncSession],
+    conn: AsyncConn,
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
@@ -161,7 +163,7 @@ def _old_paginate_sign(
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
-) -> Tuple[Select, Session, Optional[AbstractParams], AdditionalData, bool]:
+) -> Tuple[Select, SyncConn, Optional[AbstractParams], AdditionalData, bool]:
     if query.session is None:
         raise ValueError("query.session is None")
 
@@ -175,11 +177,11 @@ def _old_paginate_sign(
 
 
 def _new_paginate_sign(
-    conn: Union[Connection, Session],
+    conn: SyncConn,
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
     additional_data: AdditionalData = None,
     unique: bool = True,
-) -> Tuple[Select, Session, Optional[AbstractParams], AdditionalData, bool]:
-    return query, conn, params, additional_data, unique  # type: ignore
+) -> Tuple[Select, SyncConn, Optional[AbstractParams], AdditionalData, bool]:
+    return query, conn, params, additional_data, unique
