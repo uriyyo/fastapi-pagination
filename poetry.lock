@@ -1080,14 +1080,14 @@ pymongo = ">=3.4,<5.0"
 
 [[package]]
 name = "motor"
-version = "3.1.1"
+version = "3.1.2"
 description = "Non-blocking MongoDB driver for Tornado or asyncio"
 category = "main"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "motor-3.1.1-py3-none-any.whl", hash = "sha256:01d93d7c512810dcd85f4d634a7244ba42ff6be7340c869791fe793561e734da"},
-    {file = "motor-3.1.1.tar.gz", hash = "sha256:a4bdadf8a08ebb186ba16e557ba432aa867f689a42b80f2e9f8b24bbb1604742"},
+    {file = "motor-3.1.2-py3-none-any.whl", hash = "sha256:4bfc65230853ad61af447088527c1197f91c20ee957cfaea3144226907335716"},
+    {file = "motor-3.1.2.tar.gz", hash = "sha256:80c08477c09e70db4f85c99d484f2bafa095772f1d29b3ccb253270f9041da9a"},
 ]
 
 [package.dependencies]
