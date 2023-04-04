@@ -64,6 +64,11 @@ jobs:
         run: |
           poetry run pytest tests -m "not gino" --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
+      - name: Unit tests SQLAlchemy 2.0
+        run: |
+          poetry run pip install -U "sqlalchemy>2.0.0"
+          poetry run pytest tests -m "sqlalchemy20" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
+
       - name: Unit tests gino
         run: |
           poetry run pip install -U "gino[starlette]" "fastapi==0.84.0"

@@ -1,14 +1,14 @@
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Type, TypeVar, no_type_check, overload
+from typing import Any, Optional, Type, TypeVar, no_type_check, overload, Union
 
 from sqlmodel import Session, SQLModel, select
+from sqlmodel.ext.asyncio.session import AsyncSession, AsyncConnection
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
-from .sqlalchemy_future import exec_pagination
 from ..bases import AbstractParams
 from ..types import AdditionalData
-from ..utils import verify_params
+from .sqlalchemy import paginate as _paginate
 
 T = TypeVar("T")
 TSQLModel = TypeVar("TSQLModel", bound=SQLModel)
@@ -50,6 +50,41 @@ def paginate(
     pass
 
 
+@overload
+async def paginate(
+    session: Union[AsyncSession, AsyncConnection],
+    query: Select[TSQLModel],
+    params: Optional[AbstractParams] = None,
+    *,
+    additional_data: AdditionalData = None,
+    unique: bool = True,
+) -> Any:
+    pass
+
+
+@overload
+async def paginate(
+    session: Union[AsyncSession, AsyncConnection],
+    query: SelectOfScalar[T],
+    params: Optional[AbstractParams] = None,
+    *,
+    additional_data: AdditionalData = None,
+    unique: bool = True,
+) -> Any:
+    pass
+
+
+@overload
+async def paginate(
+    session: Union[AsyncSession, AsyncConnection],
+    query: Type[TSQLModel],
+    params: Optional[AbstractParams] = None,
+    *,
+    additional_data: AdditionalData = None,
+) -> Any:
+    pass
+
+
 @no_type_check
 def paginate(
     session: Session,
@@ -59,9 +94,7 @@ def paginate(
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
-    params, _ = verify_params(params, "limit-offset", "cursor")
-
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    return exec_pagination(query, params, session, session.exec, additional_data, unique)
+    return _paginate(session, query, params, additional_data=additional_data, unique=unique)

@@ -1,15 +1,16 @@
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Type, TypeVar, no_type_check, overload
+import warnings
+from typing import Any, Optional, Type, TypeVar, overload
 
-from sqlmodel import SQLModel, select
+from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
-from .sqlalchemy_future import async_exec_pagination
 from ..bases import AbstractParams
 from ..types import AdditionalData
-from ..utils import verify_params
+
+from .sqlmodel import paginate as _paginate
 
 T = TypeVar("T")
 TSQLModel = TypeVar("TSQLModel", bound=SQLModel)
@@ -50,7 +51,6 @@ async def paginate(
     pass
 
 
-@no_type_check
 async def paginate(
     session: AsyncSession,
     query: Any,
@@ -59,9 +59,11 @@ async def paginate(
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
-    params, _ = verify_params(params, "limit-offset", "cursor")
+    warnings.warn(
+        "fastapi_pagination.ext.async_sqlmodel module is deprecated, "
+        "please use fastapi_pagination.ext.sqlmodel module instead",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
-    if not isinstance(query, (Select, SelectOfScalar)):
-        query = select(query)
-
-    return await async_exec_pagination(query, params, session, additional_data, unique)
+    return await _paginate(session, query, params, additional_data=additional_data, unique=unique)

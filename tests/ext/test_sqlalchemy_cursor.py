@@ -10,6 +10,7 @@ from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage
 
 from ..schemas import UserOut
+from .utils import sqlalchemy20
 
 try:
     from fastapi_pagination.ext.sqlalchemy_future import paginate
@@ -32,6 +33,7 @@ def app(sa_user, sa_order, sa_session):
     return add_pagination(app)
 
 
+@sqlalchemy20
 @mark.asyncio
 async def test_cursor(app, client, entities):
     entities = sorted(parse_obj_as(List[UserOut], entities), key=(lambda it: (it.id, it.name)))

@@ -40,4 +40,5 @@ jobs:
           poetry install -E all
 
       - name: Lint
-        run: poetry run pre-commit run --all-files --show-diff-on-failure
+        run: |
+          poetry run pre-commit run --all-files --show-diff-on-failure

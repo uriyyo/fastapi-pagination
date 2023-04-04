@@ -8,6 +8,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 
 from ..base import BasePaginationTestCase
 
+
 try:
     from sqlmodel import select
     from sqlmodel.ext.asyncio.session import AsyncSession

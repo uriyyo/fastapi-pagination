@@ -66,17 +66,6 @@ Please, be careful when you work with databases, because default `paginate` will
 For instance, if you use `SQLAlchemy` you can use `paginate` from `fastapi_pagination.ext.sqlalchemy` module.
 
 ```py
-from fastapi_pagination.ext.sqlalchemy import paginate
-
-
-@app.get('/users', response_model=Page[UserOut])
-def get_users(db: Session = Depends(get_db)):
-    return paginate(db.query(User).order_by(User.created_at))
-```
-
-For `SQLAlchemy 2.0 style` you can use `paginate` from `fastapi_pagination.ext.sqlalchemy_future` module.
-
-```py
 from sqlalchemy import select
 from fastapi_pagination.ext.sqlalchemy_future import paginate
 
@@ -91,10 +80,7 @@ Currently, `fastapi-pagination` supports:
 | Library                                                                                     | `paginate` function                                 | 
 |---------------------------------------------------------------------------------------------|-----------------------------------------------------|
 | [SQLAlchemy](https://docs.sqlalchemy.org/en/14/orm/quickstart.html)                         | `fastapi_pagination.ext.sqlalchemy.paginate`        |
-| [SQLAlchemy 2.0 style](https://docs.sqlalchemy.org/en/14/changelog/migration_20.html)       | `fastapi_pagination.ext.sqlalchemy_future.paginate` |
-| [Async SQLAlchemy 2.0 style](https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html) | `fastapi_pagination.ext.async_sqlalchemy.paginate`  |
 | [SQLModel](https://sqlmodel.tiangolo.com/)                                                  | `fastapi_pagination.ext.sqlmodel.paginate`          |
-| [Async SQLModel](https://sqlmodel.tiangolo.com/)                                            | `fastapi_pagination.ext.async_sqlmodel.paginate`    |
 | [AsyncPG](https://magicstack.github.io/asyncpg/current/)                                    | `fastapi_pagination.ext.asyncpg.paginate`           |
 | [Databases](https://www.encode.io/databases/)                                               | `fastapi_pagination.ext.databases.paginate`         |
 | [Django ORM](https://docs.djangoproject.com/en/3.2/topics/db/queries/)                      | `fastapi_pagination.ext.django.paginate`            |
