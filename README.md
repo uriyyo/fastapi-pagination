@@ -67,7 +67,7 @@ For instance, if you use `SQLAlchemy` you can use `paginate` from `fastapi_pagin
 
 ```py
 from sqlalchemy import select
-from fastapi_pagination.ext.sqlalchemy_future import paginate
+from fastapi_pagination.ext.sqlalchemy import paginate
 
 
 @app.get('/users', response_model=Page[UserOut])
