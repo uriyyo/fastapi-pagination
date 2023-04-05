@@ -5,8 +5,9 @@ from typing import Optional, Any
 from pony.orm.core import Query
 
 from fastapi_pagination import create_page
+from ..api import apply_items_transformer
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, SyncItemsTransformer
 from ..utils import verify_params
 
 
@@ -14,11 +15,18 @@ def paginate(
     query: Query,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     total = query.count()
     items = query.fetch(raw_params.limit, raw_params.offset).to_list()
+    t_items = apply_items_transformer(items, transformer)
 
-    return create_page(items, total, params, **(additional_data or {}))
+    return create_page(
+        t_items,
+        total,
+        params,
+        **(additional_data or {}),
+    )

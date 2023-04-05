@@ -9,13 +9,13 @@ __all__ = [
     "paginate",
 ]
 
-from .api import create_page
+from .api import create_page, apply_items_transformer
 from .bases import AbstractParams
 from .default import Page as DefaultPage
 from .default import Params
 from .limit_offset import LimitOffsetPage as DefaultLimitOffsetPage
 from .limit_offset import LimitOffsetParams
-from .types import AdditionalData, GreaterEqualZero
+from .types import AdditionalData, GreaterEqualZero, SyncItemsTransformer
 from .utils import verify_params
 
 T = TypeVar("T")
@@ -34,6 +34,7 @@ def paginate(
     params: Optional[AbstractParams] = None,
     total: Optional[int] = None,
     *,
+    transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
@@ -41,4 +42,11 @@ def paginate(
     params_slice = raw_params.as_slice()
 
     items = [*islice(iterable, params_slice.start, params_slice.stop)]
-    return create_page(items, total, params, **(additional_data or {}))
+    t_items = apply_items_transformer(items, transformer)
+
+    return create_page(
+        t_items,
+        total,
+        params,
+        **(additional_data or {}),
+    )

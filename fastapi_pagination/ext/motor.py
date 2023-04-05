@@ -4,9 +4,9 @@ from typing import Any, Dict, List, Optional
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 
-from ..api import create_page
+from ..api import create_page, apply_items_transformer
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
 
 
@@ -14,6 +14,8 @@ async def paginate(
     collection: AsyncIOMotorCollection,
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
+    *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     **kwargs: Any,
 ) -> Any:
@@ -23,8 +25,14 @@ async def paginate(
     total = await collection.count_documents(query_filter)
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
     items = await cursor.to_list(length=raw_params.limit)
+    t_items = await apply_items_transformer(items, transformer, async_=True)
 
-    return create_page(items, total, params, **(additional_data or {}))
+    return create_page(
+        t_items,
+        total,
+        params,
+        **(additional_data or {}),
+    )
 
 
 async def paginate_aggregate(
@@ -32,6 +40,7 @@ async def paginate_aggregate(
     aggregate_pipeline: Optional[List[Dict[Any, Any]]] = None,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
@@ -63,4 +72,11 @@ async def paginate_aggregate(
     except IndexError:
         total = 0
 
-    return create_page(items, total, params, **(additional_data or {}))
+    t_items = await apply_items_transformer(items, transformer, async_=True)
+
+    return create_page(
+        t_items,
+        total,
+        params,
+        **(additional_data or {}),
+    )

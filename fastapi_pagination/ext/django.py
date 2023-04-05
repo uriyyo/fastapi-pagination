@@ -5,9 +5,9 @@ __all__ = ["paginate"]
 from django.db.models import Model, QuerySet
 from django.db.models.base import ModelBase
 
-from ..api import create_page
+from ..api import create_page, apply_items_transformer
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, SyncItemsTransformer
 from ..utils import verify_params
 
 T = TypeVar("T", bound=Model)
@@ -17,6 +17,7 @@ def paginate(
     query: Union[Type[T], QuerySet[T]],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
@@ -26,5 +27,12 @@ def paginate(
 
     total = query.count()
     query = query.all()[raw_params.as_slice()]
+    items = [*query]
+    t_items = apply_items_transformer(items, transformer)
 
-    return create_page([*query], total, params, **(additional_data or {}))
+    return create_page(
+        t_items,
+        total,
+        params,
+        **(additional_data or {}),
+    )

@@ -14,9 +14,9 @@ from sqlalchemy.orm import Query, noload, Session
 from typing_extensions import TypeAlias
 
 from .utils import generic_query_apply_params, unwrap_scalars
-from ..api import create_page
+from ..api import create_page, apply_items_transformer
 from ..bases import AbstractParams, AbstractPage, is_cursor
-from ..types import AdditionalData
+from ..types import AdditionalData, ItemsTransformer, SyncItemsTransformer, AsyncItemsTransformer
 from ..utils import verify_params
 
 
@@ -27,11 +27,14 @@ if TYPE_CHECKING:
 
 
 try:
-    from sqlalchemy.util import greenlet_spawn
+    from sqlalchemy.util import greenlet_spawn, await_only
 except ImportError:  # pragma: no cover
 
     async def greenlet_spawn(*_: Any, **__: Any) -> Any:  # type: ignore
-        raise ImportError("greenlet is not installed")
+        raise ImportError("sqlalchemy.util.greenlet_spawn is not available")
+
+    def await_only(*_: Any, **__: Any) -> Any:  # type: ignore
+        raise ImportError("sqlalchemy.util.await_only is not available")
 
 
 try:
@@ -40,8 +43,8 @@ except ImportError:  # pragma: no cover
     paging = None
 
 
-AsyncConn: TypeAlias = Union[AsyncSession, AsyncConnection]
-SyncConn: TypeAlias = Union[Session, Connection]
+AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection]"
+SyncConn: TypeAlias = "Union[Session, Connection]"
 
 
 def paginate_query(query: Select, params: AbstractParams) -> Select:
@@ -61,10 +64,20 @@ def exec_pagination(
     query: Select,
     params: AbstractParams,
     conn: SyncConn,
+    transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
+    async_: bool = False,
 ) -> AbstractPage[Any]:
     raw_params = params.to_raw_params()
+
+    if async_:
+
+        def _apply_items_transformer(*args: Any, **kwargs: Any) -> Any:
+            return await_only(apply_items_transformer(*args, **kwargs, async_=True))
+
+    else:
+        _apply_items_transformer = apply_items_transformer
 
     if is_cursor(raw_params):
         if paging is None:
@@ -76,9 +89,11 @@ def exec_pagination(
             per_page=raw_params.size,
             page=raw_params.cursor,
         )
+        items = unwrap_scalars([*page])
+        items = _apply_items_transformer(items, transformer)
 
         return create_page(
-            unwrap_scalars([*page]),
+            items,
             params=params,
             previous=page.paging.bookmark_previous if page.paging.has_previous else None,
             next_=page.paging.bookmark_next if page.paging.has_next else None,
@@ -88,8 +103,15 @@ def exec_pagination(
         total = conn.scalar(count_query(query))
         query = paginate_query(query, params)
         items = _maybe_unique(conn.execute(query), unique)
+        items = unwrap_scalars(items)
+        items = _apply_items_transformer(items, transformer)
 
-        return create_page(unwrap_scalars(items), total, params, **(additional_data or {}))
+        return create_page(
+            items,
+            total,
+            params,
+            **(additional_data or {}),
+        )
 
 
 def _get_sync_conn_from_async(conn: Any) -> SyncConn:  # pragma: no cover
@@ -112,6 +134,7 @@ def paginate(
     query: Query[Any],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
     pass
@@ -123,6 +146,7 @@ def paginate(
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
@@ -135,6 +159,7 @@ async def paginate(
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
@@ -143,27 +168,31 @@ async def paginate(
 
 def paginate(*args: Any, **kwargs: Any) -> Any:
     try:
-        query, conn, params, additional_data, unique = _old_paginate_sign(*args, **kwargs)
-    except TypeError:
-        query, conn, params, additional_data, unique = _new_paginate_sign(*args, **kwargs)
+        assert args and isinstance(args[0], Query)
+        query, conn, params, transformer, additional_data, unique = _old_paginate_sign(*args, **kwargs)
+    except (TypeError, AssertionError):
+        query, conn, params, transformer, additional_data, unique = _new_paginate_sign(*args, **kwargs)
 
     params, _ = verify_params(params, "limit-offset", "cursor")
 
     try:
         sync_conn = _get_sync_conn_from_async(conn)
-        return greenlet_spawn(exec_pagination, query, params, sync_conn, additional_data, unique)
+        return greenlet_spawn(
+            exec_pagination, query, params, sync_conn, transformer, additional_data, unique, async_=True
+        )
     except TypeError:
         pass
 
-    return exec_pagination(query, params, conn, additional_data, unique)
+    return exec_pagination(query, params, conn, transformer, additional_data, unique, async_=False)
 
 
 def _old_paginate_sign(
     query: Query[Any],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
-) -> Tuple[Select, SyncConn, Optional[AbstractParams], AdditionalData, bool]:
+) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool]:
     if query.session is None:
         raise ValueError("query.session is None")
 
@@ -173,7 +202,7 @@ def _old_paginate_sign(
         stacklevel=3,
     )
 
-    return query, query.session, params, additional_data, True  # type: ignore
+    return query, query.session, params, transformer, additional_data, True  # type: ignore
 
 
 def _new_paginate_sign(
@@ -181,7 +210,8 @@ def _new_paginate_sign(
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
-) -> Tuple[Select, SyncConn, Optional[AbstractParams], AdditionalData, bool]:
-    return query, conn, params, additional_data, unique
+) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool]:
+    return query, conn, params, transformer, additional_data, unique

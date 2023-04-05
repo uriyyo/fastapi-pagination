@@ -8,7 +8,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, AsyncItemsTransformer
 
 from .sqlmodel import paginate as _paginate
 
@@ -22,6 +22,7 @@ async def paginate(
     query: Select[TSQLModel],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
@@ -34,6 +35,7 @@ async def paginate(
     query: SelectOfScalar[T],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
@@ -46,6 +48,7 @@ async def paginate(
     query: Type[TSQLModel],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
     pass
@@ -56,6 +59,7 @@ async def paginate(
     query: Any,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
@@ -66,4 +70,11 @@ async def paginate(
         stacklevel=2,
     )
 
-    return await _paginate(session, query, params, additional_data=additional_data, unique=unique)
+    return await _paginate(
+        session,
+        query,
+        params,
+        transformer=transformer,
+        additional_data=additional_data,
+        unique=unique,
+    )

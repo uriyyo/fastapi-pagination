@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from sqlalchemy.sql import Select
 
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, AsyncItemsTransformer
 from .sqlalchemy import paginate as _paginate
 
 
@@ -18,6 +18,7 @@ async def paginate(
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
@@ -28,4 +29,11 @@ async def paginate(
         stacklevel=2,
     )
 
-    return await _paginate(conn, query, params, additional_data=additional_data, unique=unique)
+    return await _paginate(
+        conn,
+        query,
+        params,
+        transformer=transformer,
+        additional_data=additional_data,
+        unique=unique,
+    )

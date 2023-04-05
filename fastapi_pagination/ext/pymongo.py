@@ -4,9 +4,9 @@ from typing import Any, Dict, Mapping, Optional, TypeVar
 
 from pymongo.collection import Collection
 
-from ..api import create_page
+from ..api import create_page, apply_items_transformer
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, SyncItemsTransformer
 from ..utils import verify_params
 
 T = TypeVar("T", bound=Mapping[str, Any])
@@ -17,6 +17,7 @@ def paginate(
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     **kwargs: Any,
 ) -> Any:
@@ -26,5 +27,12 @@ def paginate(
 
     total = collection.count_documents(query_filter)
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
+    items = [*cursor]
+    t_items = apply_items_transformer(items, transformer)
 
-    return create_page([*cursor], total, params, **(additional_data or {}))
+    return create_page(
+        t_items,
+        total,
+        params,
+        **(additional_data or {}),
+    )

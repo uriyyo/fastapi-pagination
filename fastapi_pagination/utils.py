@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-__all__ = ["verify_params"]
+__all__ = [
+    "verify_params",
+    "is_async_callable",
+]
 
-from typing import Optional, Tuple, TypeVar, overload
+import asyncio
+import functools
+from typing import Optional, Tuple, TypeVar, overload, Any
 
 from typing_extensions import Literal
 
-from .api import resolve_params
 from .bases import AbstractParams, BaseRawParams, CursorRawParams, RawParams
 from .types import ParamsType
 
@@ -29,6 +33,8 @@ def verify_params(params: Optional[TParams], *params_types: ParamsType) -> Tuple
 
 
 def verify_params(params: Optional[TParams], *params_types: ParamsType) -> Tuple[TParams, BaseRawParams]:
+    from .api import resolve_params
+
     params = resolve_params(params)
     raw_params = params.to_raw_params()
 
@@ -36,3 +42,10 @@ def verify_params(params: Optional[TParams], *params_types: ParamsType) -> Tuple
         raise ValueError(f"{raw_params.type!r} params not supported")
 
     return params, raw_params
+
+
+def is_async_callable(obj: Any) -> bool:  # pragma: no cover
+    while isinstance(obj, functools.partial):
+        obj = obj.func
+
+    return asyncio.iscoroutinefunction(obj) or (callable(obj) and asyncio.iscoroutinefunction(obj.__call__))
