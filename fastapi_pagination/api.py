@@ -36,11 +36,11 @@ from fastapi.dependencies.utils import (
     lenient_issubclass,
 )
 from fastapi.routing import APIRoute, APIRouter
-from starlette._utils import is_async_callable
 
 from .bases import AbstractPage, AbstractParams
 from .default import Page
 from .types import ItemsTransformer, AsyncItemsTransformer, SyncItemsTransformer
+from .utils import is_async_callable
 
 T = TypeVar("T")
 TAbstractParams = TypeVar("TAbstractParams", covariant=True, bound=AbstractParams)
