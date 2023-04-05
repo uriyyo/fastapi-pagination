@@ -165,8 +165,9 @@ async def paginate(
 
 def paginate(*args: Any, **kwargs: Any) -> Any:
     try:
+        assert args and isinstance(args[0], Query)
         query, conn, params, transformer, additional_data, unique = _old_paginate_sign(*args, **kwargs)
-    except TypeError:
+    except (TypeError, AssertionError):
         query, conn, params, transformer, additional_data, unique = _new_paginate_sign(*args, **kwargs)
 
     params, _ = verify_params(params, "limit-offset", "cursor")
