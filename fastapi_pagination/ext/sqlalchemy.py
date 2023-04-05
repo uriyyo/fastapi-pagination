@@ -31,7 +31,10 @@ try:
 except ImportError:  # pragma: no cover
 
     async def greenlet_spawn(*_: Any, **__: Any) -> Any:  # type: ignore
-        raise ImportError("greenlet is not installed")
+        raise ImportError("sqlalchemy.util.greenlet_spawn is not available")
+
+    def await_only(*_: Any, **__: Any) -> Any:  # type: ignore
+        raise ImportError("sqlalchemy.util.await_only is not available")
 
 
 try:
