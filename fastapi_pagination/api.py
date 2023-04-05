@@ -7,6 +7,7 @@ __all__ = [
     "request",
     "set_page",
     "set_items_transformer",
+    "apply_items_transformer",
     "pagination_ctx",
     "pagination_items",
 ]
@@ -25,6 +26,8 @@ from typing import (
     Type,
     TypeVar,
     cast,
+    overload,
+    Literal,
 )
 
 from fastapi import Depends, FastAPI, Request, Response
@@ -36,8 +39,7 @@ from fastapi.routing import APIRoute, APIRouter
 
 from .bases import AbstractPage, AbstractParams
 from .default import Page
-from .types import ItemsTransformer
-
+from .types import ItemsTransformer, AsyncItemsTransformer, SyncItemsTransformer
 
 T = TypeVar("T")
 TAbstractParams = TypeVar("TAbstractParams", covariant=True, bound=AbstractParams)
@@ -80,7 +82,6 @@ def create_page(
     items: Sequence[T],
     total: Optional[int] = None,
     params: Optional[AbstractParams] = None,
-    transformer: Optional[ItemsTransformer] = None,
     **kwargs: Any,
 ) -> AbstractPage[T]:
     kwargs["params"] = params
@@ -88,12 +89,7 @@ def create_page(
     if total is not None:  # temporary to support old signature
         kwargs["total"] = total
 
-    transformer = resolve_items_transformer(transformer)
-
     with _ctx_var_with_reset(_items_val, items):
-        if transformer is not None:
-            items = transformer(items)
-
         return _page_val.get().create(items, **kwargs)
 
 
@@ -130,6 +126,57 @@ def set_page(page: Type[AbstractPage[Any]]) -> ContextManager[None]:
 
 def set_items_transformer(transformer: ItemsTransformer) -> ContextManager[None]:
     return _ctx_var_with_reset(_items_transformer_val, transformer)
+
+
+async def async_wrapped(obj: T) -> T:
+    return obj
+
+
+@overload
+def apply_items_transformer(
+    items: Sequence[Any],
+    /,
+    transformer: Optional[SyncItemsTransformer] = None,
+    *,
+    async_: Literal[False] = False,
+) -> Sequence[Any]:
+    pass
+
+
+@overload
+async def apply_items_transformer(
+    items: Sequence[Any],
+    /,
+    transformer: Optional[AsyncItemsTransformer] = None,
+    *,
+    async_: Literal[True],
+) -> Sequence[Any]:
+    pass
+
+
+def apply_items_transformer(
+    items: Sequence[Any],
+    /,
+    transformer: Optional[ItemsTransformer] = None,
+    *,
+    async_: bool = False,
+) -> Any:
+    if transformer is None:
+        transformer = _items_transformer_val.get()
+
+    if transformer is None:
+        return async_wrapped(items) if async_ else items
+
+    is_coro = inspect.iscoroutinefunction(transformer)
+
+    if is_coro and not async_:
+        raise ValueError("apply_items_transformer called with async_=False but transformer is async")
+
+    if is_coro:
+        return transformer(items)
+
+    items = transformer(items)  # type: ignore[assignment]
+    return async_wrapped(items) if async_ else items
 
 
 def _create_params_dependency(

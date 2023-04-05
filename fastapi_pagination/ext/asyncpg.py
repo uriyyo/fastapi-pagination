@@ -4,9 +4,9 @@ from typing import Any, Optional
 
 from asyncpg import Connection
 
-from ..api import create_page
+from ..api import create_page, apply_items_transformer
 from ..bases import AbstractParams
-from ..types import AdditionalData, ItemsTransformer
+from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
 
 
@@ -15,7 +15,7 @@ async def paginate(
     conn: Connection,
     query: str,
     *args: Any,
-    transformer: Optional[ItemsTransformer] = None,
+    transformer: Optional[AsyncItemsTransformer] = None,
     params: Optional[AbstractParams] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
@@ -33,11 +33,12 @@ async def paginate(
         limit_offset_str += f" OFFSET {raw_params.offset}"
 
     items = await conn.fetch(f"{query} {limit_offset_str}", *args)
+    items = [{**r} for r in items]
+    t_items = await apply_items_transformer(items, transformer, async_=True)
 
     return create_page(
-        [{**r} for r in items],
+        t_items,
         total,
         params,
-        transformer=transformer,
         **(additional_data or {}),
     )
