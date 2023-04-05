@@ -36,6 +36,7 @@ from fastapi.dependencies.utils import (
     lenient_issubclass,
 )
 from fastapi.routing import APIRoute, APIRouter
+from starlette._utils import is_async_callable
 
 from .bases import AbstractPage, AbstractParams
 from .default import Page
@@ -167,7 +168,7 @@ def apply_items_transformer(
     if transformer is None:
         return async_wrapped(items) if async_ else items
 
-    is_coro = inspect.iscoroutinefunction(transformer)
+    is_coro = is_async_callable(transformer)
 
     if is_coro and not async_:
         raise ValueError("apply_items_transformer called with async_=False but transformer is async")
