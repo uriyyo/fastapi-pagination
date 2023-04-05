@@ -162,8 +162,7 @@ def apply_items_transformer(
     *,
     async_: bool = False,
 ) -> Any:
-    if transformer is None:
-        transformer = _items_transformer_val.get()
+    transformer = resolve_items_transformer(transformer)
 
     if transformer is None:
         return async_wrapped(items) if async_ else items

@@ -44,7 +44,7 @@ def verify_params(params: Optional[TParams], *params_types: ParamsType) -> Tuple
     return params, raw_params
 
 
-def is_async_callable(obj: Any) -> bool:
+def is_async_callable(obj: Any) -> bool:  # pragma: no cover
     while isinstance(obj, functools.partial):
         obj = obj.func
 

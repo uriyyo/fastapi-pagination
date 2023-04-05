@@ -15,7 +15,7 @@ from fastapi_pagination import (
     request,
     response,
 )
-from fastapi_pagination.api import pagination_items, pagination_ctx
+from fastapi_pagination.api import pagination_items, pagination_ctx, apply_items_transformer
 from fastapi_pagination.bases import AbstractPage
 
 
@@ -211,3 +211,14 @@ def test_items_transformer():
 
     rsp = client.get("/implicit")
     assert rsp.json() == {"items": [2, 4, 6], "total": 3, "page": 1, "pages": 1, "size": 50}
+
+
+def test_apply_items_transformer_sync_with_async_transformer():
+    async def async_transformer(items):
+        return [i * 2 for i in items]
+
+    with raises(
+        ValueError,
+        match=r"^apply_items_transformer called with async_=False but transformer is async$",
+    ):
+        apply_items_transformer([], async_transformer, async_=False)
