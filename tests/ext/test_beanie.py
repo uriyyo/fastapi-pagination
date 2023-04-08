@@ -44,8 +44,8 @@ async def db_client(database_url, be_user):
 def query(request, be_user):
     if request.param:
         return be_user
-    else:
-        return be_user.find()
+
+    return be_user.find()
 
 
 @fixture(scope="session")

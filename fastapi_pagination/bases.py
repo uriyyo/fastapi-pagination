@@ -105,8 +105,8 @@ def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping
         ending = "s" if len(incorrect) > 1 else ""
         raise ValueError(f"Unknown field{ending} {', '.join(incorrect)}")
 
-    anns = get_type_hints(cls)
-    return {name: (anns[name], val) for name, val in fields.items()}
+    annotations = get_type_hints(cls)
+    return {name: (annotations[name], val) for name, val in fields.items()}
 
 
 def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type:  # type: ignore  # noqa
