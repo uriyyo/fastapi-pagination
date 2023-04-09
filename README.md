@@ -13,12 +13,28 @@
 
 ## Introduction
 
-`fastapi-pagination` is a library that provides pagination feature for [FastAPI](https://fastapi.tiangolo.com/)
-applications.
+`fastapi-pagination` is a Python library designed to simplify pagination in FastAPI applications. 
+It provides a set of utility functions and data models to help you paginate your database queries 
+and return paginated responses to your clients.
+
+With `fastapi-pagination`, you can easily define pagination parameters in your FastAPI endpoint functions,
+and use them to generate paginated responses that include the requested subset of your data.
+The library supports a variety of pagination strategies, including cursor-based pagination and page-based pagination.
+
+`fastapi-pagination` is built on top of the popular `fastapi` library, and it works with a wide range 
+of SQL and NoSQL databases frameworks. It also supports async/await syntax and is compatible with Python 3.8 and higher.
+
+Features:
+* Simplifies pagination in FastAPI applications.
+* Supports a variety of pagination strategies, including cursor-based pagination and page-based pagination
+* Works with a wide range of SQL and NoSQL databases frameworks, including `SQLAlchemy`, `Tortoise ORM`, and `PyMongo`.
+* Supports async/await syntax.
+* Compatible with Python 3.8 and higher.
 
 ----
 
-For more information about library please see [documentation](https://uriyyo-fastapi-pagination.netlify.app/).
+For more information on how to use fastapi-pagination, please refer to the 
+[official documentation](https://uriyyo-fastapi-pagination.netlify.app/).
 
 ---
 
@@ -74,27 +90,6 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 def get_users(db: Session = Depends(get_db)):
     return paginate(db, select(User).order_by(User.created_at))
 ```
-
-Currently, `fastapi-pagination` supports:
-
-| Library                                                                                     | `paginate` function                                 | 
-|---------------------------------------------------------------------------------------------|-----------------------------------------------------|
-| [SQLAlchemy](https://docs.sqlalchemy.org/en/14/orm/quickstart.html)                         | `fastapi_pagination.ext.sqlalchemy.paginate`        |
-| [SQLModel](https://sqlmodel.tiangolo.com/)                                                  | `fastapi_pagination.ext.sqlmodel.paginate`          |
-| [AsyncPG](https://magicstack.github.io/asyncpg/current/)                                    | `fastapi_pagination.ext.asyncpg.paginate`           |
-| [Databases](https://www.encode.io/databases/)                                               | `fastapi_pagination.ext.databases.paginate`         |
-| [Django ORM](https://docs.djangoproject.com/en/3.2/topics/db/queries/)                      | `fastapi_pagination.ext.django.paginate`            |
-| [GINO](https://python-gino.org/)                                                            | `fastapi_pagination.ext.gino.paginate`              |
-| [ORM](https://www.encode.io/orm/)                                                           | `fastapi_pagination.ext.orm.paginate`               |
-| [ormar](https://collerek.github.io/ormar/)                                                  | `fastapi_pagination.ext.ormar.paginate`             |
-| [Piccolo](https://piccolo-orm.readthedocs.io/en/latest/)                                    | `fastapi_pagination.ext.piccolo.paginate`           |
-| [Pony ORM](https://docs.ponyorm.org/)                                                       | `fastapi_pagination.ext.pony.paginate`              |
-| [Tortoise ORM](https://tortoise-orm.readthedocs.io/en/latest/)                              | `fastapi_pagination.ext.tortoise.paginate`          |
-| [Beanie](https://roman-right.github.io/beanie/)                                             | `fastapi_pagination.ext.beanie.paginate`            |
-| [PyMongo](https://pymongo.readthedocs.io/en/stable/)                                        | `fastapi_pagination.ext.pymongo.paginate`           |
-| [MongoEngine](https://docs.mongoengine.org/)                                                | `fastapi_pagination.ext.mongoengine.paginate`       |
-| [Motor](https://motor.readthedocs.io/en/stable/)                                            | `fastapi_pagination.ext.motor.paginate`             |
-
 
 ---
 
