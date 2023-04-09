@@ -1,13 +1,20 @@
-# FastAPI Pagination
+<h1 align="center">
+<img alt="logo" src="https://raw.githubusercontent.com/uriyyo/fastapi-pagination/main/docs/img/logo.png">
+</h1>
 
-FastAPI Pagination is an easy to use pagination addon for FastAPI.
+<div align="center">
+<img alt="license" src="https://img.shields.io/badge/License-MIT-lightgrey">
+<img alt="test" src="https://github.com/uriyyo/fastapi-pagination/workflows/Test/badge.svg">
+<img alt="codecov" src="https://codecov.io/gh/uriyyo/fastapi-pagination/branch/main/graph/badge.svg?token=QqIqDQ7FZi">
+<a href="https://pepy.tech/project/fastapi-pagination"><img alt="downloads" src="https://pepy.tech/badge/fastapi-pagination"></a>
+<a href="https://pypi.org/project/fastapi-pagination"><img alt="pypi" src="https://img.shields.io/pypi/v/fastapi-pagination"></a>
+<img alt="black" src="https://img.shields.io/badge/code%20style-black-000000.svg">
+</div>
 
-## Features
+## Introduction
 
-* Multiple Page Types
-* Extensible base page
-* Full OpenAPI schema support
-* Integrations to support multiple ORMs
+`fastapi-pagination` is a library that provides pagination feature for [FastAPI](https://fastapi.tiangolo.com/)
+applications.
 
 ## Installation
 
@@ -15,71 +22,78 @@ FastAPI Pagination is an easy to use pagination addon for FastAPI.
 pip install fastapi-pagination
 ```
 
-### Extras
+## Quickstart
 
-To install fastapi-pagination with all available integrations:
+All you need to do is to use `Page` class as a return type for your endpoint and call `paginate` function
+on data you want to paginate.
 
-```bash
-pip install fastapi-pagination[all]
-```
-
-## Minimal Example
-
-The most basic object that we can paginate is a list of Pydantic models.
-
-```python
+```py
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+# import all you need from fastapi-pagination
 from fastapi_pagination import Page, add_pagination, paginate
 
-app = FastAPI()
+app = FastAPI()  # create FastAPI app
 
 
-class User(BaseModel):
-    name: str
-    surname: str
+class UserOut(BaseModel):  # define your model
+    name: str = Field(..., example="Steve")
+    surname: str = Field(..., example="Rogers")
 
 
-users = [User(name='Yurii', surname='Karabas')] * 100
+users = [  # create some data
+    # ...
+]
 
 
-@app.get('/users', response_model=Page[User])
-def get_users():
-    return paginate(users)
+@app.get('/users', response_model=Page[UserOut])  # use Page[UserOut] as response model
+async def get_users():
+    return paginate(users)  # use paginate function to paginate your data
 
 
-add_pagination(app)
+add_pagination(app)  # important! add pagination to your app
 ```
 
-In the example above, we have the `Pydantic` model `User`:
-```python
-class User(BaseModel):
-    name: str
-    surname: str
+Please, be careful when you work with databases, because default `paginate` will require to load all data in memory.
+
+For instance, if you use `SQLAlchemy` you can use `paginate` from `fastapi_pagination.ext.sqlalchemy` module.
+
+```py
+from sqlalchemy import select
+from fastapi_pagination.ext.sqlalchemy import paginate
+
+
+@app.get('/users', response_model=Page[UserOut])
+def get_users(db: Session = Depends(get_db)):
+    return paginate(db, select(User).order_by(User.created_at))
 ```
 
-And a list of 100 users:
-```python
-users = [User(name='Yurii', surname='Karabas')] * 100
-```
+Currently, `fastapi-pagination` supports:
 
-To paginate the users list, all you have to do is add the parameter `response_model=Page[Users]` and return the result of `paginate(users)`.
+| Library                                                                                     | `paginate` function                                 | 
+|---------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| [SQLAlchemy](https://docs.sqlalchemy.org/en/14/orm/quickstart.html)                         | `fastapi_pagination.ext.sqlalchemy.paginate`        |
+| [SQLModel](https://sqlmodel.tiangolo.com/)                                                  | `fastapi_pagination.ext.sqlmodel.paginate`          |
+| [AsyncPG](https://magicstack.github.io/asyncpg/current/)                                    | `fastapi_pagination.ext.asyncpg.paginate`           |
+| [Databases](https://www.encode.io/databases/)                                               | `fastapi_pagination.ext.databases.paginate`         |
+| [Django ORM](https://docs.djangoproject.com/en/3.2/topics/db/queries/)                      | `fastapi_pagination.ext.django.paginate`            |
+| [GINO](https://python-gino.org/)                                                            | `fastapi_pagination.ext.gino.paginate`              |
+| [ORM](https://www.encode.io/orm/)                                                           | `fastapi_pagination.ext.orm.paginate`               |
+| [ormar](https://collerek.github.io/ormar/)                                                  | `fastapi_pagination.ext.ormar.paginate`             |
+| [Piccolo](https://piccolo-orm.readthedocs.io/en/latest/)                                    | `fastapi_pagination.ext.piccolo.paginate`           |
+| [Pony ORM](https://docs.ponyorm.org/)                                                       | `fastapi_pagination.ext.pony.paginate`              |
+| [Tortoise ORM](https://tortoise-orm.readthedocs.io/en/latest/)                              | `fastapi_pagination.ext.tortoise.paginate`          |
+| [Beanie](https://roman-right.github.io/beanie/)                                             | `fastapi_pagination.ext.beanie.paginate`            |
+| [PyMongo](https://pymongo.readthedocs.io/en/stable/)                                        | `fastapi_pagination.ext.pymongo.paginate`           |
+| [MongoEngine](https://docs.mongoengine.org/)                                                | `fastapi_pagination.ext.mongoengine.paginate`       |
+| [Motor](https://motor.readthedocs.io/en/stable/)                                            | `fastapi_pagination.ext.motor.paginate`             |
 
-```python
-@app.get('/users', response_model=Page[User])
-def get_users():
-    return paginate(users)
-```
 
-If you look at OpenAPI specification you can see this:
+---
 
-![OpenAPI](img/openapi_example.png)
+Code from `Quickstart` will generate OpenAPI schema as bellow:
 
-Note that we have two parameters as input, `page` and `size`. The parameter `page` is the page number to be requested and the parameter `size` is the size of the page.
-
-As the output, we have `items`, `total`, `page`, `size`, and `pages` where items are the list of `items` that were paginated, `total` is the total number of items, `pages` is the number of pages generated for the given input, and `page` and `size` are the same values passed in as input.
-
-
-If you execute the request, you must get this as result:
-![OpenAPI Result](img/openapi_example_result.png)
+<div align="center">
+<img alt="app-example" src="https://raw.githubusercontent.com/uriyyo/fastapi-pagination/main/docs/img/example.jpeg">
+</div>
