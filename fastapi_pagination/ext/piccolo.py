@@ -35,7 +35,7 @@ async def paginate(
     count_query = deepcopy(query)
     count_query.columns_delegate.selected_columns = []
 
-    total = 0
+    total = None
     if row := await count_query.columns(Count()).first():
         total = row["count"]
 
@@ -44,7 +44,7 @@ async def paginate(
 
     return create_page(
         t_items,
-        total,
-        params,
+        total=total,
+        params=params,
         **(additional_data or {}),
     )

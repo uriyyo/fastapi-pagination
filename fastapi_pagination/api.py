@@ -13,6 +13,7 @@ __all__ = [
 ]
 
 import inspect
+import warnings
 from contextlib import ExitStack, contextmanager, suppress
 from contextvars import ContextVar
 from typing import (
@@ -79,16 +80,44 @@ def pagination_items() -> Sequence[Any]:
         raise RuntimeError("pagination_items must be called inside create_page")
 
 
+_DEPRECATED_PARAM_MSG = """
+'{param}' is no longer can be passed as a positional argument, use keyword argument instead.
+Positional arguments are deprecated and will be removed in the next major release (0.13.0).
+"""
+
+_SENTINEL: Any = object()
+
+
 def create_page(
     items: Sequence[T],
-    total: Optional[int] = None,
-    params: Optional[AbstractParams] = None,
+    total: Optional[int] = _SENTINEL,
+    params: Optional[AbstractParams] = _SENTINEL,
+    /,
     **kwargs: Any,
 ) -> AbstractPage[T]:
-    kwargs["params"] = params
+    if params is not _SENTINEL:
+        if "params" in kwargs:
+            raise TypeError("create_page() got multiple values for argument 'params'")
 
-    if total is not None:  # temporary to support old signature
+        kwargs["params"] = params
+
+        warnings.warn(
+            _DEPRECATED_PARAM_MSG.format(param="params"),
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+    if total is not _SENTINEL:
+        if "total" in kwargs:
+            raise TypeError("create_page() got multiple values for argument 'total'")
+
         kwargs["total"] = total
+
+        warnings.warn(
+            _DEPRECATED_PARAM_MSG.format(param="total"),
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
     with _ctx_var_with_reset(_items_val, items):
         return _page_val.get().create(items, **kwargs)
