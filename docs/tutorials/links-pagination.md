@@ -13,7 +13,7 @@ Response schema will contain additional `links` field with pagination links:
 
 For instance, let user `page-number` pagination from `links` module:
 
-```py hl_lines="5"
+```py hl_lines="7"
 {! ../docs_src/tutorial/links_pagination.py !}
 ```
 

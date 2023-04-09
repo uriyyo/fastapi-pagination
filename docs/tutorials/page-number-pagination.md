@@ -20,7 +20,7 @@ Response schema will contain:
 
 To use `page-number` you need to import `Page` from `fastapi_pagination` and use it as a response model.
 
-```py hl_lines="4"
+```py hl_lines="6"
 {! ../docs_src/tutorial/page_number_pagination.py !}
 ```
 

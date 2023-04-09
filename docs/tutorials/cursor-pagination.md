@@ -17,6 +17,6 @@ In this tutorial, you will learn how to use `cursor` pagination type.
 
 To use `cursor` you need to import `CursorPage` from `fastapi_pagination.cursor` and use it as a response model.
 
-```py
+```py hl_lines="7"
 {! ../docs_src/tutorial/cursor_pagination.py !}
 ```

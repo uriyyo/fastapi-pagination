@@ -15,6 +15,10 @@ theme:
   icon:
     repo: fontawesome/brands/github
   favicon: img/small-logo.png
+  features:
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
 
 nav:
   - "Home": index.md
@@ -34,6 +38,10 @@ nav:
   - "License": license.md
 
 markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
@@ -45,6 +53,7 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.keys
   - pymdownx.inlinehilite
+  - pymdownx.snippets
 
 extra:
   social:

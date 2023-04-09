@@ -21,7 +21,7 @@ Response schema will contain:
 
 To use `limit-offset` you need to import `LimitOffsetPage` from `fastapi_pagination` and use it as a response model.
 
-```py hl_lines="4"
+```py hl_lines="6"
 {! ../docs_src/tutorial/limit_offset_pagination.py !}
 ```
 
