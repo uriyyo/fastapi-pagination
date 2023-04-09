@@ -41,8 +41,8 @@ def user(db_connect):
 def query(request, user):
     if request.param:
         return user
-    else:
-        return user.objects.all()
+
+    return user.objects.all()
 
 
 @fixture(scope="session")

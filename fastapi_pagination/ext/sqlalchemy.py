@@ -7,6 +7,7 @@ __all__ = [
 ]
 
 import warnings
+from contextlib import suppress
 from typing import Any, Optional, Union, overload, Tuple, TYPE_CHECKING
 
 from sqlalchemy import func, literal_column, select
@@ -115,15 +116,11 @@ def exec_pagination(
 
 
 def _get_sync_conn_from_async(conn: Any) -> SyncConn:  # pragma: no cover
-    try:
+    with suppress(AttributeError):
         return conn.sync_session  # type: ignore
-    except AttributeError:
-        pass
 
-    try:
+    with suppress(AttributeError):
         return conn.sync_connection  # type: ignore
-    except AttributeError:
-        pass
 
     raise TypeError("conn must be an AsyncConnection or AsyncSession")
 
@@ -175,13 +172,11 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
 
     params, _ = verify_params(params, "limit-offset", "cursor")
 
-    try:
+    with suppress(TypeError):
         sync_conn = _get_sync_conn_from_async(conn)
         return greenlet_spawn(
             exec_pagination, query, params, sync_conn, transformer, additional_data, unique, async_=True
         )
-    except TypeError:
-        pass
 
     return exec_pagination(query, params, conn, transformer, additional_data, unique, async_=False)
 
