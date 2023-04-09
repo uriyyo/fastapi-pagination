@@ -1,15 +1,18 @@
-from typing import List
+from typing import List, Union
 
 from pytest import fixture
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, relationship, sessionmaker
+from typing_extensions import TypeAlias
 
 try:
-    from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+    from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
     from sqlalchemy.orm import declarative_base
 except ImportError:
     create_async_engine = None
     AsyncSession = None
+    AsyncEngine = None
 
     from sqlalchemy.ext.declarative import declarative_base
 
@@ -20,14 +23,16 @@ except ImportError:
     Field = None
     Relationship = None
 
+PossiblyAsyncEngine: TypeAlias = Union[Engine, AsyncEngine]
+
 
 @fixture(scope="session")
-def sa_engine_params(database_url):
+def sa_engine_params(database_url: str) -> dict:
     return {}
 
 
 @fixture(scope="session")
-def sa_engine(database_url, sa_engine_params, is_async_db):
+def sa_engine(database_url: str, sa_engine_params: dict, is_async_db: bool) -> PossiblyAsyncEngine:
     if is_async_db:
         return create_async_engine(database_url, **sa_engine_params)
 
@@ -35,13 +40,13 @@ def sa_engine(database_url, sa_engine_params, is_async_db):
 
 
 @fixture(scope="session")
-def sa_session(sa_engine, is_async_db):
+def sa_session(sa_engine: PossiblyAsyncEngine, is_async_db: bool):
     session_cls = AsyncSession if is_async_db else Session
     return sessionmaker(bind=sa_engine, class_=session_cls)
 
 
 @fixture(scope="session")
-def sa_base(sa_engine):
+def sa_base(sa_engine: PossiblyAsyncEngine):
     return declarative_base()
 
 
