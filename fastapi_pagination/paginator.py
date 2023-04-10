@@ -5,7 +5,7 @@ __all__ = ["paginate"]
 from .api import create_page, apply_items_transformer
 from .bases import AbstractParams
 from .types import AdditionalData, SyncItemsTransformer
-from .utils import verify_params
+from .utils import verify_params, check_installed_extensions
 
 T = TypeVar("T")
 
@@ -18,6 +18,8 @@ def paginate(
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
+    check_installed_extensions()
+
     params, raw_params = verify_params(params, "limit-offset")
 
     items = sequence[raw_params.as_slice()]
