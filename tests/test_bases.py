@@ -19,7 +19,7 @@ def test_custom_page_invalid_params_cls():
     class CustomPage(Page[T], Generic[T]):
         __params_type__ = CustomParams
 
-    with raises(ValueError, match="^CustomParams must be subclass of BaseModel$"):
+    with raises(TypeError, match="^CustomParams must be subclass of BaseModel$"):
         CustomPage.with_custom_options(size=10)
 
 
