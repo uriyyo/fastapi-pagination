@@ -1,14 +1,14 @@
 __all__ = ["paginate"]
 
-from typing import Optional, Type, TypeVar, Union, Any
+from typing import Any, Optional, Type, TypeVar, Union
 
 from ormar import Model, QuerySet
 
-from .utils import generic_query_apply_params
-from ..api import create_page, apply_items_transformer
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
+from .utils import generic_query_apply_params
 
 TModel = TypeVar("TModel", bound=Model)
 

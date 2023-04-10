@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Union, Callable, Sequence, Awaitable
+from typing import Any, Awaitable, Callable, Dict, Optional, Sequence, Union
 
 __all__ = [
     "Cursor",

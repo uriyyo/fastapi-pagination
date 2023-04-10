@@ -59,6 +59,7 @@ requests = "^2.28.2"
 uvicorn = "^0.21.1"
 Jinja2 = "^3.1.2"
 mypy = "^1.2.0"
+ruff = "^0.0.261"
 
 [tool.poetry.extras]
 sqlmodel = ["sqlmodel", "sqlakeyset"]
@@ -106,8 +107,34 @@ exclude = '''
 
 [tool.ruff]
 line-length = 120
-select = ["E", "F"]
-ignore = []
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+    "S",  # flake8-bandit
+    "G",  # flake8-logging-format
+    "PIE", # flake8-pie
+    "COM", # flake8-commas
+    "PT", # flake8-pytest-style
+    "Q",  # flake8-quotes
+    "RSE", # flake8-raise
+    "RET", # flake8-return
+    "SIM", # flake8-simplify
+    "TRY", # tryceratops
+    "RUF", # ruff specific rules
+]
+ignore = [
+    "B008",  # do not perform function calls in argument defaults
+    "S101",  # use of assert detected
+    "PT004", # fixture doesn't return anything
+    "PT013", # allow from pytest import thing
+    "SIM114", # allow have multiplie ifs with same body
+    "TRY003", # allow long exc message
+    "RUF100", # allow unused noqa
+]
 exclude = [
     ".bzr",
     ".direnv",

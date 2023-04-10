@@ -1,14 +1,21 @@
 repos:
-  - repo: https://github.com/ambv/black
-    rev: 22.12.0
+  - repo: local
     hooks:
       - id: black
+        language: python
+        name: black
+        pass_filenames: false
         language_version: python3.8
+        entry: poetry run black fastapi_pagination docs_src tests
 
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.192'
+  - repo: local
     hooks:
       - id: ruff
+        language: python
+        name: ruff
+        pass_filenames: false
+        language_version: python3.8
+        entry: poetry run ruff --fix --exit-non-zero-on-fix --show-fixes fastapi_pagination docs_src tests
 
   - repo: local
     hooks:

@@ -1,5 +1,5 @@
 from itertools import islice
-from typing import Generic, Iterable, Optional, TypeVar, Any
+from typing import Any, Generic, Iterable, Optional, TypeVar
 
 __all__ = [
     "Page",
@@ -9,7 +9,7 @@ __all__ = [
     "paginate",
 ]
 
-from .api import create_page, apply_items_transformer
+from .api import apply_items_transformer, create_page
 from .bases import AbstractParams
 from .default import Page as DefaultPage
 from .default import Params

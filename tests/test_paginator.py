@@ -16,7 +16,7 @@ from fastapi_pagination.default import OptionalParams
 from fastapi_pagination.limit_offset import OptionalLimitOffsetParams
 
 from .base import BasePaginationTestCase
-from .utils import OptionalPage, OptionalLimitOffsetPage
+from .utils import OptionalLimitOffsetPage, OptionalPage
 
 
 class TestPaginationParams(BasePaginationTestCase):
@@ -34,7 +34,7 @@ class TestPaginationParams(BasePaginationTestCase):
         return add_pagination(app)
 
     @mark.parametrize(
-        "path,cls_name,params",
+        ("path", "cls_name", "params"),
         [
             ("/optional/default", "optional_page", OptionalParams()),
             ("/optional/limit-offset", "optional_limit_offset_page", OptionalLimitOffsetParams()),

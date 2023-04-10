@@ -1,11 +1,11 @@
-from typing import Optional, Type, TypeVar, Union, cast, Any
+from typing import Any, Optional, Type, TypeVar, Union, cast
 
 __all__ = ["paginate"]
 
 from django.db.models import Model, QuerySet
 from django.db.models.base import ModelBase
 
-from ..api import create_page, apply_items_transformer
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, SyncItemsTransformer
 from ..utils import verify_params

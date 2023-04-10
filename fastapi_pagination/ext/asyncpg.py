@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from asyncpg import Connection
 
-from ..api import create_page, apply_items_transformer
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
@@ -22,7 +22,7 @@ async def paginate(
     params, raw_params = verify_params(params, "limit-offset")
 
     total = await conn.fetchval(
-        f"SELECT count(*) FROM ({query}) AS _pagination_query",
+        f"SELECT count(*) FROM ({query}) AS _pagination_query",  # noqa: S608
         *args,
     )
 

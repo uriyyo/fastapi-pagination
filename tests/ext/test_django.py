@@ -28,7 +28,7 @@ def db(database_url):
             "default": {
                 "ENGINE": "django.db.backends.sqlite3",
                 "NAME": database_url,
-            }
+            },
         },
         INSTALLED_APPS=[],
     )

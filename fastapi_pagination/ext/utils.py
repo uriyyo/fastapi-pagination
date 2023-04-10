@@ -4,7 +4,7 @@ __all__ = [
     "generic_query_apply_params",
 ]
 
-from typing import Any, Optional, Sequence, TypeVar, Union, no_type_check, Protocol
+from typing import Any, Optional, Protocol, Sequence, TypeVar, Union, no_type_check
 
 from typing_extensions import Self
 

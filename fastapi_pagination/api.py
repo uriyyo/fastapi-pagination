@@ -22,13 +22,13 @@ from typing import (
     Callable,
     ContextManager,
     Iterator,
+    Literal,
     Optional,
     Sequence,
     Type,
     TypeVar,
     cast,
     overload,
-    Literal,
 )
 
 from fastapi import Depends, FastAPI, Request, Response
@@ -40,7 +40,7 @@ from fastapi.routing import APIRoute, APIRouter
 
 from .bases import AbstractPage, AbstractParams
 from .default import Page
-from .types import ItemsTransformer, AsyncItemsTransformer, SyncItemsTransformer
+from .types import AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 from .utils import is_async_callable
 
 T = TypeVar("T")
@@ -61,7 +61,7 @@ def resolve_params(params: Optional[TAbstractParams] = None) -> TAbstractParams:
         try:
             return cast(TAbstractParams, _params_val.get())
         except LookupError:
-            raise RuntimeError("Use params or add_pagination")
+            raise RuntimeError("Use params or add_pagination") from None
 
     return params
 
@@ -77,7 +77,7 @@ def pagination_items() -> Sequence[Any]:
     try:
         return _items_val.get()
     except LookupError:
-        raise RuntimeError("pagination_items must be called inside create_page")
+        raise RuntimeError("pagination_items must be called inside create_page") from None
 
 
 _DEPRECATED_PARAM_MSG = """
@@ -127,14 +127,14 @@ def response() -> Response:
     try:
         return _rsp_val.get()
     except LookupError:
-        raise RuntimeError("response context var must be set")
+        raise RuntimeError("response context var must be set") from None
 
 
 def request() -> Request:
     try:
         return _req_val.get()
     except LookupError:
-        raise RuntimeError("request context var must be set")
+        raise RuntimeError("request context var must be set") from None
 
 
 def _ctx_var_with_reset(var: ContextVar[T], value: T) -> ContextManager[None]:
@@ -234,11 +234,7 @@ def pagination_ctx(
     if page is not None and params is None:
         params = page.__params_type__
 
-    params_dep: Callable[..., Any]
-    if params is not None:
-        params_dep = _create_params_dependency(params)
-    else:
-        params_dep = _noop_dep
+    params_dep: Any = _create_params_dependency(params) if params is not None else _noop_dep
 
     async def _page_ctx_dependency(
         req: Request,
@@ -280,7 +276,7 @@ def _update_route(route: APIRoute) -> None:
         get_parameterless_sub_dependant(
             depends=dep,
             path=route.path_format,
-        )
+        ),
     )
 
 

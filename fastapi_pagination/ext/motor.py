@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 
-from ..api import create_page, apply_items_transformer
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
@@ -59,9 +59,9 @@ async def paginate_aggregate(
                 "$facet": {
                     "metadata": [{"$count": "total"}],
                     "data": paginate_data,
-                }
+                },
             },
-        ]
+        ],
     )
 
     data = (await cursor.to_list(length=None))[0]

@@ -6,11 +6,11 @@ __all__ = [
     "Page",
 ]
 
+from math import ceil
 from typing import Any, Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
-from math import ceil
 
 from .bases import AbstractParams, BasePage, RawParams
 from .types import GreaterEqualOne, GreaterEqualZero
@@ -57,7 +57,7 @@ class Page(BasePage[T], Generic[T]):
         **kwargs: Any,
     ) -> Page[T]:
         if not isinstance(params, Params):
-            raise ValueError("Page should be used with Params")
+            raise TypeError("Page should be used with Params")
 
         size = params.size if params.size is not None else total
         page = params.page if params.page is not None else 1

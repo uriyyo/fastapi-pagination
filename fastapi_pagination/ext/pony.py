@@ -1,10 +1,11 @@
 __all__ = ["paginate"]
 
-from typing import Optional, Any
+from typing import Any, Optional
 
 from pony.orm.core import Query
 
 from fastapi_pagination import create_page
+
 from ..api import apply_items_transformer
 from ..bases import AbstractParams
 from ..types import AdditionalData, SyncItemsTransformer

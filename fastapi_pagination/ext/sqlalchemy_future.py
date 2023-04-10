@@ -11,9 +11,9 @@ from sqlalchemy.future import Connection
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import Select
 
-from .sqlalchemy import paginate as _paginate
 from ..bases import AbstractParams
 from ..types import AdditionalData, SyncItemsTransformer
+from .sqlalchemy import paginate as _paginate
 
 
 def paginate(

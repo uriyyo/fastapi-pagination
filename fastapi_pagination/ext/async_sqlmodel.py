@@ -9,7 +9,6 @@ from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
-
 from .sqlmodel import paginate as _paginate
 
 T = TypeVar("T")

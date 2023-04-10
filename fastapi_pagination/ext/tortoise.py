@@ -1,16 +1,16 @@
 __all__ = ["paginate"]
 
-from typing import List, Optional, Type, TypeVar, Union, Any
+from typing import Any, List, Optional, Type, TypeVar, Union
 
 from tortoise.models import Model
 from tortoise.query_utils import Prefetch
 from tortoise.queryset import QuerySet
 
-from .utils import generic_query_apply_params
-from ..api import create_page, apply_items_transformer
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
+from .utils import generic_query_apply_params
 
 TModel = TypeVar("TModel", bound=Model)
 

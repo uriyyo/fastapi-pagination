@@ -19,7 +19,7 @@ def test_custom_page_invalid_params_cls():
     class CustomPage(Page[T], Generic[T]):
         __params_type__ = CustomParams
 
-    with raises(ValueError, match="^CustomParams must be subclass of BaseModel$"):
+    with raises(TypeError, match="^CustomParams must be subclass of BaseModel$"):
         CustomPage.with_custom_options(size=10)
 
 
@@ -113,7 +113,7 @@ def test_deprecated_signature():
 
         class P1(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 items: Sequence[T],
                 total: Optional[int],
@@ -126,7 +126,7 @@ def test_deprecated_signature():
 
         class P2(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 items: Sequence[T],
                 params: AbstractParams,
@@ -138,7 +138,7 @@ def test_deprecated_signature():
 
         class P3(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 items: Sequence[T],
                 /,
@@ -152,7 +152,7 @@ def test_deprecated_signature():
 
         class P4(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 items: Sequence[T],
                 params: AbstractParams,
@@ -166,7 +166,7 @@ def test_deprecated_signature():
 
         class P5(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 items: Sequence[T],
                 params: AbstractParams,
@@ -181,7 +181,7 @@ def test_deprecated_signature():
 
         class P6(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 data: Sequence[T],
                 params: AbstractParams,
@@ -193,7 +193,7 @@ def test_deprecated_signature():
     with warns(DeprecationWarning, match=massage):
 
         class P7(Page[T], Generic[T]):
-            def create(  # noqa
+            def create(
                 cls,
                 data: Sequence[T],
                 params: AbstractParams,
