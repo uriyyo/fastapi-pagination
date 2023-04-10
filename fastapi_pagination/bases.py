@@ -151,7 +151,8 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         if not is_same and _check_for_old_sign(cls.create):
             warnings.warn(
                 "The signature of the `AbstractPage.create` method has changed. "
-                f"Please, update it to the new one. {_NEW_SIGNATURE}",
+                f"Please, update it to the new one. {_NEW_SIGNATURE}"
+                "\nSupport of old signature will be removed in the next major release (0.13.0).",
                 DeprecationWarning,
                 stacklevel=3,
             )

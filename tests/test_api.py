@@ -15,7 +15,7 @@ from fastapi_pagination import (
     request,
     response,
 )
-from fastapi_pagination.api import pagination_items, pagination_ctx, apply_items_transformer
+from fastapi_pagination.api import pagination_items, pagination_ctx, apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractPage
 
 
@@ -149,6 +149,14 @@ def test_pagination_items_outside_create_page():
         match=r"^pagination_items must be called inside create_page$",
     ):
         pagination_items()
+
+
+def test_create_page_duplicate_params():
+    with raises(TypeError):
+        create_page([], 1, Params(), total=0)
+
+    with raises(TypeError):
+        create_page([], 1, Params(), params=None)
 
 
 T = TypeVar("T")

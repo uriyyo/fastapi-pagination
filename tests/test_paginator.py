@@ -79,6 +79,12 @@ def test_paginator_additional_data():
     assert page == CustomPage(items=[], total=0, page=1, pages=0, size=50, new_field=10)
 
 
+def test_explicit_params():
+    page = paginate([], Params(page=2, size=10))
+
+    assert page == Page(items=[], total=0, page=2, pages=0, size=10)
+
+
 def test_explicit_items_transformer():
     def transformer(items):
         return [item * 2 for item in items]

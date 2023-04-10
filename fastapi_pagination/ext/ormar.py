@@ -31,7 +31,7 @@ async def paginate(
 
     return create_page(
         t_items,
-        total,
-        params,
+        total=total,
+        params=params,
         **(additional_data or {}),
     )

@@ -65,7 +65,8 @@ async def paginate(
 ) -> Any:
     warnings.warn(
         "fastapi_pagination.ext.async_sqlmodel module is deprecated, "
-        "please use fastapi_pagination.ext.sqlmodel module instead",
+        "please use fastapi_pagination.ext.sqlmodel module instead"
+        "This module will be removed in the next major release (0.13.0).",
         DeprecationWarning,
         stacklevel=2,
     )

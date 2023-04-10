@@ -1,3 +1,4 @@
+import re
 from typing import ClassVar, Generic, Optional, Sequence, TypeVar
 
 from pytest import mark, raises, warns
@@ -100,9 +101,11 @@ def test_params_cast():
 
 
 def test_deprecated_signature():
-    massage = (
+    massage = re.compile(
         r"^The signature of the `AbstractPage\.create` method has changed\. Please, update it to the new one\. "
-        r"\(items: 'Sequence\[T\]', params: 'AbstractParams', \*\*kwargs: 'Any'\) \-\> 'Type'$"
+        r"\(items: 'Sequence\[T\]', params: 'AbstractParams', \*\*kwargs: 'Any'\) \-\> 'Type'"
+        r"\nSupport of old signature will be removed in the next major release \(0\.13\.0\)\.$",
+        re.DOTALL | re.MULTILINE,
     )
 
     # old signature

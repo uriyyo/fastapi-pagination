@@ -109,8 +109,8 @@ def exec_pagination(
 
         return create_page(
             items,
-            total,
-            params,
+            total=total,
+            params=params,
             **(additional_data or {}),
         )
 
@@ -192,7 +192,8 @@ def _old_paginate_sign(
         raise ValueError("query.session is None")
 
     warnings.warn(
-        "sqlalchemy.orm.Query is deprecated, use sqlalchemy.sql.Select instead",
+        "sqlalchemy.orm.Query is deprecated, use sqlalchemy.sql.Select instead"
+        "sqlalchemy.orm.Query support will be removed in the next major release (0.13.0).",
         DeprecationWarning,
         stacklevel=3,
     )
