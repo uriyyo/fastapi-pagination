@@ -1,7 +1,7 @@
 site_name: FastAPI Pagination
 site_author: Yurii Karabas
 site_description: FastAPI Pagination
-copyright: "Copyright &copy; 2021 Yurii Karabas"
+copyright: "Copyright &copy; 2023 Yurii Karabas"
 repo_url: https://github.com/uriyyo/fastapi-pagination
 repo_name: uriyyo/fastapi-pagination
 
@@ -11,38 +11,53 @@ theme:
     scheme: slate
     primary: blue grey
     second: grey
+  logo: img/small-logo.png
   icon:
     repo: fontawesome/brands/github
-  favicon: images/favicon.ico
+  favicon: img/small-logo.png
+  features:
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
 
 nav:
   - "Home": index.md
-  - "Tutorials":
-      - "First Steps": first-steps.md
-      - "Limit-Offset": limit-offset.md
-      - "Customization": customization.md
-      - "Advanced": advanced.md
-  - "Integrations": integrations.md
+  - "Tutorials - User Guide":
+      - "First Steps": tutorials/first-steps.md
+      - "Page Number Pagination": tutorials/page-number-pagination.md
+      - "Limit Offset Pagination": tutorials/limit-offset-pagination.md
+      - "Links in Pagination": tutorials/links-pagination.md
+      - "Cursor Pagination": tutorials/cursor-pagination.md
+  - "Advanced User Guide":
+      - "Custom Params": tutorials_advanced/custom-params.md
+      - "Custom Page": tutorials_advanced/custom-page.md
+      - "Custom Pagination Function": tutorials_advanced/custom-paginate.md
+  - "Integrations":
+      - "Available Integrations": integrations/available-integrations.md
   - "Contributing": contributing.md
   - "License": license.md
 
 markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - mdx_include:
+      base_path: docs
 
-  - extra
   - admonition
   - pymdownx.highlight
   - pymdownx.superfences
   - pymdownx.keys
   - pymdownx.inlinehilite
+  - pymdownx.snippets
 
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/uriyyo/fastapi-pagination
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/uriyyo
     - icon: fontawesome/brands/linkedin
       link: https://linkedin.com/in/yurii-karabas-b35653140

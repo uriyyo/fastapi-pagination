@@ -3,10 +3,13 @@ from __future__ import annotations
 __all__ = [
     "verify_params",
     "is_async_callable",
+    "check_installed_extensions",
+    "FastAPIPaginationWarning",
 ]
 
 import asyncio
 import functools
+import warnings
 from typing import Optional, Tuple, TypeVar, overload, Any
 
 from typing_extensions import Literal
@@ -50,3 +53,57 @@ def is_async_callable(obj: Any) -> bool:  # pragma: no cover
         obj = obj.func
 
     return asyncio.iscoroutinefunction(obj) or (callable(obj) and asyncio.iscoroutinefunction(obj.__call__))
+
+
+_EXTENSIONS = [
+    "databases",
+    "django",
+    "cassandra",
+    "tortoise",
+    "motor",
+    "orm",
+    "ormar",
+    "pony",
+    "piccolo",
+    "gino",
+    "beanie",
+    "sqlmodel",
+    "sqlalchemy",
+    "asyncpg",
+    "mongoengine",
+    "pymongo",
+]
+
+
+def _check_installed(module: str) -> bool:
+    try:
+        __import__(module)
+    except ImportError:
+        return False
+    else:
+        return True
+
+
+class FastAPIPaginationWarning(UserWarning):
+    pass
+
+
+_WARNING_MSG = """
+Package "{ext}" is installed.
+
+It's recommended to use extension "fastapi_pagination.ext.{ext}" instead of default 'paginate' implementation.
+
+Otherwise, you can disable this warning by adding the following code to your code:
+warnings.simplefilter("ignore", FastAPIPaginationWarning)
+"""
+
+
+def check_installed_extensions() -> None:
+    for ext in _EXTENSIONS:
+        if _check_installed(f"fastapi_pagination.ext.{ext}"):
+            warnings.warn(
+                _WARNING_MSG.format(ext=ext),
+                FastAPIPaginationWarning,
+                stacklevel=3,
+            )
+            break
