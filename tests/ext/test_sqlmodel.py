@@ -36,8 +36,8 @@ class TestSQLModelDefault(BasePaginationTestCase):
     def query(self, request, sm_user):
         if request.param:
             return sm_user
-        else:
-            return select(sm_user)
+
+        return select(sm_user)
 
     @fixture(scope="session")
     def app(self, app, query, session, model_cls):

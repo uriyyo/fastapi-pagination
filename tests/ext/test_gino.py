@@ -40,8 +40,8 @@ def User(db):
 def query(request, User):
     if request.param:
         return User
-    else:
-        return User.query
+
+    return User.query
 
 
 @fixture(scope="session")

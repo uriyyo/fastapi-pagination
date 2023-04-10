@@ -58,7 +58,7 @@ async def on_startup() -> None:
 
     p = Path(engine.path)
     if p.exists():
-        os.remove(p)
+        p.unlink()
 
     await engine.prep_database()
     await _User.create_table().run()
