@@ -152,7 +152,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             warnings.warn(
                 "The signature of the `AbstractPage.create` method has changed. "
                 f"Please, update it to the new one. {_NEW_SIGNATURE}"
-                "Support of old signature will be removed in the next major release (0.13.0).",
+                "\nSupport of old signature will be removed in the next major release (0.13.0).",
                 DeprecationWarning,
                 stacklevel=3,
             )
