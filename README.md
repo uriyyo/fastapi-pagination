@@ -96,5 +96,5 @@ def get_users(db: Session = Depends(get_db)):
 Code from `Quickstart` will generate OpenAPI schema as bellow:
 
 <div align="center">
-<img alt="app-example" src="https://raw.githubusercontent.com/uriyyo/fastapi-pagination/main/docs/img/example.jpeg">
+<img alt="app-example" src="https://raw.githubusercontent.com/uriyyo/fastapi-pagination/main/docs/img/example.png">
 </div>
