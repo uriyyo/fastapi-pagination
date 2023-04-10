@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from sqlalchemy import create_engine, select
-from sqlalchemy.orm import Mapped, mapped_column, Session, DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
 from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage
@@ -47,7 +47,7 @@ def on_startup():
                 User(name="John", age=25),
                 User(name="Jane", age=30),
                 User(name="Bob", age=20),
-            ]
+            ],
         )
         session.commit()
 

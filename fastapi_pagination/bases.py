@@ -34,7 +34,7 @@ from typing import (
 
 from pydantic import BaseModel, create_model
 from pydantic.generics import GenericModel
-from typing_extensions import TypeGuard, Self
+from typing_extensions import Self, TypeGuard
 
 from .types import Cursor, GreaterEqualZero, ParamsType
 
@@ -98,7 +98,7 @@ class AbstractParams(ABC):
 
 def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping[str, Any]:
     if not issubclass(cls, BaseModel):
-        raise ValueError(f"{cls.__name__} must be subclass of BaseModel")
+        raise TypeError(f"{cls.__name__} must be subclass of BaseModel")
 
     incorrect = sorted(fields.keys() - cls.__fields__.keys() - cls.__class_vars__)
     if incorrect:
@@ -109,7 +109,7 @@ def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping
     return {name: (annotations[name], val) for name, val in fields.items()}
 
 
-def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type:  # type: ignore  # noqa
+def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type:  # type: ignore
     return int
 
 
@@ -170,7 +170,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
     def with_custom_options(cls, **kwargs: Any) -> Type[Self]:
         params_cls = cls.__params_type__
 
-        custom_params: Any = create_model(  # noqa
+        custom_params: Any = create_model(
             params_cls.__name__,
             __base__=params_cls,
             **_create_params(params_cls, kwargs),
@@ -190,7 +190,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         new_cls = new_class("CustomPage", bases, exec_body=lambda ns: setitem(ns, "__params_type__", custom_params))
         new_cls = update_wrapper(new_cls, cls, updated=())
 
-        return new_cls  # noqa
+        return new_cls
 
     class Config:
         arbitrary_types_allowed = True

@@ -8,27 +8,26 @@ __all__ = [
 
 import warnings
 from contextlib import suppress
-from typing import Any, Optional, Union, overload, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
 from sqlalchemy import func, literal_column, select
-from sqlalchemy.orm import Query, noload, Session
+from sqlalchemy.orm import Query, Session, noload
 from typing_extensions import TypeAlias
 
-from .utils import generic_query_apply_params, unwrap_scalars
-from ..api import create_page, apply_items_transformer
-from ..bases import AbstractParams, AbstractPage, is_cursor
-from ..types import AdditionalData, ItemsTransformer, SyncItemsTransformer, AsyncItemsTransformer
+from ..api import apply_items_transformer, create_page
+from ..bases import AbstractPage, AbstractParams, is_cursor
+from ..types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 from ..utils import verify_params
-
+from .utils import generic_query_apply_params, unwrap_scalars
 
 if TYPE_CHECKING:
-    from sqlalchemy.sql import Select
-    from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
     from sqlalchemy.engine import Connection
+    from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
+    from sqlalchemy.sql import Select
 
 
 try:
-    from sqlalchemy.util import greenlet_spawn, await_only
+    from sqlalchemy.util import await_only, greenlet_spawn
 except ImportError:  # pragma: no cover
 
     async def greenlet_spawn(*_: Any, **__: Any) -> Any:  # type: ignore
@@ -100,19 +99,19 @@ def exec_pagination(
             next_=page.paging.bookmark_next if page.paging.has_next else None,
             **(additional_data or {}),
         )
-    else:
-        total = conn.scalar(count_query(query))
-        query = paginate_query(query, params)
-        items = _maybe_unique(conn.execute(query), unique)
-        items = unwrap_scalars(items)
-        items = _apply_items_transformer(items, transformer)
 
-        return create_page(
-            items,
-            total=total,
-            params=params,
-            **(additional_data or {}),
-        )
+    total = conn.scalar(count_query(query))
+    query = paginate_query(query, params)
+    items = _maybe_unique(conn.execute(query), unique)
+    items = unwrap_scalars(items)
+    items = _apply_items_transformer(items, transformer)
+
+    return create_page(
+        items,
+        total=total,
+        params=params,
+        **(additional_data or {}),
+    )
 
 
 def _get_sync_conn_from_async(conn: Any) -> SyncConn:  # pragma: no cover
@@ -165,7 +164,8 @@ async def paginate(
 
 def paginate(*args: Any, **kwargs: Any) -> Any:
     try:
-        assert args and isinstance(args[0], Query)
+        assert args
+        assert isinstance(args[0], Query)
         query, conn, params, transformer, additional_data, unique = _old_paginate_sign(*args, **kwargs)
     except (TypeError, AssertionError):
         query, conn, params, transformer, additional_data, unique = _new_paginate_sign(*args, **kwargs)
@@ -175,7 +175,14 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
     with suppress(TypeError):
         sync_conn = _get_sync_conn_from_async(conn)
         return greenlet_spawn(
-            exec_pagination, query, params, sync_conn, transformer, additional_data, unique, async_=True
+            exec_pagination,
+            query,
+            params,
+            sync_conn,
+            transformer,
+            additional_data,
+            unique,
+            async_=True,
         )
 
     return exec_pagination(query, params, conn, transformer, additional_data, unique, async_=False)

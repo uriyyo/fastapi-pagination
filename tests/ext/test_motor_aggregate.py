@@ -58,6 +58,6 @@ class TestMotorAggregate(BasePaginationTestCase):
             [
                 {"$group": {"_id": "$name", "name": {"$first": "$name"}}},
                 {"$sort": {"name": 1}},
-            ]
+            ],
         )
         return await cursor.to_list(length=None)

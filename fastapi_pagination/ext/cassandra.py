@@ -6,7 +6,7 @@ from cassandra.cluster import SimpleStatement
 from cassandra.cqlengine import connection
 from cassandra.cqlengine.models import Model
 
-from ..api import create_page, apply_items_transformer
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, SyncItemsTransformer
 from ..utils import verify_params
@@ -32,7 +32,9 @@ def paginate(
     conn = connection.get_connection()
 
     cursor = conn.session.execute(
-        stmt, parameters={str(i): v for i, v in enumerate(query_filter.values())}, paging_state=raw_params.cursor
+        stmt,
+        parameters={str(i): v for i, v in enumerate(query_filter.values())},
+        paging_state=raw_params.cursor,
     )
     items = cursor.current_rows
     t_items = apply_items_transformer(items, transformer)

@@ -1,14 +1,14 @@
 __all__ = ["paginate"]
 
-from typing import List, Tuple, Optional, Type, TypeVar, Union, Any
+from typing import Any, List, Optional, Tuple, Type, TypeVar, Union
 
 from beanie import Document
 from beanie.odm.enums import SortDirection
-from beanie.odm.interfaces.aggregate import DocumentProjectionType, ClientSession
+from beanie.odm.interfaces.aggregate import ClientSession, DocumentProjectionType
 from beanie.odm.queries.aggregation import AggregationQuery
 from beanie.odm.queries.find import FindMany
 
-from ..api import create_page, apply_items_transformer
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
@@ -43,7 +43,7 @@ async def paginate(
         aggregation_query.aggregation_pipeline.extend(
             [
                 {"$facet": {"metadata": [{"$count": "total"}], "data": paginate_data}},
-            ]
+            ],
         )
         data = (await aggregation_query.to_list())[0]
         items = data["data"]
@@ -64,7 +64,11 @@ async def paginate(
             **pymongo_kwargs,
         ).to_list()
         total = await query.find(
-            {}, session=session, ignore_cache=ignore_cache, fetch_links=False, **pymongo_kwargs
+            {},
+            session=session,
+            ignore_cache=ignore_cache,
+            fetch_links=False,
+            **pymongo_kwargs,
         ).count()
 
     t_items = await apply_items_transformer(items, transformer, async_=True)

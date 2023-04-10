@@ -5,7 +5,7 @@ __all__ = ["paginate"]
 import warnings
 from typing import Any, Optional, Union
 
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlalchemy.sql import Select
 
 from ..bases import AbstractParams

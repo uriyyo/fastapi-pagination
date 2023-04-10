@@ -1,10 +1,10 @@
-from typing import TypeVar, Generic, Sequence, Optional, Any
+from typing import Any, Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
 from typing_extensions import Self
 
-from fastapi_pagination.bases import AbstractParams, AbstractPage, RawParams
+from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
 
 
 class JSONAPIParams(BaseModel, AbstractParams):

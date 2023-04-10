@@ -1,11 +1,11 @@
-from typing import Callable, Optional, Sequence, TypeVar, Any
+from typing import Any, Callable, Optional, Sequence, TypeVar
 
 __all__ = ["paginate"]
 
-from .api import create_page, apply_items_transformer
+from .api import apply_items_transformer, create_page
 from .bases import AbstractParams
 from .types import AdditionalData, SyncItemsTransformer
-from .utils import verify_params, check_installed_extensions
+from .utils import check_installed_extensions, verify_params
 
 T = TypeVar("T")
 

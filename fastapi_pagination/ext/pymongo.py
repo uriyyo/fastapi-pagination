@@ -4,7 +4,7 @@ from typing import Any, Dict, Mapping, Optional, TypeVar
 
 from pymongo.collection import Collection
 
-from ..api import create_page, apply_items_transformer
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, SyncItemsTransformer
 from ..utils import verify_params

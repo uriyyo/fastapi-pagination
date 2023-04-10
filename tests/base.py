@@ -8,7 +8,7 @@ from fastapi_pagination.limit_offset import LimitOffsetPage, LimitOffsetParams
 from fastapi_pagination.paginator import paginate
 
 from .schemas import UserOut, UserWithOrderOut
-from .utils import normalize, OptionalPage, OptionalLimitOffsetPage
+from .utils import OptionalLimitOffsetPage, OptionalPage, normalize
 
 _default_params = [
     Params(page=1),
@@ -63,7 +63,7 @@ class BasePaginationTestCase:
     def pagination_type(self):
         return "default"
 
-    @fixture
+    @fixture()
     def path(self, cls_name, pagination_type):
         base = "default" if cls_name == "page" else "limit-offset"
 
@@ -121,7 +121,7 @@ class BasePaginationTestCase:
         assert a == b
 
     @mark.parametrize(
-        "params,cls_name",
+        ("params", "cls_name"),
         [
             *[(p, "page") for p in _default_params],
             *[(p, "limit_offset_page") for p in _limit_offset_params],
