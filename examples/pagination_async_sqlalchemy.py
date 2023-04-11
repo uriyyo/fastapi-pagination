@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Any, AsyncIterator
 
 import uvicorn
@@ -41,11 +42,8 @@ class UserOut(UserIn):
         orm_mode = True
 
 
-app = FastAPI()
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
+@asynccontextmanager
+async def lifespan() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -53,11 +51,15 @@ async def on_startup() -> None:
     async with async_session() as session:
         session.add_all([User(name=faker.name(), email=faker.email()) for _ in range(100)])
         await session.commit()
+    yield
 
 
 async def get_db() -> AsyncIterator[AsyncSession]:
     async with async_session() as session:
         yield session
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/users", response_model=UserOut)
