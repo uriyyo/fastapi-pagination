@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Any, Iterator
 
 import uvicorn
@@ -43,17 +44,18 @@ class UserOut(UserIn):
         orm_mode = True
 
 
-app = FastAPI()
-
-
-@app.on_event("startup")
-def on_startup() -> None:
+@asynccontextmanager
+async def lifespan() -> None:
     session = SessionLocal()
 
     session.add_all([User(name=faker.name(), email=faker.email()) for _ in range(100)])
 
     session.flush()
     session.close()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 def get_db() -> Iterator[Session]:

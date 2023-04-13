@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Any
 
 import sqlalchemy
@@ -27,11 +28,8 @@ class User(Model):
     email = String(max_length=100)
 
 
-app = FastAPI()
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
+@asynccontextmanager
+async def lifespan() -> None:
     engine = sqlalchemy.create_engine(str(db.url))
     metadata.drop_all(engine)
     metadata.create_all(engine)
@@ -43,6 +41,10 @@ async def on_startup() -> None:
             name=faker.name(),
             email=faker.email(),
         )
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.on_event("shutdown")

@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Any
 
 import uvicorn
@@ -25,16 +26,17 @@ class UserOut(UserIn):
         orm_mode = True
 
 
-app = FastAPI()
-client: AsyncIOMotorClient
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
+@asynccontextmanager
+async def lifespan() -> None:
     global client
     client = AsyncIOMotorClient("mongodb://localhost:27017")
 
     await client.test.users.insert_many([{"name": faker.name(), "email": faker.email()} for _ in range(100)])
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+client: AsyncIOMotorClient
 
 
 @app.post("/users", response_model=UserOut)
