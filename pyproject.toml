@@ -40,6 +40,7 @@ pony = { version = "^0.7.16", optional = true}
 beanie = { version = "^1.11.9", optional = true}
 sqlakeyset = { version = "^2.0.1680321678", optional = true }
 scylla-driver = {version = "^3.25.6", optional = true}
+bunnet = {version = "^1.1.0", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.3.1"
@@ -72,10 +73,11 @@ asyncpg = ["SQLAlchemy", "asyncpg"]
 django = ["django", "databases"]
 piccolo = ["piccolo"]
 motor = ["motor"]
+bunnet = ["bunnet"]
 mongoengine = ["mongoengine"]
 beanie =  ["beanie"]
 scylla-driver = ["scylla-driver"]
-all = ["sqlmodel", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine", "pony", "beanie", "sqlakeyset", "scylla-driver"]
+all = ["sqlmodel", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine", "pony", "beanie", "sqlakeyset", "scylla-driver", "bunnet"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
