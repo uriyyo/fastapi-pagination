@@ -1,5 +1,6 @@
 from typing import Iterator, List
 
+from _pytest.python_api import raises
 from fastapi import Depends, FastAPI, status
 from pydantic import parse_obj_as
 from pytest import fixture, mark
@@ -29,6 +30,10 @@ def app(sa_user, sa_order, sa_session):
     @app.get("/", response_model=CursorPage[UserOut])
     def route(db: Session = Depends(get_db)):
         return paginate(db, select(sa_user).order_by(sa_user.id, sa_user.name))
+
+    @app.get("/no-order", response_model=CursorPage[UserOut])
+    def route_on_order(db: Session = Depends(get_db)):
+        return paginate(db, select(sa_user))
 
     return add_pagination(app)
 
@@ -74,3 +79,13 @@ async def test_cursor(app, client, entities):
         cursor = data["previous_page"]
 
     assert items == entities
+
+
+@sqlalchemy20
+@mark.asyncio
+async def test_no_order(app, client, entities):
+    with raises(
+        ValueError,
+        match="^Cursor pagination requires ordering$",
+    ):
+        await client.get("/no-order")
