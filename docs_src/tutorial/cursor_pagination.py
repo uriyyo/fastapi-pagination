@@ -10,7 +10,7 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 app = FastAPI()
 add_pagination(app)
 
-engine = create_engine("sqlite:///.db", connect_args={"check_same_thread": False})
+engine = create_engine("sqlite:///.db")
 
 
 class Base(DeclarativeBase):
@@ -55,4 +55,4 @@ def on_startup():
 @app.get("/users")
 def get_users() -> CursorPage[UserOut]:
     with Session(engine) as session:
-        return paginate(session, select(User))
+        return paginate(session, select(User).order_by(User.id))
