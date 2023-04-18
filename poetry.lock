@@ -216,6 +216,25 @@ jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
+name = "bunnet"
+version = "1.1.0"
+description = "Synchronous Python ODM for MongoDB"
+category = "main"
+optional = true
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "bunnet-1.1.0-py3-none-any.whl", hash = "sha256:860d79bed3f97c0e45e631a725e6da22598712dad2a599240d62c5ee581dde1a"},
+    {file = "bunnet-1.1.0.tar.gz", hash = "sha256:e8e4aa61129c164f774a6549937f85507999cccef1a6591ac0ad175e695fe8c5"},
+]
+
+[package.dependencies]
+click = ">=7"
+lazy-model = ">=0.0.3"
+pydantic = ">=1.9.0"
+pymongo = "*"
+toml = "*"
+
+[[package]]
 name = "certifi"
 version = "2022.12.7"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -1867,11 +1886,15 @@ optional = true
 python-versions = "*"
 files = [
     {file = "scylla-driver-3.26.0.tar.gz", hash = "sha256:1f45c7a4cbda26853d7b55a5c7ec0c1f6cbd300ac20a12fb5085110b2de5f616"},
+    {file = "scylla_driver-3.26.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:cccbc07bfd0771fdf02da3d1c06b7e818e42d3f5df4f602a2667fe1ae153b09b"},
     {file = "scylla_driver-3.26.0-cp310-cp310-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:5311149d980112030d89b5106e84006c6f5e73d3178c227ddd7f216bb078053e"},
+    {file = "scylla_driver-3.26.0-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:fd5fe13e520cff68eb79cf1ac426f3640454e3cc3575bf0ac4cb845d98204b82"},
     {file = "scylla_driver-3.26.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9e883903f1724f4984dedb38d42646c893f7d86b0fffd49ac513d38d145e8add"},
     {file = "scylla_driver-3.26.0-cp310-cp310-win32.whl", hash = "sha256:b11e0591c8ea94ab12b95633ef7fb7e497a1956d7b3745a7217aeb0758106cc0"},
     {file = "scylla_driver-3.26.0-cp310-cp310-win_amd64.whl", hash = "sha256:61cb00582aa77cc259353c5906b4fd2d53b4ec82abc9ca93b72ba297768ba71a"},
+    {file = "scylla_driver-3.26.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:3d8a906fb5958ca12aa1f7802cb5fa06a00492b2bdd33d53c919106f711b0a34"},
     {file = "scylla_driver-3.26.0-cp311-cp311-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:93b74a1e6392184e078d5003e65367aee459a25604620e3ae3bd60b5df17dd78"},
+    {file = "scylla_driver-3.26.0-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:c192e0620386e4438902354837c4615524ee816a3e2c1e8ee472ed9e8e20fe43"},
     {file = "scylla_driver-3.26.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4d633da18d021452992c21ffaeebad2f7e085f827fdf851baf233c7c4ae82ff1"},
     {file = "scylla_driver-3.26.0-cp311-cp311-win32.whl", hash = "sha256:7998954f69b04e2a195f205f6277dd6441d7c43d180532f682449af92c338d47"},
     {file = "scylla_driver-3.26.0-cp311-cp311-win_amd64.whl", hash = "sha256:562313ccd817aa345769d38fe284d82cf366ccabb752236bd105c7f3819890fe"},
@@ -1881,11 +1904,15 @@ files = [
     {file = "scylla_driver-3.26.0-cp37-cp37m-win32.whl", hash = "sha256:2ec5f5fbb36652603d4db67ce1e02b967756c54d176be56e8a7f9d37211bcdf2"},
     {file = "scylla_driver-3.26.0-cp37-cp37m-win_amd64.whl", hash = "sha256:065fcad633ade0312cbde3918fff9150b9022e357c6b2d0ba11469c627b37e67"},
     {file = "scylla_driver-3.26.0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:8bd2b23d6c87a40a8fccc7883281ba97591f26986fe54cac72ccde16ef709bc8"},
+    {file = "scylla_driver-3.26.0-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ceae17e7074dae999577e7ab61060f9cbdbadb6910590e98e8b343c7eb744700"},
     {file = "scylla_driver-3.26.0-cp38-cp38-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:6746aa5014f5901dd904f306cfc1c0324c9780ce56ed6c56026d0533b7897d97"},
+    {file = "scylla_driver-3.26.0-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:0be45c2af6e4025a2d08897f3a12755d75924bbc562509f298ae614461a60cc3"},
     {file = "scylla_driver-3.26.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f79d969d4d617751e70acdec2e29b0cf0d92a8866d85ea23e4d8d609177382ca"},
     {file = "scylla_driver-3.26.0-cp38-cp38-win32.whl", hash = "sha256:e30515c05ec17e3fe14e22dfec198597d45d2a31922824c73e0677ac1a1a06ec"},
     {file = "scylla_driver-3.26.0-cp38-cp38-win_amd64.whl", hash = "sha256:599c2c02ae187c632470a9af94f457e247e9456fcbb4ad8e85099a3a1ec51701"},
+    {file = "scylla_driver-3.26.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:6165891e1b84b44e7e89876f0b56f6404d6f3f8aa15bf80effa4aa53ada5f57c"},
     {file = "scylla_driver-3.26.0-cp39-cp39-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:3e133940782da814546cecf5225fb092d3d94200417a6d3dfeac29156e8f2cbf"},
+    {file = "scylla_driver-3.26.0-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:614a2530cbcc8b4a5c21a8654b0236a0266b6fcf9e345f3a0017a6d243fe8dad"},
     {file = "scylla_driver-3.26.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0dd8f7ee5c0348f3ee825ba6f9fdff2aadc1b5955aeecdb5b6de2db39e6fdb7a"},
     {file = "scylla_driver-3.26.0-cp39-cp39-win32.whl", hash = "sha256:e4563f3c2f7f0bbf062610f5356617bafc2a66cfd1459ca7187d1b3917ab5b0e"},
     {file = "scylla_driver-3.26.0-cp39-cp39-win_amd64.whl", hash = "sha256:965d739f8dd3f1dd46acdcd4a01f47bdb2933d345e80acdb81b0884538d12d3a"},
@@ -2328,9 +2355,10 @@ docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker
 testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)"]
 
 [extras]
-all = ["sqlmodel", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine", "pony", "beanie", "sqlakeyset", "scylla-driver"]
+all = ["sqlmodel", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "asyncpg", "django", "piccolo", "motor", "mongoengine", "pony", "beanie", "sqlakeyset", "scylla-driver", "bunnet"]
 asyncpg = ["SQLAlchemy", "asyncpg"]
 beanie = ["beanie"]
+bunnet = ["bunnet"]
 databases = ["databases"]
 django = ["django", "databases"]
 mongoengine = ["mongoengine"]
@@ -2346,4 +2374,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "072d8605bbe2978e23cc34d3569c02753431f5e593af2241ed5afa7256bda420"
+content-hash = "4c68fbdfcf3d18f5a4c91f769ab5e52baa35378edc5a13be741f92ff0b5d61b1"

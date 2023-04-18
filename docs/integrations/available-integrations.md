@@ -14,6 +14,7 @@ Currently, `fastapi-pagination` supports:
 | [Pony ORM](https://docs.ponyorm.org/)                                  | `fastapi_pagination.ext.pony.paginate`        |
 | [Tortoise ORM](https://tortoise-orm.readthedocs.io/en/latest/)         | `fastapi_pagination.ext.tortoise.paginate`    |
 | [Beanie](https://roman-right.github.io/beanie/)                        | `fastapi_pagination.ext.beanie.paginate`      |
+| [Bunnet](https://roman-right.github.io/bunnet/)                        | `fastapi_pagination.ext.bunnet.paginate`      |
 | [PyMongo](https://pymongo.readthedocs.io/en/stable/)                   | `fastapi_pagination.ext.pymongo.paginate`     |
 | [MongoEngine](https://docs.mongoengine.org/)                           | `fastapi_pagination.ext.mongoengine.paginate` |
 | [Motor](https://motor.readthedocs.io/en/stable/)                       | `fastapi_pagination.ext.motor.paginate`       |
