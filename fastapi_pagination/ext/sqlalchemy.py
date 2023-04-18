@@ -10,7 +10,7 @@ import warnings
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
-from sqlalchemy import func, literal_column, select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Query, Session, noload
 from typing_extensions import TypeAlias
 
@@ -51,9 +51,16 @@ def paginate_query(query: Select, params: AbstractParams) -> Select:
     return generic_query_apply_params(query, params.to_raw_params().as_limit_offset())
 
 
-def count_query(query: Select) -> Select:
-    count_subquery = query.order_by(None).options(noload("*")).subquery()
-    return select(func.count(literal_column("*"))).select_from(count_subquery)
+def count_query(query: Select, *, use_subquery: bool = True) -> Select:
+    query = query.order_by(None).options(noload("*"))
+
+    if use_subquery:
+        return select(func.count()).select_from(query.subquery())
+
+    return query.with_only_columns(  # noqa: PIE804
+        func.count(),
+        **{"maintain_column_froms": True},
+    )
 
 
 def _maybe_unique(result: Any, unique: bool) -> Any:
@@ -66,6 +73,7 @@ def exec_pagination(
     conn: SyncConn,
     transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
+    subquery_count: bool = True,
     unique: bool = True,
     async_: bool = False,
 ) -> AbstractPage[Any]:
@@ -82,6 +90,8 @@ def exec_pagination(
     if is_cursor(raw_params):
         if paging is None:
             raise ImportError("sqlakeyset is not installed")
+        if not getattr(query, "_order_by_clauses", True):
+            raise ValueError("Cursor pagination requires ordering")
 
         page = paging.select_page(
             conn,
@@ -100,7 +110,7 @@ def exec_pagination(
             **(additional_data or {}),
         )
 
-    total = conn.scalar(count_query(query))
+    total = conn.scalar(count_query(query, use_subquery=subquery_count))
     query = paginate_query(query, params)
     items = _maybe_unique(conn.execute(query), unique)
     items = unwrap_scalars(items)
@@ -130,6 +140,7 @@ def paginate(
     query: Query[Any],
     params: Optional[AbstractParams] = None,
     *,
+    subquery_count: bool = True,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
@@ -142,6 +153,7 @@ def paginate(
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
+    subquery_count: bool = True,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
@@ -155,6 +167,7 @@ async def paginate(
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
+    subquery_count: bool = True,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
@@ -166,9 +179,9 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
     try:
         assert args
         assert isinstance(args[0], Query)
-        query, conn, params, transformer, additional_data, unique = _old_paginate_sign(*args, **kwargs)
+        query, conn, params, transformer, additional_data, unique, subquery_count = _old_paginate_sign(*args, **kwargs)
     except (TypeError, AssertionError):
-        query, conn, params, transformer, additional_data, unique = _new_paginate_sign(*args, **kwargs)
+        query, conn, params, transformer, additional_data, unique, subquery_count = _new_paginate_sign(*args, **kwargs)
 
     params, _ = verify_params(params, "limit-offset", "cursor")
 
@@ -181,20 +194,22 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
             sync_conn,
             transformer,
             additional_data,
+            subquery_count,
             unique,
             async_=True,
         )
 
-    return exec_pagination(query, params, conn, transformer, additional_data, unique, async_=False)
+    return exec_pagination(query, params, conn, transformer, additional_data, subquery_count, unique, async_=False)
 
 
 def _old_paginate_sign(
     query: Query[Any],
     params: Optional[AbstractParams] = None,
     *,
+    subquery_count: bool = True,
     transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
-) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool]:
+) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool, bool]:
     if query.session is None:
         raise ValueError("query.session is None")
 
@@ -205,7 +220,7 @@ def _old_paginate_sign(
         stacklevel=3,
     )
 
-    return query, query.session, params, transformer, additional_data, True  # type: ignore
+    return query, query.session, params, transformer, additional_data, True, subquery_count  # type: ignore
 
 
 def _new_paginate_sign(
@@ -213,8 +228,9 @@ def _new_paginate_sign(
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
+    subquery_count: bool = True,
     transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
-) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool]:
-    return query, conn, params, transformer, additional_data, unique
+) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool, bool]:
+    return query, conn, params, transformer, additional_data, unique, subquery_count
