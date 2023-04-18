@@ -38,11 +38,21 @@ def pytest_addoption(parser):
         action="store_true",
         default=False,
     )
+    parser.addoption(
+        "--sql-tests",
+        action="store_true",
+        default=False,
+    )
 
 
 @fixture(scope="session")
 def is_unit_tests_run(request):
     return request.config.getoption("--unit-tests")
+
+
+@fixture(scope="session")
+def is_sql_tests_run(request):
+    return request.config.getoption("--sql-tests")
 
 
 @fixture(scope="session")
@@ -75,8 +85,8 @@ def entities(raw_data):
 
 
 @fixture(scope="session")
-def cassandra_session(cassandra_address, is_unit_tests_run):
-    if is_unit_tests_run:
+def cassandra_session(cassandra_address, is_unit_tests_run, is_sql_tests_run):
+    if is_unit_tests_run or is_sql_tests_run:
         return
 
     with Cluster(
@@ -180,8 +190,8 @@ async def _setup_sqlite(sqlite_file, raw_data, is_unit_tests_run):
 
 
 @async_fixture(scope="session", autouse=True)
-async def _setup_mongodb(mongodb_url, raw_data, is_unit_tests_run):
-    if is_unit_tests_run:
+async def _setup_mongodb(mongodb_url, raw_data, is_unit_tests_run, is_sql_tests_run):
+    if is_unit_tests_run or is_sql_tests_run:
         return
 
     client = AsyncIOMotorClient(mongodb_url)
