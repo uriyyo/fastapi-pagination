@@ -60,7 +60,7 @@ requests = "^2.28.2"
 uvicorn = "^0.21.1"
 Jinja2 = "^3.1.2"
 mypy = "^1.2.0"
-ruff = "^0.0.262"
+ruff = "^0.0.263"
 
 [tool.poetry.extras]
 sqlmodel = ["sqlmodel", "sqlakeyset"]
