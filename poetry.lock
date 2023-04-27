@@ -1251,14 +1251,14 @@ files = [
 
 [[package]]
 name = "piccolo"
-version = "0.109.0"
+version = "0.110.0"
 description = "A fast, user friendly ORM and query builder which supports asyncio."
 category = "main"
 optional = true
 python-versions = ">=3.7.0"
 files = [
-    {file = "piccolo-0.109.0-py3-none-any.whl", hash = "sha256:c6bcbf0255047f60e642f1631b4b2b4dc845420190412e0a24211141f6483bd8"},
-    {file = "piccolo-0.109.0.tar.gz", hash = "sha256:0508a5b834a4a51aa83a93274ff15cb468f6b408b4e4496f91fa8e6822bc045c"},
+    {file = "piccolo-0.110.0-py3-none-any.whl", hash = "sha256:daf20547df5bb04834a4c5db71dd425eeeba65d07b29a78c8ace211419012d7a"},
+    {file = "piccolo-0.110.0.tar.gz", hash = "sha256:422c9f8274072c0be0848fcd008dc785049a59e33da592f400b7d38c21277aeb"},
 ]
 
 [package.dependencies]
@@ -2374,4 +2374,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "0332b262a02b348cc91e837bff61b69da3820eeec9bb061278c7b216e37a9e33"
+content-hash = "8e4731d7ba4d53bbbe5c83cda6c5d50a41da13438f1cd7b652a1715769f80a85"
