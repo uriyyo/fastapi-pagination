@@ -4,31 +4,28 @@ import uvicorn
 from faker import Faker
 from fastapi import Depends, FastAPI
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 faker = Faker()
 
-engine = create_engine("sqlite:///.db", connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=True, autoflush=True, bind=engine)
+engine = create_engine("sqlite:///.db")
 
-Base = declarative_base(bind=engine)
+
+class Base(MappedAsDataclass, DeclarativeBase):
+    pass
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    email = Column(String, nullable=False)
+    name: Mapped[str]
+    email: Mapped[str]
 
-
-Base.metadata.drop_all()
-Base.metadata.create_all()
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, default=None)
 
 
 class UserIn(BaseModel):
@@ -44,42 +41,39 @@ class UserOut(UserIn):
 
 
 app = FastAPI()
+add_pagination(app)
 
 
 @app.on_event("startup")
 def on_startup() -> None:
-    session = SessionLocal()
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
-    session.add_all([User(name=faker.name(), email=faker.email()) for _ in range(100)])
+    session = Session(engine)
 
-    session.flush()
-    session.close()
+    with session.begin():
+        session.add_all([User(name=faker.name(), email=faker.email()) for _ in range(100)])
 
 
 def get_db() -> Iterator[Session]:
-    db = SessionLocal()
-    try:
+    with Session(engine) as db, db.begin():
         yield db
-    finally:
-        db.close()
 
 
-@app.post("/users", response_model=UserOut)
-def create_user(user_in: UserIn, db: Session = Depends(get_db)) -> User:
+@app.post("/users")
+def create_user(user_in: UserIn, db: Session = Depends(get_db)) -> UserOut:
     user = User(name=user_in.name, email=user_in.email)
     db.add(user)
-    db.flush()
+    db.commit()
 
-    return user
+    return UserOut.from_orm(user)
 
 
 @app.get("/users/default", response_model=Page[UserOut])
 @app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
 def get_users(db: Session = Depends(get_db)) -> Any:
-    return paginate(db.query(User))
+    return paginate(db, select(User))
 
-
-add_pagination(app)
 
 if __name__ == "__main__":
     uvicorn.run("pagination_sqlalchemy:app")
