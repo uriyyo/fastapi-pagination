@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 __all__ = ["paginate"]
 
 from typing import Any, Dict, Mapping, Optional, TypeVar
