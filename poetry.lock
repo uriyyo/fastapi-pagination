@@ -148,14 +148,14 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "beanie"
-version = "1.18.1"
+version = "1.19.0"
 description = "Asynchronous Python ODM for MongoDB"
 category = "main"
 optional = true
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "beanie-1.18.1-py3-none-any.whl", hash = "sha256:9deb7524d1ab3545c715d048bfb8d05c261e4491f7f9518dc1eeef5dc1f30ef1"},
-    {file = "beanie-1.18.1.tar.gz", hash = "sha256:d72ebf5d153997e1aef0f0e04cb44baca55219516f489db64fede1012091fa24"},
+    {file = "beanie-1.19.0-py3-none-any.whl", hash = "sha256:b8f61c1e15eac43e0fe62b01d1b5f520b8f69ece5ca5b8672c0bfeb560ca873c"},
+    {file = "beanie-1.19.0.tar.gz", hash = "sha256:31a95a17b3059f232510279f09ebb1221c5fa5d71e28368752f600bc05a10046"},
 ]
 
 [package.dependencies]
