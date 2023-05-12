@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Any
 
 import sqlalchemy
@@ -36,11 +37,8 @@ class UserOut(UserIn):
         orm_mode = True
 
 
-app = FastAPI()
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
+@asynccontextmanager
+async def lifespan() -> None:
     engine = sqlalchemy.create_engine(str(db.url))
     metadata.drop_all(engine)
     metadata.create_all(engine)
@@ -55,11 +53,11 @@ async def on_startup() -> None:
                 "email": faker.email(),
             },
         )
-
-
-@app.on_event("shutdown")
-async def on_shutdown() -> None:
+    yield
     await db.disconnect()
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/users", response_model=UserOut)

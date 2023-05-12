@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Any
 
 import uvicorn
@@ -32,7 +33,17 @@ class UserOut(UserIn):
         orm_mode = True
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan() -> None:
+    for _ in range(100):
+        await User.create(
+            name=faker.name(),
+            email=faker.email(),
+        )
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 register_tortoise(
     app,
@@ -40,15 +51,6 @@ register_tortoise(
     modules={"models": [__name__]},
     generate_schemas=True,
 )
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
-    for _ in range(100):
-        await User.create(
-            name=faker.name(),
-            email=faker.email(),
-        )
 
 
 @app.post("/users", response_model=UserOut)

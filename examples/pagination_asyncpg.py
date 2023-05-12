@@ -1,5 +1,6 @@
 from typing import Any
 
+from contextlib import asynccontextmanager
 import uvicorn
 from asyncpg import Pool, create_pool
 from faker import Faker
@@ -24,12 +25,8 @@ class UserOut(UserIn):
         orm_mode = True
 
 
-app = FastAPI()
-pool: Pool
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
+@asynccontextmanager
+async def lifespan() -> None:
     global pool
     pool = await create_pool("postgresql://postgres:postgres@localhost:5432")
 
@@ -51,6 +48,11 @@ async def on_startup() -> None:
                 faker.name(),
                 faker.email(),
             )
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+pool: Pool
 
 
 @app.post("/users", response_model=UserOut)

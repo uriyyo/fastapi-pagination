@@ -38,12 +38,8 @@ class UserOut(UserIn):
         orm_mode = True
 
 
-app = FastAPI()
-db.init_app(app)
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
+@asynccontextmanager
+async def lifespan() -> None:
     await db.gino.drop_all()
     await db.gino.create_all()
 
@@ -52,6 +48,11 @@ async def on_startup() -> None:
             name=faker.name(),
             email=faker.email(),
         )
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+db.init_app(app)
 
 
 @app.post("/users", response_model=UserOut)
