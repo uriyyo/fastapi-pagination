@@ -11,9 +11,9 @@ _link_field = Field(example="/api/v1/users?limit=1&offset1")
 
 
 class Links(BaseModel):
-    first: str = _link_field
-    last: str = _link_field
-    self: str = _link_field
+    first: Optional[str] = _link_field
+    last: Optional[str] = _link_field
+    self: Optional[str] = _link_field
     next: Optional[str] = _link_field
     prev: Optional[str] = _link_field
 

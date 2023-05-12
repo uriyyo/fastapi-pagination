@@ -8,11 +8,11 @@ from databases import Database
 from sqlalchemy import func, select
 from sqlalchemy.sql import Select
 
-from .sqlalchemy import paginate_query
-from ..api import create_page
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
+from .sqlalchemy import paginate_query
 
 
 async def paginate(
@@ -20,6 +20,7 @@ async def paginate(
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     convert_to_mapping: bool = True,
 ) -> Any:
@@ -33,4 +34,11 @@ async def paginate(
     if convert_to_mapping:
         items = [{**item._mapping} for item in raw_items]
 
-    return create_page(items, total, params, **(additional_data or {}))
+    t_items = await apply_items_transformer(items, transformer, async_=True)
+
+    return create_page(
+        t_items,
+        total=total,
+        params=params,
+        **(additional_data or {}),
+    )

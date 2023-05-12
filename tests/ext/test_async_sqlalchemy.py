@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 
 from ..base import BasePaginationTestCase
+from .utils import sqlalchemy20
 
 try:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,5 +50,6 @@ def app(sa_session, sa_user, model_cls, model_with_rel_cls):
     return add_pagination(app)
 
 
+@sqlalchemy20
 class TestAsyncSQLAlchemy(BasePaginationTestCase):
     pagination_types = ["default", "non-scalar", "relationship"]

@@ -1,15 +1,16 @@
 __all__ = ["paginate"]
 
-from typing import List, Optional, Type, TypeVar, Union, Any
+from typing import Any, List, Optional, Type, TypeVar, Union
 
 from tortoise.models import Model
 from tortoise.query_utils import Prefetch
 from tortoise.queryset import QuerySet
 
-from ..api import create_page
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
+from .utils import generic_query_apply_params
 
 TModel = TypeVar("TModel", bound=Model)
 
@@ -32,6 +33,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     prefetch_related: Union[bool, List[Union[str, Prefetch]]] = False,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
@@ -40,6 +42,12 @@ async def paginate(
         query = query.all()
 
     total = await query.count()
-    items = await _generate_query(query, prefetch_related).offset(raw_params.offset).limit(raw_params.limit).all()
+    items = await generic_query_apply_params(_generate_query(query, prefetch_related), raw_params).all()
+    t_items = await apply_items_transformer(items, transformer, async_=True)
 
-    return create_page(items, total, params, **(additional_data or {}))
+    return create_page(
+        t_items,
+        total=total,
+        params=params,
+        **(additional_data or {}),
+    )

@@ -28,7 +28,6 @@ class User(models.Model):
 
 @fixture(scope="session")
 def app(cassandra_session, raw_data):
-
     connection.register_connection("cluster1", session=cassandra_session, default=True)
     management.sync_table(model=User, keyspaces=("ks",))
 
@@ -40,7 +39,7 @@ def app(cassandra_session, raw_data):
 
     @app.get("/", response_model=CursorPage[UserOut])
     def route():
-        return paginate(User.objects().order_by("id").allow_filtering(), query_filter=dict(group="GC"))
+        return paginate(User.objects().order_by("id").allow_filtering(), query_filter={"group": "GC"})
 
     return add_pagination(app)
 

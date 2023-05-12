@@ -4,9 +4,9 @@ from typing import Any, Optional
 
 from asyncpg import Connection
 
-from ..api import create_page
+from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
-from ..types import AdditionalData
+from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
 
 
@@ -15,24 +15,30 @@ async def paginate(
     conn: Connection,
     query: str,
     *args: Any,
+    transformer: Optional[AsyncItemsTransformer] = None,
     params: Optional[AbstractParams] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     total = await conn.fetchval(
-        f"SELECT count(*) FROM ({query}) AS _pagination_query",
+        f"SELECT count(*) FROM ({query}) AS _pagination_query",  # noqa: S608
         *args,
     )
 
-    items = await conn.fetch(
-        f"{query} LIMIT {raw_params.limit} OFFSET {raw_params.offset}",
-        *args,
-    )
+    limit_offset_str = ""
+    if raw_params.limit is not None:
+        limit_offset_str += f" LIMIT {raw_params.limit}"
+    if raw_params.offset is not None:
+        limit_offset_str += f" OFFSET {raw_params.offset}"
+
+    items = await conn.fetch(f"{query} {limit_offset_str}", *args)
+    items = [{**r} for r in items]
+    t_items = await apply_items_transformer(items, transformer, async_=True)
 
     return create_page(
-        [{**r} for r in items],
-        total,
-        params,
+        t_items,
+        total=total,
+        params=params,
         **(additional_data or {}),
     )

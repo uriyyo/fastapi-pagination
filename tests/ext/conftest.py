@@ -42,7 +42,7 @@ def sa_session(sa_engine, is_async_db):
 
 @fixture(scope="session")
 def sa_base(sa_engine):
-    return declarative_base(bind=sa_engine)
+    return declarative_base()
 
 
 @fixture(scope="session")

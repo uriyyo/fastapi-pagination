@@ -1,3 +1,4 @@
+import re
 from typing import ClassVar, Generic, Optional, Sequence, TypeVar
 
 from pytest import mark, raises, warns
@@ -18,7 +19,7 @@ def test_custom_page_invalid_params_cls():
     class CustomPage(Page[T], Generic[T]):
         __params_type__ = CustomParams
 
-    with raises(ValueError, match="^CustomParams must be subclass of BaseModel$"):
+    with raises(TypeError, match="^CustomParams must be subclass of BaseModel$"):
         CustomPage.with_custom_options(size=10)
 
 
@@ -100,9 +101,11 @@ def test_params_cast():
 
 
 def test_deprecated_signature():
-    massage = (
+    massage = re.compile(
         r"^The signature of the `AbstractPage\.create` method has changed\. Please, update it to the new one\. "
-        r"\(items: 'Sequence\[T\]', params: 'AbstractParams', \*\*kwargs: 'Any'\) \-\> 'Type'$"
+        r"\(items: 'Sequence\[T\]', params: 'AbstractParams', \*\*kwargs: 'Any'\) \-\> 'Type'"
+        r"\nSupport of old signature will be removed in the next major release \(0\.13\.0\)\.$",
+        re.DOTALL | re.MULTILINE,
     )
 
     # old signature
@@ -110,7 +113,7 @@ def test_deprecated_signature():
 
         class P1(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 items: Sequence[T],
                 total: Optional[int],
@@ -123,7 +126,7 @@ def test_deprecated_signature():
 
         class P2(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 items: Sequence[T],
                 params: AbstractParams,
@@ -135,7 +138,7 @@ def test_deprecated_signature():
 
         class P3(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 items: Sequence[T],
                 /,
@@ -149,7 +152,7 @@ def test_deprecated_signature():
 
         class P4(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 items: Sequence[T],
                 params: AbstractParams,
@@ -163,7 +166,7 @@ def test_deprecated_signature():
 
         class P5(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 items: Sequence[T],
                 params: AbstractParams,
@@ -178,7 +181,7 @@ def test_deprecated_signature():
 
         class P6(Page[T], Generic[T]):
             @classmethod
-            def create(  # noqa
+            def create(
                 cls,
                 data: Sequence[T],
                 params: AbstractParams,
@@ -190,7 +193,7 @@ def test_deprecated_signature():
     with warns(DeprecationWarning, match=massage):
 
         class P7(Page[T], Generic[T]):
-            def create(  # noqa
+            def create(
                 cls,
                 data: Sequence[T],
                 params: AbstractParams,

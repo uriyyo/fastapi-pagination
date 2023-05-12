@@ -41,8 +41,8 @@ def User(meta, db):
 def query(request, User):
     if request.param:
         return User
-    else:
-        return User.objects
+
+    return User.objects
 
 
 @fixture(scope="session")

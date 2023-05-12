@@ -34,7 +34,7 @@ from typing import (
 
 from pydantic import BaseModel, create_model
 from pydantic.generics import GenericModel
-from typing_extensions import TypeGuard
+from typing_extensions import Self, TypeGuard
 
 from .types import Cursor, GreaterEqualZero, ParamsType
 
@@ -70,10 +70,16 @@ def is_cursor(params: BaseRawParams) -> TypeGuard[CursorRawParams]:
 
 @dataclass
 class RawParams(BaseRawParams):
-    limit: int
-    offset: int
+    limit: Optional[int] = None
+    offset: Optional[int] = None
 
     type: ClassVar[ParamsType] = "limit-offset"
+
+    def as_slice(self) -> slice:
+        return slice(
+            self.offset,
+            (self.offset or 0) + self.limit if self.limit is not None else None,
+        )
 
 
 @dataclass
@@ -92,18 +98,18 @@ class AbstractParams(ABC):
 
 def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping[str, Any]:
     if not issubclass(cls, BaseModel):
-        raise ValueError(f"{cls.__name__} must be subclass of BaseModel")
+        raise TypeError(f"{cls.__name__} must be subclass of BaseModel")
 
     incorrect = sorted(fields.keys() - cls.__fields__.keys() - cls.__class_vars__)
     if incorrect:
         ending = "s" if len(incorrect) > 1 else ""
         raise ValueError(f"Unknown field{ending} {', '.join(incorrect)}")
 
-    anns = get_type_hints(cls)
-    return {name: (anns[name], val) for name, val in fields.items()}
+    annotations = get_type_hints(cls)
+    return {name: (annotations[name], val) for name, val in fields.items()}
 
 
-def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type:  # type: ignore  # noqa
+def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type:  # type: ignore
     return int
 
 
@@ -145,7 +151,8 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         if not is_same and _check_for_old_sign(cls.create):
             warnings.warn(
                 "The signature of the `AbstractPage.create` method has changed. "
-                f"Please, update it to the new one. {_NEW_SIGNATURE}",
+                f"Please, update it to the new one. {_NEW_SIGNATURE}"
+                "\nSupport of old signature will be removed in the next major release (0.13.0).",
                 DeprecationWarning,
                 stacklevel=3,
             )
@@ -160,15 +167,19 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         pass
 
     @classmethod
-    def with_custom_options(cls: Type[TAbstractPage], **kwargs: Any) -> Type[TAbstractPage]:
+    def with_custom_options(cls, **kwargs: Any) -> Type[Self]:
         params_cls = cls.__params_type__
 
-        custom_params: Any = create_model(  # noqa
+        custom_params: Any = create_model(
             params_cls.__name__,
             __base__=params_cls,
             **_create_params(params_cls, kwargs),
         )
 
+        return cls.with_params(custom_params)
+
+    @classmethod
+    def with_params(cls, custom_params: Type[AbstractParams]) -> Type[Self]:
         bases: Tuple[Type[Any], ...]
         if cls.__concrete__:
             bases = (cls,)
@@ -179,7 +190,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         new_cls = new_class("CustomPage", bases, exec_body=lambda ns: setitem(ns, "__params_type__", custom_params))
         new_cls = update_wrapper(new_cls, cls, updated=())
 
-        return new_cls  # noqa
+        return new_cls
 
     class Config:
         arbitrary_types_allowed = True

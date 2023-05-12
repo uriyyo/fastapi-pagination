@@ -1,15 +1,15 @@
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Type, TypeVar, no_type_check, overload
+import warnings
+from typing import Any, Optional, Type, TypeVar, overload
 
-from sqlmodel import SQLModel, select
+from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
-from .sqlalchemy_future import async_exec_pagination
 from ..bases import AbstractParams
-from ..types import AdditionalData
-from ..utils import verify_params
+from ..types import AdditionalData, AsyncItemsTransformer
+from .sqlmodel import paginate as _paginate
 
 T = TypeVar("T")
 TSQLModel = TypeVar("TSQLModel", bound=SQLModel)
@@ -21,6 +21,7 @@ async def paginate(
     query: Select[TSQLModel],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
@@ -33,6 +34,7 @@ async def paginate(
     query: SelectOfScalar[T],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
@@ -45,23 +47,34 @@ async def paginate(
     query: Type[TSQLModel],
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
     pass
 
 
-@no_type_check
 async def paginate(
     session: AsyncSession,
     query: Any,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
-    params, _ = verify_params(params, "limit-offset", "cursor")
+    warnings.warn(
+        "fastapi_pagination.ext.async_sqlmodel module is deprecated, "
+        "please use fastapi_pagination.ext.sqlmodel module instead"
+        "This module will be removed in the next major release (0.13.0).",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
-    if not isinstance(query, (Select, SelectOfScalar)):
-        query = select(query)
-
-    return await async_exec_pagination(query, params, session.exec, additional_data, unique)
+    return await _paginate(
+        session,
+        query,
+        params,
+        transformer=transformer,
+        additional_data=additional_data,
+        unique=unique,
+    )

@@ -35,8 +35,8 @@ class User(Table, tablename="users"):
 def query(request):
     if request.param:
         return User
-    else:
-        return User.select()
+
+    return User.select()
 
 
 DB = SQLiteEngine()
@@ -60,7 +60,7 @@ async def engine(database_url):
 
     p = Path(engine.path)
     if p.exists():
-        os.remove(p)
+        p.unlink()
 
     await engine.prep_database()
     await User.create_table().run()

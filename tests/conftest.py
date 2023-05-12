@@ -38,11 +38,21 @@ def pytest_addoption(parser):
         action="store_true",
         default=False,
     )
+    parser.addoption(
+        "--sql-tests",
+        action="store_true",
+        default=False,
+    )
 
 
 @fixture(scope="session")
 def is_unit_tests_run(request):
     return request.config.getoption("--unit-tests")
+
+
+@fixture(scope="session")
+def is_sql_tests_run(request):
+    return request.config.getoption("--sql-tests")
 
 
 @fixture(scope="session")
@@ -62,7 +72,7 @@ def raw_data():
                     "user_id": id_,
                     "name": faker.name(),
                 }
-                for _ in range(randint(1, 10))
+                for _ in range(randint(1, 10))  # noqa: S311
             ],
         }
 
@@ -75,14 +85,14 @@ def entities(raw_data):
 
 
 @fixture(scope="session")
-def cassandra_session(cassandra_address, is_unit_tests_run):
-    if is_unit_tests_run:
+def cassandra_session(cassandra_address, is_unit_tests_run, is_sql_tests_run):
+    if is_unit_tests_run or is_sql_tests_run:
         return
 
     with Cluster(
         [
             cassandra_address,
-        ]
+        ],
     ).connect() as session:
         ddl = "DROP KEYSPACE IF EXISTS  ks"
         session.execute(ddl)
@@ -109,7 +119,7 @@ async def _setup_postgres(postgres_url, raw_data, is_unit_tests_run):
             "id" SERIAL NOT NULL PRIMARY KEY,
             "name" TEXT NOT NULL
         );
-        """
+        """,
         )
         await pool.fetch(
             """
@@ -118,7 +128,7 @@ async def _setup_postgres(postgres_url, raw_data, is_unit_tests_run):
             "name" TEXT NOT NULL,
             "user_id" INT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
         );
-        """
+        """,
         )
 
         await pool.executemany(
@@ -151,7 +161,7 @@ async def _setup_sqlite(sqlite_file, raw_data, is_unit_tests_run):
             "id" INTEGER PRIMARY KEY NOT NULL,
             "name" TEXT NOT NULL
         );
-        """
+        """,
         )
         await pool.execute(
             """
@@ -160,7 +170,7 @@ async def _setup_sqlite(sqlite_file, raw_data, is_unit_tests_run):
             "name" TEXT NOT NULL,
             "user_id" INT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
         );
-        """
+        """,
         )
 
         await pool.executemany(
@@ -180,8 +190,8 @@ async def _setup_sqlite(sqlite_file, raw_data, is_unit_tests_run):
 
 
 @async_fixture(scope="session", autouse=True)
-async def _setup_mongodb(mongodb_url, raw_data, is_unit_tests_run):
-    if is_unit_tests_run:
+async def _setup_mongodb(mongodb_url, raw_data, is_unit_tests_run, is_sql_tests_run):
+    if is_unit_tests_run or is_sql_tests_run:
         return
 
     client = AsyncIOMotorClient(mongodb_url)
@@ -232,10 +242,7 @@ def db_type(request) -> str:
 
 @fixture(scope="session")
 def database_url(db_type, postgres_url, sqlite_url, is_async_db) -> str:
-    if db_type == "postgres":
-        url = postgres_url
-    else:
-        url = sqlite_url
+    url = postgres_url if db_type == "postgres" else sqlite_url
 
     if is_async_db:
         url = url.replace("postgresql", "postgresql+asyncpg", 1)

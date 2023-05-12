@@ -24,7 +24,7 @@ add_pagination(app)
 
 
 @mark.parametrize(
-    "self,prev,next,first,last",
+    ("self", "prev", "next", "first", "last"),
     [
         (
             "/default",

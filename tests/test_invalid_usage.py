@@ -27,5 +27,5 @@ def test_default_page_with_limit_offset():
         return paginate([], params)
 
     add_pagination(app)
-    with raises(ValueError, match="Page should be used with Params"):
+    with raises(TypeError, match="Page should be used with Params"):
         client.get("/")

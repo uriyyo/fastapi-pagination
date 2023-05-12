@@ -1,11 +1,11 @@
-from typing import Callable, Optional, Sequence, TypeVar, Any
+from typing import Any, Callable, Optional, Sequence, TypeVar
 
 __all__ = ["paginate"]
 
-from .api import create_page
+from .api import apply_items_transformer, create_page
 from .bases import AbstractParams
-from .types import AdditionalData
-from .utils import verify_params
+from .types import AdditionalData, SyncItemsTransformer
+from .utils import check_installed_extensions, verify_params
 
 T = TypeVar("T")
 
@@ -15,13 +15,19 @@ def paginate(
     params: Optional[AbstractParams] = None,
     length_function: Callable[[Sequence[T]], int] = len,
     *,
+    transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
+    check_installed_extensions()
+
     params, raw_params = verify_params(params, "limit-offset")
 
+    items = sequence[raw_params.as_slice()]
+    t_items = apply_items_transformer(items, transformer)
+
     return create_page(
-        sequence[raw_params.offset : raw_params.offset + raw_params.limit],
-        length_function(sequence),
-        params,
+        t_items,
+        total=length_function(sequence),
+        params=params,
         **(additional_data or {}),
     )

@@ -28,7 +28,7 @@ def db(database_url):
             "default": {
                 "ENGINE": "django.db.backends.sqlite3",
                 "NAME": database_url,
-            }
+            },
         },
         INSTALLED_APPS=[],
     )
@@ -58,8 +58,8 @@ def User(db):
 def query(request, User):
     if request.param:
         return User
-    else:
-        return User.objects.all()
+
+    return User.objects.all()
 
 
 @fixture(scope="session")

@@ -4,128 +4,233 @@ __all__ = [
     "paginate_query",
     "count_query",
     "paginate",
-    "paginate_using_cursor",
-    "paginate_cursor_process_items",
 ]
 
-from typing import Any, Optional, Sequence, Tuple, TypeVar, cast, no_type_check
+import warnings
+from contextlib import suppress
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
-from fastapi import HTTPException
-from sqlalchemy import func, literal_column, select
-from sqlalchemy.orm import Query, noload
-from sqlalchemy.sql import Select
+from sqlalchemy import func, select
+from sqlalchemy.orm import Query, Session, noload
+from typing_extensions import TypeAlias
 
-from ..api import create_page
-from ..bases import AbstractParams, CursorRawParams
-from ..types import AdditionalData
+from ..api import apply_items_transformer, create_page
+from ..bases import AbstractPage, AbstractParams, is_cursor
+from ..types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 from ..utils import verify_params
+from .utils import generic_query_apply_params, unwrap_scalars
+
+if TYPE_CHECKING:
+    from sqlalchemy.engine import Connection
+    from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
+    from sqlalchemy.sql import Select
+
+
+try:
+    from sqlalchemy.util import await_only, greenlet_spawn
+except ImportError:  # pragma: no cover
+
+    async def greenlet_spawn(*_: Any, **__: Any) -> Any:  # type: ignore
+        raise ImportError("sqlalchemy.util.greenlet_spawn is not available")
+
+    def await_only(*_: Any, **__: Any) -> Any:  # type: ignore
+        raise ImportError("sqlalchemy.util.await_only is not available")
+
 
 try:
     from sqlakeyset import paging
-except ImportError:
+except ImportError:  # pragma: no cover
     paging = None
 
 
-T = TypeVar("T", Select, "Query[Any]")
+AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection]"
+SyncConn: TypeAlias = "Union[Session, Connection]"
 
 
-# adapted from  sqlakeyset.paging.perform_paging
-@no_type_check
-def paginate_using_cursor(
-    q: Select,
-    raw_params: CursorRawParams,
-) -> Tuple[Any, Tuple[Any, ...]]:
-    if paging is None:
-        raise ImportError("sqlakeyset is not installed")
-
-    try:
-        place, backwards = paging.process_args(page=raw_params.cursor)
-    except paging.InvalidPage:
-        raise HTTPException(status_code=400, detail="Invalid cursor")
-
-    try:
-        dialect = q.bind.dialect
-    except AttributeError:
-        dialect = None
-
-    selectable = q.selectable
-    column_descriptions = q.column_descriptions
-    keys = paging.orm_query_keys(q)
-
-    order_cols = paging.parse_ob_clause(selectable)
-    if backwards:
-        order_cols = [c.reversed for c in order_cols]
-
-    mapped_ocols = [paging.find_order_key(ocol, column_descriptions) for ocol in order_cols]
-
-    clauses = [col.ob_clause for col in mapped_ocols]
-
-    if not clauses:
-        raise ValueError("Order by clause is required for cursor pagination")
-
-    q = q.order_by(None).order_by(*clauses)
-
-    extra_columns = [col.extra_column for col in mapped_ocols if col.extra_column is not None]
-    q = q.add_columns(*extra_columns)
-
-    if place:
-        condition = paging.where_condition_for_page(order_cols, place, dialect)
-        groupby = paging.group_by_clauses(selectable)
-        if groupby:
-            q = q.having(condition)
-        else:
-            q = q.where(condition)
-
-    pagination_info = order_cols, mapped_ocols, extra_columns, keys, backwards, place
-    return q.limit(raw_params.size + 1), pagination_info  # 1 extra to check if there's a further page
+def paginate_query(query: Select, params: AbstractParams) -> Select:
+    return generic_query_apply_params(query, params.to_raw_params().as_limit_offset())
 
 
-def paginate_cursor_process_items(
-    items: Sequence[Any],
-    pagination_info: Tuple[Any, ...],
-    raw_params: CursorRawParams,
-) -> Tuple[Sequence[Any], Optional[str], Optional[str]]:
-    order_cols, mapped_ocols, extra_columns, keys, backwards, current_place = pagination_info
+def count_query(query: Select, *, use_subquery: bool = True) -> Select:
+    query = query.order_by(None).options(noload("*"))
 
-    page = paging.core_page_from_rows(
-        (
-            order_cols,
-            mapped_ocols,
-            extra_columns,
-            items,
-            None,
-        ),
-        None,
-        raw_params.size,
-        backwards,
-        current_place,
+    if use_subquery:
+        return select(func.count()).select_from(query.subquery())
+
+    return query.with_only_columns(  # noqa: PIE804
+        func.count(),
+        **{"maintain_column_froms": True},
     )
 
-    next_ = page.paging.bookmark_next if page.paging.has_next else None
-    previous = page.paging.bookmark_previous if page.paging.has_previous else None
 
-    return [*page], previous, next_
-
-
-def paginate_query(query: T, params: AbstractParams) -> T:
-    raw_params = params.to_raw_params().as_limit_offset()
-    return query.limit(raw_params.limit).offset(raw_params.offset)
+def _maybe_unique(result: Any, unique: bool) -> Any:
+    return (result.unique() if unique else result).all()
 
 
-def count_query(query: Select) -> Select:
-    count_subquery = cast(Any, query.order_by(None)).options(noload("*")).subquery()
-    return select(func.count(literal_column("*"))).select_from(count_subquery)
+def exec_pagination(
+    query: Select,
+    params: AbstractParams,
+    conn: SyncConn,
+    transformer: Optional[ItemsTransformer] = None,
+    additional_data: AdditionalData = None,
+    subquery_count: bool = True,
+    unique: bool = True,
+    async_: bool = False,
+) -> AbstractPage[Any]:
+    raw_params = params.to_raw_params()
+
+    if async_:
+
+        def _apply_items_transformer(*args: Any, **kwargs: Any) -> Any:
+            return await_only(apply_items_transformer(*args, **kwargs, async_=True))
+
+    else:
+        _apply_items_transformer = apply_items_transformer
+
+    if is_cursor(raw_params):
+        if paging is None:
+            raise ImportError("sqlakeyset is not installed")
+        if not getattr(query, "_order_by_clauses", True):
+            raise ValueError("Cursor pagination requires ordering")
+
+        page = paging.select_page(
+            conn,
+            selectable=query,
+            per_page=raw_params.size,
+            page=raw_params.cursor,
+        )
+        items = unwrap_scalars([*page])
+        items = _apply_items_transformer(items, transformer)
+
+        return create_page(
+            items,
+            params=params,
+            previous=page.paging.bookmark_previous if page.paging.has_previous else None,
+            next_=page.paging.bookmark_next if page.paging.has_next else None,
+            **(additional_data or {}),
+        )
+
+    total = conn.scalar(count_query(query, use_subquery=subquery_count))
+    query = paginate_query(query, params)
+    items = _maybe_unique(conn.execute(query), unique)
+    items = unwrap_scalars(items)
+    items = _apply_items_transformer(items, transformer)
+
+    return create_page(
+        items,
+        total=total,
+        params=params,
+        **(additional_data or {}),
+    )
 
 
+def _get_sync_conn_from_async(conn: Any) -> SyncConn:  # pragma: no cover
+    with suppress(AttributeError):
+        return conn.sync_session  # type: ignore
+
+    with suppress(AttributeError):
+        return conn.sync_connection  # type: ignore
+
+    raise TypeError("conn must be an AsyncConnection or AsyncSession")
+
+
+# old deprecated paginate function that use sqlalchemy.orm.Query
+@overload
 def paginate(
     query: Query[Any],
     params: Optional[AbstractParams] = None,
     *,
+    subquery_count: bool = True,
+    transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
 ) -> Any:
-    params, _ = verify_params(params, "limit-offset")
+    pass
 
-    total = query.count()
-    items = paginate_query(query, params).all()
 
-    return create_page(items, total, params, **(additional_data or {}))
+@overload
+def paginate(
+    conn: SyncConn,
+    query: Select,
+    params: Optional[AbstractParams] = None,
+    *,
+    subquery_count: bool = True,
+    transformer: Optional[SyncItemsTransformer] = None,
+    additional_data: AdditionalData = None,
+    unique: bool = True,
+) -> Any:
+    pass
+
+
+@overload
+async def paginate(
+    conn: AsyncConn,
+    query: Select,
+    params: Optional[AbstractParams] = None,
+    *,
+    subquery_count: bool = True,
+    transformer: Optional[AsyncItemsTransformer] = None,
+    additional_data: AdditionalData = None,
+    unique: bool = True,
+) -> Any:
+    pass
+
+
+def paginate(*args: Any, **kwargs: Any) -> Any:
+    try:
+        assert args
+        assert isinstance(args[0], Query)
+        query, conn, params, transformer, additional_data, unique, subquery_count = _old_paginate_sign(*args, **kwargs)
+    except (TypeError, AssertionError):
+        query, conn, params, transformer, additional_data, unique, subquery_count = _new_paginate_sign(*args, **kwargs)
+
+    params, _ = verify_params(params, "limit-offset", "cursor")
+
+    with suppress(TypeError):
+        sync_conn = _get_sync_conn_from_async(conn)
+        return greenlet_spawn(
+            exec_pagination,
+            query,
+            params,
+            sync_conn,
+            transformer,
+            additional_data,
+            subquery_count,
+            unique,
+            async_=True,
+        )
+
+    return exec_pagination(query, params, conn, transformer, additional_data, subquery_count, unique, async_=False)
+
+
+def _old_paginate_sign(
+    query: Query[Any],
+    params: Optional[AbstractParams] = None,
+    *,
+    subquery_count: bool = True,
+    transformer: Optional[ItemsTransformer] = None,
+    additional_data: AdditionalData = None,
+) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool, bool]:
+    if query.session is None:
+        raise ValueError("query.session is None")
+
+    warnings.warn(
+        "sqlalchemy.orm.Query is deprecated, use sqlalchemy.sql.Select instead"
+        "sqlalchemy.orm.Query support will be removed in the next major release (0.13.0).",
+        DeprecationWarning,
+        stacklevel=3,
+    )
+
+    return query, query.session, params, transformer, additional_data, True, subquery_count  # type: ignore
+
+
+def _new_paginate_sign(
+    conn: SyncConn,
+    query: Select,
+    params: Optional[AbstractParams] = None,
+    *,
+    subquery_count: bool = True,
+    transformer: Optional[ItemsTransformer] = None,
+    additional_data: AdditionalData = None,
+    unique: bool = True,
+) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool, bool]:
+    return query, conn, params, transformer, additional_data, unique, subquery_count

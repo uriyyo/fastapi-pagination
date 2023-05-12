@@ -2,99 +2,42 @@ from __future__ import annotations
 
 __all__ = [
     "paginate",
-    "exec_pagination",
-    "async_exec_pagination",
 ]
 
-from typing import Any, Awaitable, Callable, Optional, Union
+import warnings
+from typing import Any, Optional, Union
 
-from sqlalchemy.future import Connection, Engine
+from sqlalchemy.future import Connection
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import Select
 
-from .sqlalchemy import (
-    count_query,
-    paginate_cursor_process_items,
-    paginate_query,
-    paginate_using_cursor,
-)
-from .utils import unwrap_scalars, wrap_scalars
-from ..api import create_page
-from ..bases import AbstractPage, AbstractParams, is_cursor
-from ..types import AdditionalData
-from ..utils import verify_params
-
-
-def _maybe_unique(result: Any, unique: bool) -> Any:
-    return (result.unique() if unique else result).all()
-
-
-def exec_pagination(
-    query: Select,
-    params: AbstractParams,
-    db_exec: Callable[..., Any],
-    additional_data: AdditionalData = None,
-    unique: bool = True,
-) -> AbstractPage[Any]:
-    raw_params = params.to_raw_params()
-
-    if is_cursor(raw_params):
-        query, info = paginate_using_cursor(query, raw_params)
-
-        items = wrap_scalars(_maybe_unique(db_exec(query), unique))
-        items, previous, next_ = paginate_cursor_process_items(items, info, raw_params)
-
-        return create_page(
-            unwrap_scalars(items),
-            params=params,
-            previous=previous,
-            next_=next_,
-            **(additional_data or {}),
-        )
-    else:
-        (total,) = db_exec(count_query(query)).scalars()
-        query = paginate_query(query, params)
-        items = _maybe_unique(db_exec(query), unique)
-
-        return create_page(unwrap_scalars(items), total, params, **(additional_data or {}))
-
-
-async def async_exec_pagination(
-    query: Select,
-    params: AbstractParams,
-    db_exec: Callable[..., Awaitable[Any]],
-    additional_data: AdditionalData = None,
-    unique: bool = True,
-) -> AbstractPage[Any]:  # pragma: no cover
-    raw_params = params.to_raw_params()
-
-    if is_cursor(raw_params):
-        query, info = paginate_using_cursor(query, raw_params)
-
-        items = wrap_scalars(_maybe_unique(await db_exec(query), unique))
-        items, previous, next_ = paginate_cursor_process_items(items, info, raw_params)
-
-        return create_page(
-            unwrap_scalars(items),
-            params=params,
-            previous=previous,
-            next_=next_,
-            **(additional_data or {}),
-        )
-    else:
-        (total,) = (await db_exec(count_query(query))).scalars()
-        items = _maybe_unique(await db_exec(paginate_query(query, params)), unique)
-
-        return create_page(unwrap_scalars(items), total, params, **(additional_data or {}))
+from ..bases import AbstractParams
+from ..types import AdditionalData, SyncItemsTransformer
+from .sqlalchemy import paginate as _paginate
 
 
 def paginate(
-    conn: Union[Connection, Engine, Session],
+    conn: Union[Connection, Session],
     query: Select,
     params: Optional[AbstractParams] = None,
     *,
+    transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
     unique: bool = True,
 ) -> Any:
-    params, _ = verify_params(params, "limit-offset", "cursor")
-    return exec_pagination(query, params, conn.execute, additional_data, unique)
+    warnings.warn(
+        "fastapi_pagination.ext.sqlalchemy_future module is deprecated, "
+        "please use fastapi_pagination.ext.sqlalchemy module instead"
+        "This module will be removed in the next major release (0.13.0).",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
+    return _paginate(
+        conn,
+        query,
+        params,
+        transformer=transformer,
+        additional_data=additional_data,
+        unique=unique,
+    )
