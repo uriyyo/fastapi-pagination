@@ -1,4 +1,5 @@
 import os
+from contextlib import asynccontextmanager
 from itertools import count
 from pathlib import Path
 from typing import Any
@@ -40,8 +41,6 @@ class UserOut(UserIn):
         orm_mode = True
 
 
-app = FastAPI()
-
 DB = SQLiteEngine()
 APP_REGISTRY = AppRegistry()
 
@@ -52,8 +51,8 @@ APP_CONFIG = AppConfig(
 )
 
 
-@app.on_event("startup")
-async def on_startup() -> None:
+@asynccontextmanager
+async def lifespan() -> None:
     engine: SQLiteEngine = engine_finder()
 
     p = Path(engine.path)
@@ -68,6 +67,10 @@ async def on_startup() -> None:
             name=faker.name(),
             email=faker.email(),
         ).save()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/users", response_model=UserOut)

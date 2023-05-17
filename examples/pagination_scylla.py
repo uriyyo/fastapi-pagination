@@ -1,4 +1,5 @@
 import uuid
+from contextlib import asynccontextmanager
 from typing import Any
 
 import uvicorn
@@ -37,18 +38,8 @@ class UserOut(UserIn):
         orm_mode = True
 
 
-app = FastAPI()
-
-
-session = Cluster(
-    [
-        "172.17.0.2",
-    ]
-).connect()
-
-
-@app.on_event("startup")
-def on_startup() -> None:
+@asynccontextmanager
+async def lifespan() -> None:
     ddl = "CREATE KEYSPACE IF NOT EXISTS ks WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}"
     session.execute(ddl)
     connection.register_connection("cluster1", session=session, default=True)
@@ -57,6 +48,15 @@ def on_startup() -> None:
     users = [User(id=uuid.uuid4(), name=faker.name(), email=faker.email()) for _ in range(100)]
     for user in users:
         user.save()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+session = Cluster(
+    [
+        "172.17.0.2",
+    ]
+).connect()
 
 
 @app.post("/users", response_model=UserOut)

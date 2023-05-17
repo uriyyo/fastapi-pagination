@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Any, Dict, Generator
 
 import uvicorn
@@ -47,13 +48,14 @@ class UserOut(UserIn):
         orm_mode = True
 
 
-app = FastAPI()
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
+@asynccontextmanager
+async def lifespan() -> None:
     connect(host="mongodb://localhost:27017")
     User.objects().insert([User(name=faker.name(), email=faker.email()) for i in range(100)])
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/users", response_model=UserOut)
