@@ -143,6 +143,7 @@ def paginate(
     subquery_count: bool = True,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: AdditionalData = None,
+    unique: bool = True,
 ) -> Any:
     pass
 
@@ -209,18 +210,19 @@ def _old_paginate_sign(
     subquery_count: bool = True,
     transformer: Optional[ItemsTransformer] = None,
     additional_data: AdditionalData = None,
+    unique: bool = True,
 ) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool, bool]:
     if query.session is None:
         raise ValueError("query.session is None")
 
     warnings.warn(
-        "sqlalchemy.orm.Query is deprecated, use sqlalchemy.sql.Select instead"
+        "sqlalchemy.orm.Query is deprecated, use sqlalchemy.sql.Select instead "
         "sqlalchemy.orm.Query support will be removed in the next major release (0.13.0).",
         DeprecationWarning,
         stacklevel=3,
     )
 
-    return query, query.session, params, transformer, additional_data, True, subquery_count  # type: ignore
+    return query, query.session, params, transformer, additional_data, unique, subquery_count  # type: ignore
 
 
 def _new_paginate_sign(
