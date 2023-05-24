@@ -109,7 +109,8 @@ def create_page(
            items (Sequence[T]): A sequence of items to be included in the page.
            total (Optional[int], deprecated): The total number of items. If not provided, defaults to _SENTINEL.
                If 'total' is specified in kwargs, it will raise a TypeError.
-           params (Optional[AbstractParams], deprecated): The parameters for the page. If not provided, defaults to _SENTINEL.
+           params (Optional[AbstractParams], deprecated): The parameters for the page.
+           If not provided, defaults to _SENTINEL.
                If 'params' is specified in kwargs, it will raise a TypeError.
 
        Keyword Args:
