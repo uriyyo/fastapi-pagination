@@ -95,6 +95,35 @@ def create_page(
     /,
     **kwargs: Any,
 ) -> AbstractPage[T]:
+    """
+       Creates an instance of AbstractPage with provided items and optional parameters.
+
+       This function uses positional-only arguments for `items`, `total`, and `params` to enforce explicit naming
+       of these parameters when calling the function.
+       The use of positional-only arguments also prevents the caller from providing these arguments more than once.
+
+       The `total` and `params` parameters are deprecated and may be removed in future versions.
+       Their use will emit a DeprecationWarning.
+
+       Args:
+           items (Sequence[T]): A sequence of items to be included in the page.
+           total (Optional[int], deprecated): The total number of items. If not provided, defaults to _SENTINEL.
+               If 'total' is specified in kwargs, it will raise a TypeError.
+           params (Optional[AbstractParams], deprecated): The parameters for the page.
+           If not provided, defaults to _SENTINEL.
+               If 'params' is specified in kwargs, it will raise a TypeError.
+
+       Keyword Args:
+           **kwargs (Any): Additional parameters. 'total' and 'params' are not allowed in kwargs.
+
+       Returns:
+           AbstractPage[T]: An instance of AbstractPage containing the provided items and additional parameters.
+
+       Raises:
+           TypeError: If 'total' or 'params' are specified more than once (either as named arguments or in kwargs).
+           DeprecationWarning: If 'total' or 'params' are provided (as these are deprecated parameters).
+    """
+
     if params is not _SENTINEL:
         if "params" in kwargs:
             raise TypeError("create_page() got multiple values for argument 'params'")
