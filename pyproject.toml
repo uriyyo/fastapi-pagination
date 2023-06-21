@@ -136,7 +136,8 @@ ignore = [
     "SIM114", # allow have multiplie ifs with same body
     "TRY003", # allow long exc message
     "RUF100", # allow unused noqa
-    "RUF013", # implicit optional 
+    "RUF012", # allow mutable class var
+    "RUF013", # disable implicit optional
 ]
 exclude = [
     ".bzr",

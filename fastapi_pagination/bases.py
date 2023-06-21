@@ -188,9 +188,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             bases = (cls[params], Generic[params])  # type: ignore[assignment, index]
 
         new_cls = new_class("CustomPage", bases, exec_body=lambda ns: setitem(ns, "__params_type__", custom_params))
-        new_cls = update_wrapper(new_cls, cls, updated=())
-
-        return new_cls
+        return update_wrapper(new_cls, cls, updated=())
 
     class Config:
         arbitrary_types_allowed = True
