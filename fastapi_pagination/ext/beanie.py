@@ -21,7 +21,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
     projection_model: Optional[Type[DocumentProjectionType]] = None,
     sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
     session: Optional[ClientSession] = None,

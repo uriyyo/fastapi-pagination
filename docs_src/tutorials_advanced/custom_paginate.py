@@ -16,7 +16,7 @@ def paginate(
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[ItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 

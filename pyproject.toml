@@ -137,7 +137,6 @@ ignore = [
     "TRY003", # allow long exc message
     "RUF100", # allow unused noqa
     "RUF012", # allow mutable class var
-    "RUF013", # disable implicit optional
 ]
 exclude = [
     ".bzr",

@@ -22,7 +22,7 @@ def paginate(
     *,
     subquery_count: bool = True,
     transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
 ) -> Any:
     pass
@@ -36,7 +36,7 @@ def paginate(
     *,
     subquery_count: bool = True,
     transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
 ) -> Any:
     pass
@@ -50,7 +50,7 @@ def paginate(
     *,
     subquery_count: bool = True,
     transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
 ) -> Any:
     pass
@@ -64,7 +64,7 @@ async def paginate(
     *,
     subquery_count: bool = True,
     transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
 ) -> Any:
     pass
@@ -78,7 +78,7 @@ async def paginate(
     *,
     subquery_count: bool = True,
     transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
 ) -> Any:
     pass
@@ -92,7 +92,7 @@ async def paginate(
     *,
     subquery_count: bool = True,
     transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
 ) -> Any:
     pass
 
@@ -105,7 +105,7 @@ def paginate(
     *,
     subquery_count: bool = True,
     transformer: Optional[ItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
 ) -> Any:
     if not isinstance(query, (Select, SelectOfScalar)):

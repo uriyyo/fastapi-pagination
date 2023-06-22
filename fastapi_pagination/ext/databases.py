@@ -21,7 +21,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
     convert_to_mapping: bool = True,
 ) -> Any:
     params, _ = verify_params(params, "limit-offset")

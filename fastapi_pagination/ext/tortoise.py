@@ -34,7 +34,7 @@ async def paginate(
     prefetch_related: Union[bool, List[Union[str, Prefetch]]] = False,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 

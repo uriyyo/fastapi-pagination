@@ -16,7 +16,7 @@ def paginate(
     length_function: Callable[[Sequence[T]], int] = len,
     *,
     transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
 ) -> Any:
     check_installed_extensions()
 

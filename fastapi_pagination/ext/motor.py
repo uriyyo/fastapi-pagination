@@ -17,7 +17,7 @@ async def paginate(
     sort: Optional[Sequence[Any]] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
     **kwargs: Any,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
@@ -45,7 +45,7 @@ async def paginate_aggregate(
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []

@@ -19,7 +19,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: AdditionalData = None,
+    additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
 ) -> Any:
     warnings.warn(
