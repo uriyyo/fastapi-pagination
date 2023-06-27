@@ -34,7 +34,7 @@ class UserOut(UserIn):
 
 
 @asynccontextmanager
-async def lifespan() -> None:
+async def lifespan(_: Any) -> None:
     for _ in range(100):
         await User.create(
             name=faker.name(),

@@ -38,7 +38,7 @@ class UserOut(UserIn):
 
 
 @asynccontextmanager
-async def lifespan() -> None:
+async def lifespan(_: Any) -> None:
     engine = sqlalchemy.create_engine(str(db.url))
     metadata.drop_all(engine)
     metadata.create_all(engine)

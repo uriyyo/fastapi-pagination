@@ -27,7 +27,7 @@ class UserOut(UserIn):
 
 
 @asynccontextmanager
-async def lifespan() -> None:
+async def lifespan(_: Any) -> None:
     global client
     client = AsyncIOMotorClient("mongodb://localhost:27017")
     await init_beanie(client.test, document_models=[UserIn])

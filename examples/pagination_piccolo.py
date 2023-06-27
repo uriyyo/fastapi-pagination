@@ -52,7 +52,7 @@ APP_CONFIG = AppConfig(
 
 
 @asynccontextmanager
-async def lifespan() -> None:
+async def lifespan(_: Any) -> None:
     engine: SQLiteEngine = engine_finder()
 
     p = Path(engine.path)

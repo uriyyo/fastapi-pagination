@@ -26,7 +26,7 @@ class UserOut(UserIn):
 
 
 @asynccontextmanager
-async def lifespan() -> None:
+async def lifespan(_: Any) -> None:
     global pool
     pool = await create_pool("postgresql://postgres:postgres@localhost:5432")
 

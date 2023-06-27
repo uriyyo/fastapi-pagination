@@ -39,7 +39,7 @@ class UserOut(UserIn):
 
 
 @asynccontextmanager
-async def lifespan() -> None:
+async def lifespan(_: Any) -> None:
     await db.gino.drop_all()
     await db.gino.create_all()
 
