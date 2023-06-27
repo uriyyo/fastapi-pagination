@@ -39,7 +39,7 @@ class UserOut(UserIn):
 
 
 @asynccontextmanager
-async def lifespan() -> None:
+async def lifespan(_: Any) -> None:
     ddl = "CREATE KEYSPACE IF NOT EXISTS ks WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}"
     session.execute(ddl)
     connection.register_connection("cluster1", session=session, default=True)

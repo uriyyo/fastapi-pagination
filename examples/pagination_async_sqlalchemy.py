@@ -44,7 +44,7 @@ class UserOut(UserIn):
 
 
 @asynccontextmanager
-async def lifespan() -> None:
+async def lifespan(_: Any) -> None:
     async with engine.connect() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)

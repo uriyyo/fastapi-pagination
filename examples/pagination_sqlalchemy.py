@@ -42,7 +42,7 @@ class UserOut(UserIn):
 
 
 @asynccontextmanager
-async def lifespan() -> None:
+async def lifespan(_: Any) -> None:
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
