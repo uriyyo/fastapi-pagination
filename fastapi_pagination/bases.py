@@ -15,7 +15,6 @@ import inspect
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from functools import update_wrapper
 from operator import setitem
 from types import new_class
 from typing import (
@@ -35,6 +34,8 @@ from typing import (
 )
 
 from pydantic import BaseModel, create_model
+
+from .utils import IS_PYDANTIC_V2, get_caller
 
 if TYPE_CHECKING:
     from pydantic import BaseModel as GenericModel
@@ -185,7 +186,14 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         pass
 
     @classmethod
-    def with_custom_options(cls, **kwargs: Any) -> Type[Self]:
+    @no_type_check
+    def with_custom_options(
+        cls,
+        *,
+        cls_name: Optional[str] = None,
+        module: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Type[Self]:
         params_cls = cls.__params_type__
 
         custom_params: Any = create_model(
@@ -194,21 +202,47 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             **_create_params(params_cls, kwargs),
         )
 
-        return cls.with_params(custom_params)
+        return cls.with_params(
+            custom_params,
+            cls_name=cls_name,
+            module=module,
+        )
 
     @classmethod
-    def with_params(cls, custom_params: Type[AbstractParams]) -> Type[Self]:
+    @no_type_check
+    def with_params(
+        cls,
+        custom_params: Type[AbstractParams],
+        *,
+        cls_name: Optional[str] = None,
+        module: Optional[str] = None,
+    ) -> Type[Self]:
         bases: Tuple[Type[Any], ...]
-        if cls.__concrete__:
-            bases = (cls,)
-        else:
-            params = tuple(cls.__parameters__)
-            bases = (cls[params], Generic[params])  # type: ignore[assignment, index]
 
-        new_cls = new_class("CustomPage", bases, exec_body=lambda ns: setitem(ns, "__params_type__", custom_params))
-        return update_wrapper(new_cls, cls, updated=())
+        if IS_PYDANTIC_V2:
+            params = cls.__pydantic_generic_metadata__["parameters"]
+            bases = (cls,) if not params else (cls[params], Generic[params])
+        else:
+            if cls.__concrete__:
+                bases = (cls,)
+            else:
+                params = tuple(cls.__parameters__)
+                bases = (cls[params], Generic[params])
+
+        cls_name = cls_name or f"Customized{cls.__name__}"
+        module_name = module or get_caller()
+
+        new_ns = {
+            "__params_type__": custom_params,
+            "__module__": module_name,
+            "__qualname__": cls_name,
+            "__name__": cls_name,
+        }
+
+        return new_class(cls_name, bases, exec_body=lambda ns: [setitem(ns, k, v) for k, v in new_ns.items()])
 
     class Config:
+        orm_mode = True
         arbitrary_types_allowed = True
 
 

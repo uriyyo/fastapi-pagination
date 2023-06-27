@@ -23,6 +23,7 @@ from typing_extensions import Literal
 
 from .bases import AbstractPage, AbstractParams, CursorRawParams
 from .types import Cursor
+from .utils import create_pydantic_model
 
 T = TypeVar("T")
 
@@ -89,7 +90,8 @@ class CursorPage(AbstractPage[T], Generic[T]):
         previous: Optional[Cursor] = None,
         **kwargs: Any,
     ) -> CursorPage[T]:
-        return cls(
+        return create_pydantic_model(
+            cls,
             items=items,
             next_page=encode_cursor(next_),
             previous_page=encode_cursor(previous),
