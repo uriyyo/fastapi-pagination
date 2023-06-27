@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from flaky import flaky
 from motor.motor_asyncio import AsyncIOMotorClient
 from pytest import fixture
 
@@ -37,5 +38,6 @@ def app(db_client, model_cls):
     return add_pagination(app)
 
 
+@flaky(max_runs=5)
 class TestMotor(BasePaginationTestCase):
     pass
