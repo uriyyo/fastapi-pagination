@@ -4,7 +4,12 @@ from fastapi import Depends, FastAPI, Request, Response
 from fastapi.routing import APIRouter
 from fastapi.testclient import TestClient
 from pydantic import Field
-from pydantic.generics import GenericModel
+
+try:
+    from pydantic.generics import GenericModel
+except ImportError:  # pragma: no cover
+    from pydantic import BaseModel as GenericModel
+
 from pytest import raises
 
 from fastapi_pagination import (

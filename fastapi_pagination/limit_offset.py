@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from .bases import AbstractParams, BasePage, RawParams
 from .types import GreaterEqualOne, GreaterEqualZero
+from .utils import create_pydantic_model
 
 T = TypeVar("T")
 
@@ -50,8 +51,9 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
     ) -> LimitOffsetPage[T]:
         raw_params = params.to_raw_params().as_limit_offset()
 
-        return cls(
-            total=total,  # type: ignore[arg-type]
+        return create_pydantic_model(
+            cls,
+            total=total,
             items=items,
             limit=raw_params.limit,
             offset=raw_params.offset,

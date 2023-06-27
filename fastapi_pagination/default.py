@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 from .bases import AbstractParams, BasePage, RawParams
 from .types import GreaterEqualOne, GreaterEqualZero
+from .utils import create_pydantic_model
 
 T = TypeVar("T")
 
@@ -63,8 +64,9 @@ class Page(BasePage[T], Generic[T]):
         page = params.page if params.page is not None else 1
         pages = ceil(total / size) if total is not None else None
 
-        return cls(
-            total=total,  # type: ignore[arg-type]
+        return create_pydantic_model(
+            cls,
+            total=total,
             items=items,
             page=page,
             size=size,

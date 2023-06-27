@@ -16,6 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ "3.8", "3.9", "3.10", "3.11" ]
+        pydantic_v2: [ "true", "false" ]
 
     steps:
       - uses: actions/checkout@v3
@@ -59,6 +60,11 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install -E all
+
+      - name: Install pydantic v2
+        if: ${{ matrix.pydantic_v2 == 'true' }}
+        run: |
+          poetry run pip install -U --pre fastapi pydantic
 
       - name: Unit tests
         run: |
