@@ -19,6 +19,7 @@ from functools import update_wrapper
 from operator import setitem
 from types import new_class
 from typing import (
+    TYPE_CHECKING,
     Any,
     ClassVar,
     Dict,
@@ -30,10 +31,20 @@ from typing import (
     Type,
     TypeVar,
     get_type_hints,
+    no_type_check,
 )
 
 from pydantic import BaseModel, create_model
-from pydantic.generics import GenericModel
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel as GenericModel
+else:
+    try:
+        from pydantic.generics import GenericModel
+    except ImportError:  # pragma: no cover
+        GenericModel = BaseModel
+
+
 from typing_extensions import Self, TypeGuard
 
 from .types import Cursor, GreaterEqualZero, ParamsType
@@ -96,6 +107,7 @@ class AbstractParams(ABC):
         pass
 
 
+@no_type_check
 def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping[str, Any]:
     if not issubclass(cls, BaseModel):
         raise TypeError(f"{cls.__name__} must be subclass of BaseModel")
@@ -142,6 +154,10 @@ def _check_for_old_sign(func: Any) -> bool:
 class AbstractPage(GenericModel, Generic[T], ABC):
     __params_type__: ClassVar[Type[AbstractParams]]
 
+    if TYPE_CHECKING:
+        __concrete__: ClassVar[bool]
+        __parameters__: ClassVar[Tuple[Any, ...]]
+
     def __init_subclass__(cls, **kwargs: Any) -> None:
         try:
             is_same = cls.create.__func__ is AbstractPage.create.__func__  # type: ignore[attr-defined]
@@ -156,6 +172,8 @@ class AbstractPage(GenericModel, Generic[T], ABC):
                 DeprecationWarning,
                 stacklevel=3,
             )
+
+        super().__init_subclass__(**kwargs)
 
     @classmethod
     @abstractmethod
