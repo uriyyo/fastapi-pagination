@@ -146,6 +146,6 @@ def get_caller(depth: int = 1) -> Optional[str]:
 
 def create_pydantic_model(model_cls: Type[TModel], /, **kwargs: Any) -> TModel:
     if IS_PYDANTIC_V2:
-        return model_cls.model_validate(kwargs, from_attributes=True)
+        return model_cls.model_validate(kwargs, from_attributes=True)  # type: ignore
 
-    return model_cls(**kwargs)
+    return model_cls(**kwargs)  # type: ignore
