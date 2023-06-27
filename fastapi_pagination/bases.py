@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 else:
     try:
         from pydantic.generics import GenericModel
-    except ImportError:
+    except ImportError:  # pragma: no cover
         GenericModel = BaseModel
 
 
