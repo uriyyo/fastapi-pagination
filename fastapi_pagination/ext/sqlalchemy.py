@@ -222,7 +222,12 @@ def _old_paginate_sign(
         stacklevel=3,
     )
 
-    return query, query.session, params, transformer, additional_data, unique, subquery_count  # type: ignore
+    session = query.session
+
+    with suppress(AttributeError):
+        query = query._statement_20()  # type: ignore[attr-defined]
+
+    return query, session, params, transformer, additional_data, unique, subquery_count  # type: ignore
 
 
 def _new_paginate_sign(
