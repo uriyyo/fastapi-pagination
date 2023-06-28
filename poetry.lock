@@ -1937,13 +1937,13 @@ files = [
 
 [[package]]
 name = "sqlakeyset"
-version = "2.0.1684285512"
+version = "2.0.1687912386"
 description = "offset-free paging for sqlalchemy"
 optional = true
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "sqlakeyset-2.0.1684285512-py3-none-any.whl", hash = "sha256:9b470842d50398666a8fd7c6ab831d8a0ea732a4feb01e4aeb852c9ab9548906"},
-    {file = "sqlakeyset-2.0.1684285512.tar.gz", hash = "sha256:1c559efdc2d68f68123b7e3e67e20ee737bcdc668f552a03e9bbc7a53a6b4b3b"},
+    {file = "sqlakeyset-2.0.1687912386-py3-none-any.whl", hash = "sha256:0df8fb54987d35e5170a047468c5d99aa224fe62986ea3035671d50628ab7623"},
+    {file = "sqlakeyset-2.0.1687912386.tar.gz", hash = "sha256:319625a139dcb264907e5cd5405d1296a1463d9d15cef2b273e37d5fb6ff2fbe"},
 ]
 
 [package.dependencies]
@@ -2318,4 +2318,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "1a973f311a10a0e45eaf1be642f0ad42db90bd35b0e578d6d12d16ff3a1cfe61"
+content-hash = "80c4fdd39fcb6a221fdaa03bb049873d9c84d8c0a18bad73ddb01ff1c7c52ca1"
