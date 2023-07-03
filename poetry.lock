@@ -142,21 +142,26 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "beanie"
-version = "1.19.2"
+version = "1.20.0"
 description = "Asynchronous Python ODM for MongoDB"
 optional = true
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "beanie-1.19.2-py3-none-any.whl", hash = "sha256:fba803e954eff3f036db2236c1e02fe7afffe4330db2108d405ac820076e3ae1"},
-    {file = "beanie-1.19.2.tar.gz", hash = "sha256:1894c984a9f129bce03e19a9cb52ad47002bb3b4ea1a6b7af3a8a65978a35b78"},
+    {file = "beanie-1.20.0-py3-none-any.whl", hash = "sha256:3212cfc20c1b30d5b4ae9d9dfc02eda0cbc09c26f23c7aeb079baa1d90889a57"},
+    {file = "beanie-1.20.0.tar.gz", hash = "sha256:d83004a8330dab9055ea57a6247a324ed40011f9cdcd527aaf4c0dc9253e9d21"},
 ]
 
 [package.dependencies]
 click = ">=7"
 lazy-model = ">=0.0.3"
-motor = ">=2.5,<4.0"
-pydantic = ">=1.10.0"
+motor = ">=2.5.0,<4.0.0"
+pydantic = ">=1.10.0,<2.0.0"
 toml = "*"
+
+[package.extras]
+doc = ["Markdown (>=3.3)", "Pygments (>=2.8.0)", "jinja2 (>=3.0.3)", "mkdocs (>=1.4)", "mkdocs-material (>=9.0)", "pydoc-markdown (==4.6)"]
+queue = ["beanie-batteries-queue (>=0.2)"]
+test = ["asgi-lifespan (>=1.0.1)", "dnspython (>=2.1.0)", "fastapi (>=0.78.0)", "flake8 (>=3)", "httpx (>=0.23.0)", "pre-commit (>=2.3.0)", "pyright (>=0)", "pytest (>=6.0.0)", "pytest-asyncio (>=0.21.0)", "pytest-cov (>=2.8.1)"]
 
 [[package]]
 name = "black"
