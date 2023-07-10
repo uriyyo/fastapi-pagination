@@ -1213,13 +1213,13 @@ files = [
 
 [[package]]
 name = "piccolo"
-version = "0.116.0"
+version = "0.117.0"
 description = "A fast, user friendly ORM and query builder which supports asyncio."
 optional = true
 python-versions = ">=3.7.0"
 files = [
-    {file = "piccolo-0.116.0-py3-none-any.whl", hash = "sha256:c32d50425c283adaa3df3c57fa08df83a076babecf71b46d23ab85c5f29bfadd"},
-    {file = "piccolo-0.116.0.tar.gz", hash = "sha256:e41440a89dc3b7a5706f71497375f620279de0845789fdb9a962b690451d760b"},
+    {file = "piccolo-0.117.0-py3-none-any.whl", hash = "sha256:4ddb2408ebc622b85d36a99a38ef25ec287d7e35a7d9018f17f0ae8ede29625e"},
+    {file = "piccolo-0.117.0.tar.gz", hash = "sha256:14be1df7398432b30ac38f3148fec3e5c62a809d5bb15a13ea16ca40355a3633"},
 ]
 
 [package.dependencies]
@@ -1227,7 +1227,7 @@ black = "*"
 colorama = ">=0.4.0"
 inflection = ">=0.5.1"
 Jinja2 = ">=2.11.0"
-pydantic = {version = ">=1.6", extras = ["email"]}
+pydantic = {version = ">=1.6,<2.0", extras = ["email"]}
 targ = ">=0.3.7"
 typing-extensions = ">=4.3.0"
 
@@ -2327,4 +2327,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "1c84d94ce06cd1d8e65daaa076ab3ec9ee2d4254f53a9a05667f3ceb6b09efb1"
+content-hash = "b640ce0b8ac79c4f74aae698ef824478a0f6015cfcafc24c3d8c5d959e9e2834"
