@@ -8,7 +8,7 @@ Let's create a custom pagination class that will allow us to paginate `sqlalchem
 ## Step 1: create `paginate` function
 
 First, we need to create a function that will paginate `sqlalchemy` queries.
-`paginete` is a common name for this function, but you can use any name you want.
+`paginate` is a common name for this function, but you can use any name you want.
 
 ```py hl_lines="13"
 {! ../docs_src/tutorials_advanced/custom_paginate.py !}
