@@ -5,10 +5,8 @@ __all__ = ["LimitOffsetPage"]
 from math import floor
 from typing import Any, Generic, TypeVar
 
-from pydantic import root_validator
-
 from ..limit_offset import LimitOffsetPage as BasePage
-from .bases import Links, create_links
+from .bases import Links, create_links, validation_decorator
 
 T = TypeVar("T")
 
@@ -16,7 +14,7 @@ T = TypeVar("T")
 class LimitOffsetPage(BasePage[T], Generic[T]):
     links: Links
 
-    @root_validator(pre=True)
+    @validation_decorator
     def __root_validator__(cls, value: Any) -> Any:
         if "links" not in value:
             offset, limit, total = [value[k] for k in ("offset", "limit", "total")]

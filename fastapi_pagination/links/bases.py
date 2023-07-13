@@ -1,11 +1,12 @@
-__all__ = ["Links", "create_links"]
+__all__ = ["Links", "create_links", "validation_decorator"]
 
-from typing import Any, Mapping, Optional
+from typing import TYPE_CHECKING, Any, Mapping, Optional
 
 from pydantic import BaseModel, Field
 from starlette.requests import URL
 
 from ..api import request
+from ..utils import IS_PYDANTIC_V2
 
 _link_field = Field(example="/api/v1/users?limit=1&offset1")
 
@@ -48,3 +49,22 @@ def create_links(
         next=_update_path(url, next),
         prev=_update_path(url, prev),
     )
+
+
+if TYPE_CHECKING:
+    from typing import Callable, TypeVar
+
+    TCallable = TypeVar("TCallable", bound=Callable[..., Any])
+
+    def validation_decorator(func: TCallable) -> TCallable:
+        return func
+
+else:
+    if IS_PYDANTIC_V2:
+        from pydantic import model_validator
+
+        validation_decorator = model_validator(mode="before")
+    else:
+        from pydantic import root_validator
+
+        validation_decorator = root_validator(pre=True)
