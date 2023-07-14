@@ -241,9 +241,16 @@ class AbstractPage(GenericModel, Generic[T], ABC):
 
         return new_class(cls_name, bases, exec_body=lambda ns: [setitem(ns, k, v) for k, v in new_ns.items()])
 
-    class Config:
-        orm_mode = True
-        arbitrary_types_allowed = True
+    if IS_PYDANTIC_V2:
+        model_config = {
+            "arbitrary_types_allowed": True,
+            "from_attributes": True,
+        }
+    else:
+
+        class Config:
+            orm_mode = True
+            arbitrary_types_allowed = True
 
 
 class BasePage(AbstractPage[T], Generic[T], ABC):

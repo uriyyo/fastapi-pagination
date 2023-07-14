@@ -5,10 +5,8 @@ __all__ = ["Page"]
 from math import ceil
 from typing import Any, Generic, TypeVar
 
-from pydantic import root_validator
-
 from ..default import Page as BasePage
-from .bases import Links, create_links
+from .bases import Links, create_links, validation_decorator
 
 T = TypeVar("T")
 
@@ -16,7 +14,7 @@ T = TypeVar("T")
 class Page(BasePage[T], Generic[T]):
     links: Links
 
-    @root_validator(pre=True)
+    @validation_decorator
     def __root_validator__(cls, value: Any) -> Any:
         if "links" not in value:
             page, size, total = [value[k] for k in ("page", "size", "total")]
