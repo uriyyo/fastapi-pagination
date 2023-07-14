@@ -75,10 +75,10 @@ class CursorParams(BaseModel, AbstractParams):
 class CursorPage(AbstractPage[T], Generic[T]):
     items: Sequence[T]
 
-    current_page: str = Field(..., description="Cursor to refetch the current page in the given scroll direction")
+    current_page: str = Field(..., description="Cursor to refetch the current page")
     current_page_backwards: str = Field(
         ...,
-        description="Cursor to refetch the current page in the opposite scroll direction",
+        description="Cursor to refetch the current page starting from the last item",
     )
     previous_page: Optional[str] = Field(None, description="Cursor for the previous page")
     next_page: Optional[str] = Field(None, description="Cursor for the next page")
