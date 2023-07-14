@@ -33,11 +33,11 @@ def app(sa_user, sa_order, sa_session):
 
     @app.get("/first-85", response_model=CursorPage[UserOut])
     def route(db: Session = Depends(get_db)):
-        return paginate(db, select(sa_user.where(sa_user.id <= 85)).order_by(sa_user.id, sa_user.name))
+        return paginate(db, select(sa_user).where(sa_user.id <= 85).order_by(sa_user.id, sa_user.name))
 
     @app.get("/last-85", response_model=CursorPage[UserOut])
     def route(db: Session = Depends(get_db)):
-        return paginate(db, select(sa_user.where(sa_user.id > 15)).order_by(sa_user.id, sa_user.name))
+        return paginate(db, select(sa_user).where(sa_user.id > 15).order_by(sa_user.id, sa_user.name))
 
     @app.get("/no-order", response_model=CursorPage[UserOut])
     def route_on_order(db: Session = Depends(get_db)):
