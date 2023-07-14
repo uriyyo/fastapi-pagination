@@ -2,7 +2,7 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
-from typing import Any, Dict, Mapping, Optional, TypeVar
+from typing import Any, Dict, Mapping, Optional, Sequence, TypeVar
 
 from pymongo.collection import Collection
 
@@ -18,6 +18,7 @@ def paginate(
     collection: Collection[T],
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
+    sort: Optional[Sequence[Any]] = None,
     *,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
@@ -28,7 +29,7 @@ def paginate(
     query_filter = query_filter or {}
 
     total = collection.count_documents(query_filter)
-    cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
+    cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, sort=sort, **kwargs)
     items = [*cursor]
     t_items = apply_items_transformer(items, transformer)
 
