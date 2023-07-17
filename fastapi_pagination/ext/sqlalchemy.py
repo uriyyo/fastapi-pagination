@@ -105,6 +105,8 @@ def exec_pagination(
         return create_page(
             items,
             params=params,
+            current=page.paging.bookmark_current,
+            current_backwards=page.paging.bookmark_current_backwards,
             previous=page.paging.bookmark_previous if page.paging.has_previous else None,
             next_=page.paging.bookmark_next if page.paging.has_next else None,
             **(additional_data or {}),

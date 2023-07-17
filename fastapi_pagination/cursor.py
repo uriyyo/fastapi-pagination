@@ -75,6 +75,11 @@ class CursorParams(BaseModel, AbstractParams):
 class CursorPage(AbstractPage[T], Generic[T]):
     items: Sequence[T]
 
+    current_page: Optional[str] = Field(None, description="Cursor to refetch the current page")
+    current_page_backwards: Optional[str] = Field(
+        None,
+        description="Cursor to refetch the current page starting from the last item",
+    )
     previous_page: Optional[str] = Field(None, description="Cursor for the previous page")
     next_page: Optional[str] = Field(None, description="Cursor for the next page")
 
@@ -86,6 +91,8 @@ class CursorPage(AbstractPage[T], Generic[T]):
         items: Sequence[T],
         params: AbstractParams,
         *,
+        current: Optional[Cursor] = None,
+        current_backwards: Optional[Cursor] = None,
         next_: Optional[Cursor] = None,
         previous: Optional[Cursor] = None,
         **kwargs: Any,
@@ -93,6 +100,8 @@ class CursorPage(AbstractPage[T], Generic[T]):
         return create_pydantic_model(
             cls,
             items=items,
+            current_page=encode_cursor(current),
+            current_page_backwards=encode_cursor(current_backwards),
             next_page=encode_cursor(next_),
             previous_page=encode_cursor(previous),
             **kwargs,
