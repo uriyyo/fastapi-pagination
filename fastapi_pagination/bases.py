@@ -37,13 +37,10 @@ from pydantic import BaseModel, create_model
 
 from .utils import IS_PYDANTIC_V2, get_caller
 
-if TYPE_CHECKING:
+if IS_PYDANTIC_V2:
     from pydantic import BaseModel as GenericModel
 else:
-    try:
-        from pydantic.generics import GenericModel
-    except ImportError:  # pragma: no cover
-        GenericModel = BaseModel
+    from pydantic.generics import GenericModel
 
 
 from typing_extensions import Self, TypeGuard
