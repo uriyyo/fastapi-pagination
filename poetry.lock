@@ -145,26 +145,27 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "beanie"
-version = "1.20.0"
+version = "1.21.0"
 description = "Asynchronous Python ODM for MongoDB"
 optional = true
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "beanie-1.20.0-py3-none-any.whl", hash = "sha256:3212cfc20c1b30d5b4ae9d9dfc02eda0cbc09c26f23c7aeb079baa1d90889a57"},
-    {file = "beanie-1.20.0.tar.gz", hash = "sha256:d83004a8330dab9055ea57a6247a324ed40011f9cdcd527aaf4c0dc9253e9d21"},
+    {file = "beanie-1.21.0-py3-none-any.whl", hash = "sha256:180a6d5e854297be2da84689b03509e7dc4f40f00c58a894a17ad40a00630838"},
+    {file = "beanie-1.21.0.tar.gz", hash = "sha256:df1bcac1d5834730d3a1e461814fd0dfa173d91daca047b4d8ddcbf54343b4fd"},
 ]
 
 [package.dependencies]
 click = ">=7"
-lazy-model = ">=0.0.3"
+lazy-model = "0.1.0b0"
 motor = ">=2.5.0,<4.0.0"
-pydantic = ">=1.10.0,<2.0.0"
+pydantic = ">=1.10,<3.0"
 toml = "*"
+typing-extensions = ">=4.7"
 
 [package.extras]
-doc = ["Markdown (>=3.3)", "Pygments (>=2.8.0)", "jinja2 (>=3.0.3)", "mkdocs (>=1.4)", "mkdocs-material (>=9.0)", "pydoc-markdown (==4.6)"]
+doc = ["Markdown (>=3.3)", "Pygments (>=2.8.0)", "jinja2 (>=3.0.3)", "mkdocs (>=1.4)", "mkdocs-material (>=9.0)", "pydoc-markdown (>=4.8)"]
 queue = ["beanie-batteries-queue (>=0.2)"]
-test = ["asgi-lifespan (>=1.0.1)", "dnspython (>=2.1.0)", "fastapi (>=0.78.0)", "flake8 (>=3)", "httpx (>=0.23.0)", "pre-commit (>=2.3.0)", "pyright (>=0)", "pytest (>=6.0.0)", "pytest-asyncio (>=0.21.0)", "pytest-cov (>=2.8.1)"]
+test = ["asgi-lifespan (>=1.0.1)", "dnspython (>=2.1.0)", "fastapi (>=0.100)", "flake8 (>=3)", "httpx (>=0.23.0)", "pre-commit (>=2.3.0)", "pydantic-settings (>=2.0)", "pyright (>=0)", "pytest (>=6.0.0)", "pytest-asyncio (>=0.21.0)", "pytest-cov (>=2.8.1)"]
 
 [[package]]
 name = "black"
@@ -872,13 +873,13 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "lazy-model"
-version = "0.0.5"
+version = "0.1.0b0"
 description = ""
 optional = true
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "lazy-model-0.0.5.tar.gz", hash = "sha256:2d98f9dfe275012477555a439dceb56364793a0f266758d1a33267d68e8fbc76"},
-    {file = "lazy_model-0.0.5-py3-none-any.whl", hash = "sha256:8b4fc5eac99029f84b11b21e81a6894911a475f25e53227b7e44833e62e26553"},
+    {file = "lazy-model-0.1.0b0.tar.gz", hash = "sha256:90dd0b26d3033fadc18f697ab9cdd66cdf8e55469f32f2d88efd92610468e2d6"},
+    {file = "lazy_model-0.1.0b0-py3-none-any.whl", hash = "sha256:74406bd54cf96a89b73570d8409b538c660ae4d0bfb4b30bbe46db2658a5937d"},
 ]
 
 [package.dependencies]
@@ -2179,13 +2180,13 @@ pyyaml = ["pyyaml"]
 
 [[package]]
 name = "typing-extensions"
-version = "4.5.0"
+version = "4.7.1"
 description = "Backported and Experimental Type Hints for Python 3.7+"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typing_extensions-4.5.0-py3-none-any.whl", hash = "sha256:fb33085c39dd998ac16d1431ebc293a8b3eedd00fd4a32de0ff79002c19511b4"},
-    {file = "typing_extensions-4.5.0.tar.gz", hash = "sha256:5cb5f4a79139d699607b3ef622a1dedafa84e115ab0024e0d9c044a9479ca7cb"},
+    {file = "typing_extensions-4.7.1-py3-none-any.whl", hash = "sha256:440d5dd3af93b060174bf433bccd69b0babc3b15b1a8dca43789fd7f61514b36"},
+    {file = "typing_extensions-4.7.1.tar.gz", hash = "sha256:b75ddc264f0ba5615db7ba217daeb99701ad295353c45f9e95963337ceeeffb2"},
 ]
 
 [[package]]
