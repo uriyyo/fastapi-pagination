@@ -34,7 +34,7 @@ jobs:
           postgresql password: 'postgres'
 
       - name: Set up MongoDB
-        uses: supercharge/mongodb-github-action@1.9.0
+        uses: supercharge/mongodb-github-action@v1.10.0
 
       - name: Set up Scylla
         run: |
