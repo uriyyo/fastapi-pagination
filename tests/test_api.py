@@ -1,6 +1,6 @@
 from typing import Any, Generic, Sequence, TypeVar
 
-from fastapi import Depends, FastAPI, Request, Response
+from fastapi import Depends, FastAPI, Request, Response, status
 from fastapi.routing import APIRouter
 from fastapi.testclient import TestClient
 from pydantic import Field
@@ -235,3 +235,20 @@ def test_apply_items_transformer_sync_with_async_transformer():
         match=r"^apply_items_transformer called with async_=False but transformer is async$",
     ):
         apply_items_transformer([], async_transformer, async_=False)
+
+
+def test_no_exception_on_validation_error():
+    app = FastAPI()
+    client = TestClient(app)
+
+    @app.get(
+        "/",
+        response_model=Page[int],
+    )
+    async def route():
+        return paginate([])
+
+    add_pagination(app)
+
+    rsp = client.get("/", params={"page": -1})
+    assert rsp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
