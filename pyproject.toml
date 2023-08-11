@@ -60,7 +60,7 @@ asgi-lifespan = "^2.1.0"
 requests = "^2.31.0"
 uvicorn = "^0.23.2"
 Jinja2 = "^3.1.2"
-mypy = "^1.4.1"
+mypy = "^1.5.0"
 ruff = "^0.0.284"
 
 [tool.poetry.extras]
