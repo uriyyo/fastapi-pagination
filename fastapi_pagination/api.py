@@ -37,11 +37,12 @@ from fastapi.dependencies.utils import (
     lenient_issubclass,
 )
 from fastapi.routing import APIRoute, APIRouter
+from pydantic import BaseModel
 
 from .bases import AbstractPage, AbstractParams
 from .default import Page
 from .types import AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
-from .utils import is_async_callable
+from .utils import IS_PYDANTIC_V2, is_async_callable
 
 T = TypeVar("T")
 TAbstractParams = TypeVar("TAbstractParams", covariant=True, bound=AbstractParams)
@@ -245,7 +246,18 @@ def _create_params_dependency(
         with _ctx_var_with_reset(_params_val, cast(AbstractParams, val)):
             yield val
 
-    _pagination_params.__signature__ = inspect.signature(params)  # type: ignore[attr-defined]
+    sign = inspect.signature(params)
+
+    if IS_PYDANTIC_V2:
+        with suppress(ValueError, TypeError):
+            if issubclass(params, BaseModel):
+                sign_params = {**sign.parameters}
+                for name, field in params.model_fields.items():
+                    sign_params[name] = sign_params[name].replace(default=field)
+
+                sign = sign.replace(parameters=[*sign_params.values()])
+
+    _pagination_params.__signature__ = sign  # type: ignore[attr-defined]
 
     return _pagination_params
 
