@@ -17,6 +17,7 @@ T = TypeVar("T", bound=Mapping[str, Any])
 def paginate(
     collection: Collection[T],
     query_filter: Optional[Dict[Any, Any]] = None,
+    filter_fields: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     sort: Optional[Sequence[Any]] = None,
     *,
@@ -27,11 +28,22 @@ def paginate(
     params, raw_params = verify_params(params, "limit-offset")
 
     query_filter = query_filter or {}
+    filter_fields = filter_fields or {}
 
     total = collection.count_documents(query_filter)
-    cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, sort=sort, **kwargs)
+    cursor = collection.find(
+        query_filter,
+        filter_fields,
+        skip=raw_params.offset,
+        limit=raw_params.limit,
+        sort=sort,
+        **kwargs,
+    )
     items = [*cursor]
-    t_items = apply_items_transformer(items, transformer)
+    t_items = apply_items_transformer(
+        items,
+        transformer,
+    )
 
     return create_page(
         t_items,
