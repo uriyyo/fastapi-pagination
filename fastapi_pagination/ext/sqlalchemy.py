@@ -51,8 +51,11 @@ def paginate_query(query: Select, params: AbstractParams) -> Select:
     return generic_query_apply_params(query, params.to_raw_params().as_limit_offset())
 
 
-def count_query(query: Select, *, use_subquery: bool = True) -> Select:
+def count_query(query: Select, *, use_subquery: bool, unique: bool) -> Select:
     query = query.order_by(None).options(noload("*"))
+
+    if unique:
+        query = query.distinct()
 
     if use_subquery:
         return select(func.count()).select_from(query.subquery())
@@ -112,7 +115,7 @@ def exec_pagination(
             **(additional_data or {}),
         )
 
-    total = conn.scalar(count_query(query, use_subquery=subquery_count))
+    total = conn.scalar(count_query(query, use_subquery=subquery_count, unique=unique))
     query = paginate_query(query, params)
     items = _maybe_unique(conn.execute(query), unique)
     items = unwrap_scalars(items)
