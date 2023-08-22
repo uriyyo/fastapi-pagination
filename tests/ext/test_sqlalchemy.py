@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, Type
 
 from fastapi import Depends, FastAPI
 from pytest import fixture, skip
@@ -25,7 +25,7 @@ def use_subquery_count(request):
 
 
 @fixture(scope="session")
-def app(sa_user, sa_session, model_cls, use_subquery_count):
+def app(sa_user, sa_session: Type[Session], model_cls: Type[object], use_subquery_count: bool):
     app = FastAPI()
 
     def get_db() -> Iterator[Session]:
