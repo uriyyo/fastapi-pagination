@@ -28,12 +28,15 @@ nav:
       - "Limit Offset Pagination": tutorials/limit-offset-pagination.md
       - "Links in Pagination": tutorials/links-pagination.md
       - "Cursor Pagination": tutorials/cursor-pagination.md
+      - "Items Transformer": tutorials/items-transformer.md
   - "Advanced User Guide":
       - "Custom Params": tutorials_advanced/custom-params.md
       - "Custom Page": tutorials_advanced/custom-page.md
       - "Custom Pagination Function": tutorials_advanced/custom-paginate.md
   - "Integrations":
+      - "Integrations": integrations/integrations.md
       - "Available Integrations": integrations/available-integrations.md
+      - "SQLAlchemy": integrations/sqlalchemy.md
   - "Contributing": contributing.md
   - "License": license.md
 
