@@ -3,7 +3,7 @@ from __future__ import annotations
 __all__ = ["Page"]
 
 from math import ceil
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, MutableMapping, TypeVar
 
 from ..default import Page as BasePage
 from .bases import Links, create_links, validation_decorator
@@ -16,6 +16,9 @@ class Page(BasePage[T], Generic[T]):
 
     @validation_decorator
     def __root_validator__(cls, value: Any) -> Any:
+        if not isinstance(value, MutableMapping):
+            return value
+
         if "links" not in value:
             page, size, total = [value[k] for k in ("page", "size", "total")]
 

@@ -1,8 +1,11 @@
-from fastapi import FastAPI, status
+from typing import Any
+
+from fastapi import Depends, FastAPI, status
 from fastapi.testclient import TestClient
+from pydantic import BaseModel
 from pytest import mark
 
-from fastapi_pagination import add_pagination, paginate
+from fastapi_pagination import add_pagination, paginate, pagination_ctx
 from fastapi_pagination.links import LimitOffsetPage, Page
 
 app = FastAPI()
@@ -18,6 +21,20 @@ async def route_1():
 @app.get("/default-empty", response_model=Page[int])
 async def route_2():
     return paginate([])
+
+
+class MySchema(BaseModel):
+    page: Page[Any]
+
+
+@app.get(
+    "/revalidate",
+    dependencies=[Depends(pagination_ctx(Page))],
+    response_model=MySchema,
+)
+async def route_3():
+    page = paginate([*range(10)])
+    return {"page": page}
 
 
 add_pagination(app)
@@ -104,4 +121,26 @@ def test_links(self, prev, next, first, last):
         "next": next,
         "first": first,
         "last": last,
+    }
+
+
+def test_revalidation():
+    response = client.get("/revalidate")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {
+        "page": {
+            "items": [*range(10)],
+            "total": 10,
+            "page": 1,
+            "size": 50,
+            "pages": 1,
+            "links": {
+                "first": "/revalidate?page=1",
+                "last": "/revalidate?page=1",
+                "self": "/revalidate",
+                "next": None,
+                "prev": None,
+            },
+        },
     }
