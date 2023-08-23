@@ -1,12 +1,12 @@
 from typing import List
 
-from fastapi import FastAPI
-from pydantic import BaseModel, EmailStr, Field
+from fastapi import FastAPI, Query
+from pydantic import BaseModel, EmailStr
 
 from fastapi_pagination import Page, add_pagination, paginate
 
 Page = Page.with_custom_options(
-    size=Field(100, ge=1, le=500),
+    size=Query(100, ge=1, le=500),
 )
 
 app = FastAPI()
