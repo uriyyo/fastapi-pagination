@@ -23,14 +23,23 @@ async def route_2():
     return paginate([])
 
 
-class MySchema(BaseModel):
+class MySchemaPage(BaseModel):
     page: Page[Any]
 
 
+class MySchemaLimitOffset(BaseModel):
+    page: LimitOffsetPage[Any]
+
+
 @app.get(
-    "/revalidate",
-    dependencies=[Depends(pagination_ctx(Page))],
-    response_model=MySchema,
+    "/revalidate/default",
+    dependencies=[Depends(pagination_ctx(Page[int]))],
+    response_model=MySchemaPage,
+)
+@app.get(
+    "/revalidate/limit-offset",
+    dependencies=[Depends(pagination_ctx(LimitOffsetPage[int]))],
+    response_model=MySchemaLimitOffset,
 )
 async def route_3():
     page = paginate([*range(10)])
@@ -124,8 +133,9 @@ def test_links(self, prev, next, first, last):
     }
 
 
-def test_revalidation():
-    response = client.get("/revalidate")
+def test_revalidation_default():
+    response = client.get("/revalidate/default")
+    print(response.json())
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
@@ -136,9 +146,30 @@ def test_revalidation():
             "size": 50,
             "pages": 1,
             "links": {
-                "first": "/revalidate?page=1",
-                "last": "/revalidate?page=1",
-                "self": "/revalidate",
+                "first": "/revalidate/default?page=1",
+                "last": "/revalidate/default?page=1",
+                "self": "/revalidate/default",
+                "next": None,
+                "prev": None,
+            },
+        },
+    }
+
+
+def test_revalidation_limit_offset():
+    response = client.get("/revalidate/limit-offset")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {
+        "page": {
+            "items": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "total": 10,
+            "limit": 50,
+            "offset": 0,
+            "links": {
+                "first": "/revalidate/limit-offset?offset=0",
+                "last": "/revalidate/limit-offset?offset=0",
+                "self": "/revalidate/limit-offset",
                 "next": None,
                 "prev": None,
             },
