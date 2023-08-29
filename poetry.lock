@@ -1618,18 +1618,21 @@ plugins = ["importlib-metadata"]
 
 [[package]]
 name = "pymdown-extensions"
-version = "10.1"
+version = "10.2"
 description = "Extension pack for Python Markdown."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pymdown_extensions-10.1-py3-none-any.whl", hash = "sha256:ef25dbbae530e8f67575d222b75ff0649b1e841e22c2ae9a20bad9472c2207dc"},
-    {file = "pymdown_extensions-10.1.tar.gz", hash = "sha256:508009b211373058debb8247e168de4cbcb91b1bff7b5e961b2c3e864e00b195"},
+    {file = "pymdown_extensions-10.2-py3-none-any.whl", hash = "sha256:fbb86243db9a681602e3b869deef000211c55d0261015a5cc41d6f34d2afc57f"},
+    {file = "pymdown_extensions-10.2.tar.gz", hash = "sha256:06042274876eb4267f12a389daf505eabaebc38bdca26725560c9afda5867549"},
 ]
 
 [package.dependencies]
 markdown = ">=3.2"
 pyyaml = "*"
+
+[package.extras]
+extra = ["pygments (>=2.12)"]
 
 [[package]]
 name = "pymongo"
@@ -2552,4 +2555,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "3c46b70de92b70bd34ad9d410aacc10c6ecd07c8947670ca72390578857924c2"
+content-hash = "b0c60b2ed6ecb5dbbce28727dd31d096303b3d9f1e088d9adc6a5a06121703b8"
