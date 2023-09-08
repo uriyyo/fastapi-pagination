@@ -561,13 +561,13 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "faker"
-version = "19.3.1"
+version = "19.4.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Faker-19.3.1-py3-none-any.whl", hash = "sha256:e2722fdf622cf24e974aaba15a3dee97a6f8b98d869bd827ff1af9c87695af46"},
-    {file = "Faker-19.3.1.tar.gz", hash = "sha256:a6624d9574623bb27dfca33fff94581cd7b23b562901db8ad59acbde9a52543e"},
+    {file = "Faker-19.4.0-py3-none-any.whl", hash = "sha256:11f0d2a6632d212e8ab89fd9152a1b8db777816e42f3579f8c63c11e43cec873"},
+    {file = "Faker-19.4.0.tar.gz", hash = "sha256:0c3a7cbaa6497dcc18819bfe31ae916d2180c31a3b1ea8907c948d94eb06955d"},
 ]
 
 [package.dependencies]
@@ -2364,4 +2364,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "32c6773c41f221f97fe21df38b05e22812104e8277a64dbacd7202b63eda6767"
+content-hash = "81ea3a31c6870221d5f37fb458a509d9964ba590c03203b374ebd86234f8dac8"
