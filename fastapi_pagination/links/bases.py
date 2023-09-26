@@ -8,7 +8,11 @@ from starlette.requests import URL
 from ..api import request
 from ..utils import IS_PYDANTIC_V2
 
-_link_field = Field(example="/api/v1/users?limit=1&offset1")
+_link_field = (
+    Field(examples=["/api/v1/users?limit=1&offset1"])
+    if IS_PYDANTIC_V2
+    else Field(example="/api/v1/users?limit=1&offset1")
+)
 
 
 class Links(BaseModel):
