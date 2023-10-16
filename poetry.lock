@@ -230,21 +230,27 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "bunnet"
-version = "1.1.0"
+version = "1.2.0"
 description = "Synchronous Python ODM for MongoDB"
 optional = true
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "bunnet-1.1.0-py3-none-any.whl", hash = "sha256:860d79bed3f97c0e45e631a725e6da22598712dad2a599240d62c5ee581dde1a"},
-    {file = "bunnet-1.1.0.tar.gz", hash = "sha256:e8e4aa61129c164f774a6549937f85507999cccef1a6591ac0ad175e695fe8c5"},
+    {file = "bunnet-1.2.0-py3-none-any.whl", hash = "sha256:0c13511fc33a109ebaaa8aed0ff4488c2f553d97a3a521c02a2346d16dc79270"},
+    {file = "bunnet-1.2.0.tar.gz", hash = "sha256:8be5a58afa9a42c2af9913bfd264322806f20ca741ba488ea88e5f613ae42782"},
 ]
 
 [package.dependencies]
 click = ">=7"
-lazy-model = ">=0.0.3"
-pydantic = ">=1.9.0"
-pymongo = "*"
+lazy-model = "0.2.0"
+pydantic = ">=1.10,<3.0"
+pymongo = ">=3"
 toml = "*"
+typing-extensions = {version = ">=4.7", markers = "python_version < \"3.11\""}
+
+[package.extras]
+doc = ["Markdown (>=3.3)", "Pygments (>=2.8.0)", "jinja2 (>=3.0.3)", "mkdocs (>=1.4)", "mkdocs-material (>=9.0)", "pydoc-markdown (>=4.8)"]
+queue = ["beanie-batteries-queue (>=0.2)"]
+test = ["asgi-lifespan (>=1.0.1)", "dnspython (>=2.1.0)", "fastapi (>=0.100)", "flake8 (>=3)", "httpx (>=0.23.0)", "pre-commit (>=2.3.0)", "pydantic-extra-types (>=2)", "pydantic-settings (>=2)", "pyright (>=0)", "pytest (>=6.0.0)", "pytest-asyncio (>=0.21.0)", "pytest-cov (>=2.8.1)"]
 
 [[package]]
 name = "certifi"
