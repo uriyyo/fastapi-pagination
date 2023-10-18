@@ -33,11 +33,13 @@ from typing import (
 
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.dependencies.utils import (
+    get_body_field,
     get_parameterless_sub_dependant,
     lenient_issubclass,
 )
 from fastapi.routing import APIRoute, APIRouter
 from pydantic import BaseModel
+from starlette.routing import request_response
 
 from .bases import AbstractPage, AbstractParams
 from .default import Page
@@ -319,6 +321,9 @@ def _update_route(route: APIRoute) -> None:
             path=route.path_format,
         ),
     )
+
+    route.body_field = get_body_field(dependant=route.dependant, name=route.unique_id)
+    route.app = request_response(route.get_route_handler())
 
 
 def _add_pagination(parent: ParentT) -> None:
