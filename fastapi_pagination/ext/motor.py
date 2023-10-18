@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional
 
 from motor.core import AgnosticCollection
 
@@ -14,7 +14,7 @@ async def paginate(
     collection: AgnosticCollection,
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
-    sort: Optional[Sequence[Any]] = None,
+    sort: Optional[Any] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
@@ -26,7 +26,7 @@ async def paginate(
     total = await collection.count_documents(query_filter)
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
     if sort is not None:
-        cursor = cursor.sort(*sort)
+        cursor = cursor.sort(*sort) if isinstance(sort, tuple) else cursor.sort(sort)
 
     items = await cursor.to_list(length=raw_params.limit)  # type: ignore[arg-type]
     t_items = await apply_items_transformer(items, transformer, async_=True)
