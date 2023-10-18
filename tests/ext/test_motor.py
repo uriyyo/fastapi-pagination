@@ -33,7 +33,7 @@ def app(db_client, model_cls):
     @app.get("/default", response_model=Page[model_cls])
     @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     async def route():
-        return await paginate(db_client.test.users, sort=["name", 1])
+        return await paginate(db_client.test.users, sort=[("name", 1)])
 
     return add_pagination(app)
 
