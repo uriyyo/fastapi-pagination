@@ -11,7 +11,6 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import async_scoped_session
 from sqlalchemy.orm import Query, Session, noload, scoped_session
 from typing_extensions import TypeAlias
 
@@ -36,6 +35,15 @@ except ImportError:  # pragma: no cover
 
     def await_only(*_: Any, **__: Any) -> Any:  # type: ignore
         raise ImportError("sqlalchemy.util.await_only is not available")
+
+
+try:
+    from sqlalchemy.ext.asyncio import async_scoped_session
+except ImportError:  # pragma: no cover
+
+    class async_scoped_session:  # type: ignore
+        def __init__(self, *_: Any, **__: Any) -> None:
+            raise ImportError("sqlalchemy.ext.asyncio is not available")
 
 
 try:
