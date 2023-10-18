@@ -11,7 +11,7 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Query, Session, noload
+from sqlalchemy.orm import Query, Session, noload, scoped_session
 from typing_extensions import TypeAlias
 
 from ..api import apply_items_transformer, create_page
@@ -38,13 +38,22 @@ except ImportError:  # pragma: no cover
 
 
 try:
+    from sqlalchemy.ext.asyncio import async_scoped_session
+except ImportError:  # pragma: no cover
+
+    class async_scoped_session:  # type: ignore
+        def __init__(self, *_: Any, **__: Any) -> None:
+            raise ImportError("sqlalchemy.ext.asyncio is not available")
+
+
+try:
     from sqlakeyset import paging
 except ImportError:  # pragma: no cover
     paging = None
 
 
-AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection]"
-SyncConn: TypeAlias = "Union[Session, Connection]"
+AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection, async_scoped_session]"
+SyncConn: TypeAlias = "Union[Session, Connection, scoped_session]"
 
 
 def paginate_query(query: Select, params: AbstractParams) -> Select:
@@ -127,6 +136,9 @@ def exec_pagination(
 
 
 def _get_sync_conn_from_async(conn: Any) -> SyncConn:  # pragma: no cover
+    if isinstance(conn, async_scoped_session):
+        conn = conn()
+
     with suppress(AttributeError):
         return conn.sync_session  # type: ignore
 
