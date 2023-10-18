@@ -34,6 +34,8 @@ async def paginate(
     # need another copy for count query
     count_query = deepcopy(query)
     count_query.columns_delegate.selected_columns = []
+    # reset order by to avoid errors in count query
+    count_query.order_by_delegate._order_by.order_by_items = []  # noqa
 
     total = None
     if row := await count_query.columns(Count()).first():
