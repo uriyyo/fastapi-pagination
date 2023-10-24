@@ -2111,18 +2111,18 @@ typing-extensions = ">=3.7.4"
 
 [[package]]
 name = "sqlmodel"
-version = "0.0.8"
+version = "0.0.9"
 description = "SQLModel, SQL databases in Python, designed for simplicity, compatibility, and robustness."
 optional = true
-python-versions = ">=3.6.1,<4.0.0"
+python-versions = ">=3.7,<4.0"
 files = [
-    {file = "sqlmodel-0.0.8-py3-none-any.whl", hash = "sha256:0fd805719e0c5d4f22be32eb3ffc856eca3f7f20e8c7aa3e117ad91684b518ee"},
-    {file = "sqlmodel-0.0.8.tar.gz", hash = "sha256:3371b4d1ad59d2ffd0c530582c2140b6c06b090b32af9b9c6412986d7b117036"},
+    {file = "sqlmodel-0.0.9-py3-none-any.whl", hash = "sha256:29739ce1d7b02cfbbc38f42d83e975a13aa7238fc0b12b6b670d2a6d54e45957"},
+    {file = "sqlmodel-0.0.9.tar.gz", hash = "sha256:7e8bd40d6322a56dec3efe0ca05371c7c1dfd7aa0bc6826d45d0f16f2c72a4dc"},
 ]
 
 [package.dependencies]
 pydantic = ">=1.8.2,<2.0.0"
-SQLAlchemy = ">=1.4.17,<=1.4.41"
+SQLAlchemy = ">=1.4.36,<2.0.0"
 sqlalchemy2-stubs = "*"
 
 [[package]]
@@ -2388,4 +2388,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "fde6339af23e4ae9383187b5a7deb1c6d74d5e9a3afabdff0e86dcc5e690f721"
+content-hash = "c5109b9c4524ae1da94ce6d2b82ad9f683776ee0eefb600e88759f72b0bc1624"
