@@ -255,6 +255,7 @@ def _create_params_dependency(
             if issubclass(params, BaseModel):
                 sign_params = {**sign.parameters}
                 for name, field in params.model_fields.items():
+                    name = field.alias or name
                     sign_params[name] = sign_params[name].replace(default=field)
 
                 sign = sign.replace(parameters=[*sign_params.values()])
