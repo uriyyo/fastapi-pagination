@@ -23,7 +23,7 @@ async def paginate(
     params, raw_params = verify_params(params, "limit-offset")
     query_filter = query_filter or {}
 
-    total = await collection.count_documents(query_filter)
+    total = await collection.count_documents(query_filter) if raw_params.include_total else None
     cursor = collection.find(query_filter, skip=raw_params.offset, limit=raw_params.limit, **kwargs)
     if sort is not None:
         cursor = cursor.sort(*sort) if isinstance(sort, tuple) else cursor.sort(sort)

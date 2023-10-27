@@ -55,6 +55,7 @@ TAbstractPage = TypeVar("TAbstractPage", bound="AbstractPage[Any]")
 
 class BaseRawParams:
     type: ClassVar[ParamsType]
+    include_total: bool
 
     def as_limit_offset(self) -> RawParams:
         if is_limit_offset(self):
@@ -81,6 +82,7 @@ def is_cursor(params: BaseRawParams) -> TypeGuard[CursorRawParams]:
 class RawParams(BaseRawParams):
     limit: Optional[int] = None
     offset: Optional[int] = None
+    include_total: bool = True
 
     type: ClassVar[ParamsType] = "limit-offset"
 
@@ -95,6 +97,7 @@ class RawParams(BaseRawParams):
 class CursorRawParams(BaseRawParams):
     cursor: Optional[Cursor]
     size: int
+    include_total: bool = False
 
     type: ClassVar[ParamsType] = "cursor"
 
@@ -253,4 +256,4 @@ class AbstractPage(GenericModel, Generic[T], ABC):
 
 class BasePage(AbstractPage[T], Generic[T], ABC):
     items: Sequence[T]
-    total: GreaterEqualZero
+    total: Optional[GreaterEqualZero]

@@ -38,7 +38,7 @@ async def paginate(
     count_query.order_by_delegate._order_by.order_by_items = []  # noqa
 
     total = None
-    if row := await count_query.columns(Count()).first():
+    if raw_params.include_total and (row := await count_query.columns(Count()).first()):
         total = row["count"]
 
     items = await generic_query_apply_params(query, raw_params)

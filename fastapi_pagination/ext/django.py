@@ -25,7 +25,7 @@ def paginate(
     if isinstance(query, ModelBase):
         query = cast(Type[T], query).objects.all()
 
-    total = query.count()
+    total = query.count() if raw_params.include_total else None
     query = query.all()[raw_params.as_slice()]
     items = [*query]
     t_items = apply_items_transformer(items, transformer)

@@ -23,12 +23,16 @@ async def paginate(
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
 ) -> Any:
-    params, _ = verify_params(params, "limit-offset")
+    params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, type) and issubclass(query, CRUDModel):
         query = query.query
 
-    total = await func.count(literal_column("*")).select().select_from(query.order_by(None).alias()).gino.scalar()
+    if raw_params.include_total:
+        total = await func.count(literal_column("*")).select().select_from(query.order_by(None).alias()).gino.scalar()
+    else:
+        total = None
+
     query = paginate_query(query, params)
     items = await query.gino.all()
     t_items = await apply_items_transformer(items, transformer, async_=True)
