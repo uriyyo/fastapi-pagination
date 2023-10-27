@@ -1,11 +1,11 @@
 __all__ = ["paginate"]
 
-import warnings
 from typing import Any, Optional, Type, TypeVar, overload
 
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select, SelectOfScalar
+from typing_extensions import deprecated
 
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
@@ -16,6 +16,11 @@ TSQLModel = TypeVar("TSQLModel", bound=SQLModel)
 
 
 @overload
+@deprecated(
+    "fastapi_pagination.ext.async_sqlmodel module is deprecated, "
+    "please use fastapi_pagination.ext.sqlmodel module instead"
+    "This module will be removed in the next major release (0.13.0).",
+)
 async def paginate(
     session: AsyncSession,
     query: Select[TSQLModel],
@@ -29,6 +34,11 @@ async def paginate(
 
 
 @overload
+@deprecated(
+    "fastapi_pagination.ext.async_sqlmodel module is deprecated, "
+    "please use fastapi_pagination.ext.sqlmodel module instead"
+    "This module will be removed in the next major release (0.13.0).",
+)
 async def paginate(
     session: AsyncSession,
     query: SelectOfScalar[T],
@@ -42,6 +52,11 @@ async def paginate(
 
 
 @overload
+@deprecated(
+    "fastapi_pagination.ext.async_sqlmodel module is deprecated, "
+    "please use fastapi_pagination.ext.sqlmodel module instead"
+    "This module will be removed in the next major release (0.13.0).",
+)
 async def paginate(
     session: AsyncSession,
     query: Type[TSQLModel],
@@ -62,14 +77,6 @@ async def paginate(
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
 ) -> Any:
-    warnings.warn(
-        "fastapi_pagination.ext.async_sqlmodel module is deprecated, "
-        "please use fastapi_pagination.ext.sqlmodel module instead"
-        "This module will be removed in the next major release (0.13.0).",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-
     return await _paginate(
         session,
         query,

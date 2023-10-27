@@ -40,6 +40,7 @@ from fastapi.dependencies.utils import (
 from fastapi.routing import APIRoute, APIRouter
 from pydantic import BaseModel
 from starlette.routing import request_response
+from typing_extensions import deprecated
 
 from .bases import AbstractPage, AbstractParams
 from .default import Page
@@ -89,6 +90,30 @@ Positional arguments are deprecated and will be removed in the next major releas
 """
 
 _SENTINEL: Any = object()
+
+
+@overload
+def create_page(
+    items: Sequence[T],
+    /,
+    **kwargs: Any,
+) -> AbstractPage[T]:
+    pass
+
+
+@overload
+@deprecated(
+    "'total' and 'params' are deprecated parameters, use keyword arguments instead. "
+    "These parameters are deprecated and will be removed in the next major release (0.13.0).",
+)
+def create_page(
+    items: Sequence[T],
+    total: Optional[int] = _SENTINEL,
+    params: Optional[AbstractParams] = _SENTINEL,
+    /,
+    **kwargs: Any,
+) -> AbstractPage[T]:
+    pass
 
 
 def create_page(
