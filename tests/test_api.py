@@ -1,9 +1,11 @@
-from typing import Any, Generic, Sequence, TypeVar
+from contextlib import asynccontextmanager
+from typing import Any, AsyncIterator, Generic, Sequence, TypeVar
 
 from fastapi import Depends, FastAPI, Request, Response, status
 from fastapi.routing import APIRouter
 from fastapi.testclient import TestClient
 from pydantic import Field
+from pytest import fixture
 
 try:
     from pydantic.generics import GenericModel
@@ -252,3 +254,32 @@ def test_no_exception_on_validation_error():
 
     rsp = client.get("/", params={"page": -1})
     assert rsp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+class TestLifespan:
+    @fixture(scope="class")
+    def app(self):
+        @asynccontextmanager
+        async def lifespan(_: Any) -> AsyncIterator[None]:
+            app.state.called = True
+            yield
+
+        app = FastAPI(lifespan=lifespan)
+
+        @app.get(
+            "/",
+            response_model=Page[int],
+        )
+        async def route():
+            return paginate([])
+
+        add_pagination(app)
+        app.state.called = False
+
+        return app
+
+    async def test_lifespan_wrap(self, app, client):
+        rsp = await client.get("/")
+        assert rsp.status_code == status.HTTP_200_OK
+
+        assert app.state.called, "original lifespan not called"
