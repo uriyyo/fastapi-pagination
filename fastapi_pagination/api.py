@@ -14,7 +14,7 @@ __all__ = [
 
 import inspect
 import warnings
-from contextlib import ExitStack, contextmanager, suppress
+from contextlib import ExitStack, asynccontextmanager, contextmanager, suppress
 from contextvars import ContextVar
 from typing import (
     Any,
@@ -365,8 +365,15 @@ def _add_pagination(parent: ParentT) -> None:
 def add_pagination(parent: ParentT) -> ParentT:
     _add_pagination(parent)
 
-    @parent.on_event("startup")
-    def on_startup() -> None:
+    router = parent.router if isinstance(parent, FastAPI) else parent
+    _original_lifespan_context = router.lifespan_context
+
+    @asynccontextmanager
+    async def lifespan(app: Any) -> AsyncIterator[Any]:
         _add_pagination(parent)
 
+        async with _original_lifespan_context(app) as maybe_state:
+            yield maybe_state
+
+    router.lifespan_context = lifespan
     return parent
