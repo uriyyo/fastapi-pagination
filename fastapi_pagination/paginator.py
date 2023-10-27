@@ -27,7 +27,7 @@ def paginate(
 
     return create_page(
         t_items,
-        total=length_function(sequence),
+        total=length_function(sequence) if raw_params.include_total else None,
         params=params,
         **(additional_data or {}),
     )

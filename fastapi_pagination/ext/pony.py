@@ -21,7 +21,7 @@ def paginate(
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
-    total = query.count()
+    total = query.count() if raw_params.include_total else None
     items = query.fetch(raw_params.limit, raw_params.offset).to_list()
     t_items = apply_items_transformer(items, transformer)
 

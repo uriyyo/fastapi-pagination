@@ -25,7 +25,7 @@ def paginate(
     if isinstance(query, TopLevelDocumentMetaclass):
         query = cast(Type[T], query).objects().all()
 
-    total = query.count()
+    total = query.count() if raw_params.include_total else None
     cursor = query.skip(raw_params.offset).limit(raw_params.limit)
     items = [item.to_mongo() for item in cursor]
     t_items = apply_items_transformer(items, transformer)

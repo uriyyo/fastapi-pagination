@@ -15,18 +15,18 @@ from .default import Page as DefaultPage
 from .default import Params
 from .limit_offset import LimitOffsetPage as DefaultLimitOffsetPage
 from .limit_offset import LimitOffsetParams
-from .types import AdditionalData, GreaterEqualZero, SyncItemsTransformer
+from .types import AdditionalData, SyncItemsTransformer
 from .utils import verify_params
 
 T = TypeVar("T")
 
 
 class Page(DefaultPage[T], Generic[T]):
-    total: Optional[GreaterEqualZero]  # type: ignore[assignment]
+    pass
 
 
 class LimitOffsetPage(DefaultLimitOffsetPage[T], Generic[T]):
-    total: Optional[GreaterEqualZero]  # type: ignore[assignment]
+    pass
 
 
 def paginate(

@@ -23,6 +23,7 @@ def paginate(
     additional_data: Optional[AdditionalData] = None,
 ) -> Any:
     params, raw_params = verify_params(params, "cursor")
+    assert not raw_params.include_total, "Cassandra does not support total count"
 
     query_filter = query_filter or {}
     stmt = SimpleStatement(

@@ -96,6 +96,10 @@ def exec_pagination(
     else:
         _apply_items_transformer = apply_items_transformer
 
+    total = None
+    if raw_params.include_total:
+        total = conn.scalar(count_query(query, use_subquery=subquery_count))
+
     if is_cursor(raw_params):
         if paging is None:
             raise ImportError("sqlakeyset is not installed")
@@ -118,10 +122,10 @@ def exec_pagination(
             current_backwards=page.paging.bookmark_current_backwards,
             previous=page.paging.bookmark_previous if page.paging.has_previous else None,
             next_=page.paging.bookmark_next if page.paging.has_next else None,
+            total=total,
             **(additional_data or {}),
         )
 
-    total = conn.scalar(count_query(query, use_subquery=subquery_count))
     query = paginate_query(query, params)
     items = _maybe_unique(conn.execute(query), unique)
     items = unwrap_scalars(items)

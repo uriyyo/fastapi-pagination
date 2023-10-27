@@ -21,10 +21,13 @@ async def paginate(
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
-    total = await conn.fetchval(
-        f"SELECT count(*) FROM ({query}) AS _pagination_query",  # noqa: S608
-        *args,
-    )
+    if raw_params.include_total:
+        total = await conn.fetchval(
+            f"SELECT count(*) FROM ({query}) AS _pagination_query",  # noqa: S608
+            *args,
+        )
+    else:
+        total = None
 
     limit_offset_str = ""
     if raw_params.limit is not None:

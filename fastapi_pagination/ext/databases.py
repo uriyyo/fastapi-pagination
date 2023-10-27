@@ -24,9 +24,13 @@ async def paginate(
     additional_data: Optional[AdditionalData] = None,
     convert_to_mapping: bool = True,
 ) -> Any:
-    params, _ = verify_params(params, "limit-offset")
+    params, raw_params = verify_params(params, "limit-offset")
 
-    total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))
+    if raw_params.include_total:
+        total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))
+    else:
+        total = None
+
     query = paginate_query(query, params)
     raw_items = await db.fetch_all(query)
 

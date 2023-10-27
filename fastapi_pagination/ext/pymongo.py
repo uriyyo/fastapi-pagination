@@ -30,7 +30,7 @@ def paginate(
     query_filter = query_filter or {}
     filter_fields = filter_fields or {}
 
-    total = collection.count_documents(query_filter)
+    total = collection.count_documents(query_filter) if raw_params.include_total else None
     cursor = collection.find(
         query_filter,
         filter_fields,

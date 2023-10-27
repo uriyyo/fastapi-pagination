@@ -74,6 +74,7 @@ class CursorParams(BaseModel, AbstractParams):
 
 class CursorPage(AbstractPage[T], Generic[T]):
     items: Sequence[T]
+    total: Optional[int] = Field(None, description="Total items")
 
     current_page: Optional[str] = Field(None, description="Cursor to refetch the current page")
     current_page_backwards: Optional[str] = Field(

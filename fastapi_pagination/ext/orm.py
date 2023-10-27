@@ -20,7 +20,7 @@ async def paginate(
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
-    total = await query.count()
+    total = await query.count() if raw_params.include_total else None
     items = await generic_query_apply_params(query, raw_params).all()
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
