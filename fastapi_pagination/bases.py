@@ -110,7 +110,8 @@ def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping
     if not issubclass(cls, BaseModel):
         raise TypeError(f"{cls.__name__} must be subclass of BaseModel")
 
-    incorrect = sorted(fields.keys() - cls.__fields__.keys() - cls.__class_vars__)
+    model_fields = cls.model_fields if IS_PYDANTIC_V2 else cls.__fields__
+    incorrect = sorted(fields.keys() - model_fields.keys() - cls.__class_vars__)
     if incorrect:
         ending = "s" if len(incorrect) > 1 else ""
         raise ValueError(f"Unknown field{ending} {', '.join(incorrect)}")
