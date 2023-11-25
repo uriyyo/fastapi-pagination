@@ -1,17 +1,23 @@
 __all__ = ["paginate"]
 
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from motor.core import AgnosticCollection
+from typing_extensions import TypeAlias
 
 from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
 
+if TYPE_CHECKING:
+    _AgnosticCollection: TypeAlias = AgnosticCollection[Any]  # type: ignore
+else:
+    _AgnosticCollection = AgnosticCollection
+
 
 async def paginate(
-    collection: AgnosticCollection,
+    collection: _AgnosticCollection,
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     sort: Optional[Any] = None,
@@ -28,7 +34,7 @@ async def paginate(
     if sort is not None:
         cursor = cursor.sort(*sort) if isinstance(sort, tuple) else cursor.sort(sort)
 
-    items = await cursor.to_list(length=raw_params.limit)  # type: ignore[arg-type]
+    items = await cursor.to_list(length=raw_params.limit)
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
     return create_page(
@@ -40,7 +46,7 @@ async def paginate(
 
 
 async def paginate_aggregate(
-    collection: AgnosticCollection,
+    collection: _AgnosticCollection,
     aggregate_pipeline: Optional[List[Dict[Any, Any]]] = None,
     params: Optional[AbstractParams] = None,
     *,
@@ -68,7 +74,7 @@ async def paginate_aggregate(
         ],
     )
 
-    data, *_ = await cursor.to_list(length=None)  # type: ignore[arg-type]
+    data, *_ = await cursor.to_list(length=None)
 
     items = data["data"]
     try:
