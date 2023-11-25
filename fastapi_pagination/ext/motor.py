@@ -11,7 +11,7 @@ from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
 
 if TYPE_CHECKING:
-    _AgnosticCollection: TypeAlias = AgnosticCollection[Any]
+    _AgnosticCollection: TypeAlias = AgnosticCollection[Any]  # type: ignore
 else:
     _AgnosticCollection = AgnosticCollection
 
