@@ -11,7 +11,7 @@ from ..utils import verify_params
 
 
 async def paginate(
-    collection: AgnosticCollection,
+    collection: AgnosticCollection[Any],
     query_filter: Optional[Dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     sort: Optional[Any] = None,
@@ -28,7 +28,7 @@ async def paginate(
     if sort is not None:
         cursor = cursor.sort(*sort) if isinstance(sort, tuple) else cursor.sort(sort)
 
-    items = await cursor.to_list(length=raw_params.limit)  # type: ignore[arg-type]
+    items = await cursor.to_list(length=raw_params.limit)
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
     return create_page(
@@ -40,7 +40,7 @@ async def paginate(
 
 
 async def paginate_aggregate(
-    collection: AgnosticCollection,
+    collection: AgnosticCollection[Any],
     aggregate_pipeline: Optional[List[Dict[Any, Any]]] = None,
     params: Optional[AbstractParams] = None,
     *,
@@ -68,7 +68,7 @@ async def paginate_aggregate(
         ],
     )
 
-    data, *_ = await cursor.to_list(length=None)  # type: ignore[arg-type]
+    data, *_ = await cursor.to_list(length=None)
 
     items = data["data"]
     try:
