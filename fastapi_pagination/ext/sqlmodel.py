@@ -2,8 +2,8 @@ __all__ = ["paginate"]
 
 from typing import Any, Optional, Type, TypeVar, Union, no_type_check, overload
 
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlmodel import Session, SQLModel, select
-from sqlmodel.ext.asyncio.session import AsyncConnection, AsyncSession
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from ..bases import AbstractParams
