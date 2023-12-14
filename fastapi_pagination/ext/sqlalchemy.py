@@ -66,9 +66,9 @@ def count_query(query: Select, *, use_subquery: bool = True) -> Select:
     if use_subquery:
         return select(func.count()).select_from(query.subquery())
 
-    return query.with_only_columns(  # noqa: PIE804
+    return query.with_only_columns(  # type: ignore[call-arg] # noqa: PIE804
         func.count(),
-        **{"maintain_column_froms": True},
+        maintain_column_froms=True,
     )
 
 
