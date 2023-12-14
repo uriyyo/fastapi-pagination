@@ -604,13 +604,13 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "faker"
-version = "20.1.0"
+version = "21.0.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Faker-20.1.0-py3-none-any.whl", hash = "sha256:aeb3e26742863d1e387f9d156f1c36e14af63bf5e6f36fb39b8c27f6a903be38"},
-    {file = "Faker-20.1.0.tar.gz", hash = "sha256:562a3a09c3ed3a1a7b20e13d79f904dfdfc5e740f72813ecf95e4cf71e5a2f52"},
+    {file = "Faker-21.0.0-py3-none-any.whl", hash = "sha256:ff61cca42547795bee8a11319792a8fee6d0f0cd191e831f7f3050c5851fcd8a"},
+    {file = "Faker-21.0.0.tar.gz", hash = "sha256:2d8a350e952225a145307d7461881c44a1c9320e90fbe8bd903d5947f133f3ec"},
 ]
 
 [package.dependencies]
@@ -1592,6 +1592,7 @@ files = [
     {file = "pymongo-4.6.0-cp312-cp312-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:8ab6bcc8e424e07c1d4ba6df96f7fb963bcb48f590b9456de9ebd03b88084fe8"},
     {file = "pymongo-4.6.0-cp312-cp312-win32.whl", hash = "sha256:47aa128be2e66abd9d1a9b0437c62499d812d291f17b55185cb4aa33a5f710a4"},
     {file = "pymongo-4.6.0-cp312-cp312-win_amd64.whl", hash = "sha256:014e7049dd019a6663747ca7dae328943e14f7261f7c1381045dfc26a04fa330"},
+    {file = "pymongo-4.6.0-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:e24025625bad66895b1bc3ae1647f48f0a92dd014108fb1be404c77f0b69ca67"},
     {file = "pymongo-4.6.0-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:288c21ab9531b037f7efa4e467b33176bc73a0c27223c141b822ab4a0e66ff2a"},
     {file = "pymongo-4.6.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:747c84f4e690fbe6999c90ac97246c95d31460d890510e4a3fa61b7d2b87aa34"},
     {file = "pymongo-4.6.0-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:055f5c266e2767a88bb585d01137d9c7f778b0195d3dbf4a487ef0638be9b651"},
@@ -2449,4 +2450,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "13e2bf64c8d50882d1f6ef7afca24799286e2c2de937e901c28aaedcd12708aa"
+content-hash = "ec7185f829fca4a131a45ddf98c88758cc5e08157e15534796ae91e7ed59a3c1"
