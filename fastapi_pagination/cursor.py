@@ -5,6 +5,7 @@ __all__ = [
     "CursorParams",
 ]
 
+import binascii
 from base64 import b64decode, b64encode
 from typing import (
     Any,
@@ -17,7 +18,7 @@ from typing import (
 )
 from urllib.parse import quote, unquote
 
-from fastapi import Query
+from fastapi import HTTPException, Query, status
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
@@ -45,8 +46,14 @@ def decode_cursor(cursor: Optional[str], *, to_str: bool) -> Optional[Cursor]:
 
 def decode_cursor(cursor: Optional[str], *, to_str: bool = True) -> Optional[Cursor]:
     if cursor:
-        res = b64decode(unquote(cursor).encode())
-        return res.decode() if to_str else res
+        try:
+            res = b64decode(unquote(cursor).encode())
+            return res.decode() if to_str else res
+        except binascii.Error:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid cursor value",
+            ) from None
 
     return None
 
