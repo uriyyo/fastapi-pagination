@@ -62,7 +62,13 @@ class Page(BasePage[T], Generic[T]):
 
         size = params.size if params.size is not None else total
         page = params.page if params.page is not None else 1
-        pages = ceil(total / size) if total is not None else None
+
+        if size == 0:
+            pages = 0
+        elif total is not None:
+            pages = ceil(total / size)
+        else:
+            pages = None
 
         return create_pydantic_model(
             cls,
