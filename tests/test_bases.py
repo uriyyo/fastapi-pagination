@@ -1,6 +1,7 @@
 import re
 from typing import ClassVar, Generic, Optional, Sequence, TypeVar
 
+from fastapi import Query
 from pytest import mark, raises, warns
 
 from fastapi_pagination import Page, Params
@@ -79,6 +80,30 @@ def test_with_custom_options_items_casted():
         "pages": 10,
         "size": 10,
         "total": 100,
+    }
+
+
+def test_zero_size():
+    class CustomParams(Params):
+        size: Optional[int] = Query(0)
+
+    class CustomPage(Page[T], Generic[T]):
+        size: Optional[int] = None
+
+        __params_type__ = CustomParams
+
+    res = CustomPage[int].create(
+        [],
+        CustomParams(),
+        total=0,
+    )
+
+    assert res.dict() == {
+        "items": [],
+        "page": 1,
+        "pages": 0,
+        "size": 0,
+        "total": 0,
     }
 
 
