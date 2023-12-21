@@ -64,7 +64,7 @@ def count_query(query: Select, *, use_subquery: bool = True) -> Select:
     query = query.order_by(None).options(noload("*"))
 
     if use_subquery:
-        return select(func.count()).select_from(query.subquery())
+        return select([func.count()]).select_from(query.subquery())
 
     return query.with_only_columns(  # type: ignore[call-arg] # noqa: PIE804
         func.count(),
@@ -73,7 +73,7 @@ def count_query(query: Select, *, use_subquery: bool = True) -> Select:
 
 
 def _maybe_unique(result: Any, unique: bool) -> Any:
-    return (result.unique() if unique else result).all()
+    return result.distinct() if unique else result
 
 
 def exec_pagination(
@@ -127,7 +127,7 @@ def exec_pagination(
         )
 
     query = paginate_query(query, params)
-    items = _maybe_unique(conn.execute(query), unique)
+    items = conn.execute(_maybe_unique(query, unique))
     items = unwrap_scalars(items)
     items = _apply_items_transformer(items, transformer)
 
