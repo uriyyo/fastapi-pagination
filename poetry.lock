@@ -1539,13 +1539,13 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pymdown-extensions"
-version = "10.5"
+version = "10.6"
 description = "Extension pack for Python Markdown."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pymdown_extensions-10.5-py3-none-any.whl", hash = "sha256:1f0ca8bb5beff091315f793ee17683bc1390731f6ac4c5eb01e27464b80fe879"},
-    {file = "pymdown_extensions-10.5.tar.gz", hash = "sha256:1b60f1e462adbec5a1ed79dac91f666c9c0d241fa294de1989f29d20096cfd0b"},
+    {file = "pymdown_extensions-10.6-py3-none-any.whl", hash = "sha256:561eb3a5f3c3c2512952a4d6f5b311aa124b7147bd54a3ea0f36ce030c7e3dd9"},
+    {file = "pymdown_extensions-10.6.tar.gz", hash = "sha256:e4531379e0d74b329ff264217ef5b8b1a37bed3afe36f98001b74ecff52215c0"},
 ]
 
 [package.dependencies]
@@ -2458,4 +2458,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "bd01168ef3781cd373fb220d11d0eb8ad6075eed1ac270adde6ab53122deef29"
+content-hash = "26437bfaf2ca82b2e5a7248283dc639aa8edb959f67a7787d5cbb12b25aa505b"
