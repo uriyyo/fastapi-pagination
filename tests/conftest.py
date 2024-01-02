@@ -1,5 +1,4 @@
 from . import patch  # noqa  # isort: skip  # DO NOT REMOVE THIS LINE.
-from asyncio import new_event_loop
 from itertools import count
 from pathlib import Path
 from random import randint
@@ -257,16 +256,11 @@ def database_url(db_type: str, postgres_url: str, sqlite_url: str, is_async_db: 
     return url
 
 
-@fixture(scope="session")
-def event_loop():
-    return new_event_loop()
-
-
 def pytest_collection_modifyitems(items: List[Function]):
     items.sort(key=lambda it: (it.path, it.name))
 
 
-@async_fixture(scope="class")
+@async_fixture
 async def client(app: FastAPI):
     async with LifespanManager(app), AsyncClient(app=app, base_url="http://testserver") as c:
         yield c

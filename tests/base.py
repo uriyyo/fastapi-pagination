@@ -109,7 +109,7 @@ class BasePaginationTestCase:
         additional_params,
         result_model_cls,
     ):
-        response = await client.get(path, params={**params.dict(), **additional_params})
+        response = await client.get(path, params={**params.dict(exclude_none=True), **additional_params})
         response.raise_for_status()
 
         cls = getattr(self, cls_name)
