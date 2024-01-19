@@ -365,7 +365,7 @@ def _add_pagination(parent: ParentT) -> None:
 def add_pagination(parent: ParentT) -> ParentT:
     _add_pagination(parent)
 
-    router = parent.router if isinstance(parent, FastAPI) else parent
+    router = parent.router if isinstance(parent, FastAPI) else parent  # type: ignore[attr-defined]
     _original_lifespan_context = router.lifespan_context
 
     @asynccontextmanager
