@@ -1,12 +1,12 @@
 repos:
   - repo: local
     hooks:
-      - id: black
+      - id: ruff-format
         language: python
-        name: black
+        name: ruff-format
         pass_filenames: false
         language_version: python3.8
-        entry: poetry run black fastapi_pagination docs_src tests
+        entry: poetry run ruff format fastapi_pagination docs_src tests
 
   - repo: local
     hooks:

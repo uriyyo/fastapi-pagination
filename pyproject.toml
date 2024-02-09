@@ -49,7 +49,6 @@ pytest = "^8.0.0"
 pytest-cov = "^4.1.0"
 pytest-asyncio = "^0.21.1"
 flaky = "^3.7.0"
-black = "^24.1.1"
 pre-commit = "^3.5.0"
 Faker = "^23.1.0"
 psycopg2-binary = "^2.9.9"
@@ -86,32 +85,11 @@ all = ["sqlmodel", "SQLAlchemy", "databases", "orm", "ormar", "tortoise-orm", "a
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
-line-length = 120
-target-version = ['py38']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  # The following are specific to Black, you probably don't want those.
-  | blib2to3
-  | tests/data
-  | profiling
-)/
-'''
-
-
 [tool.ruff]
 line-length = 120
+target-version = "py38"
+
+[tool.ruff.lint]
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -165,9 +143,8 @@ exclude = [
 ]
 per-file-ignores = {}
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-target-version = "py38"
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 10
 
 [tool.mypy]
