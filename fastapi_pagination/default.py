@@ -60,10 +60,10 @@ class Page(BasePage[T], Generic[T]):
         if not isinstance(params, Params):
             raise TypeError("Page should be used with Params")
 
-        size = params.size if params.size is not None else total
+        size = params.size if params.size is not None else (total or None)
         page = params.page if params.page is not None else 1
 
-        if size == 0:
+        if size in {0, None}:
             pages = 0
         elif total is not None:
             pages = ceil(total / size)
