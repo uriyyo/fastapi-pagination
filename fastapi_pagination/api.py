@@ -6,6 +6,7 @@ __all__ = [
     "response",
     "request",
     "set_page",
+    "set_params",
     "set_items_transformer",
     "apply_items_transformer",
     "pagination_ctx",
@@ -207,6 +208,10 @@ def _ctx_var_with_reset(var: ContextVar[T], value: T) -> ContextManager[None]:
     return _reset_ctx()
 
 
+def set_params(params: AbstractParams) -> ContextManager[None]:
+    return _ctx_var_with_reset(_params_val, params)
+
+
 def set_page(page: Type[AbstractPage[Any]]) -> ContextManager[None]:
     return _ctx_var_with_reset(_page_val, page)
 
@@ -270,7 +275,7 @@ def _create_params_dependency(
 ) -> Callable[[TAbstractParams], AsyncIterator[TAbstractParams]]:
     async def _pagination_params(*args: Any, **kwargs: Any) -> AsyncIterator[TAbstractParams]:
         val = params(*args, **kwargs)
-        with _ctx_var_with_reset(_params_val, cast(AbstractParams, val)):
+        with set_params(val):
             yield val
 
     sign = inspect.signature(params)

@@ -5,6 +5,7 @@ __all__ = [
     "resolve_params",
     "response",
     "set_page",
+    "set_params",
     "Page",
     "Params",
     "LimitOffsetPage",
@@ -21,6 +22,7 @@ from .api import (
     resolve_params,
     response,
     set_page,
+    set_params,
 )
 from .default import Page, Params
 from .limit_offset import LimitOffsetPage, LimitOffsetParams
