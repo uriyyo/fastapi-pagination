@@ -69,8 +69,8 @@ users = [  # create some data
 ]
 
 
-@app.get('/users', response_model=Page[UserOut])  # use Page[UserOut] as response model
-async def get_users():
+@app.get('/users')  
+async def get_users() -> Page[UserOut]:  # use Page[UserOut] as return type annotation
     return paginate(users)  # use paginate function to paginate your data
 
 
@@ -86,8 +86,8 @@ from sqlalchemy import select
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 
-@app.get('/users', response_model=Page[UserOut])
-def get_users(db: Session = Depends(get_db)):
+@app.get('/users')
+def get_users(db: Session = Depends(get_db)) -> Page[UserOut]:
     return paginate(db, select(User).order_by(User.created_at))
 ```
 
