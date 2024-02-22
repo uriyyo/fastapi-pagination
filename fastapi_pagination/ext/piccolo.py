@@ -1,6 +1,7 @@
 __all__ = ["paginate"]
 
-from copy import deepcopy
+from contextlib import suppress
+from copy import copy
 from typing import Any, Optional, Type, TypeVar, Union
 
 from piccolo.query import Select
@@ -16,6 +17,18 @@ from .utils import generic_query_apply_params
 T = TypeVar("T", bound=Table, covariant=True)
 
 
+# TODO: there should be a better way to copy query object
+def _copy_query(query: Select[T]) -> Select[T]:
+    select_cls = type(query)
+    q = select_cls(query.table)
+
+    for s in select_cls.__slots__:
+        with suppress(AttributeError):
+            setattr(q, s, copy(getattr(query, s)))
+
+    return q
+
+
 async def paginate(
     query: Union[Select[T], Type[T]],
     params: Optional[AbstractParams] = None,
@@ -29,10 +42,10 @@ async def paginate(
         query = query.select()
 
     # query object is mutable, so we need deepcopy of it
-    query = deepcopy(query)
+    query = _copy_query(query)
 
     # need another copy for count query
-    count_query = deepcopy(query)
+    count_query = _copy_query(query)
     count_query.columns_delegate.selected_columns = []
     # reset order by to avoid errors in count query
     count_query.order_by_delegate._order_by.order_by_items = []  # noqa
