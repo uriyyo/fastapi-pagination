@@ -15,10 +15,12 @@ def paginate(
     params: Optional[AbstractParams] = None,
     length_function: Callable[[Sequence[T]], int] = len,
     *,
+    safe: bool = False,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
 ) -> Any:
-    check_installed_extensions()
+    if not safe:
+        check_installed_extensions()
 
     params, raw_params = verify_params(params, "limit-offset")
 
