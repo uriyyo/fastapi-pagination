@@ -48,7 +48,7 @@ def get_page_bases(cls: Type[TPage]) -> tuple[Type[Any], ...]:
 
 def new_page_cls(cls: Type[TPage], new_ns: ClsNamespace) -> Type[TPage]:
     return new_class(
-        new_ns["__name__"],
+        new_ns.get("__name__", cls.__name__),
         get_page_bases(cls),
         exec_body=lambda ns: ns.update(new_ns),
     )
@@ -64,6 +64,8 @@ else:
                 item = (item,)
 
             page_cls, *customizers = item
+
+            assert isinstance(page_cls, type), f"Expected type, got {page_cls!r}"
             assert issubclass(page_cls, AbstractPage), f"Expected subclass of AbstractPage, got {page_cls!r}"
 
             if not customizers:
@@ -80,13 +82,15 @@ else:
 
             for customizer in customizers:
                 if isinstance(customizer, PageCustomizer):
-                    customizer.customize_ns(page_cls, new_ns)
+                    customizer.customize_page_ns(page_cls, new_ns)
+                else:
+                    raise TypeError(f"Expected PageCustomizer, got {customizer!r}")
 
             return new_page_cls(page_cls, new_ns)
 
 
 class PageCustomizer:
-    def customize_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
         return None
 
 
@@ -94,7 +98,7 @@ class PageCustomizer:
 class UseName(PageCustomizer):
     name: str
 
-    def customize_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
         ns["__name__"] = self.name
         ns["__qualname__"] = self.name
 
@@ -103,7 +107,7 @@ class UseName(PageCustomizer):
 class UseModule(PageCustomizer):
     module: str
 
-    def customize_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
         ns["__module__"] = self.module
 
 
@@ -111,7 +115,7 @@ class UseModule(PageCustomizer):
 class IncludeTotal(PageCustomizer):
     include_total: bool
 
-    def customize_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
         include_total = self.include_total
 
         if TYPE_CHECKING:
@@ -133,7 +137,7 @@ class IncludeTotal(PageCustomizer):
 class UseParams(PageCustomizer):
     params: Type[AbstractParams]
 
-    def customize_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
         if page_cls.__params_type__ is not ns["__params_type__"]:
             raise ValueError(
                 "Params type was already customized, cannot customize it again. "
@@ -171,7 +175,7 @@ class UseParamsFields(PageCustomizer):
     def __init__(self, **kwargs: Any) -> None:
         self.fields = kwargs
 
-    def customize_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
         params_cls = ns["__params_type__"]
 
         ns["__params_type__"] = create_model(
