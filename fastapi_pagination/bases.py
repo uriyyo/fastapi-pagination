@@ -37,7 +37,7 @@ else:
     from pydantic.generics import GenericModel
 
 
-from typing_extensions import Self, TypeGuard
+from typing_extensions import Self, TypeGuard, deprecated
 
 from .types import Cursor, GreaterEqualZero, ParamsType
 
@@ -191,6 +191,11 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         return cast(Type[Self], CustomizePage[(cls, *args)])
 
     @classmethod
+    @deprecated(
+        "`with_custom_options` method is deprecated, please use "
+        "`fastapi_pagination.customization.CustomizePage` instead."
+        "This method will be removed in the next major release (0.13.0)."
+    )
     def with_custom_options(
         cls,
         *,
@@ -205,6 +210,11 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         )
 
     @classmethod
+    @deprecated(
+        "`with_params` method is deprecated, please use "
+        "`fastapi_pagination.customization.CustomizePage` instead."
+        "This method will be removed in the next major release (0.13.0)."
+    )
     def with_params(
         cls,
         custom_params: Type[AbstractParams],
@@ -213,9 +223,9 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         module: Optional[str] = None,
     ) -> Type[Self]:
         return cls._old_customization(
+            custom_params,
             cls_name=cls_name,
             module=module or get_caller(),
-            custom_params=custom_params,
         )
 
     if IS_PYDANTIC_V2:

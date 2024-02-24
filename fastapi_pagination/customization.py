@@ -12,9 +12,10 @@ __all__ = [
     "UseParamsFields",
 ]
 
+from copy import copy
 from dataclasses import dataclass
 from types import new_class
-from typing import TYPE_CHECKING, Any, Dict, Generic, Tuple, Type, TypeVar, no_type_check
+from typing import TYPE_CHECKING, Any, Dict, Generic, Optional, Tuple, Type, TypeVar, no_type_check
 
 from fastapi import Query
 from fastapi.params import Param
@@ -147,28 +148,66 @@ class UseParams(PageCustomizer):
         ns["__params_type__"] = self.params
 
 
+def _get_model_fields(cls: Type[BaseModel]) -> ClsNamespace:
+    if IS_PYDANTIC_V2:
+        return cls.model_fields  # type: ignore
+
+    return cls.__fields__
+
+
+if IS_PYDANTIC_V2:
+    from pydantic.fields import FieldInfo as _PydanticField
+
+    @no_type_check
+    def _make_field_optional(field: Any) -> Any:
+        assert isinstance(field, _PydanticField)
+
+        field = copy(field)
+
+        field.annotation = Optional[field.annotation]
+        field.default = None
+        field.default_factory = None
+
+        return field
+
+else:
+    from pydantic.fields import ModelField as _PydanticField  # type: ignore[assignment]
+
+    def _make_field_optional(field: Any) -> Any:
+        assert isinstance(field, _PydanticField)
+
+        return copy(field)
+
+
 @no_type_check
 def _update_params_fields(cls: Type[AbstractParams], fields: ClsNamespace) -> ClsNamespace:
     if not issubclass(cls, BaseModel):
         raise TypeError(f"{cls.__name__} must be subclass of BaseModel")
 
-    model_fields = cls.model_fields if IS_PYDANTIC_V2 else cls.__fields__
+    model_fields = _get_model_fields(cls)
     incorrect = sorted(fields.keys() - model_fields.keys() - cls.__class_vars__)
 
     if incorrect:
         ending = "s" if len(incorrect) > 1 else ""
         raise ValueError(f"Unknown field{ending} {', '.join(incorrect)}")
 
+    anns = get_type_hints(cls)
+
     def _wrap_val(name: str, v: Any) -> Any:
         if name in cls.__class_vars__:
             return v
-        if not isinstance(v, Param):
+        if not isinstance(v, (Param, _PydanticField)):
             return Query(v)
 
         return v
 
-    anns = get_type_hints(cls)
-    return {name: (anns[name], _wrap_val(name, val)) for name, val in fields.items()}
+    def _get_ann(name: str, v: Any) -> Any:
+        if IS_PYDANTIC_V2:
+            return getattr(v, "annotation", anns[name])
+
+        return anns[name]
+
+    return {name: (_get_ann(name, val), _wrap_val(name, val)) for name, val in fields.items()}
 
 
 class UseParamsFields(PageCustomizer):
@@ -183,3 +222,14 @@ class UseParamsFields(PageCustomizer):
             __base__=params_cls,
             **_update_params_fields(params_cls, self.fields),
         )
+
+
+class UseOptionalParams(PageCustomizer):
+    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+        params_cls = ns["__params_type__"]
+
+        fields = _get_model_fields(params_cls)
+        new_fields = {name: _make_field_optional(field) for name, field in fields.items()}
+
+        customizer = UseParamsFields(**new_fields)
+        customizer.customize_page_ns(page_cls, ns)
