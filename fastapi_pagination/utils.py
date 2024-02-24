@@ -135,7 +135,7 @@ def check_installed_extensions() -> None:
 def get_caller(depth: int = 1) -> Optional[str]:
     frame = inspect.currentframe()
 
-    for _ in range(depth + 2):
+    for _ in range(depth + 1):
         if frame is None:
             return None
 

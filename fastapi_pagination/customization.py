@@ -11,12 +11,26 @@ __all__ = [
     "UseParams",
     "UseParamsFields",
     "UseOptionalParams",
+    "ClsNamespace",
 ]
 
+from abc import abstractmethod
 from copy import copy
 from dataclasses import dataclass
 from types import new_class
-from typing import TYPE_CHECKING, Any, Dict, Generic, Optional, Tuple, Type, TypeVar, no_type_check
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Generic,
+    Optional,
+    Protocol,
+    Tuple,
+    Type,
+    TypeVar,
+    no_type_check,
+    runtime_checkable,
+)
 
 from fastapi import Query
 from fastapi.params import Param
@@ -29,6 +43,7 @@ from .utils import IS_PYDANTIC_V2, get_caller
 TPage = TypeVar("TPage", bound="AbstractPage[Any]")
 
 ClsNamespace: TypeAlias = Dict[str, Any]
+PageCls: TypeAlias = "Type[AbstractPage[Any]]"
 
 
 @no_type_check
@@ -91,16 +106,18 @@ else:
             return new_page_cls(page_cls, new_ns)
 
 
-class PageCustomizer:
-    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
-        return None
+@runtime_checkable
+class PageCustomizer(Protocol):
+    @abstractmethod
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        pass
 
 
 @dataclass
 class UseName(PageCustomizer):
     name: str
 
-    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         ns["__name__"] = self.name
         ns["__qualname__"] = self.name
 
@@ -109,7 +126,7 @@ class UseName(PageCustomizer):
 class UseModule(PageCustomizer):
     module: str
 
-    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         ns["__module__"] = self.module
 
 
@@ -117,7 +134,7 @@ class UseModule(PageCustomizer):
 class UseIncludeTotal(PageCustomizer):
     include_total: bool
 
-    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         include_total = self.include_total
 
         if TYPE_CHECKING:
@@ -139,11 +156,11 @@ class UseIncludeTotal(PageCustomizer):
 class UseParams(PageCustomizer):
     params: Type[AbstractParams]
 
-    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         if page_cls.__params_type__ is not ns["__params_type__"]:
             raise ValueError(
                 "Params type was already customized, cannot customize it again. "
-                "(IncludeTotal must go after UseParams)"
+                "(IncludeTotal/UseParamsFields must go after UseParams)"
             )
 
         ns["__params_type__"] = self.params
@@ -177,7 +194,7 @@ else:
     def _make_field_optional(field: Any) -> Any:
         assert isinstance(field, _PydanticField)
 
-        return copy(field)
+        return None
 
 
 @no_type_check
@@ -215,7 +232,7 @@ class UseParamsFields(PageCustomizer):
     def __init__(self, **kwargs: Any) -> None:
         self.fields = kwargs
 
-    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         params_cls = ns["__params_type__"]
 
         ns["__params_type__"] = create_model(
@@ -226,7 +243,7 @@ class UseParamsFields(PageCustomizer):
 
 
 class UseOptionalParams(PageCustomizer):
-    def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         params_cls = ns["__params_type__"]
 
         fields = _get_model_fields(params_cls)
