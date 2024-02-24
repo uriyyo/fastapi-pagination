@@ -1,10 +1,11 @@
 import re
 from typing import ClassVar, Generic, Optional, Sequence, TypeVar
 
-from fastapi import Query
+from fastapi import FastAPI, Query, status
+from fastapi.testclient import TestClient
 from pytest import mark, raises, warns
 
-from fastapi_pagination import Page, Params
+from fastapi_pagination import Page, Params, add_pagination, paginate
 from fastapi_pagination.bases import AbstractParams, RawParams
 from fastapi_pagination.cursor import CursorParams
 
@@ -81,6 +82,25 @@ def test_with_custom_options_items_casted():
         "size": 10,
         "total": 100,
     }
+
+
+def test_with_custom_options_wrap_into_query():
+    app = FastAPI()
+    client = TestClient(app)
+
+    page_cls = Page.with_custom_options(size=10, page=Query(2))
+
+    @app.get(
+        "/",
+        response_model=page_cls[int],
+    )
+    async def route():
+        return paginate([])
+
+    add_pagination(app)
+
+    rsp = client.get("/", params={"page": 3, "size": 5})
+    assert rsp.status_code == status.HTTP_200_OK
 
 
 def test_zero_size():
