@@ -41,10 +41,10 @@ from typing_extensions import TypeAlias, get_type_hints
 from .bases import AbstractPage, AbstractParams, BaseRawParams
 from .utils import IS_PYDANTIC_V2, get_caller
 
-TPage = TypeVar("TPage", bound="AbstractPage[Any]")
-
 ClsNamespace: TypeAlias = Dict[str, Any]
 PageCls: TypeAlias = "Type[AbstractPage[Any]]"
+
+TPage = TypeVar("TPage", bound=PageCls)
 
 
 @no_type_check
