@@ -6,6 +6,7 @@ from fastapi.routing import APIRouter
 from fastapi.testclient import TestClient
 from pydantic import Field
 from pytest import fixture
+from typing_extensions import Annotated
 
 try:
     from pydantic.generics import GenericModel
@@ -254,6 +255,23 @@ def test_no_exception_on_validation_error():
 
     rsp = client.get("/", params={"page": -1})
     assert rsp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def test_unwrap_annotated():
+    app = FastAPI()
+    client = TestClient(app)
+
+    @app.get(
+        "/",
+        response_model=Annotated[Page[int], "my-metadata"],
+    )
+    async def route():
+        return paginate([])
+
+    add_pagination(app)
+
+    rsp = client.get("/")
+    assert rsp.status_code == status.HTTP_200_OK
 
 
 class TestLifespan:

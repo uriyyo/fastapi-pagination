@@ -46,7 +46,7 @@ from typing_extensions import deprecated
 from .bases import AbstractPage, AbstractParams
 from .default import Page
 from .types import AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
-from .utils import IS_PYDANTIC_V2, is_async_callable
+from .utils import IS_PYDANTIC_V2, is_async_callable, unwrap_annotated
 
 T = TypeVar("T")
 TAbstractParams = TypeVar("TAbstractParams", covariant=True, bound=AbstractParams)
@@ -339,10 +339,12 @@ def _update_route(route: APIRoute) -> None:
     if any(hasattr(d.call, "__page_ctx_dep__") for d in route.dependant.dependencies):
         return
 
-    if not lenient_issubclass(route.response_model, AbstractPage):
+    page_cls = unwrap_annotated(route.response_model)
+
+    if not lenient_issubclass(page_cls, AbstractPage):
         return
 
-    cls = cast(Type[AbstractPage[Any]], route.response_model)
+    cls = cast(Type[AbstractPage[Any]], page_cls)
     dep = Depends(pagination_ctx(cls, __page_ctx_dep__=True))
 
     route.dependencies.append(dep)
