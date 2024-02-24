@@ -7,9 +7,10 @@ __all__ = [
     "PageCustomizer",
     "UseName",
     "UseModule",
-    "IncludeTotal",
+    "UseIncludeTotal",
     "UseParams",
     "UseParamsFields",
+    "UseOptionalParams",
 ]
 
 from copy import copy
@@ -113,7 +114,7 @@ class UseModule(PageCustomizer):
 
 
 @dataclass
-class IncludeTotal(PageCustomizer):
+class UseIncludeTotal(PageCustomizer):
     include_total: bool
 
     def customize_page_ns(self, page_cls: Type[TPage], ns: ClsNamespace) -> None:
