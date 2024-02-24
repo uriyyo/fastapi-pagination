@@ -10,6 +10,7 @@ from typing import Any, Generic, Optional, Sequence, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
+from typing_extensions import deprecated
 
 from .bases import AbstractParams, BasePage, RawParams
 from .types import GreaterEqualOne, GreaterEqualZero
@@ -29,6 +30,11 @@ class LimitOffsetParams(BaseModel, AbstractParams):
         )
 
 
+@deprecated(
+    "`OptionalLimitOffsetParams` class is deprecated, please use "
+    "`CustomizePage[LimitOffsetPage, UseOptionalParams()]` instead. "
+    "This class will be removed in the next major release (0.13.0)."
+)
 class OptionalLimitOffsetParams(LimitOffsetParams):
     limit: Optional[int] = Query(None, ge=1, le=100, description="Page size limit")  # type: ignore[assignment]
     offset: Optional[int] = Query(None, ge=0, description="Page offset")  # type: ignore[assignment]

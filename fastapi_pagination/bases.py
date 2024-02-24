@@ -15,28 +15,21 @@ import inspect
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from operator import setitem
-from types import new_class
 from typing import (
     TYPE_CHECKING,
     Any,
     ClassVar,
-    Dict,
     Generic,
-    Mapping,
+    List,
     Optional,
     Sequence,
     Tuple,
     Type,
     TypeVar,
-    get_type_hints,
-    no_type_check,
+    cast,
 )
 
-from fastapi.params import Param, Query
-from pydantic import BaseModel, create_model
-
-from .utils import IS_PYDANTIC_V2, get_caller, is_class_var_annotation
+from .utils import IS_PYDANTIC_V2, get_caller
 
 if IS_PYDANTIC_V2:
     from pydantic import BaseModel as GenericModel
@@ -44,7 +37,7 @@ else:
     from pydantic.generics import GenericModel
 
 
-from typing_extensions import Self, TypeGuard
+from typing_extensions import Self, TypeGuard, deprecated
 
 from .types import Cursor, GreaterEqualZero, ParamsType
 
@@ -107,30 +100,6 @@ class AbstractParams(ABC):
     @abstractmethod
     def to_raw_params(self) -> BaseRawParams:
         pass
-
-
-@no_type_check
-def _create_params(cls: Type[AbstractParams], fields: Dict[str, Any]) -> Mapping[str, Any]:
-    if not issubclass(cls, BaseModel):
-        raise TypeError(f"{cls.__name__} must be subclass of BaseModel")
-
-    model_fields = cls.model_fields if IS_PYDANTIC_V2 else cls.__fields__
-    incorrect = sorted(fields.keys() - model_fields.keys() - cls.__class_vars__)
-    if incorrect:
-        ending = "s" if len(incorrect) > 1 else ""
-        raise ValueError(f"Unknown field{ending} {', '.join(incorrect)}")
-
-    def _wrap_val(v: Any, ann: Any) -> Any:
-        if is_class_var_annotation(ann):
-            return v
-
-        if not isinstance(v, Param):
-            return Query(v)
-
-        return v
-
-    annotations = get_type_hints(cls)
-    return {name: (ann := annotations[name], _wrap_val(val, ann)) for name, val in fields.items()}
 
 
 def _new_page_signature(items: Sequence[T], params: AbstractParams, **kwargs: Any) -> Type:  # type: ignore
@@ -197,7 +166,36 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         pass
 
     @classmethod
-    @no_type_check
+    def _old_customization(
+        cls,
+        custom_params: Optional[Type[AbstractParams]] = None,
+        /,
+        *,
+        cls_name: Optional[str] = None,
+        module: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Type[Self]:
+        from .customization import CustomizePage, PageCustomizer, UseModule, UseName, UseParams, UseParamsFields
+
+        args: List[PageCustomizer] = []
+
+        if cls_name:
+            args.append(UseName(cls_name))
+        if module:
+            args.append(UseModule(module))
+        if custom_params:
+            args.append(UseParams(custom_params))
+        if kwargs:
+            args.append(UseParamsFields(**kwargs))
+
+        return cast(Type[Self], CustomizePage[(cls, *args)])
+
+    @classmethod
+    @deprecated(
+        "`with_custom_options` method is deprecated, please use "
+        "`fastapi_pagination.customization.CustomizePage` instead. "
+        "This method will be removed in the next major release (0.13.0)."
+    )
     def with_custom_options(
         cls,
         *,
@@ -205,22 +203,18 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         module: Optional[str] = None,
         **kwargs: Any,
     ) -> Type[Self]:
-        params_cls = cls.__params_type__
-
-        custom_params: Any = create_model(
-            params_cls.__name__,
-            __base__=params_cls,
-            **_create_params(params_cls, kwargs),
-        )
-
-        return cls.with_params(
-            custom_params,
+        return cls._old_customization(
             cls_name=cls_name,
-            module=module,
+            module=module or get_caller(),
+            **kwargs,
         )
 
     @classmethod
-    @no_type_check
+    @deprecated(
+        "`with_params` method is deprecated, please use "
+        "`fastapi_pagination.customization.CustomizePage` instead. "
+        "This method will be removed in the next major release (0.13.0)."
+    )
     def with_params(
         cls,
         custom_params: Type[AbstractParams],
@@ -228,29 +222,11 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         cls_name: Optional[str] = None,
         module: Optional[str] = None,
     ) -> Type[Self]:
-        bases: Tuple[Type[Any], ...]
-
-        if IS_PYDANTIC_V2:
-            params = cls.__pydantic_generic_metadata__["parameters"]
-            bases = (cls,) if not params else (cls[params], Generic[params])
-        else:
-            if cls.__concrete__:
-                bases = (cls,)
-            else:
-                params = tuple(cls.__parameters__)
-                bases = (cls[params], Generic[params])
-
-        cls_name = cls_name or f"Customized{cls.__name__}"
-        module_name = module or get_caller()
-
-        new_ns = {
-            "__params_type__": custom_params,
-            "__module__": module_name,
-            "__qualname__": cls_name,
-            "__name__": cls_name,
-        }
-
-        return new_class(cls_name, bases, exec_body=lambda ns: [setitem(ns, k, v) for k, v in new_ns.items()])
+        return cls._old_customization(
+            custom_params,
+            cls_name=cls_name,
+            module=module or get_caller(),
+        )
 
     if IS_PYDANTIC_V2:
         model_config = {

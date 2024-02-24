@@ -2,7 +2,6 @@ from __future__ import annotations
 
 __all__ = [
     "unwrap_annotated",
-    "is_class_var_annotation",
     "get_caller",
     "create_pydantic_model",
     "verify_params",
@@ -17,7 +16,7 @@ import asyncio
 import functools
 import inspect
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Optional, Tuple, Type, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Type, TypeVar, cast, overload
 
 from pydantic import VERSION, BaseModel
 from typing_extensions import Annotated, Literal, get_origin
@@ -136,7 +135,7 @@ def check_installed_extensions() -> None:
 def get_caller(depth: int = 1) -> Optional[str]:
     frame = inspect.currentframe()
 
-    for _ in range(depth + 2):
+    for _ in range(depth + 1):
         if frame is None:
             return None
 
@@ -157,7 +156,3 @@ def unwrap_annotated(ann: Any) -> Any:
         return ann.__args__[0]
 
     return ann
-
-
-def is_class_var_annotation(ann: Any) -> Any:
-    return ann is ClassVar or get_origin(ann) is ClassVar
