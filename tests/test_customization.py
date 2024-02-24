@@ -150,3 +150,12 @@ def test_use_include_total(include_total):
     raw_params = CustomPage.__params_type__().to_raw_params()
 
     assert raw_params.include_total == include_total
+
+
+def test_custom_customizer():
+    class CustomCustomizer(PageCustomizer):
+        def customize_page_ns(self, page_cls: Type[AbstractPage], ns: ClsNamespace) -> None:
+            ns["__customized__"] = True
+
+    CustomPage = CustomizePage[Page, CustomCustomizer()]
+    assert CustomPage.__customized__ is True

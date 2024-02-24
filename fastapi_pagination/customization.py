@@ -12,6 +12,7 @@ __all__ = [
     "UseParamsFields",
     "UseOptionalParams",
     "ClsNamespace",
+    "PageCls",
 ]
 
 from abc import abstractmethod
