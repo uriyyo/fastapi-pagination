@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 __all__ = [
+    "unwrap_annotated",
     "get_caller",
     "create_pydantic_model",
     "verify_params",
@@ -18,7 +19,7 @@ import warnings
 from typing import TYPE_CHECKING, Any, Optional, Tuple, Type, TypeVar, cast, overload
 
 from pydantic import VERSION, BaseModel
-from typing_extensions import Literal
+from typing_extensions import Annotated, Literal, get_origin
 
 if TYPE_CHECKING:
     from .bases import AbstractParams, BaseRawParams, CursorRawParams, RawParams
@@ -26,7 +27,6 @@ if TYPE_CHECKING:
 
     TParams = TypeVar("TParams", bound=AbstractParams)
     TModel = TypeVar("TModel", bound=BaseModel)
-
 
 IS_PYDANTIC_V2 = VERSION.startswith("2.")
 
@@ -149,3 +149,10 @@ def create_pydantic_model(model_cls: Type[TModel], /, **kwargs: Any) -> TModel:
         return model_cls.model_validate(kwargs, from_attributes=True)  # type: ignore
 
     return model_cls(**kwargs)
+
+
+def unwrap_annotated(ann: Any) -> Any:
+    if get_origin(ann) is Annotated:
+        return ann.__args__[0]
+
+    return ann
