@@ -2,6 +2,7 @@ from __future__ import annotations
 
 __all__ = [
     "unwrap_annotated",
+    "is_class_var_annotation",
     "get_caller",
     "create_pydantic_model",
     "verify_params",
@@ -16,7 +17,7 @@ import asyncio
 import functools
 import inspect
 import warnings
-from typing import TYPE_CHECKING, Any, Optional, Tuple, Type, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, ClassVar, Optional, Tuple, Type, TypeVar, cast, overload
 
 from pydantic import VERSION, BaseModel
 from typing_extensions import Annotated, Literal, get_origin
@@ -156,3 +157,7 @@ def unwrap_annotated(ann: Any) -> Any:
         return ann.__args__[0]
 
     return ann
+
+
+def is_class_var_annotation(ann: Any) -> Any:
+    return ann is ClassVar or get_origin(ann) is ClassVar
