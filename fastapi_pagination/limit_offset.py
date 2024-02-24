@@ -32,7 +32,7 @@ class LimitOffsetParams(BaseModel, AbstractParams):
 
 @deprecated(
     "`OptionalLimitOffsetParams` class is deprecated, please use "
-    "`CustomizePage[LimitOffsetPage, UseOptionalParams()]` instead."
+    "`CustomizePage[LimitOffsetPage, UseOptionalParams()]` instead. "
     "This class will be removed in the next major release (0.13.0)."
 )
 class OptionalLimitOffsetParams(LimitOffsetParams):

@@ -204,7 +204,7 @@ def _update_params_fields(cls: Type[AbstractParams], fields: ClsNamespace) -> Cl
 
     def _get_ann(name: str, v: Any) -> Any:
         if IS_PYDANTIC_V2:
-            return getattr(v, "annotation", anns[name])
+            return getattr(v, "annotation", None) or anns[name]
 
         return anns[name]
 

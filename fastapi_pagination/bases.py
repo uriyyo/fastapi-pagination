@@ -193,7 +193,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
     @classmethod
     @deprecated(
         "`with_custom_options` method is deprecated, please use "
-        "`fastapi_pagination.customization.CustomizePage` instead."
+        "`fastapi_pagination.customization.CustomizePage` instead. "
         "This method will be removed in the next major release (0.13.0)."
     )
     def with_custom_options(
@@ -212,7 +212,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
     @classmethod
     @deprecated(
         "`with_params` method is deprecated, please use "
-        "`fastapi_pagination.customization.CustomizePage` instead."
+        "`fastapi_pagination.customization.CustomizePage` instead. "
         "This method will be removed in the next major release (0.13.0)."
     )
     def with_params(

@@ -33,7 +33,7 @@ class Params(BaseModel, AbstractParams):
 
 @deprecated(
     "`OptionalParams` class is deprecated, please use "
-    "`CustomizePage[Page, UseOptionalParams()]` instead."
+    "`CustomizePage[Page, UseOptionalParams()]` instead. "
     "This class will be removed in the next major release (0.13.0)."
 )
 class OptionalParams(Params):
