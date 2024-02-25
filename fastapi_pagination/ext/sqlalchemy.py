@@ -11,6 +11,7 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query, Session, noload, scoped_session
 from typing_extensions import TypeAlias
 
@@ -72,8 +73,18 @@ def count_query(query: Select, *, use_subquery: bool = True) -> Select:
     )
 
 
+class NonHashableRowsException(Exception):
+    pass
+
+
 def _maybe_unique(result: Any, unique: bool) -> Any:
-    return (result.unique() if unique else result).all()
+    try:
+        return (result.unique() if unique else result).all()
+    except InvalidRequestError as e:  # pragma: no cover
+        if "non-hashable" in str(e):
+            raise NonHashableRowsException("The rows are not hashable, please use `unique=False`") from e
+
+        raise
 
 
 def exec_pagination(
