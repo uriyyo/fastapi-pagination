@@ -14,7 +14,7 @@ The simplest FastAPI pagination looks like this:
 
 ## Step 1: import pagination components
 
-```py hl_lines="4"
+```py hl_lines="6"
 {! ../docs_src/tutorial/first_steps.py !}
 ```
 
@@ -24,7 +24,7 @@ The simplest FastAPI pagination looks like this:
 
 ## Step 2: add pagination to app
 
-```py hl_lines="6-7"
+```py hl_lines="8-9"
 {! ../docs_src/tutorial/first_steps.py !}
 ```
 
@@ -35,7 +35,7 @@ If you forget to add `add_pagination` to your app, pagination will not work.
 
 ## Step 3: create a route
 
-```py hl_lines="21"
+```py hl_lines="22"
 {! ../docs_src/tutorial/first_steps.py !}
 ```
 
@@ -43,7 +43,7 @@ Return type/response model is `Page`. It means that this endpoints can use `pagi
 
 ## Step 4: paginate the data
 
-```py hl_lines="22"
+```py hl_lines="24"
 {! ../docs_src/tutorial/first_steps.py !}
 ```
 
