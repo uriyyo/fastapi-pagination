@@ -175,7 +175,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         module: Optional[str] = None,
         **kwargs: Any,
     ) -> Type[Self]:
-        from .customization import CustomizePage, PageCustomizer, UseModule, UseName, UseParams, UseParamsFields
+        from .customization import CustomizedPage, PageCustomizer, UseModule, UseName, UseParams, UseParamsFields
 
         args: List[PageCustomizer] = []
 
@@ -188,7 +188,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         if kwargs:
             args.append(UseParamsFields(**kwargs))
 
-        return cast(Type[Self], CustomizePage[(cls, *args)])
+        return cast(Type[Self], CustomizedPage[(cls, *args)])
 
     @classmethod
     @deprecated(

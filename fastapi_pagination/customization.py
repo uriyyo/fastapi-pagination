@@ -3,7 +3,7 @@ from __future__ import annotations
 __all__ = [
     "new_page_cls",
     "get_page_bases",
-    "CustomizePage",
+    "CustomizedPage",
     "PageCustomizer",
     "UseName",
     "UseModule",
@@ -73,10 +73,10 @@ def new_page_cls(cls: Type[TPage], new_ns: ClsNamespace) -> Type[TPage]:
 
 
 if TYPE_CHECKING:
-    from typing_extensions import Annotated as CustomizePage
+    from typing_extensions import Annotated as CustomizedPage
 else:
 
-    class CustomizePage:
+    class CustomizedPage:
         def __class_getitem__(cls, item: Any) -> Any:
             if not isinstance(item, tuple):
                 item = (item,)

@@ -7,7 +7,7 @@ from fastapi_pagination import Page, Params
 from fastapi_pagination.bases import AbstractPage, AbstractParams
 from fastapi_pagination.customization import (
     ClsNamespace,
-    CustomizePage,
+    CustomizedPage,
     PageCustomizer,
     UseIncludeTotal,
     UseModule,
@@ -24,7 +24,7 @@ class _NoopCustomizer(PageCustomizer):
 
 
 def test_customization_happy_path():
-    _ = CustomizePage[
+    _ = CustomizedPage[
         Page,
         UseName("CustomPage"),
         UseModule("custom_module"),
@@ -34,36 +34,36 @@ def test_customization_happy_path():
         UseOptionalParams(),
     ]
 
-    _ = CustomizePage[
+    _ = CustomizedPage[
         Page[int],
         UseName("IntPage"),
     ]
 
 
 def test_customization_no_args():
-    assert CustomizePage[Page] is Page
+    assert CustomizedPage[Page] is Page
 
 
 def test_customization_incorrect_customizer():
     with raises(TypeError, match="^Expected PageCustomizer, got .*$"):
-        _ = CustomizePage[Page, object()]
+        _ = CustomizedPage[Page, object()]
 
 
 def test_customization_use_name():
-    CustomPage = CustomizePage[Page, UseName("CustomPage")]
+    CustomPage = CustomizedPage[Page, UseName("CustomPage")]
 
     assert CustomPage.__name__ == "CustomPage"
     assert CustomPage.__qualname__ == "CustomPage"
 
 
 def test_customization_use_module():
-    CustomPage = CustomizePage[Page, UseModule("custom_module")]
+    CustomPage = CustomizedPage[Page, UseModule("custom_module")]
 
     assert CustomPage.__module__ == "custom_module"
 
 
 def test_customization_default_module():
-    CustomPage = CustomizePage[Page, _NoopCustomizer()]
+    CustomPage = CustomizedPage[Page, _NoopCustomizer()]
 
     assert CustomPage.__module__ == __name__
 
@@ -72,7 +72,7 @@ def test_customization_use_params():
     class CustomParams(AbstractParams):
         pass
 
-    CustomPage = CustomizePage[Page, UseParams(CustomParams)]
+    CustomPage = CustomizedPage[Page, UseParams(CustomParams)]
 
     assert CustomPage.__params_type__ is CustomParams
 
@@ -82,11 +82,11 @@ def test_customization_use_params_after_use_include_total():
         pass
 
     with raises(ValueError, match=r"^Params type was already customized, cannot customize it again\..*$"):
-        _ = CustomizePage[Page, UseIncludeTotal(True), UseParams(CustomParams)]
+        _ = CustomizedPage[Page, UseIncludeTotal(True), UseParams(CustomParams)]
 
 
 def test_customization_use_params_fields():
-    CustomPage = CustomizePage[Page, UseParamsFields(page=10, size=20)]
+    CustomPage = CustomizedPage[Page, UseParamsFields(page=10, size=20)]
 
     params = CustomPage.__params_type__()
 
@@ -96,14 +96,14 @@ def test_customization_use_params_fields():
 
 def test_customization_use_unknown_field():
     with raises(ValueError, match="^Unknown field unknown_field$"):
-        _ = CustomizePage[Page, UseParamsFields(unknown_field=10)]
+        _ = CustomizedPage[Page, UseParamsFields(unknown_field=10)]
 
     with raises(ValueError, match="^Unknown fields a, b$"):
-        _ = CustomizePage[Page, UseParamsFields(a=10, b=1)]
+        _ = CustomizedPage[Page, UseParamsFields(a=10, b=1)]
 
 
 def test_customization_use_query_field():
-    CustomPage = CustomizePage[Page, UseParamsFields(page=Query(10), size=Query(20))]
+    CustomPage = CustomizedPage[Page, UseParamsFields(page=Query(10), size=Query(20))]
 
     params = CustomPage.__params_type__()
 
@@ -120,7 +120,7 @@ def test_customization_update_class_var():
     class _Page(Page[T], Generic[T]):
         __params_type__ = _Params
 
-    CustomPage = CustomizePage[_Page, UseParamsFields(var=20)]
+    CustomPage = CustomizedPage[_Page, UseParamsFields(var=20)]
 
     assert CustomPage.__params_type__.var == 20
 
@@ -132,11 +132,11 @@ def test_customization_use_params_fields_non_pydantic_params():
         __params_type__ = object
 
     with raises(TypeError, match="^.* must be subclass of BaseModel$"):
-        _ = CustomizePage[CustomPage, UseParamsFields(page=10, size=20)]
+        _ = CustomizedPage[CustomPage, UseParamsFields(page=10, size=20)]
 
 
 def test_customize_use_optional_params():
-    CustomPage = CustomizePage[Page, UseOptionalParams()]
+    CustomPage = CustomizedPage[Page, UseOptionalParams()]
 
     params = CustomPage.__params_type__()
 
@@ -146,7 +146,7 @@ def test_customize_use_optional_params():
 
 @mark.parametrize("include_total", [True, False])
 def test_use_include_total(include_total):
-    CustomPage = CustomizePage[Page, UseIncludeTotal(include_total)]
+    CustomPage = CustomizedPage[Page, UseIncludeTotal(include_total)]
     raw_params = CustomPage.__params_type__().to_raw_params()
 
     assert raw_params.include_total == include_total
@@ -157,5 +157,5 @@ def test_custom_customizer():
         def customize_page_ns(self, page_cls: Type[AbstractPage], ns: ClsNamespace) -> None:
             ns["__customized__"] = True
 
-    CustomPage = CustomizePage[Page, CustomCustomizer()]
+    CustomPage = CustomizedPage[Page, CustomCustomizer()]
     assert CustomPage.__customized__ is True
