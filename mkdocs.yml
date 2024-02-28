@@ -30,7 +30,7 @@ nav:
       - "Cursor Pagination": tutorials/cursor-pagination.md
       - "Items Transformer": tutorials/items-transformer.md
   - "Advanced User Guide":
-      - "Custom Params": tutorials_advanced/custom-params.md
+      - "Customization": tutorials_advanced/customization.md
       - "Custom Page": tutorials_advanced/custom-page.md
       - "Custom Pagination Function": tutorials_advanced/custom-paginate.md
   - "Integrations":
@@ -53,10 +53,10 @@ markdown_extensions:
 
   - admonition
   - pymdownx.highlight
-  - pymdownx.superfences
   - pymdownx.keys
   - pymdownx.inlinehilite
   - pymdownx.snippets
+  - pymdownx.superfences
 
 extra:
   social:
