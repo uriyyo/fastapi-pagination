@@ -17,10 +17,15 @@ if IS_PYDANTIC_V2:
     def parse_obj(model: Type[T], obj: Any) -> T:
         return model.model_validate(obj, from_attributes=True)
 
+    def dump_obj(model: Type[T], obj: Any) -> dict:
+        return model.model_dump(obj, by_alias=True)
 else:
 
     def parse_obj(model: Type[T], obj: Any) -> T:
         return model.parse_obj(obj)
+
+    def dump_obj(model: Type[T], obj: Any) -> dict:
+        return model.dump(obj, by_alias=True)
 
 
 def normalize(model: Type[T], *models: Any) -> List[T]:
@@ -36,4 +41,6 @@ __all__ = [
     "faker",
     "OptionalPage",
     "OptionalLimitOffsetPage",
+    "parse_obj",
+    "dump_obj",
 ]

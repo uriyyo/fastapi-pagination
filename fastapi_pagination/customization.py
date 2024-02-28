@@ -11,6 +11,9 @@ __all__ = [
     "UseParams",
     "UseParamsFields",
     "UseOptionalParams",
+    "UseModelConfig",
+    "UseExcludedFields",
+    "UseFieldsAliases",
     "ClsNamespace",
     "PageCls",
 ]
@@ -35,8 +38,8 @@ from typing import (
 
 from fastapi import Query
 from fastapi.params import Param
-from pydantic import BaseModel, create_model
-from typing_extensions import TypeAlias, get_type_hints
+from pydantic import BaseModel, ConfigDict, create_model
+from typing_extensions import TypeAlias, Unpack, get_type_hints
 
 from .bases import AbstractPage, AbstractParams, BaseRawParams
 from .utils import IS_PYDANTIC_V2, get_caller
@@ -100,7 +103,18 @@ else:
                 "__qualname__": cls_name,
                 "__module__": get_caller(),
                 "__params_type__": page_cls.__params_type__,
+                "__model_aliases__": copy(page_cls.__model_aliases__),
+                "__model_exclude__": copy(page_cls.__model_exclude__),
             }
+
+            if IS_PYDANTIC_V2:
+                new_ns["model_config"] = {}
+            else:
+
+                class Config:
+                    pass
+
+                new_ns["Config"] = Config
 
             for customizer in customizers:
                 if isinstance(customizer, PageCustomizer):
@@ -256,3 +270,54 @@ class UseOptionalParams(PageCustomizer):
 
         customizer = UseParamsFields(**new_fields)
         customizer.customize_page_ns(page_cls, ns)
+
+
+class UseModelConfig(PageCustomizer):
+    def __init__(self, **kwargs: Unpack[ConfigDict]) -> None:
+        self.config = kwargs
+
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        if IS_PYDANTIC_V2:
+            ns["model_config"].update(self.config)
+        else:
+            for key, val in self.config.items():
+                setattr(ns["Config"], key, val)
+
+
+def _pydantic_v1_get_inited_fields(cls: Any, /, *fields: str) -> ClsNamespace:
+    if not hasattr(cls, "fields"):
+        cls.fields = {}
+
+    for f in fields:
+        cls.fields.setdefault(f, {})
+
+    return cls.fields  # type: ignore[no-any-return]
+
+
+class UseExcludedFields(PageCustomizer):
+    def __init__(self, *fields: str) -> None:
+        self.fields = fields
+
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        if IS_PYDANTIC_V2:
+            ns["__model_exclude__"].update(self.fields)
+        else:
+            fields_config = _pydantic_v1_get_inited_fields(ns["Config"], *self.fields)
+
+            for f in self.fields:
+                fields_config[f]["exclude"] = True
+
+
+class UseFieldsAliases(PageCustomizer):
+    def __init__(self, **aliases: str) -> None:
+        self.aliases = aliases
+
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        if IS_PYDANTIC_V2:
+            ns["__model_aliases__"].update(self.aliases)
+        else:
+            fields_config = _pydantic_v1_get_inited_fields(ns["Config"], *self.aliases)
+
+            for name, alias in self.aliases.items():
+                assert name in page_cls.__fields__, f"Unknown field {name!r}"
+                fields_config[name]["alias"] = alias
