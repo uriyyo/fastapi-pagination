@@ -9,13 +9,17 @@ from fastapi_pagination.customization import (
     ClsNamespace,
     CustomizedPage,
     PageCustomizer,
+    UseExcludedFields,
+    UseFieldsAliases,
     UseIncludeTotal,
+    UseModelConfig,
     UseModule,
     UseName,
     UseOptionalParams,
     UseParams,
     UseParamsFields,
 )
+from fastapi_pagination.utils import IS_PYDANTIC_V2
 
 
 class _NoopCustomizer(PageCustomizer):
@@ -159,3 +163,41 @@ def test_custom_customizer():
 
     CustomPage = CustomizedPage[Page, CustomCustomizer()]
     assert CustomPage.__customized__ is True
+
+
+def test_use_model_config():
+    key = "populate_by_name" if IS_PYDANTIC_V2 else "allow_population_by_field_name"
+
+    CustomPage = CustomizedPage[
+        Page,
+        UseModelConfig(**{key: False}),
+    ]
+
+    if IS_PYDANTIC_V2:
+        assert CustomPage.model_config["populate_by_name"] is False
+    else:
+        assert CustomPage.__config__.allow_population_by_field_name is False
+
+
+def test_use_excluded_fields():
+    CustomPage = CustomizedPage[
+        Page,
+        UseExcludedFields("total"),
+    ]
+
+    if IS_PYDANTIC_V2:
+        assert CustomPage.model_fields["total"].exclude
+    else:
+        assert "total" in CustomPage.__exclude_fields__
+
+
+def test_use_aliases():
+    CustomPage = CustomizedPage[
+        Page,
+        UseFieldsAliases(total="count"),
+    ]
+
+    if IS_PYDANTIC_V2:
+        assert CustomPage.model_fields["total"].serialization_alias == "count"
+    else:
+        assert CustomPage.__fields__["total"].alias == "count"

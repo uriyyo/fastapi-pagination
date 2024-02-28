@@ -19,14 +19,17 @@ from typing import (
     TYPE_CHECKING,
     Any,
     ClassVar,
+    Dict,
     Generic,
     List,
     Optional,
     Sequence,
+    Set,
     Tuple,
     Type,
     TypeVar,
     cast,
+    no_type_check,
 )
 
 from .utils import IS_PYDANTIC_V2, get_caller
@@ -135,9 +138,27 @@ def _check_for_old_sign(func: Any) -> bool:
 class AbstractPage(GenericModel, Generic[T], ABC):
     __params_type__: ClassVar[Type[AbstractParams]]
 
-    if TYPE_CHECKING:
+    # used by pydantic v2
+    __model_aliases__: ClassVar[Dict[str, str]] = {}
+    __model_exclude__: ClassVar[Set[str]] = set()
+
+    if TYPE_CHECKING:  # only for pydantic v1
         __concrete__: ClassVar[bool]
         __parameters__: ClassVar[Tuple[Any, ...]]
+
+    if IS_PYDANTIC_V2:
+
+        @classmethod
+        @no_type_check
+        def __pydantic_init_subclass__(cls, **kwargs: Any) -> None:
+            super().__pydantic_init_subclass__(**kwargs)
+
+            for exclude in cls.__model_exclude__:
+                cls.model_fields[exclude].exclude = True
+            for name, alias in cls.__model_aliases__.items():
+                cls.model_fields[name].serialization_alias = alias
+
+            cls.model_rebuild(force=True)
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         try:
@@ -232,12 +253,14 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         model_config = {
             "arbitrary_types_allowed": True,
             "from_attributes": True,
+            "populate_by_name": True,
         }
     else:
 
         class Config:
             orm_mode = True
             arbitrary_types_allowed = True
+            allow_population_by_field_name = True
 
 
 class BasePage(AbstractPage[T], Generic[T], ABC):
