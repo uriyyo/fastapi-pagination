@@ -2084,13 +2084,13 @@ files = [
 
 [[package]]
 name = "sqlakeyset"
-version = "2.0.1706067133"
+version = "2.0.1708907391"
 description = "offset-free paging for sqlalchemy"
 optional = true
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "sqlakeyset-2.0.1706067133-py3-none-any.whl", hash = "sha256:a2432d1e72daea1a8cf91ccccb25068cf4ec12ba12eced6f4e5954391823c9ef"},
-    {file = "sqlakeyset-2.0.1706067133.tar.gz", hash = "sha256:a74680a2d3dce89d3e9a3d50126a7bb66eb56ce0bfaf8a5ae025361a7d1741e0"},
+    {file = "sqlakeyset-2.0.1708907391-py3-none-any.whl", hash = "sha256:3eb6bd0ccd599ab44aa5c0b0f9a710d5c4d24813c7053adc9398bf539b68859e"},
+    {file = "sqlakeyset-2.0.1708907391.tar.gz", hash = "sha256:376af65f0faecea6e19b16dd5dd047439d4314c5ae1d85d8a46bbb1ee44f32e3"},
 ]
 
 [package.dependencies]
