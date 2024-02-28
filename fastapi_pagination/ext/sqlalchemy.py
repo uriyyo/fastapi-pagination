@@ -50,7 +50,7 @@ except ImportError:  # pragma: no cover
 try:
     from sqlakeyset import paging
 except ImportError:  # pragma: no cover
-    paging = None
+    paging = None  # type: ignore[assignment]
 
 
 AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection, async_scoped_session]"
@@ -117,11 +117,11 @@ def exec_pagination(
         if not getattr(query, "_order_by_clauses", True):
             raise ValueError("Cursor pagination requires ordering")
 
-        page = paging.select_page(
-            conn,
+        page = paging.select_page(  # type: ignore
+            conn,  # type: ignore[arg-type]
             selectable=query,
             per_page=raw_params.size,
-            page=raw_params.cursor,
+            page=raw_params.cursor,  # type: ignore[arg-type]
         )
         items = unwrap_scalars([*page])
         items = _apply_items_transformer(items, transformer)
