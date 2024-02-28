@@ -605,13 +605,13 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "faker"
-version = "23.2.1"
+version = "23.3.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Faker-23.2.1-py3-none-any.whl", hash = "sha256:0520a6b97e07c658b2798d7140971c1d5bc4bcd5013e7937fe075fd054aa320c"},
-    {file = "Faker-23.2.1.tar.gz", hash = "sha256:f07b64d27f67b62c7f0536a72f47813015b3b51cd4664918454011094321e464"},
+    {file = "Faker-23.3.0-py3-none-any.whl", hash = "sha256:117ce1a2805c1bc5ca753b3dc6f9d567732893b2294b827d3164261ee8f20267"},
+    {file = "Faker-23.3.0.tar.gz", hash = "sha256:458d93580de34403a8dec1e8d5e6be2fee96c4deca63b95d71df7a6a80a690de"},
 ]
 
 [package.dependencies]
@@ -620,13 +620,13 @@ typing-extensions = {version = ">=3.10.0.1", markers = "python_version <= \"3.8\
 
 [[package]]
 name = "fastapi"
-version = "0.109.2"
+version = "0.110.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "fastapi-0.109.2-py3-none-any.whl", hash = "sha256:2c9bab24667293b501cad8dd388c05240c850b58ec5876ee3283c47d6e1e3a4d"},
-    {file = "fastapi-0.109.2.tar.gz", hash = "sha256:f3817eac96fe4f65a2ebb4baa000f394e55f5fccdaf7f75250804bc58f354f73"},
+    {file = "fastapi-0.110.0-py3-none-any.whl", hash = "sha256:87a1f6fb632a218222c5984be540055346a8f5d8a68e8f6fb647b1dc9934de4b"},
+    {file = "fastapi-0.110.0.tar.gz", hash = "sha256:266775f0dcc95af9d3ef39bad55cff525329a931d5fd51930aadd4f428bf7ff3"},
 ]
 
 [package.dependencies]
@@ -1075,13 +1075,13 @@ min-versions = ["babel (==2.9.0)", "click (==7.0)", "colorama (==0.4)", "ghp-imp
 
 [[package]]
 name = "mkdocs-material"
-version = "9.5.10"
+version = "9.5.11"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocs_material-9.5.10-py3-none-any.whl", hash = "sha256:3c6c46b57d2ee3c8890e6e0406e68b6863cf65768f0f436990a742702d198442"},
-    {file = "mkdocs_material-9.5.10.tar.gz", hash = "sha256:6ad626dbb31070ebbaedff813323a16a406629620e04b96458f16e6e9c7008fe"},
+    {file = "mkdocs_material-9.5.11-py3-none-any.whl", hash = "sha256:788ee0f3e036dca2dc20298d65e480297d348a44c9d7b2ee05c5262983e66072"},
+    {file = "mkdocs_material-9.5.11.tar.gz", hash = "sha256:7af7f8af0dea16175558f3fb9245d26c83a17199baa5f157755e63d7437bf971"},
 ]
 
 [package.dependencies]
@@ -1672,13 +1672,13 @@ files = [
 
 [[package]]
 name = "pytest"
-version = "8.0.1"
+version = "8.0.2"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest-8.0.1-py3-none-any.whl", hash = "sha256:3e4f16fe1c0a9dc9d9389161c127c3edc5d810c38d6793042fb81d9f48a59fca"},
-    {file = "pytest-8.0.1.tar.gz", hash = "sha256:267f6563751877d772019b13aacbe4e860d73fe8f651f28112e9ac37de7513ae"},
+    {file = "pytest-8.0.2-py3-none-any.whl", hash = "sha256:edfaaef32ce5172d5466b5127b42e0d6d35ebbe4453f0e3505d96afd93f6b096"},
+    {file = "pytest-8.0.2.tar.gz", hash = "sha256:d4051d623a2e0b7e51960ba963193b09ce6daeb9759a451844a21e4ddedfc1bd"},
 ]
 
 [package.dependencies]
@@ -2084,13 +2084,13 @@ files = [
 
 [[package]]
 name = "sqlakeyset"
-version = "2.0.1706067133"
+version = "2.0.1708907391"
 description = "offset-free paging for sqlalchemy"
 optional = true
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "sqlakeyset-2.0.1706067133-py3-none-any.whl", hash = "sha256:a2432d1e72daea1a8cf91ccccb25068cf4ec12ba12eced6f4e5954391823c9ef"},
-    {file = "sqlakeyset-2.0.1706067133.tar.gz", hash = "sha256:a74680a2d3dce89d3e9a3d50126a7bb66eb56ce0bfaf8a5ae025361a7d1741e0"},
+    {file = "sqlakeyset-2.0.1708907391-py3-none-any.whl", hash = "sha256:3eb6bd0ccd599ab44aa5c0b0f9a710d5c4d24813c7053adc9398bf539b68859e"},
+    {file = "sqlakeyset-2.0.1708907391.tar.gz", hash = "sha256:376af65f0faecea6e19b16dd5dd047439d4314c5ae1d85d8a46bbb1ee44f32e3"},
 ]
 
 [package.dependencies]
@@ -2316,13 +2316,13 @@ pyyaml = ["pyyaml"]
 
 [[package]]
 name = "typing-extensions"
-version = "4.9.0"
+version = "4.10.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "typing_extensions-4.9.0-py3-none-any.whl", hash = "sha256:af72aea155e91adfc61c3ae9e0e342dbc0cba726d6cba4b6c72c1f34e47291cd"},
-    {file = "typing_extensions-4.9.0.tar.gz", hash = "sha256:23478f88c37f27d76ac8aee6c905017a143b0b1b886c3c9f66bc2fd94f9f5783"},
+    {file = "typing_extensions-4.10.0-py3-none-any.whl", hash = "sha256:69b1a937c3a517342112fb4c6df7e72fc39a38e7891a5730ed4985b5214b5475"},
+    {file = "typing_extensions-4.10.0.tar.gz", hash = "sha256:b0abd7c89e8fb96f98db18d86106ff1d90ab692004eb746cf6eda2682f91b3cb"},
 ]
 
 [[package]]
@@ -2468,4 +2468,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "dea78c9ae84a431cfac85b3d33ae3e034c0c14bca5b8b7ef2128f48876bfe98c"
+content-hash = "6df9c762b28cecb6e59ce5b456baaf9455572239f9262bc73cb115f5904f9f77"
