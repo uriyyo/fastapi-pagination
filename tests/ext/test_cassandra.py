@@ -7,6 +7,7 @@ from pytest import fixture, mark
 
 from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage as BaseCursorPage
+from fastapi_pagination.customization import CustomizedPage, UseParamsFields
 
 from ..schemas import UserOut
 
@@ -15,7 +16,10 @@ try:
 except ImportError:
     paginate = None
 
-CursorPage = BaseCursorPage.with_custom_options(str_cursor=False)
+CursorPage = CustomizedPage[
+    BaseCursorPage,
+    UseParamsFields(str_cursor=False),
+]
 
 
 class User(models.Model):

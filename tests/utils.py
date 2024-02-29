@@ -4,8 +4,7 @@ from faker import Faker
 from pydantic import BaseModel
 
 from fastapi_pagination import LimitOffsetPage, Page
-from fastapi_pagination.default import OptionalParams
-from fastapi_pagination.limit_offset import OptionalLimitOffsetParams
+from fastapi_pagination.customization import CustomizedPage, UseOptionalParams
 from fastapi_pagination.utils import IS_PYDANTIC_V2
 
 faker = Faker()
@@ -32,8 +31,8 @@ def normalize(model: Type[T], *models: Any) -> List[T]:
     return [parse_obj(model, m) for m in models]
 
 
-OptionalPage = Page.with_params(OptionalParams)
-OptionalLimitOffsetPage = LimitOffsetPage.with_params(OptionalLimitOffsetParams)
+OptionalPage = CustomizedPage[Page, UseOptionalParams()]
+OptionalLimitOffsetPage = CustomizedPage[LimitOffsetPage, UseOptionalParams()]
 
 
 __all__ = [
