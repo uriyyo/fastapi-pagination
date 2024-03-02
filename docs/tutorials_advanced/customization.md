@@ -50,7 +50,7 @@ If you want to change this behavior, you should use `UseIncludeTotal` customizer
 {!../docs_src/tutorials_advanced/customization.py [ln:16-19]!}
 ```
 
-1. Now when you will paginate using `PageNoToal` class, it will not include total count of items.
+1. Now when you will paginate using `PageNoTotal` class, it will not include total count of items.
 
 ### Change params default values
 
