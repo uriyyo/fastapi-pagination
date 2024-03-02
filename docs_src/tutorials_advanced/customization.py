@@ -29,8 +29,7 @@ PageOptionalParams = CustomizedPage[
 ]
 
 
-class MyParams(Params):
-    ...  # your magic here
+class MyParams(Params): ...  # your magic here
 
 
 PageWithMyParams = CustomizedPage[
