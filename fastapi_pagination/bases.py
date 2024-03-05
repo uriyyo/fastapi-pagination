@@ -14,6 +14,7 @@ __all__ = [
 import inspect
 import warnings
 from abc import ABC, abstractmethod
+from contextlib import suppress
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
@@ -38,6 +39,14 @@ if IS_PYDANTIC_V2:
     from pydantic import BaseModel as GenericModel
 else:
     from pydantic.generics import GenericModel
+
+
+try:
+    from pydantic import PydanticUndefinedAnnotation  # type: ignore[attr-defined]
+except ImportError:
+
+    class PydanticUndefinedAnnotation(Exception):  # type: ignore[no-redef]
+        pass
 
 
 from typing_extensions import Self, TypeGuard, deprecated
@@ -158,7 +167,10 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             for name, alias in cls.__model_aliases__.items():
                 cls.model_fields[name].serialization_alias = alias
 
-            cls.model_rebuild(force=True)
+            # rebuild model only in case if customizations is present
+            if cls.__model_exclude__ or cls.__model_aliases__:
+                with suppress(PydanticUndefinedAnnotation):
+                    cls.model_rebuild(force=True)
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         try:
