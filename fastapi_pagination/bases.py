@@ -158,7 +158,9 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             for name, alias in cls.__model_aliases__.items():
                 cls.model_fields[name].serialization_alias = alias
 
-            cls.model_rebuild(force=True)
+            # rebuild model only in case if customizations is present
+            if cls.__model_exclude__ or cls.__model_aliases__:
+                cls.model_rebuild(force=True)
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         try:
