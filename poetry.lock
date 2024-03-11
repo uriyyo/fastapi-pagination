@@ -655,13 +655,13 @@ typing = ["typing-extensions (>=4.8)"]
 
 [[package]]
 name = "flaky"
-version = "3.7.0"
-description = "Plugin for nose or pytest that automatically reruns flaky tests."
+version = "3.8.0"
+description = "Plugin for pytest that automatically reruns flaky tests."
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = ">=3.5"
 files = [
-    {file = "flaky-3.7.0-py2.py3-none-any.whl", hash = "sha256:d6eda73cab5ae7364504b7c44670f70abed9e75f77dd116352f662817592ec9c"},
-    {file = "flaky-3.7.0.tar.gz", hash = "sha256:3ad100780721a1911f57a165809b7ea265a7863305acb66708220820caf8aa0d"},
+    {file = "flaky-3.8.0-py2.py3-none-any.whl", hash = "sha256:06152dc0582c18e2cc3d241feece008c074b17e1292658cb39ff8464ae19bd89"},
+    {file = "flaky-3.8.0.tar.gz", hash = "sha256:3b4b9f5c15829c919c8e05b15582fa1c9c7f20a303581dd5d0bc56a66441389c"},
 ]
 
 [[package]]
@@ -2468,4 +2468,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "2dd61a13fa38ef4e418daac935d2fc8054ccbbaccf3f1a56738bcb24ae9fa372"
+content-hash = "01a8e23268f7ef0aae6ec10ac7ca9dd08d0648ab562877f3eeea2e31525981b1"
