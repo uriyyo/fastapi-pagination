@@ -655,13 +655,13 @@ typing = ["typing-extensions (>=4.8)"]
 
 [[package]]
 name = "flaky"
-version = "3.8.0"
+version = "3.8.1"
 description = "Plugin for pytest that automatically reruns flaky tests."
 optional = false
 python-versions = ">=3.5"
 files = [
-    {file = "flaky-3.8.0-py2.py3-none-any.whl", hash = "sha256:06152dc0582c18e2cc3d241feece008c074b17e1292658cb39ff8464ae19bd89"},
-    {file = "flaky-3.8.0.tar.gz", hash = "sha256:3b4b9f5c15829c919c8e05b15582fa1c9c7f20a303581dd5d0bc56a66441389c"},
+    {file = "flaky-3.8.1-py2.py3-none-any.whl", hash = "sha256:194ccf4f0d3a22b2de7130f4b62e45e977ac1b5ccad74d4d48f3005dcc38815e"},
+    {file = "flaky-3.8.1.tar.gz", hash = "sha256:47204a81ec905f3d5acfbd61daeabcada8f9d4031616d9bcb0618461729699f5"},
 ]
 
 [[package]]
@@ -2468,4 +2468,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "86cabaa4b29ece4544b8ac4f7451e06c2051c1f642f3308e02eed66671b5143e"
+content-hash = "279c64097038a027e4689d426343cdf1f358d7f31f8d7fb6e15e4f82adc51f45"
