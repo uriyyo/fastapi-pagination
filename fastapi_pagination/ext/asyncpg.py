@@ -8,6 +8,7 @@ from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
+from .sqlalchemy import count_text_query, paginate_text_query
 
 
 # FIXME: find a way to parse raw sql queries
@@ -23,19 +24,13 @@ async def paginate(
 
     if raw_params.include_total:
         total = await conn.fetchval(
-            f"SELECT count(*) FROM ({query}) AS _pagination_query",  # noqa: S608
+            count_text_query(query),
             *args,
         )
     else:
         total = None
 
-    limit_offset_str = ""
-    if raw_params.limit is not None:
-        limit_offset_str += f" LIMIT {raw_params.limit}"
-    if raw_params.offset is not None:
-        limit_offset_str += f" OFFSET {raw_params.offset}"
-
-    items = await conn.fetch(f"{query} {limit_offset_str}", *args)
+    items = await conn.fetch(paginate_text_query(query, params), *args)
     items = [{**r} for r in items]
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
