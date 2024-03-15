@@ -25,7 +25,7 @@ def app(sa_user, sa_session: Type[Session], model_cls: Type[object]):
     @app.get("/default", response_model=Page[model_cls])
     @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
     def route(db: Session = Depends(get_db)):
-        return paginate(db, text("users"))
+        return paginate(db, text("SELECT * FROM users"))
 
     return add_pagination(app)
 
