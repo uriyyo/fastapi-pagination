@@ -31,8 +31,8 @@ async def paginate(
     else:
         total = None
 
-    query = paginate_query(query, params)
-    raw_items = await db.fetch_all(query)
+    paginated_query = paginate_query(query, params)
+    raw_items = await db.fetch_all(paginated_query)
 
     items: List[Any] = raw_items
     if convert_to_mapping:

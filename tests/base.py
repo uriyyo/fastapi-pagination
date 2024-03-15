@@ -1,6 +1,7 @@
 from typing import Any, ClassVar, Dict, List, Type
 
 from pytest import fixture, mark
+from typing_extensions import Literal, TypeAlias
 
 from fastapi_pagination import set_page
 from fastapi_pagination.default import Page, Params
@@ -44,10 +45,17 @@ _params_desc = [
     "31-items",
 ]
 
+PaginationTestCaseType: TypeAlias = Literal[
+    "default",
+    "non-scalar",
+    "relationship",
+    "optional",
+]
+
 
 @mark.usefixtures("db_type")
 class BasePaginationTestCase:
-    pagination_types: ClassVar[List[str]] = ["default"]
+    pagination_types: ClassVar[List[PaginationTestCaseType]] = ["default"]
 
     page: ClassVar[Type[Page]] = Page
     limit_offset_page: ClassVar[Type[LimitOffsetPage]] = LimitOffsetPage

@@ -1,18 +1,22 @@
 from __future__ import annotations
 
 __all__ = [
+    "paginate_text_query",
+    "count_text_query",
     "paginate_query",
     "count_query",
     "paginate",
+    "Selectable",
 ]
 
 import warnings
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query, Session, noload, scoped_session
+from sqlalchemy.sql.elements import TextClause
 from typing_extensions import TypeAlias
 
 from ..api import apply_items_transformer, create_page
@@ -56,12 +60,36 @@ except ImportError:  # pragma: no cover
 AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection, async_scoped_session]"
 SyncConn: TypeAlias = "Union[Session, Connection, scoped_session]"
 
+Selectable: TypeAlias = "Union[Select, TextClause]"
 
-def paginate_query(query: Select, params: AbstractParams) -> Select:
+
+def paginate_text_query(query: str, params: AbstractParams) -> str:
+    raw_params = params.to_raw_params().as_limit_offset()
+
+    suffix = ""
+    if raw_params.limit is not None:
+        suffix += f" LIMIT {raw_params.limit}"
+    if raw_params.offset is not None:
+        suffix += f" OFFSET {raw_params.offset}"
+
+    return f"{query} {suffix}".strip()
+
+
+def count_text_query(query: str) -> str:
+    return f"SELECT count(*) FROM ({query}) AS __count__query__"  # noqa: S608
+
+
+def paginate_query(query: Selectable, params: AbstractParams) -> Selectable:
+    if isinstance(query, TextClause):
+        return text(paginate_text_query(query.text, params))
+
     return generic_query_apply_params(query, params.to_raw_params().as_limit_offset())
 
 
-def count_query(query: Select, *, use_subquery: bool = True) -> Select:
+def count_query(query: Selectable, *, use_subquery: bool = True) -> Selectable:
+    if isinstance(query, TextClause):
+        return text(count_text_query(query.text))
+
     query = query.order_by(None).options(noload("*"))
 
     if use_subquery:
@@ -88,7 +116,7 @@ def _maybe_unique(result: Any, unique: bool) -> Any:
 
 
 def exec_pagination(
-    query: Select,
+    query: Selectable,
     params: AbstractParams,
     conn: SyncConn,
     transformer: Optional[ItemsTransformer] = None,
@@ -119,7 +147,7 @@ def exec_pagination(
 
         page = paging.select_page(  # type: ignore
             conn,  # type: ignore[arg-type]
-            selectable=query,
+            selectable=query,  # type: ignore[arg-type]
             per_page=raw_params.size,
             page=raw_params.cursor,  # type: ignore[arg-type]
         )
@@ -180,7 +208,7 @@ def paginate(
 @overload
 def paginate(
     conn: SyncConn,
-    query: Select,
+    query: Selectable,
     params: Optional[AbstractParams] = None,
     *,
     subquery_count: bool = True,
@@ -194,7 +222,7 @@ def paginate(
 @overload
 async def paginate(
     conn: AsyncConn,
-    query: Select,
+    query: Selectable,
     params: Optional[AbstractParams] = None,
     *,
     subquery_count: bool = True,
@@ -213,7 +241,10 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
     except (TypeError, AssertionError):
         query, conn, params, transformer, additional_data, unique, subquery_count = _new_paginate_sign(*args, **kwargs)
 
-    params, _ = verify_params(params, "limit-offset", "cursor")
+    params, raw_params = verify_params(params, "limit-offset", "cursor")
+
+    if isinstance(query, TextClause) and is_cursor(raw_params):
+        raise ValueError("Cursor pagination cannot be used with raw SQL queries")
 
     with suppress(TypeError):
         sync_conn = _get_sync_conn_from_async(conn)
