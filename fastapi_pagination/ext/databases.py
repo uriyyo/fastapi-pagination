@@ -12,7 +12,7 @@ from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
-from .sqlalchemy import paginate_query
+from .sqlalchemy import create_paginate_query
 
 
 async def paginate(
@@ -31,7 +31,7 @@ async def paginate(
     else:
         total = None
 
-    paginated_query = paginate_query(query, params)
+    paginated_query = create_paginate_query(query, params)
     raw_items = await db.fetch_all(paginated_query)
 
     items: List[Any] = raw_items

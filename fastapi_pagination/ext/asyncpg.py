@@ -8,7 +8,7 @@ from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
-from .sqlalchemy import count_text_query, paginate_text_query
+from .sqlalchemy import create_count_query_from_text, create_paginate_query_from_text
 
 
 # FIXME: find a way to parse raw sql queries
@@ -24,13 +24,13 @@ async def paginate(
 
     if raw_params.include_total:
         total = await conn.fetchval(
-            count_text_query(query),
+            create_count_query_from_text(query),
             *args,
         )
     else:
         total = None
 
-    items = await conn.fetch(paginate_text_query(query, params), *args)
+    items = await conn.fetch(create_paginate_query_from_text(query, params), *args)
     items = [{**r} for r in items]
     t_items = await apply_items_transformer(items, transformer, async_=True)
 

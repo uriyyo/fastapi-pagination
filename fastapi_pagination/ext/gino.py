@@ -12,7 +12,7 @@ from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
-from .sqlalchemy import paginate_query
+from .sqlalchemy import create_paginate_query
 
 
 @no_type_check
@@ -33,7 +33,7 @@ async def paginate(
     else:
         total = None
 
-    query = paginate_query(query, params)
+    query = create_paginate_query(query, params)
     items = await query.gino.all()
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
