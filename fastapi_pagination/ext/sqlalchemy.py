@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 __all__ = [
-    "paginate_text_query",
-    "count_text_query",
-    "paginate_query",
-    "count_query",
+    "create_paginate_query_from_text",
+    "create_count_query_from_text",
+    "create_paginate_query",
+    "create_count_query",
     "paginate",
     "Selectable",
 ]
@@ -63,7 +63,7 @@ SyncConn: TypeAlias = "Union[Session, Connection, scoped_session]"
 Selectable: TypeAlias = "Union[Select, TextClause]"
 
 
-def paginate_text_query(query: str, params: AbstractParams) -> str:
+def create_paginate_query_from_text(query: str, params: AbstractParams) -> str:
     raw_params = params.to_raw_params().as_limit_offset()
 
     suffix = ""
@@ -75,20 +75,20 @@ def paginate_text_query(query: str, params: AbstractParams) -> str:
     return f"{query} {suffix}".strip()
 
 
-def count_text_query(query: str) -> str:
-    return f"SELECT count(*) FROM ({query}) AS __count__query__"  # noqa: S608
+def create_count_query_from_text(query: str) -> str:
+    return f"SELECT count(*) FROM ({query}) AS __count_query__"  # noqa: S608
 
 
-def paginate_query(query: Selectable, params: AbstractParams) -> Selectable:
+def create_paginate_query(query: Selectable, params: AbstractParams) -> Selectable:
     if isinstance(query, TextClause):
-        return text(paginate_text_query(query.text, params))
+        return text(create_paginate_query_from_text(query.text, params))
 
     return generic_query_apply_params(query, params.to_raw_params().as_limit_offset())
 
 
-def count_query(query: Selectable, *, use_subquery: bool = True) -> Selectable:
+def create_count_query(query: Selectable, *, use_subquery: bool = True) -> Selectable:
     if isinstance(query, TextClause):
-        return text(count_text_query(query.text))
+        return text(create_count_query_from_text(query.text))
 
     query = query.order_by(None).options(noload("*"))
 
@@ -117,6 +117,7 @@ def _maybe_unique(result: Any, unique: bool) -> Any:
 
 def exec_pagination(
     query: Selectable,
+    count_query: Optional[Selectable],
     params: AbstractParams,
     conn: SyncConn,
     transformer: Optional[ItemsTransformer] = None,
@@ -137,7 +138,8 @@ def exec_pagination(
 
     total = None
     if raw_params.include_total:
-        total = conn.scalar(count_query(query, use_subquery=subquery_count))
+        count_query = count_query or create_count_query(query, use_subquery=subquery_count)
+        total = conn.scalar(count_query)
 
     if is_cursor(raw_params):
         if paging is None:
@@ -165,7 +167,7 @@ def exec_pagination(
             **(additional_data or {}),
         )
 
-    query = paginate_query(query, params)
+    query = create_paginate_query(query, params)
     items = _maybe_unique(conn.execute(query), unique)
     items = unwrap_scalars(items)
     items = _apply_items_transformer(items, transformer)
@@ -211,6 +213,7 @@ def paginate(
     query: Selectable,
     params: Optional[AbstractParams] = None,
     *,
+    count_query: Optional[Selectable] = None,
     subquery_count: bool = True,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
@@ -225,6 +228,7 @@ async def paginate(
     query: Selectable,
     params: Optional[AbstractParams] = None,
     *,
+    count_query: Optional[Selectable] = None,
     subquery_count: bool = True,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
@@ -237,9 +241,13 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
     try:
         assert args
         assert isinstance(args[0], Query)
-        query, conn, params, transformer, additional_data, unique, subquery_count = _old_paginate_sign(*args, **kwargs)
+        query, count_query, conn, params, transformer, additional_data, unique, subquery_count = _old_paginate_sign(
+            *args, **kwargs
+        )
     except (TypeError, AssertionError):
-        query, conn, params, transformer, additional_data, unique, subquery_count = _new_paginate_sign(*args, **kwargs)
+        query, count_query, conn, params, transformer, additional_data, unique, subquery_count = _new_paginate_sign(
+            *args, **kwargs
+        )
 
     params, raw_params = verify_params(params, "limit-offset", "cursor")
 
@@ -251,6 +259,7 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
         return greenlet_spawn(
             exec_pagination,
             query,
+            count_query,
             params,
             sync_conn,
             transformer,
@@ -260,7 +269,17 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
             async_=True,
         )
 
-    return exec_pagination(query, params, conn, transformer, additional_data, subquery_count, unique, async_=False)
+    return exec_pagination(
+        query,
+        count_query,
+        params,
+        conn,
+        transformer,
+        additional_data,
+        subquery_count,
+        unique,
+        async_=False,
+    )
 
 
 def _old_paginate_sign(
@@ -271,7 +290,16 @@ def _old_paginate_sign(
     transformer: Optional[ItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
-) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool, bool]:
+) -> Tuple[
+    Select,
+    Optional[Selectable],
+    SyncConn,
+    Optional[AbstractParams],
+    Optional[ItemsTransformer],
+    AdditionalData,
+    bool,
+    bool,
+]:
     if query.session is None:
         raise ValueError("query.session is None")
 
@@ -287,7 +315,7 @@ def _old_paginate_sign(
     with suppress(AttributeError):
         query = query._statement_20()  # type: ignore[attr-defined]
 
-    return query, session, params, transformer, additional_data, unique, subquery_count  # type: ignore
+    return query, None, session, params, transformer, additional_data, unique, subquery_count  # type: ignore
 
 
 def _new_paginate_sign(
@@ -296,8 +324,18 @@ def _new_paginate_sign(
     params: Optional[AbstractParams] = None,
     *,
     subquery_count: bool = True,
+    count_query: Optional[Selectable] = None,
     transformer: Optional[ItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
-) -> Tuple[Select, SyncConn, Optional[AbstractParams], Optional[ItemsTransformer], AdditionalData, bool, bool]:
-    return query, conn, params, transformer, additional_data, unique, subquery_count
+) -> Tuple[
+    Select,
+    Optional[Selectable],
+    SyncConn,
+    Optional[AbstractParams],
+    Optional[ItemsTransformer],
+    AdditionalData,
+    bool,
+    bool,
+]:
+    return query, count_query, conn, params, transformer, additional_data, unique, subquery_count
