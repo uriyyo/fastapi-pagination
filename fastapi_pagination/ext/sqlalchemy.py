@@ -5,6 +5,7 @@ __all__ = [
     "create_count_query_from_text",
     "create_paginate_query",
     "create_count_query",
+    "paginate_query",
     "paginate",
     "Selectable",
 ]
@@ -17,7 +18,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query, Session, noload, scoped_session
 from sqlalchemy.sql.elements import TextClause
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, deprecated
 
 from ..api import apply_items_transformer, create_page
 from ..bases import AbstractPage, AbstractParams, is_cursor
@@ -77,6 +78,15 @@ def create_paginate_query_from_text(query: str, params: AbstractParams) -> str:
 
 def create_count_query_from_text(query: str) -> str:
     return f"SELECT count(*) FROM ({query}) AS __count_query__"  # noqa: S608
+
+
+@deprecated(
+    "fastapi_pagination.ext.sqlalchemy.paginate_query function is deprecated, "
+    "please use fastapi_pagination.ext.sqlalchemy.create_paginate_query function instead"
+    "This function will be removed in the next major release (0.13.0).",
+)
+def paginate_query(query: Select, params: AbstractParams) -> Select:
+    return create_paginate_query(query, params)  # type: ignore[return-value]
 
 
 def create_paginate_query(query: Selectable, params: AbstractParams) -> Selectable:
