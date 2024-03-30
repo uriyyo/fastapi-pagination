@@ -301,3 +301,28 @@ class TestLifespan:
         assert rsp.status_code == status.HTTP_200_OK
 
         assert app.state.called, "original lifespan not called"
+
+
+class TestPatchOpenAPI:
+    @fixture(scope="class")
+    def app(self):
+        app = FastAPI()
+        app.openapi()["info"]["title"] = "Custom Title"
+
+        @app.get(
+            "/",
+            response_model=Page[int],
+        )
+        async def route():
+            return paginate([])
+
+        add_pagination(app)
+
+        return app
+
+    async def test_patch_openapi(self, app, client):
+        rsp = await client.get("/openapi.json")
+        assert rsp.status_code == status.HTTP_200_OK
+
+        data = rsp.json()
+        assert data["info"]["title"] == "Custom Title"
