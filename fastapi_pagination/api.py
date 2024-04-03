@@ -284,12 +284,17 @@ def _create_params_dependency(
     if IS_PYDANTIC_V2:
         with suppress(ValueError, TypeError):
             if issubclass(params, BaseModel):
-                sign_params = {**sign.parameters}
-                for name, field in params.model_fields.items():
-                    name = field.alias or name
-                    sign_params[name] = sign_params[name].replace(default=field)
+                sign_params = [
+                    inspect.Parameter(
+                        name=name,
+                        kind=inspect.Parameter.KEYWORD_ONLY,
+                        annotation=field.annotation,
+                        default=field,
+                    )
+                    for name, field in params.model_fields.items()
+                ]
 
-                sign = sign.replace(parameters=[*sign_params.values()])
+                sign = sign.replace(parameters=sign_params)
 
     _pagination_params.__signature__ = sign  # type: ignore[attr-defined]
 
