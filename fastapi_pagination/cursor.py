@@ -68,7 +68,7 @@ def encode_cursor(cursor: Optional[Cursor]) -> Optional[str]:
 
 class CursorParams(BaseModel, AbstractParams):
     cursor: Optional[str] = Query(None, description="Cursor for the next page")
-    size: int = Query(50, ge=0, description="Page offset")
+    size: int = Query(50, ge=0, le=100, description="Page size")
 
     str_cursor: ClassVar[bool] = True
 
