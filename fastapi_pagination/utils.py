@@ -108,7 +108,7 @@ Otherwise, you can disable this warning by adding the following code to your cod
 from fastapi_pagination.utils import disable_installed_extensions_check
 
 disable_installed_extensions_check()
-"""
+""".strip()
 
 _CHECK_INSTALLED_EXTENSIONS = True
 
