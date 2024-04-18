@@ -1,17 +1,12 @@
 from fastapi import FastAPI
-from flaky import flaky
 from motor.motor_asyncio import AsyncIOMotorClient
-from pytest import fixture, mark
+from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.motor import paginate
 
 from ..base import BasePaginationTestCase
-
-
-@fixture(scope="session")
-def database_url(mongodb_url) -> str:
-    return mongodb_url
+from .utils import mongodb_test
 
 
 @fixture(scope="session")
@@ -38,7 +33,6 @@ def app(db_client, model_cls):
     return add_pagination(app)
 
 
-@mark.skip(reason="Flaky test, don't know why (((")
-@flaky(max_runs=5)
+@mongodb_test
 class TestMotor(BasePaginationTestCase):
     pass

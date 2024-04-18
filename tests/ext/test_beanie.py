@@ -9,11 +9,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.beanie import paginate
 
 from ..base import BasePaginationTestCase
-
-
-@fixture(scope="session")
-def database_url(mongodb_url) -> str:
-    return mongodb_url
+from .utils import mongodb_test
 
 
 @fixture(scope="session")
@@ -66,5 +62,6 @@ def app(db_client, query, model_cls):
     return add_pagination(app)
 
 
+@mongodb_test
 class TestBeanie(BasePaginationTestCase):
     pass
