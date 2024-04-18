@@ -27,11 +27,6 @@ pytestmark = mark.skipif(
 
 
 @fixture(scope="session")
-def database_url(mongodb_url) -> str:
-    return mongodb_url
-
-
-@fixture(scope="session")
 def db_client(database_url):
     client = AsyncIOMotorClient(database_url)
     yield client
