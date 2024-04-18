@@ -67,7 +67,7 @@ def resolve_params(params: Optional[TAbstractParams] = None) -> TAbstractParams:
         try:
             return cast(TAbstractParams, _params_val.get())
         except LookupError:
-            raise RuntimeError("Use params or add_pagination") from None
+            raise RuntimeError("Use params, add_pagination or pagination_ctx") from None
 
     return params
 

@@ -14,7 +14,7 @@ def test_params_not_set():
     def route():
         return paginate([])
 
-    with raises(RuntimeError, match="Use params or add_pagination"):
+    with raises(RuntimeError, match="Use params, add_pagination or pagination_ctx"):
         client.get("/")
 
 
