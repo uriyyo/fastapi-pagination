@@ -1,13 +1,31 @@
 import databases
 import sqlalchemy
 from fastapi import FastAPI
-from ormar import Integer, Model, ModelMeta, String
-from pytest import fixture
+from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.ormar import paginate
 
 from ..base import BasePaginationTestCase
+
+try:
+    from ormar import Integer, Model, ModelMeta, String
+
+    from fastapi_pagination.ext.ormar import paginate
+
+    has_ormar = True
+except ImportError:
+    Integer = None
+    Model = None
+    ModelMeta = None
+    String = None
+
+    has_ormar = False
+
+
+pytestmark = mark.skipif(
+    not has_ormar,
+    reason="Ormar is not installed",
+)
 
 
 @fixture(scope="session")
