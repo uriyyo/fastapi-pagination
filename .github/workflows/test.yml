@@ -64,7 +64,7 @@ jobs:
       - name: Install pydantic v2
         if: ${{ matrix.pydantic_v2 == 'true' }}
         run: |
-          poetry run pip install -U --pre fastapi pydantic
+          poetry run pip install -U --pre fastapi pydantic odmantic
 
       - name: Unit tests pydantic v2
         if: ${{ matrix.pydantic_v2 == 'true' }}
