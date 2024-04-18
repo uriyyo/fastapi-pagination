@@ -3,12 +3,13 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.odmantic import paginate
 
 from ..base import BasePaginationTestCase
 
 try:
     from odmantic import AIOEngine, Model
+
+    from fastapi_pagination.ext.odmantic import paginate
 
     has_odmantic = True
 except ImportError:
