@@ -1,8 +1,6 @@
 from typing import Awaitable
 
 from fastapi import FastAPI
-from motor import MotorClient
-from motor.motor_asyncio import AsyncIOMotorClient
 from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -11,6 +9,8 @@ from ..base import BasePaginationTestCase
 from .utils import mongodb_test
 
 try:
+    from motor import MotorClient
+    from motor.motor_asyncio import AsyncIOMotorClient
     from odmantic import AIOEngine, Model, SyncEngine
 
     from fastapi_pagination.ext.odmantic import paginate
@@ -21,6 +21,8 @@ except ImportError:
     AIOEngine = None
     SyncEngine = None
     paginate = None
+    MotorClient = None
+    AsyncIOMotorClient = None
 
     has_odmantic = False
 
