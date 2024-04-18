@@ -62,5 +62,6 @@ def app(db_client, db_engine, db_model, model_cls):
     return add_pagination(app)
 
 
+@mark.odmantic
 class TestOdmantic(BasePaginationTestCase):
     pass

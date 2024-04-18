@@ -64,12 +64,19 @@ jobs:
       - name: Install pydantic v2
         if: ${{ matrix.pydantic_v2 == 'true' }}
         run: |
-          poetry run pip install -U --pre fastapi pydantic odmantic
+          poetry run pip install -U --pre fastapi pydantic
 
       - name: Unit tests pydantic v2
         if: ${{ matrix.pydantic_v2 == 'true' }}
         run: |
           poetry run pytest tests  --ignore=tests/ext --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
+
+      # TODO: remove it when ormar will support pydantic v2
+      - name: Unit tests Odmantic
+        if: ${{ matrix.pydantic_v2 == 'true' }}
+        run: |
+          poetry run pip install -U odmantic
+          poetry run pytest tests -m "odmantic" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
       - name: Unit tests
         if: ${{ matrix.pydantic_v2 == 'false' }}
