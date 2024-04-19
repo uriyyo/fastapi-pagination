@@ -82,6 +82,13 @@ jobs:
           poetry run pip install -U "sqlalchemy>2.0.0"
           poetry run pytest tests -m "sqlalchemy20" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
+      # TODO: remove it when ormar will support pydantic v2
+      - name: Unit tests Odmantic
+        if: ${{ matrix.pydantic_v2 == 'true' }}
+        run: |
+          poetry run pip install -U odmantic "pydantic<2.7"
+          poetry run pytest tests -m "odmantic" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
+
       - name: Unit tests gino
         if: ${{ matrix.pydantic_v2 == 'false' }}
         run: |

@@ -11,6 +11,11 @@ from ..base import BasePaginationTestCase
 
 
 @fixture(scope="session")
+def db_type():
+    return "postgres"
+
+
+@fixture(scope="session")
 def database_url(postgres_url):
     return postgres_url
 

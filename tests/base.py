@@ -8,7 +8,7 @@ from fastapi_pagination.default import Page, Params
 from fastapi_pagination.limit_offset import LimitOffsetPage, LimitOffsetParams
 from fastapi_pagination.paginator import paginate
 
-from .schemas import UserOut, UserWithOrderOut
+from .schemas import UserOut, UserWithOrderOut, UserWithoutIDOut
 from .utils import OptionalLimitOffsetPage, OptionalPage, normalize
 
 _default_params = [
@@ -93,7 +93,10 @@ class BasePaginationTestCase:
         return {}
 
     @fixture(scope="session")
-    def model_cls(self, pagination_type):
+    def model_cls(self, db_type, pagination_type):
+        if db_type == "mongodb":
+            return UserWithoutIDOut
+
         return UserOut
 
     @fixture(scope="session")

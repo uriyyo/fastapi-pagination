@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel
 from pytest import fixture
 from pytest_asyncio import fixture as async_fixture
 
@@ -8,15 +7,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.motor import paginate_aggregate
 
 from ..base import BasePaginationTestCase
-
-
-class Model(BaseModel):
-    name: str
-
-
-@fixture(scope="session")
-def database_url(mongodb_url) -> str:
-    return mongodb_url
+from .utils import mongodb_test
 
 
 @fixture(scope="session")
@@ -44,11 +35,8 @@ def app(db_client, model_cls, raw_data):
     return add_pagination(app)
 
 
+@mongodb_test
 class TestMotorAggregate(BasePaginationTestCase):
-    @fixture(scope="session")
-    def model_cls(self):
-        return Model
-
     @async_fixture(scope="session")
     async def entities(self, db_client, raw_data):
         await db_client.test_agg.users.delete_many({})

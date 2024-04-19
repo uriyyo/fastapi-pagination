@@ -6,11 +6,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.mongoengine import paginate
 
 from ..base import BasePaginationTestCase
-
-
-@fixture(scope="session")
-def database_url(mongodb_url):
-    return mongodb_url
+from .utils import mongodb_test
 
 
 @fixture(scope="session")
@@ -21,7 +17,6 @@ def db_connect(database_url):
 @fixture(scope="session")
 def user(db_connect):
     class User(Document):
-        id = fields.IntField()
         name = fields.StringField()
 
         meta = {
@@ -57,5 +52,6 @@ def app(db_connect, query, model_cls):
     return add_pagination(app)
 
 
+@mongodb_test
 class TestMongoEngine(BasePaginationTestCase):
     pass

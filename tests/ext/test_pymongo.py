@@ -6,6 +6,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.pymongo import paginate
 
 from ..base import BasePaginationTestCase
+from .utils import mongodb_test
 
 
 @fixture(scope="session")
@@ -31,5 +32,6 @@ def app(db_client, model_cls):
     return add_pagination(app)
 
 
+@mongodb_test
 class TestPymongo(BasePaginationTestCase):
     pass

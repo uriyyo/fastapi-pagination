@@ -19,6 +19,13 @@ class UserOut(BaseModel):
         orm_mode = True
 
 
+class UserWithoutIDOut(BaseModel):
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
 class UserWithOrderOut(BaseModel):
     id: int
     name: str
@@ -32,5 +39,6 @@ class UserWithOrderOut(BaseModel):
 __all__ = [
     "OrderOut",
     "UserOut",
+    "UserWithoutIDOut",
     "UserWithOrderOut",
 ]
