@@ -20,7 +20,7 @@ new class objects and `mypy` does not support such ways.
 First, let's import all necessary components:
 
 ```py
-{!../docs_src/tutorials_advanced/customization.py [ln:1-12]!}
+{!../docs_src/tutorials_advanced/customization.py [ln:1-17]!}
 ```
 
 Now we can customize our page.
@@ -30,7 +30,7 @@ Now we can customize our page.
 If you want to change default name of page class, you should use `UseName` customizer:
 
 ```py
-{!../docs_src/tutorials_advanced/customization.py [ln:14-17]!}
+{!../docs_src/tutorials_advanced/customization.py [ln:17-21]!}
 ```
 
 1. Now your class will be names 'IntPage' instead of 'CustomizedPage'.
@@ -47,7 +47,7 @@ By default, cursor-based page don't include total count of items, and offset-bas
 If you want to change this behavior, you should use `UseIncludeTotal` customizer:
 
 ```py
-{!../docs_src/tutorials_advanced/customization.py [ln:19-22]!}
+{!../docs_src/tutorials_advanced/customization.py [ln:22-26]!}
 ```
 
 1. Now when you will paginate using `PageNoTotal` class, it will not include total count of items.
@@ -57,7 +57,7 @@ If you want to change this behavior, you should use `UseIncludeTotal` customizer
 If you want to change default values of pagination parameters, you should use `UseParamsFields` customizer:
 
 ```py
-{!../docs_src/tutorials_advanced/customization.py [ln:24-27]!}
+{!../docs_src/tutorials_advanced/customization.py [ln:27-31]!}
 ```
 
 1. Now when `size` parameter is not provided, it will be equal to 500.
@@ -68,7 +68,7 @@ If you want to change default values of pagination parameters, you should use `U
 If you want to change type of pagination parameters, you should use `UseParams` customizer:
 
 ```py
-{!../docs_src/tutorials_advanced/customization.py [ln:29-32]!}
+{!../docs_src/tutorials_advanced/customization.py [ln:32-36]!}
 ```
 
 1. Now all pagination parameters will be optional.
@@ -79,7 +79,7 @@ If you want to change type of pagination parameters, you should use `UseParams` 
 If you want use another name of field rather than default, you should use `UseFieldsAliases` customizer:
 
 ```py
-{!../docs_src/tutorials_advanced/customization.py [ln:43-46]!}
+{!../docs_src/tutorials_advanced/customization.py [ln:46-50]!}
 ```
 
 1. Now `total` field will be serialized as `count`.
@@ -90,7 +90,7 @@ If you want use another name of field rather than default, you should use `UseFi
 If you want to exclude some fields from serialization, you should use `UseExcludedFields` customizer:
 
 ```py
-{!../docs_src/tutorials_advanced/customization.py [ln:48-51]!}
+{!../docs_src/tutorials_advanced/customization.py [ln:51-55]!}
 ```
 
 1. Now `total` field will not be serialized.
@@ -101,7 +101,7 @@ If you want to exclude some fields from serialization, you should use `UseExclud
 If you want to change pydantic model config, you should use `UseModelConfig` customizer:
 
 ```py
-{!../docs_src/tutorials_advanced/customization.py [ln:53-56]!}
+{!../docs_src/tutorials_advanced/customization.py [ln:56-60]!}
 ```
 
 1. Now `Page` class will have `anystr_lower` set to `True`.
@@ -112,7 +112,7 @@ If you want to change pydantic model config, you should use `UseModelConfig` cus
 If you want to change type of page parameters, you should use `UseParams` customizer:
 
 ```py
-{!../docs_src/tutorials_advanced/customization.py [ln:35-41]!}
+{!../docs_src/tutorials_advanced/customization.py [ln:38-46]!}
 ```
 
 1. Now `Page.__params_type__` attribute will be point to `MyParams` class.
@@ -123,7 +123,7 @@ If you want to change type of page parameters, you should use `UseParams` custom
 You can use multiple customizers at once, just pass them as to regular `Annotated`:
 
 ```py
-{!../docs_src/tutorials_advanced/customization.py [ln:58-63]!}
+{!../docs_src/tutorials_advanced/customization.py [ln:62-68]!}
 ```
 
 1. Now `CustomPage` will have `CustomPage` name, no total count of items, all params optional.
