@@ -5,14 +5,13 @@ __all__ = ["paginate"]
 from typing import Any, List, Optional
 
 from databases import Database
-from sqlalchemy import func, select
 from sqlalchemy.sql import Select
 
 from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
-from .sqlalchemy import create_paginate_query
+from .sqlalchemy import create_count_query, create_paginate_query
 
 
 async def paginate(
@@ -23,11 +22,12 @@ async def paginate(
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     convert_to_mapping: bool = True,
+    use_subquery: bool = True,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     if raw_params.include_total:
-        total = await db.fetch_val(select([func.count()]).select_from(query.order_by(None).alias()))
+        total = await db.fetch_val(create_count_query(query, use_subquery=use_subquery))
     else:
         total = None
 
