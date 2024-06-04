@@ -9,6 +9,7 @@ from fastapi_pagination.customization import (
     ClsNamespace,
     CustomizedPage,
     PageCustomizer,
+    UseAdditionalFields,
     UseExcludedFields,
     UseFieldsAliases,
     UseIncludeTotal,
@@ -201,3 +202,28 @@ def test_use_aliases():
         assert CustomPage.model_fields["total"].serialization_alias == "count"
     else:
         assert CustomPage.__fields__["total"].alias == "count"
+
+
+def test_additional_fields():
+    CustomPage = CustomizedPage[
+        Page,
+        UseAdditionalFields(
+            a=int,
+            b=(str, "my-default"),
+        ),
+    ]
+
+    if IS_PYDANTIC_V2:
+        from pydantic_core import PydanticUndefined
+
+        assert CustomPage.model_fields["a"].annotation == int
+        assert CustomPage.model_fields["a"].default is PydanticUndefined
+
+        assert CustomPage.model_fields["b"].annotation == str
+        assert CustomPage.model_fields["b"].default == "my-default"
+    else:
+        assert CustomPage.__fields__["a"].type_ == int
+        assert CustomPage.__fields__["a"].default is None
+
+        assert CustomPage.__fields__["b"].type_ == str
+        assert CustomPage.__fields__["b"].default == "my-default"

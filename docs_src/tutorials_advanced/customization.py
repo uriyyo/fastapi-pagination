@@ -1,8 +1,9 @@
-from typing import TypeVar
+from typing import Optional, TypeVar
 
 from fastapi_pagination import Page, Params
 from fastapi_pagination.customization import (
     CustomizedPage,
+    UseAdditionalFields,
     UseExcludedFields,
     UseFieldsAliases,
     UseIncludeTotal,
@@ -64,4 +65,13 @@ CustomPage = CustomizedPage[
     UseName("CustomPage"),
     UseIncludeTotal(False),
     UseOptionalParams(),
+]  # (1)
+
+
+PageWithAdditionalFields = CustomizedPage[
+    Page[T],
+    UseAdditionalFields(
+        filters=str,  # without default value
+        sort=(Optional[str], None),  # with default value
+    ),
 ]  # (1)
