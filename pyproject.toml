@@ -45,12 +45,12 @@ bunnet = {version = "^1.1.0", optional = true}
 
 [tool.poetry.dev-dependencies]
 fastapi = ">=0.93.0"
-pytest = "^8.2.1"
+pytest = "^8.2.2"
 pytest-cov = "^5.0.0"
 pytest-asyncio = "^0.21.1"
 flaky = "^3.8.1"
 pre-commit = "^3.5.0"
-Faker = "^25.4.0"
+Faker = "^25.5.0"
 psycopg2-binary = "^2.9.9"
 mkdocs = "^1.5.3"
 mkdocs-material = "^9.5.18"
