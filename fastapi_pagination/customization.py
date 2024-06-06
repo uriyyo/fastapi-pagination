@@ -14,6 +14,7 @@ __all__ = [
     "UseModelConfig",
     "UseExcludedFields",
     "UseFieldsAliases",
+    "UseAdditionalFields",
     "ClsNamespace",
     "PageCls",
 ]
@@ -32,6 +33,7 @@ from typing import (
     Tuple,
     Type,
     TypeVar,
+    Union,
     no_type_check,
     runtime_checkable,
 )
@@ -321,3 +323,20 @@ class UseFieldsAliases(PageCustomizer):
             for name, alias in self.aliases.items():
                 assert name in page_cls.__fields__, f"Unknown field {name!r}"
                 fields_config[name]["alias"] = alias
+
+
+_RawFieldDef: TypeAlias = Union[Any, Tuple[Any, Any]]
+
+
+class UseAdditionalFields(PageCustomizer):
+    def __init__(self, **fields: _RawFieldDef) -> None:
+        self.fields = fields
+
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        anns = ns.setdefault("__annotations__", {})
+
+        for name, field in self.fields.items():
+            if isinstance(field, tuple):
+                anns[name], ns[name] = field
+            else:
+                anns[name] = field
