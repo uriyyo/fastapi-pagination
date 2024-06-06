@@ -20,3 +20,13 @@ To use `cursor` you need to import `CursorPage` from `fastapi_pagination.cursor`
 ```py hl_lines="7"
 {! ../docs_src/tutorial/cursor_pagination.py !}
 ```
+
+
+## Total items behavior 
+
+By default `CursorPage` doesn't include total count of items. If you want to include it, you should customize page
+using `UseIncludeTotal` customizer.
+
+```py hl_lines="58-63"
+{! ../docs_src/tutorial/cursor_pagination_with_total.py !}
+```
