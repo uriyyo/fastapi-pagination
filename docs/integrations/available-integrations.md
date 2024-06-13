@@ -12,7 +12,7 @@ Currently, `fastapi-pagination` supports:
 | [ormar](https://collerek.github.io/ormar/)                             | `fastapi_pagination.ext.ormar.paginate`       |
 | [Piccolo](https://piccolo-orm.readthedocs.io/en/latest/)               | `fastapi_pagination.ext.piccolo.paginate`     |
 | [Pony ORM](https://docs.ponyorm.org/)                                  | `fastapi_pagination.ext.pony.paginate`        |
-| [Tortoise ORM](https://tortoise-orm.readthedocs.io/en/latest/)         | `fastapi_pagination.ext.tortoise.paginate`    |
+| [Tortoise ORM](https://tortoise.github.io/)                            | `fastapi_pagination.ext.tortoise.paginate`    |
 | [Beanie](https://roman-right.github.io/beanie/)                        | `fastapi_pagination.ext.beanie.paginate`      |
 | [Bunnet](https://roman-right.github.io/bunnet/)                        | `fastapi_pagination.ext.bunnet.paginate`      |
 | [PyMongo](https://pymongo.readthedocs.io/en/stable/)                   | `fastapi_pagination.ext.pymongo.paginate`     |
