@@ -148,7 +148,7 @@ def exec_pagination(
 
     total = None
     if raw_params.include_total:
-        if count_query:
+        if count_query is None:
             count_query = create_count_query(query, use_subquery=subquery_count)
         total = conn.scalar(count_query)
 
