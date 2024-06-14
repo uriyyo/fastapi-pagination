@@ -13,8 +13,6 @@ from tortoise.contrib.fastapi import RegisterTortoise  # requires 'tortoise-orm>
 from tortoise.contrib.pydantic import PydanticModel, pydantic_model_creator
 from tortoise.fields import IntField, TextField
 
-faker = Faker()
-
 
 class User(Model):
     id = IntField(pk=True)
@@ -35,11 +33,9 @@ else:
 
 
 async def _initial_users() -> None:
-    for _ in range(100):
-        await User.create(
-            name=faker.name(),
-            email=faker.email(),
-        )
+    faker = Faker()
+    users = [User(name=faker.name(), email=faker.email()) for _ in range(100)]
+    await User.bulk_create(users)
 
 
 @asynccontextmanager
