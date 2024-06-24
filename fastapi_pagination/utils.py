@@ -6,6 +6,7 @@ __all__ = [
     "create_pydantic_model",
     "verify_params",
     "is_async_callable",
+    "await_if_async",
     "check_installed_extensions",
     "disable_installed_extensions_check",
     "FastAPIPaginationWarning",
@@ -16,10 +17,10 @@ import asyncio
 import functools
 import inspect
 import warnings
-from typing import TYPE_CHECKING, Any, Optional, Tuple, Type, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Optional, Tuple, Type, TypeVar, cast, overload
 
 from pydantic import VERSION, BaseModel
-from typing_extensions import Annotated, Literal, get_origin
+from typing_extensions import Annotated, Literal, ParamSpec, get_origin
 
 if TYPE_CHECKING:
     from .bases import AbstractParams, BaseRawParams, CursorRawParams, RawParams
@@ -64,6 +65,27 @@ def is_async_callable(obj: Any) -> bool:  # pragma: no cover
         obj = obj.func
 
     return asyncio.iscoroutinefunction(obj) or (callable(obj) and asyncio.iscoroutinefunction(obj.__call__))
+
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+@overload
+async def await_if_async(func: Callable[P, Awaitable[R]], /, *args: P.args, **kwargs: P.kwargs) -> R:
+    pass
+
+
+@overload
+async def await_if_async(func: Callable[P, R], /, *args: P.args, **kwargs: P.kwargs) -> R:
+    pass
+
+
+async def await_if_async(func: Callable[P, Any], /, *args: P.args, **kwargs: P.kwargs) -> Any:
+    if is_async_callable(func):
+        return await func(*args, **kwargs)
+
+    return func(*args, **kwargs)
 
 
 _EXTENSIONS = [
