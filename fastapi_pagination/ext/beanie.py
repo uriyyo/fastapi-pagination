@@ -52,6 +52,17 @@ async def paginate(
         except IndexError:
             total = 0
     else:
+        if raw_params.include_total:
+            total = await query.find(
+                {},
+                session=session,
+                ignore_cache=ignore_cache,
+                fetch_links=fetch_links,
+                **pymongo_kwargs,
+            ).count()
+        else:
+            total = None
+
         items = await query.find_many(
             limit=raw_params.limit,
             skip=raw_params.offset,
@@ -63,17 +74,6 @@ async def paginate(
             lazy_parse=lazy_parse,
             **pymongo_kwargs,
         ).to_list()
-
-        if raw_params.include_total:
-            total = await query.find(
-                {},
-                session=session,
-                ignore_cache=ignore_cache,
-                fetch_links=False,
-                **pymongo_kwargs,
-            ).count()
-        else:
-            total = None
 
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
