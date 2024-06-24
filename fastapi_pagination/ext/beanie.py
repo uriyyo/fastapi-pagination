@@ -75,7 +75,6 @@ async def paginate(
             **pymongo_kwargs,
         ).to_list()
 
-
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
     return create_page(
