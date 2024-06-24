@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         yield
 
 
-app = FastAPI(title="Tortoise ORM Pagination example", lifespan=lifespan)
+app = FastAPI(title="Pagination example -- Tortoise ORM", lifespan=lifespan)
 
 
 @app.post("/users", response_model=UserOut)
