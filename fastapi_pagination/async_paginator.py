@@ -1,11 +1,11 @@
-from typing import Any, Callable, Optional, Sequence, TypeVar
+from typing import Any, Awaitable, Callable, Optional, Sequence, TypeVar, Union
 
 __all__ = ["paginate"]
 
 from .api import apply_items_transformer, create_page
 from .bases import AbstractParams
 from .types import AdditionalData, SyncItemsTransformer
-from .utils import check_installed_extensions, verify_params
+from .utils import await_if_async, check_installed_extensions, verify_params
 
 T = TypeVar("T")
 
@@ -14,7 +14,7 @@ T = TypeVar("T")
 async def paginate(
     sequence: Sequence[T],
     params: Optional[AbstractParams] = None,
-    length_function: Callable[[Sequence[T]], int] = len,
+    length_function: Optional[Callable[[Sequence[T]], Union[int, Awaitable[int]]]] = None,
     *,
     safe: bool = False,
     transformer: Optional[SyncItemsTransformer] = None,
@@ -28,9 +28,15 @@ async def paginate(
     items = sequence[raw_params.as_slice()]
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
+    length_function = length_function or len
+
+    total = None
+    if raw_params.include_total:
+        total = await await_if_async(length_function, sequence)
+
     return create_page(
         t_items,
-        total=length_function(sequence) if raw_params.include_total else None,
+        total=total,
         params=params,
         **(additional_data or {}),
     )
