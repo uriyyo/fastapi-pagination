@@ -15,7 +15,7 @@ from tortoise.fields import IntField, TextField
 
 
 class User(Model):
-    id = IntField(pk=True)
+    id = IntField(primary_key=True)
     name = TextField(null=False)
     email = TextField(null=False)
 
@@ -47,7 +47,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         generate_schemas=True,
     ):
         await _initial_users()
-        add_pagination(app)
         yield
 
 
@@ -64,6 +63,8 @@ async def create_user(user_in: UserIn) -> Any:
 async def get_users() -> Any:
     return await paginate(User)
 
+
+add_pagination(app)
 
 if __name__ == "__main__":
     uvicorn.run(f"{Path(__file__).stem}:app")
