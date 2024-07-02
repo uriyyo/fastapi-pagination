@@ -216,14 +216,14 @@ def test_additional_fields():
     if IS_PYDANTIC_V2:
         from pydantic_core import PydanticUndefined
 
-        assert CustomPage.model_fields["a"].annotation == int
+        assert CustomPage.model_fields["a"].annotation is int
         assert CustomPage.model_fields["a"].default is PydanticUndefined
 
-        assert CustomPage.model_fields["b"].annotation == str
+        assert CustomPage.model_fields["b"].annotation is str
         assert CustomPage.model_fields["b"].default == "my-default"
     else:
-        assert CustomPage.__fields__["a"].type_ == int
+        assert CustomPage.__fields__["a"].type_ is int
         assert CustomPage.__fields__["a"].default is None
 
-        assert CustomPage.__fields__["b"].type_ == str
+        assert CustomPage.__fields__["b"].type_ is str
         assert CustomPage.__fields__["b"].default == "my-default"
