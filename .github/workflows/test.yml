@@ -59,7 +59,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install -E all
+          poetry install -E all --sync
 
       - name: Install pydantic v2
         if: ${{ matrix.pydantic_v2 == 'true' }}
