@@ -37,7 +37,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install -E all
+          poetry install -E all --sync
 
       - name: Lint
         run: |
