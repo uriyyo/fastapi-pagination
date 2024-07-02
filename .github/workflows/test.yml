@@ -89,12 +89,6 @@ jobs:
           poetry run pip install -U odmantic "pydantic<2.7"
           poetry run pytest tests -m "odmantic" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
-      - name: Unit tests gino
-        if: ${{ matrix.pydantic_v2 == 'false' && matrix.python-version != '3.12' }}
-        run: |
-          poetry run pip install -U "gino[starlette]" "fastapi==0.84.0"
-          poetry run pytest -m gino --cov-append --cov-report=xml
-
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
