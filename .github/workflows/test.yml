@@ -47,7 +47,7 @@ jobs:
           echo "CQL_TEST_HOST=${CQL_TEST_HOST}" >> $GITHUB_ENV
 
       - name: Install Poetry
-        uses: snok/install-poetry@v1.4.0
+        uses: snok/install-poetry@v1.4.1
 
       - name: Setup cache
         id: cached-poetry-dependencies
