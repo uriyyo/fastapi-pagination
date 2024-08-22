@@ -71,7 +71,7 @@ class BasePaginationTestCase:
     def pagination_type(self):
         return "default"
 
-    @fixture()
+    @fixture
     def path(self, cls_name, pagination_type):
         base = "default" if cls_name == "page" else "limit-offset"
 
