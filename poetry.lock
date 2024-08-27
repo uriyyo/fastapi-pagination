@@ -1132,17 +1132,20 @@ files = [
 
 [[package]]
 name = "mongoengine"
-version = "0.28.2"
+version = "0.29.0"
 description = "MongoEngine is a Python Object-Document Mapper for working with MongoDB."
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "mongoengine-0.28.2-py3-none-any.whl", hash = "sha256:8e0f84a5ad3d335e5da98261454d4ab546c866241ed064adc6433fe2077d43c9"},
-    {file = "mongoengine-0.28.2.tar.gz", hash = "sha256:67c35a2ebe0ee7fd8eda3766dc251b9e0aada4489bb935f7a55b4c570d148ca7"},
+    {file = "mongoengine-0.29.0-py3-none-any.whl", hash = "sha256:1bd91649f62b66d0aaa11eac889618ee8ea4d8408f04c23ddc49b0469c2e1c9f"},
+    {file = "mongoengine-0.29.0.tar.gz", hash = "sha256:fcf2065153e07ec2488556c51d801938720c6bfaa73a13b41789470a877af852"},
 ]
 
 [package.dependencies]
 pymongo = ">=3.4,<5.0"
+
+[package.extras]
+test = ["Pillow (>=7.0.0)", "blinker", "coverage", "pytest", "pytest-cov"]
 
 [[package]]
 name = "motor"
@@ -2427,4 +2430,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "191fe2bbafc34d39ffd7605b04dfe3053ca34d4b8fa1205cf03f615823a9ed53"
+content-hash = "e3229a7c0b5aadb5f8988fb0efca6053c8e1463668e78dade31676434180fe3e"
