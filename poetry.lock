@@ -1380,13 +1380,13 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "pony"
-version = "0.7.18"
+version = "0.7.19"
 description = "Pony Object-Relational Mapper"
 optional = true
 python-versions = "*"
 files = [
-    {file = "pony-0.7.18-py3-none-any.whl", hash = "sha256:f912fbefa98cd12b1ee1704671d02bec8e5d63638a4c3930e4e8ec87d4ebddbf"},
-    {file = "pony-0.7.18.tar.gz", hash = "sha256:1fa2398b7e67b2576f32309c4e882ce796c78397062474b9ff39856bab14f6a2"},
+    {file = "pony-0.7.19-py3-none-any.whl", hash = "sha256:5112b4cf40d3f24e93ae66dc5ab7dc6813388efa870e750928d60dc699873cf5"},
+    {file = "pony-0.7.19.tar.gz", hash = "sha256:f7f83b2981893e49f7f18e8def52ad8fa8f8e6c5f9583b9aaed62d4d85036a0f"},
 ]
 
 [[package]]
