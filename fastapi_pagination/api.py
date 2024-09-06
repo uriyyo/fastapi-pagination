@@ -361,7 +361,7 @@ def _update_route(route: APIRoute) -> None:
         ),
     )
 
-    route.body_field = get_body_field(dependant=route.dependant, name=route.unique_id)
+    route.body_field = get_body_field(flat_dependant=route.dependant, name=route.unique_id, embed_body_fields=True)
     route.app = request_response(route.get_route_handler())
 
 
