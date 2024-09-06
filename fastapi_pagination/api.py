@@ -40,6 +40,7 @@ from fastapi.dependencies.utils import (
     lenient_issubclass,
 )
 from fastapi.routing import APIRoute, APIRouter
+from importlib.metadata import version
 from pydantic import BaseModel
 from starlette.routing import request_response
 from typing_extensions import deprecated
@@ -352,6 +353,7 @@ def _update_route(route: APIRoute) -> None:
 
     cls = cast(Type[AbstractPage[Any]], page_cls)
     dep = Depends(pagination_ctx(cls, __page_ctx_dep__=True))
+    fastapi_version = version("fastapi")
 
     route.dependencies.append(dep)
     route.dependant.dependencies.append(
@@ -361,7 +363,11 @@ def _update_route(route: APIRoute) -> None:
         ),
     )
 
-    route.body_field = get_body_field(flat_dependant=route.dependant, name=route.unique_id, embed_body_fields=True)
+    if fastapi_version >= '0.112.4':
+        route.body_field = get_body_field(flat_dependant=route.dependant, name=route.unique_id, embed_body_fields=False)
+    else:
+        route.body_field = get_body_field(dependant=route.dependant, name=route.unique_id)
+
     route.app = request_response(route.get_route_handler())
 
 
