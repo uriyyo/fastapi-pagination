@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
 from sqlalchemy import func, select, text
 from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy.orm import Query, Session, noload, scoped_session
+from sqlalchemy.orm import FromStatement, Query, Session, noload, scoped_session
 from sqlalchemy.sql.elements import TextClause
 from typing_extensions import TypeAlias, deprecated
 
@@ -61,7 +61,7 @@ except ImportError:  # pragma: no cover
 AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection, async_scoped_session]"
 SyncConn: TypeAlias = "Union[Session, Connection, scoped_session]"
 
-Selectable: TypeAlias = "Union[Select, TextClause]"
+Selectable: TypeAlias = "Union[Select, TextClause, FromStatement]"
 
 
 def create_paginate_query_from_text(query: str, params: AbstractParams) -> str:
@@ -89,9 +89,17 @@ def paginate_query(query: Select, params: AbstractParams) -> Select:
     return create_paginate_query(query, params)  # type: ignore[return-value]
 
 
+def _paginate_from_statement(query: FromStatement, params: AbstractParams) -> FromStatement:
+    query = query._generate()  # type: ignore[attr-defined]
+    query.element = create_paginate_query(query.element, params)
+    return query
+
+
 def create_paginate_query(query: Selectable, params: AbstractParams) -> Selectable:
     if isinstance(query, TextClause):
         return text(create_paginate_query_from_text(query.text, params))
+    if isinstance(query, FromStatement):
+        return _paginate_from_statement(query, params)
 
     return generic_query_apply_params(query, params.to_raw_params().as_limit_offset())
 
@@ -99,6 +107,8 @@ def create_paginate_query(query: Selectable, params: AbstractParams) -> Selectab
 def create_count_query(query: Selectable, *, use_subquery: bool = True) -> Selectable:
     if isinstance(query, TextClause):
         return text(create_count_query_from_text(query.text))
+    if isinstance(query, FromStatement):
+        return create_count_query(query.element)
 
     query = query.order_by(None).options(noload("*"))
 
