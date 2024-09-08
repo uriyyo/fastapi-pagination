@@ -35,13 +35,14 @@ async def paginate(
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    total: Optional[int] = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
 
     if not isinstance(query, QuerySet):
         query = query.all()
-
-    total = await query.count() if raw_params.include_total else None
+    if total is None and raw_params.include_total:
+        total = await query.count()
     items = await generic_query_apply_params(_generate_query(query, prefetch_related), raw_params).all()
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
