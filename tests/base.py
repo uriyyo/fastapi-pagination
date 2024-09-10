@@ -142,7 +142,7 @@ class BasePaginationTestCase:
             *[f"limit-offset-{key}" for key in _params_desc],
         ],
     )
-    @mark.asyncio
+    @mark.asyncio(loop_scope="session")
     async def test_pagination(
         self,
         client,
