@@ -48,7 +48,7 @@ def app(cassandra_session, raw_data):
     return add_pagination(app)
 
 
-@mark.asyncio
+@mark.asyncio(loop_scope="session")
 async def test_cursor(app, client, entities):
     entities = sorted(parse_obj_as(List[UserOut], entities), key=(lambda it: (it.id, it.name)))
 

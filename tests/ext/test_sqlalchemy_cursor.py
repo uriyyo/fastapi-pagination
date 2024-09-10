@@ -47,7 +47,7 @@ def app(sa_user, sa_order, sa_session):
 
 
 @sqlalchemy20
-@mark.asyncio
+@mark.asyncio(loop_scope="session")
 async def test_cursor(app, client, entities):
     entities = sorted(parse_obj_as(List[UserOut], entities), key=(lambda it: (it.id, it.name)))
 
@@ -90,7 +90,7 @@ async def test_cursor(app, client, entities):
 
 
 @sqlalchemy20
-@mark.asyncio
+@mark.asyncio(loop_scope="session")
 async def test_cursor_refetch(app, client, entities, postgres_url):
     entities = sorted(parse_obj_as(List[UserOut], entities), key=(lambda it: (it.id, it.name)))
     first_85_entities = entities[:85]
@@ -180,7 +180,7 @@ async def test_cursor_refetch(app, client, entities, postgres_url):
 
 
 @sqlalchemy20
-@mark.asyncio
+@mark.asyncio(loop_scope="session")
 async def test_no_order(app, client, entities):
     with raises(
         ValueError,
