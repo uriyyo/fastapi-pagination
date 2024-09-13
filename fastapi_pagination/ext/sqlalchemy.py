@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
 from sqlalchemy import func, select, text
 from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy.orm import FromStatement, Query, Session, noload, scoped_session
+from sqlalchemy.orm import Query, Session, noload, scoped_session
 from sqlalchemy.sql.elements import TextClause
 from typing_extensions import TypeAlias, deprecated, no_type_check
 
@@ -30,6 +30,15 @@ if TYPE_CHECKING:
     from sqlalchemy.engine import Connection
     from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
     from sqlalchemy.sql import Select
+
+
+try:
+    from sqlalchemy.orm import FromStatement
+except ImportError:
+
+    class FromStatement:  # type: ignore
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            raise ImportError("sqlalchemy.orm.FromStatement is not available")
 
 
 try:
