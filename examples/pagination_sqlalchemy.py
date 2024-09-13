@@ -5,7 +5,7 @@ import uvicorn
 from faker import Faker
 from fastapi import Depends, FastAPI
 from pydantic import BaseModel
-from sqlalchemy import create_engine, select, text
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -74,7 +74,7 @@ def create_user(user_in: UserIn, db: Session = Depends(get_db)) -> UserOut:
 @app.get("/users/default", response_model=Page[UserOut])
 @app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
 def get_users(db: Session = Depends(get_db)) -> Any:
-    return paginate(db, select(User).from_statement(text("""SELECT * FROM users""")))
+    return paginate(db, select(User))
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import FromStatement, Query, Session, noload, scoped_session
 from sqlalchemy.sql.elements import TextClause
-from typing_extensions import TypeAlias, deprecated
+from typing_extensions import TypeAlias, deprecated, no_type_check
 
 from ..api import apply_items_transformer, create_page
 from ..bases import AbstractPage, AbstractParams, is_cursor
@@ -62,6 +62,14 @@ AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection, async_scoped_sessio
 SyncConn: TypeAlias = "Union[Session, Connection, scoped_session]"
 
 Selectable: TypeAlias = "Union[Select, TextClause, FromStatement]"
+
+
+@no_type_check
+def _should_unwrap_scalars(query: Selectable) -> bool:
+    try:
+        return len(query.column_descriptions) == 1 and len(query.columns) > 1
+    except AttributeError:
+        return True
 
 
 def create_paginate_query_from_text(query: str, params: AbstractParams) -> str:
@@ -174,7 +182,9 @@ def exec_pagination(
             per_page=raw_params.size,
             page=raw_params.cursor,  # type: ignore[arg-type]
         )
-        items = unwrap_scalars([*page])
+        items = [*page]
+        if _should_unwrap_scalars(query):
+            items = unwrap_scalars(items)
         items = _apply_items_transformer(items, transformer)
 
         return create_page(
@@ -190,7 +200,8 @@ def exec_pagination(
 
     query = create_paginate_query(query, params)
     items = _maybe_unique(conn.execute(query), unique)
-    items = unwrap_scalars(items)
+    if _should_unwrap_scalars(query):
+        items = unwrap_scalars(items)
     items = _apply_items_transformer(items, transformer)
 
     return create_page(
