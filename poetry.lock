@@ -1153,13 +1153,13 @@ files = [
 
 [[package]]
 name = "mongoengine"
-version = "0.29.0"
+version = "0.29.1"
 description = "MongoEngine is a Python Object-Document Mapper for working with MongoDB."
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "mongoengine-0.29.0-py3-none-any.whl", hash = "sha256:1bd91649f62b66d0aaa11eac889618ee8ea4d8408f04c23ddc49b0469c2e1c9f"},
-    {file = "mongoengine-0.29.0.tar.gz", hash = "sha256:fcf2065153e07ec2488556c51d801938720c6bfaa73a13b41789470a877af852"},
+    {file = "mongoengine-0.29.1-py3-none-any.whl", hash = "sha256:9302ec407dd60f47f62cc07684d9f6cac87f1e93283c54203851788104d33df4"},
+    {file = "mongoengine-0.29.1.tar.gz", hash = "sha256:3b43abaf2d5f0b7d39efc2b7d9e78f4d4a5dc7ce92b9889ba81a5a9b8dee3cf3"},
 ]
 
 [package.dependencies]
