@@ -342,8 +342,12 @@ def pagination_ctx(
 def _bet_body_field(route: APIRoute) -> Optional[Any]:
     try:
         # starting from fastapi 0.113.0 get_body_field changed its signature
-        return get_body_field(flat_dependant=route.dependant, name=route.unique_id, embed_body_fields=True)
-    except TypeError:
+        return get_body_field(
+            flat_dependant=route.dependant,
+            name=route.unique_id,
+            embed_body_fields=route._embed_body_fields,
+        )
+    except (TypeError, AttributeError):
         return get_body_field(dependant=route.dependant, name=route.unique_id)
 
 
