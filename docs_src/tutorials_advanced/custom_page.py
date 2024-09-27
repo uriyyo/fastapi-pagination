@@ -1,6 +1,6 @@
-from typing import Any, Generic, Optional, Sequence, TypeVar, List
+from typing import Any, Generic, List, Optional, Sequence, TypeVar
 
-from fastapi import Query, FastAPI
+from fastapi import FastAPI, Query
 from pydantic import BaseModel
 from typing_extensions import Self
 
@@ -50,6 +50,7 @@ class JSONAPIPage(AbstractPage[T], Generic[T]):
             meta={"page": {"total": total}},
             **kwargs,
         )
+
 
 app = FastAPI()
 add_pagination(app)
