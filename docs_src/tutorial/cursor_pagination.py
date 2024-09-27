@@ -1,3 +1,6 @@
+from contextlib import asynccontextmanager
+from typing import Any, AsyncIterator
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 from sqlalchemy import create_engine, select
@@ -7,10 +10,7 @@ from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage
 from fastapi_pagination.ext.sqlalchemy import paginate
 
-app = FastAPI()
-add_pagination(app)
-
-engine = create_engine("sqlite:///.db")
+engine = create_engine("sqlite:///:memory:")
 
 
 class Base(DeclarativeBase):
@@ -31,12 +31,9 @@ class UserOut(BaseModel):
     name: str
     age: int
 
-    class Config:
-        orm_mode = True
 
-
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(_: Any) -> AsyncIterator[None]:
     with engine.begin() as conn:
         Base.metadata.drop_all(conn)
         Base.metadata.create_all(conn)
@@ -51,7 +48,14 @@ def on_startup():
         )
         session.commit()
 
+    yield
 
+
+app = FastAPI(lifespan=lifespan)
+add_pagination(app)
+
+
+# req: GET /users
 @app.get("/users")
 def get_users() -> CursorPage[UserOut]:
     with Session(engine) as session:

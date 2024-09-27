@@ -19,6 +19,7 @@ users: List[UserOut] = [
 ]
 
 
+# req: GET /users
 @app.get("/users")
 def get_users() -> Page[UserOut]:
     return paginate(users)

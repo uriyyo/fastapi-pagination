@@ -6,6 +6,7 @@ app = FastAPI()
 add_pagination(app)
 
 
+# req: GET /double-nums
 @app.get("/double-nums")
 def get_double_nums() -> Page[int]:
     return paginate(

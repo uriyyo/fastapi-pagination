@@ -1,9 +1,10 @@
-from typing import Any, Generic, Optional, Sequence, TypeVar
+from typing import Any, Generic, Optional, Sequence, TypeVar, List
 
-from fastapi import Query
+from fastapi import Query, FastAPI
 from pydantic import BaseModel
 from typing_extensions import Self
 
+from fastapi_pagination import Page, add_pagination, paginate
 from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
 
 
@@ -49,3 +50,23 @@ class JSONAPIPage(AbstractPage[T], Generic[T]):
             meta={"page": {"total": total}},
             **kwargs,
         )
+
+app = FastAPI()
+add_pagination(app)
+
+
+class UserOut(BaseModel):
+    name: str
+    email: str
+
+
+users: List[UserOut] = [
+    UserOut(name="Steve", email="hello@world.com"),
+    # ...
+]
+
+
+# req: GET /users
+@app.get("/users")
+def get_users() -> Page[UserOut]:
+    return paginate(users)

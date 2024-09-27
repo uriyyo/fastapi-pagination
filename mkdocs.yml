@@ -20,6 +20,10 @@ theme:
     - content.code.select
     - content.code.annotate
 
+extra_javascript:
+#  - 'http://localhost:8001/run_code_main.js'
+  - 'https://uriyyo.github.io/mkdocs-run-code/run_code_main.js'
+
 nav:
   - "Home": index.md
   - "Tutorials - User Guide":
@@ -64,3 +68,9 @@ extra:
       link: https://github.com/uriyyo/fastapi-pagination
     - icon: fontawesome/brands/linkedin
       link: https://linkedin.com/in/yurii-karabas-b35653140
+
+watch:
+  - docs
+  - docs_src
+  - README.md
+  - mkdocs.yml
