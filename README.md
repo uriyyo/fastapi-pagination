@@ -73,7 +73,8 @@ users = [  # create some data
 
 # req: GET /users
 @app.get("/users")
-async def get_users() -> Page[UserOut]:  # use Page[UserOut] as return type annotation
+async def get_users() -> Page[UserOut]:
+    # use Page[UserOut] as return type annotation
     return paginate(users)  # use paginate function to paginate your data
 ```
 
@@ -81,7 +82,7 @@ Please, be careful when you work with databases, because default `paginate` will
 
 For instance, if you use `SQLAlchemy` you can use `paginate` from `fastapi_pagination.ext.sqlalchemy` module.
 
-```py
+```python
 from sqlalchemy import select
 from fastapi_pagination.ext.sqlalchemy import paginate
 

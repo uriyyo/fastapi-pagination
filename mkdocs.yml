@@ -6,68 +6,94 @@ repo_url: https://github.com/uriyyo/fastapi-pagination
 repo_name: uriyyo/fastapi-pagination
 
 theme:
-  name: material
+  name: 'material'
   palette:
-    scheme: slate
-    primary: blue grey
-    second: grey
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/lightbulb-outline
+        name: "Switch to dark mode"
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/lightbulb
+        name: "Switch to light mode"
+  features:
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+    - announce.dismiss
+    - navigation.footer
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.preview
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - toc.follow
+  favicon: img/small-logo.png
   logo: img/small-logo.png
   icon:
     repo: fontawesome/brands/github
-  favicon: img/small-logo.png
-  features:
-    - content.code.copy
-    - content.code.select
-    - content.code.annotate
 
 extra_javascript:
-#  - 'http://localhost:8001/run_code_main.js'
+  #  - 'http://localhost:8001/run_code_main.js'
   - 'https://uriyyo.github.io/mkdocs-run-code/run_code_main.js'
 
 nav:
-  - "Home": index.md
-  - "Tutorials - User Guide":
-      - "First Steps": tutorials/first-steps.md
-      - "Page Number Pagination": tutorials/page-number-pagination.md
-      - "Limit Offset Pagination": tutorials/limit-offset-pagination.md
-      - "Links in Pagination": tutorials/links-pagination.md
-      - "Cursor Pagination": tutorials/cursor-pagination.md
-      - "Items Transformer": tutorials/items-transformer.md
-  - "Advanced User Guide":
-      - "Customization": tutorials_advanced/customization.md
-      - "Custom Page": tutorials_advanced/custom-page.md
-      - "Custom Pagination Function": tutorials_advanced/custom-paginate.md
+  - "General": index.md
+  - "Learn":
+      - "Pagination":
+        - "General": learn/pagination/general.md
+        - "Techniques": learn/pagination/techniques.md
+      - "Tutorial - User Guide":
+        - "First Steps": learn/tutorial_user_guide/first_steps.md
+        - "Elements": learn/tutorial_user_guide/elements.md
+        - "Add to Route": learn/tutorial_user_guide/add_to_route.md
+  - "Customization":
+      - "General": customization/general.md
   - "Integrations":
-      - "Integrations": integrations/integrations.md
-      - "Available Integrations": integrations/available-integrations.md
       - "SQLAlchemy": integrations/sqlalchemy.md
   - "Contributing": contributing.md
   - "License": license.md
 
 markdown_extensions:
+  - tables
+  - toc:
+      permalink: true
+      title: Page contents
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
   - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
       pygments_lang_class: true
+  - pymdownx.extra
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.tabbed:
+      alternate_style: true
   - mdx_include:
       base_path: docs
 
-  - admonition
-  - pymdownx.highlight
-  - pymdownx.keys
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.superfences
+plugins:
+  - search
 
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/uriyyo/fastapi-pagination
+      link: https://github.com/uriyyo/fastapi-pagination/
     - icon: fontawesome/brands/linkedin
-      link: https://linkedin.com/in/yurii-karabas-b35653140
+      link: https://www.linkedin.com/in/uriyyo/
 
 watch:
   - docs
