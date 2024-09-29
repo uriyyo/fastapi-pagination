@@ -65,6 +65,7 @@ nav:
         - "Paginate": learn/tutorial_user_guide/paginate.md
       - "Tutorial - Advanced":
           - "Low-Level API": learn/tutorial_advanced/low_level_api.md
+          - "Custom paginate": learn/tutorial_advanced/custom_paginate.md
   - "Customization":
       - "General": customization/general.md
   - "Integrations":
