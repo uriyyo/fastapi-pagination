@@ -4,7 +4,7 @@ __all__ = ["paginate"]
 
 from .api import apply_items_transformer, create_page
 from .bases import AbstractParams
-from .types import AdditionalData, SyncItemsTransformer
+from .types import AdditionalData, ItemsTransformer
 from .utils import await_if_async, check_installed_extensions, verify_params
 
 T = TypeVar("T")
@@ -17,7 +17,7 @@ async def paginate(
     length_function: Optional[Callable[[Sequence[T]], Union[int, Awaitable[int]]]] = None,
     *,
     safe: bool = False,
-    transformer: Optional[SyncItemsTransformer] = None,
+    transformer: Optional[ItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
 ) -> Any:
     if not safe:

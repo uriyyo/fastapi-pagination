@@ -59,8 +59,12 @@ nav:
         - "First Steps": learn/tutorial_user_guide/first_steps.md
         - "Elements": learn/tutorial_user_guide/elements.md
         - "Add to Route": learn/tutorial_user_guide/add_to_route.md
-        - "Own Page Model" : learn/tutorial_user_guide/own_page_model.md
+        - "Own Page Model": learn/tutorial_user_guide/own_page_model.md
         - "Items Transformer": learn/tutorial_user_guide/items_transformer.md
+        - "Links": learn/tutorial_user_guide/page_links.md
+        - "Paginate": learn/tutorial_user_guide/paginate.md
+      - "Tutorial - Advanced":
+          - "Low-Level API": learn/tutorial_advanced/low_level_api.md
   - "Customization":
       - "General": customization/general.md
   - "Integrations":
