@@ -6,11 +6,11 @@ The simplest FastAPI pagination looks like this:
 
 !!! warning "Be careful"
     
-    If you use ORM/DB framework that you need to use `paginate` function that is specific to your framework.
+    If you use an ORM/DB framework you need to use the `paginate` function that is specific to your framework.
     Otherwise, you will need to load all data into memory and then paginate it which is not good for performance.
 
-    You can find more information about intergrations in
-    [Avaiable Integrations](../integrations/available-integrations.md) section.   
+    You can find more information about integrations in
+    [Available Integrations](../integrations/available-integrations.md) section.   
 
 ## Step 1: import pagination components
 
@@ -19,8 +19,8 @@ The simplest FastAPI pagination looks like this:
 ```
 
 * `Page` - a class that represents a paginated data.
-* `paginate` - a function that paginates data and returns `Page` instance.
-* `add_pagination` - a function that adds pagination feature to the app.
+* `paginate` - a function that paginates data and returns a `Page` instance.
+* `add_pagination` - a function that adds a pagination feature to the app.
 
 ## Step 2: add pagination to app
 
@@ -39,7 +39,7 @@ If you forget to add `add_pagination` to your app, pagination will not work.
 {! ../docs_src/tutorial/first_steps.py !}
 ```
 
-Return type/response model is `Page`. It means that this endpoints can use `paginate` function inside it.
+The return type/response model is `Page`. It means that this endpoint can use the `paginate` function inside it.
 
 ## Step 4: paginate the data
 
@@ -49,7 +49,7 @@ Return type/response model is `Page`. It means that this endpoints can use `pagi
 
 `paginate` function will return `Page` instance with paginated data.
 
-## Step 5: Start application and check OpenAPI docs
+## Step 5: Start the application and check OpenAPI docs
 
 You will see that pagination parameters were added to the endpoint.
 
