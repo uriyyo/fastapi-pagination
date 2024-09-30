@@ -74,6 +74,10 @@ class TestSQLAlchemy(BasePaginationTestCase):
                 lambda sa_user: select(sa_user.id, sa_user.name),
                 lambda sa_user, item: len(item) == 2,
             ),
+            (
+                lambda sa_user: select(sa_user).from_statement(select(sa_user)),
+                lambda sa_user, item: isinstance(item, sa_user),
+            ),
         ],
     )
     def test_unwrap_raw_results(self, sa_session, sa_user, query, validate):
