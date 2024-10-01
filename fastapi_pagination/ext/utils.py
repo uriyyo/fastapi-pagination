@@ -21,8 +21,12 @@ def len_or_none(obj: Any) -> Optional[int]:
 
 
 @no_type_check
-def unwrap_scalars(items: Sequence[Sequence[T]]) -> Union[Sequence[T], Sequence[Sequence[T]]]:
-    return [item[0] if len_or_none(item) == 1 else item for item in items]
+def unwrap_scalars(
+    items: Sequence[Sequence[T]],
+    *,
+    force_unwrap: bool = False,
+) -> Union[Sequence[T], Sequence[Sequence[T]]]:
+    return [item[0] if force_unwrap or len_or_none(item) == 1 else item for item in items]
 
 
 @no_type_check
