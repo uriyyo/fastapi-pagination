@@ -167,7 +167,9 @@ def _unwrap_items(
     query: Selectable,
     unwrap_mode: Optional[UnwrapMode] = None,
 ) -> _TSeq:
-    if isinstance(query, (TextClause, FromStatement)):
+    # for raw queries we will use legacy mode by default
+    # because we can't determine if we should unwrap or not
+    if isinstance(query, (TextClause, FromStatement)):  # noqa: SIM108
         unwrap_mode = unwrap_mode or "legacy"
     else:
         unwrap_mode = unwrap_mode or "auto"

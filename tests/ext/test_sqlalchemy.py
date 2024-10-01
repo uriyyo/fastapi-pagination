@@ -151,4 +151,3 @@ class TestSQLAlchemy(BasePaginationTestCase):
             )
 
         assert validate(page.items[0], sa_user)
-
