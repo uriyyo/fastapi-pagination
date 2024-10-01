@@ -167,7 +167,10 @@ def _unwrap_items(
     query: Selectable,
     unwrap_mode: Optional[UnwrapMode] = None,
 ) -> _TSeq:
-    unwrap_mode = unwrap_mode or "auto"
+    if isinstance(query, (TextClause, FromStatement)):
+        unwrap_mode = unwrap_mode or "legacy"
+    else:
+        unwrap_mode = unwrap_mode or "auto"
 
     if unwrap_mode == "legacy":
         items = unwrap_scalars(items)
@@ -269,7 +272,7 @@ def paginate(
     params: Optional[AbstractParams] = None,
     *,
     subquery_count: bool = True,
-    mode: Optional[UnwrapMode] = None,
+    unwrap_mode: Optional[UnwrapMode] = None,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
@@ -285,7 +288,7 @@ def paginate(
     *,
     count_query: Optional[Selectable] = None,
     subquery_count: bool = True,
-    mode: Optional[UnwrapMode] = None,
+    unwrap_mode: Optional[UnwrapMode] = None,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
@@ -301,7 +304,7 @@ async def paginate(
     *,
     count_query: Optional[Selectable] = None,
     subquery_count: bool = True,
-    mode: Optional[UnwrapMode] = None,
+    unwrap_mode: Optional[UnwrapMode] = None,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
