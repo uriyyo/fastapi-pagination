@@ -83,9 +83,21 @@ Selectable: TypeAlias = "Union[Select, TextClause, FromStatement]"
 @no_type_check
 def _should_unwrap_scalars(query: Selectable) -> bool:
     try:
-        return len(query.column_descriptions) == 1 and len(query._all_selected_columns) > 1
+        cols_desc = query.column_descriptions
+        all_cols = query._all_selected_columns
+
+        if len(cols_desc) == 1 and len(all_cols) > 1:
+            return True
+
+        if len(cols_desc) == 1 and len(all_cols) == 1:
+            (desc,) = cols_desc
+            first, *rest = [desc.get(key) for key in ("type", "expr", "entity")]
+
+            return first is not None and all(first is obj for obj in rest)
     except AttributeError:
         return True
+
+    return False
 
 
 def create_paginate_query_from_text(query: str, params: AbstractParams) -> str:
