@@ -68,8 +68,22 @@ nav:
           - "Custom paginate": learn/tutorial_advanced/custom_paginate.md
   - "Customization":
       - "General": customization/general.md
+      - "Available Customizers":
+          - "UseName": customization/customizers/use_name.md
+          - "UseModule": customization/customizers/use_module.md
+          - "UseIncludeTotal": customization/customizers/use_include_total.md
+          - "UseParams": customization/customizers/use_params.md
+          - "UseParamsFields": customization/customizers/use_params_fields.md
+          - "UseOptionalParams": customization/customizers/use_optional_params.md
+          - "UseModelConfig": customization/customizers/use_model_config.md
+          - "UseExcludedFields": customization/customizers/use_excluded_fields.md
+          - "UseFieldsAliases": customization/customizers/use_fields_aliases.md
+          - "UseAdditionalFields": customization/customizers/use_additional_fields.md
+      - "Customizers Combinations": customization/customizer_combinations.md
   - "Integrations":
       - "SQLAlchemy": integrations/sqlalchemy.md
+  - "FAQ":
+      - "FAQ": faq/faq.md
   - "Contributing": contributing.md
   - "License": license.md
 
