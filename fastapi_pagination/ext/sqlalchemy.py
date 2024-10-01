@@ -76,7 +76,7 @@ Selectable: TypeAlias = "Union[Select, TextClause, FromStatement]"
 @no_type_check
 def _should_unwrap_scalars(query: Selectable) -> bool:
     try:
-        return len(query.column_descriptions) == 1 and len(query.columns) > 1
+        return len(query.column_descriptions) == 1 and len(query._all_selected_columns) > 1
     except AttributeError:
         return True
 
