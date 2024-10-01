@@ -74,6 +74,10 @@ class TestSQLAlchemy(BasePaginationTestCase):
                 lambda sa_user: select(sa_user.id, sa_user.name),
                 lambda sa_user, item: len(item) == 2,
             ),
+            (
+                lambda sa_user: select(sa_user).from_statement(select(sa_user)),
+                lambda sa_user, item: isinstance(item, sa_user),
+            ),
         ],
     )
     def test_unwrap_raw_results(self, sa_session, sa_user, query, validate):
@@ -84,3 +88,66 @@ class TestSQLAlchemy(BasePaginationTestCase):
 
         assert page.items
         assert validate(sa_user, page.items[0])
+
+    @mark.parametrize(
+        ("unwrap_mode", "validate"),
+        [
+            (None, lambda item, sa_user: isinstance(item, sa_user)),
+            ("auto", lambda item, sa_user: isinstance(item, sa_user)),
+            ("legacy", lambda item, sa_user: isinstance(item, sa_user)),
+            ("unwrap", lambda item, sa_user: isinstance(item, sa_user)),
+            ("no-unwrap", lambda item, sa_user: len(item) == 1 and isinstance(item[0], sa_user)),
+        ],
+    )
+    def test_unwrap_mode_select_scalar_model(self, sa_session, sa_user, unwrap_mode, validate):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                select(sa_user),
+                params=Params(page=1, size=1),
+                unwrap_mode=unwrap_mode,
+            )
+
+        assert validate(page.items[0], sa_user)
+
+    @mark.parametrize(
+        ("unwrap_mode", "validate"),
+        [
+            (None, lambda item, sa_user: len(item) == 1),
+            ("auto", lambda item, sa_user: len(item) == 1),
+            ("legacy", lambda item, sa_user: isinstance(item, str)),
+            ("unwrap", lambda item, sa_user: isinstance(item, str)),
+            ("no-unwrap", lambda item, sa_user: len(item) == 1),
+        ],
+    )
+    def test_unwrap_mode_select_scalar_column(self, sa_session, sa_user, unwrap_mode, validate):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                select(sa_user.name),
+                params=Params(page=1, size=1),
+                unwrap_mode=unwrap_mode,
+            )
+
+        assert validate(page.items[0], sa_user)
+
+    @mark.parametrize(
+        ("unwrap_mode", "validate"),
+        [
+            (None, lambda item, sa_user: len(item) == 2),
+            ("auto", lambda item, sa_user: len(item) == 2),
+            ("legacy", lambda item, sa_user: len(item) == 2),
+            ("unwrap", lambda item, sa_user: isinstance(item, sa_user)),
+            ("no-unwrap", lambda item, sa_user: len(item) == 2),
+        ],
+    )
+    def test_unwrap_mode_select_non_scalar(self, sa_session, sa_user, unwrap_mode, validate):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                select(sa_user, sa_user.name),
+                params=Params(page=1, size=1),
+                unwrap_mode=unwrap_mode,
+            )
+
+        assert validate(page.items[0], sa_user)
