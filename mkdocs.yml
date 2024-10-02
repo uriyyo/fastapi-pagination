@@ -81,7 +81,11 @@ nav:
           - "UseAdditionalFields": customization/customizers/use_additional_fields.md
       - "Customizers Combinations": customization/customizer_combinations.md
   - "Integrations":
-      - "SQLAlchemy": integrations/sqlalchemy.md
+      - "SQLAlchemy":
+          - "General": integrations/sqlalchemy/general.md
+          - "Paginate Function": integrations/sqlalchemy/paginate.md
+          - "Cursor Pagination": integrations/sqlalchemy/cursor_pagination.md
+          - "Relationships": integrations/sqlalchemy/relationships.md
   - "FAQ":
       - "FAQ": faq/faq.md
   - "Contributing": contributing.md
