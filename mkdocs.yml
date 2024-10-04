@@ -81,6 +81,7 @@ nav:
           - "UseAdditionalFields": customization/customizers/use_additional_fields.md
       - "Customizers Combinations": customization/customizer_combinations.md
   - "Integrations":
+      - "Available": integrations/available.md
       - "SQLAlchemy":
           - "General": integrations/sqlalchemy/general.md
           - "Paginate Function": integrations/sqlalchemy/paginate.md
@@ -122,6 +123,5 @@ extra:
 
 watch:
   - docs
-  - docs_src
   - README.md
   - mkdocs.yml
