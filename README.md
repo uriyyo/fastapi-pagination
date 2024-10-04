@@ -8,7 +8,6 @@
 <img alt="codecov" src="https://codecov.io/gh/uriyyo/fastapi-pagination/branch/main/graph/badge.svg?token=QqIqDQ7FZi">
 <a href="https://pepy.tech/project/fastapi-pagination"><img alt="downloads" src="https://pepy.tech/badge/fastapi-pagination"></a>
 <a href="https://pypi.org/project/fastapi-pagination"><img alt="pypi" src="https://img.shields.io/pypi/v/fastapi-pagination"></a>
-<img alt="black" src="https://img.shields.io/badge/code%20style-black-000000.svg">
 </div>
 
 ## Introduction
@@ -25,6 +24,7 @@ The library supports a variety of pagination strategies, including cursor-based 
 of SQL and NoSQL databases frameworks. It also supports async/await syntax and is compatible with Python 3.8 and higher.
 
 Features:
+
 * Simplifies pagination in FastAPI applications.
 * Supports a variety of pagination strategies, including cursor-based pagination and page-based pagination
 * Works with a wide range of SQL and NoSQL databases frameworks, including `SQLAlchemy`, `Tortoise ORM`, and `PyMongo`.
@@ -57,6 +57,7 @@ from pydantic import BaseModel, Field
 from fastapi_pagination import Page, add_pagination, paginate
 
 app = FastAPI()  # create FastAPI app
+add_pagination(app)  # important! add pagination to your app
 
 
 class UserOut(BaseModel):  # define your model
@@ -65,28 +66,28 @@ class UserOut(BaseModel):  # define your model
 
 
 users = [  # create some data
+    UserOut(name="Steve", surname="Rogers"),
     # ...
 ]
 
 
-@app.get('/users')  
-async def get_users() -> Page[UserOut]:  # use Page[UserOut] as return type annotation
+# req: GET /users
+@app.get("/users")
+async def get_users() -> Page[UserOut]:
+    # use Page[UserOut] as return type annotation
     return paginate(users)  # use paginate function to paginate your data
-
-
-add_pagination(app)  # important! add pagination to your app
 ```
 
 Please, be careful when you work with databases, because default `paginate` will require to load all data in memory.
 
 For instance, if you use `SQLAlchemy` you can use `paginate` from `fastapi_pagination.ext.sqlalchemy` module.
 
-```py
+```python
 from sqlalchemy import select
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 
-@app.get('/users')
+@app.get("/users")
 def get_users(db: Session = Depends(get_db)) -> Page[UserOut]:
     return paginate(db, select(User).order_by(User.created_at))
 ```

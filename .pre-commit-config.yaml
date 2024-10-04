@@ -6,7 +6,7 @@ repos:
         name: ruff-format
         pass_filenames: false
         language_version: python3.8
-        entry: poetry run ruff format fastapi_pagination docs_src tests
+        entry: poetry run ruff format fastapi_pagination tests
 
   - repo: local
     hooks:
@@ -15,7 +15,7 @@ repos:
         name: ruff
         pass_filenames: false
         language_version: python3.8
-        entry: poetry run ruff check --fix --exit-non-zero-on-fix --show-fixes fastapi_pagination docs_src tests
+        entry: poetry run ruff check --fix --exit-non-zero-on-fix --show-fixes fastapi_pagination tests
 
   - repo: local
     hooks:
