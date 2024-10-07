@@ -22,12 +22,10 @@ from typing import (
     AsyncIterator,
     Callable,
     ContextManager,
-    Dict,
     Iterator,
     Literal,
     Optional,
     Sequence,
-    Type,
     TypeVar,
     cast,
     overload,
@@ -53,7 +51,7 @@ T = TypeVar("T")
 TAbstractParams = TypeVar("TAbstractParams", covariant=True, bound=AbstractParams)
 
 _params_val: ContextVar[AbstractParams] = ContextVar("_params_val")
-_page_val: ContextVar[Type[AbstractPage[Any]]] = ContextVar("_page_val", default=Page)
+_page_val: ContextVar[type[AbstractPage[Any]]] = ContextVar("_page_val", default=Page)
 
 _rsp_val: ContextVar[Response] = ContextVar("_rsp_val")
 _req_val: ContextVar[Request] = ContextVar("_req_val")
@@ -213,7 +211,7 @@ def set_params(params: AbstractParams) -> ContextManager[None]:
     return _ctx_var_with_reset(_params_val, params)
 
 
-def set_page(page: Type[AbstractPage[Any]]) -> ContextManager[None]:
+def set_page(page: type[AbstractPage[Any]]) -> ContextManager[None]:
     return _ctx_var_with_reset(_page_val, page)
 
 
@@ -272,7 +270,7 @@ def apply_items_transformer(
 
 
 def _create_params_dependency(
-    params: Type[TAbstractParams],
+    params: type[TAbstractParams],
 ) -> Callable[[TAbstractParams], AsyncIterator[TAbstractParams]]:
     async def _pagination_params(*args: Any, **kwargs: Any) -> AsyncIterator[TAbstractParams]:
         val = params(*args, **kwargs)
@@ -306,8 +304,8 @@ async def _noop_dep() -> None:
 
 
 def pagination_ctx(
-    page: Optional[Type[AbstractPage[Any]]] = None,
-    params: Optional[Type[AbstractParams]] = None,
+    page: Optional[type[AbstractPage[Any]]] = None,
+    params: Optional[type[AbstractParams]] = None,
     transformer: Optional[ItemsTransformer] = None,
     __page_ctx_dep__: bool = False,
 ) -> Callable[..., AsyncIterator[AbstractParams]]:
@@ -363,7 +361,7 @@ def _update_route(route: APIRoute) -> None:
     if not lenient_issubclass(page_cls, AbstractPage):
         return
 
-    cls = cast(Type[AbstractPage[Any]], page_cls)
+    cls = cast(type[AbstractPage[Any]], page_cls)
     dep = Depends(pagination_ctx(cls, __page_ctx_dep__=True))
 
     route.dependencies.append(dep)
@@ -378,7 +376,7 @@ def _update_route(route: APIRoute) -> None:
     route.app = request_response(route.get_route_handler())
 
 
-def _patch_openapi(dst: Dict[str, Any], src: Dict[str, Any]) -> None:
+def _patch_openapi(dst: dict[str, Any], src: dict[str, Any]) -> None:
     with suppress(KeyError):
         dst["paths"].update(src["paths"])
 

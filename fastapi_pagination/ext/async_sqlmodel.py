@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Type, TypeVar, overload
+from typing import Any, Optional, TypeVar, overload
 
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -59,7 +59,7 @@ async def paginate(
 )
 async def paginate(
     session: AsyncSession,
-    query: Type[TSQLModel],
+    query: type[TSQLModel],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,

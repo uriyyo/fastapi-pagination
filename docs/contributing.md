@@ -14,7 +14,7 @@ The documentation is built using [mkdocs](https://www.mkdocs.org/). All document
 `fastapi-pagination` uses [poetry](https://python-poetry.org/) for dependency management.
 Please, install poetry before continuing.
 
-Minimum supported python version is `3.8`.
+Minimum supported python version is `3.9`.
 
 
 ### Step 2: clone the repo
