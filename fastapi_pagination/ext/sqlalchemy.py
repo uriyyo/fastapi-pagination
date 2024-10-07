@@ -12,7 +12,7 @@ __all__ = [
 
 import warnings
 from contextlib import suppress
-from typing import TYPE_CHECKING, Any, Optional, Sequence, Tuple, TypeVar, Union, overload
+from typing import TYPE_CHECKING, Any, Optional, Sequence, TypeVar, Union, overload
 
 from sqlalchemy import func, select, text
 from sqlalchemy.exc import InvalidRequestError
@@ -388,7 +388,7 @@ def _old_paginate_sign(
     transformer: Optional[ItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
-) -> Tuple[
+) -> tuple[
     Select,
     Optional[Selectable],
     SyncConn,
@@ -428,7 +428,7 @@ def _new_paginate_sign(
     transformer: Optional[ItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
-) -> Tuple[
+) -> tuple[
     Select,
     Optional[Selectable],
     SyncConn,

@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Dict, Mapping, Optional, Type, TypeVar
+from typing import Any, Mapping, Optional, TypeVar
 
 from cassandra.cluster import SimpleStatement
 from cassandra.cqlengine import connection
@@ -15,8 +15,8 @@ T = TypeVar("T", bound=Mapping[str, Any])
 
 
 def paginate(
-    model: Type[Model],
-    query_filter: Optional[Dict[Any, Any]] = None,
+    model: type[Model],
+    query_filter: Optional[dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[SyncItemsTransformer] = None,

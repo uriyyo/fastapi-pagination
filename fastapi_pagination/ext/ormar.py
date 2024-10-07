@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Type, TypeVar, Union
+from typing import Any, Optional, TypeVar, Union
 
 from ormar import Model, QuerySet
 
@@ -14,7 +14,7 @@ TModel = TypeVar("TModel", bound=Model)
 
 
 async def paginate(
-    query: Union[QuerySet[TModel], Type[TModel]],
+    query: Union[QuerySet[TModel], type[TModel]],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,

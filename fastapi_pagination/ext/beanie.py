@@ -1,12 +1,13 @@
 __all__ = ["paginate"]
 
-from typing import Any, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, List, Optional, TypeVar, Union
 
 from beanie import Document
 from beanie.odm.enums import SortDirection
-from beanie.odm.interfaces.aggregate import ClientSession, DocumentProjectionType
+from beanie.odm.interfaces.aggregate import DocumentProjectionType
 from beanie.odm.queries.aggregation import AggregationQuery
 from beanie.odm.queries.find import FindMany
+from motor.motor_asyncio import AsyncIOMotorClientSession
 
 from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
@@ -22,9 +23,9 @@ async def paginate(
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
-    projection_model: Optional[Type[DocumentProjectionType]] = None,
-    sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
-    session: Optional[ClientSession] = None,
+    projection_model: Optional[type[DocumentProjectionType]] = None,
+    sort: Union[None, str, List[tuple[str, SortDirection]]] = None,
+    session: Optional[AsyncIOMotorClientSession] = None,
     ignore_cache: bool = False,
     fetch_links: bool = False,
     lazy_parse: bool = False,

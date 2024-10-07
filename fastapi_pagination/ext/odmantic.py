@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Dict, Optional, Type, Union, overload
+from typing import Any, Optional, Union, overload
 
 from odmantic import AIOEngine, Model, SyncEngine
 from odmantic.engine import AIOSessionType, SyncSessionType
@@ -12,12 +12,12 @@ from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 from ..utils import verify_params
 
-_Query: TypeAlias = Union[QueryExpression, Dict[Any, Any], bool]
+_Query: TypeAlias = Union[QueryExpression, dict[Any, Any], bool]
 
 
 def sync_paginate(
     engine: SyncEngine,
-    model: Type[Model],
+    model: type[Model],
     *queries: _Query,
     # odmantic related
     sort: Optional[Any] = None,
@@ -54,7 +54,7 @@ def sync_paginate(
 
 async def async_paginate(
     engine: AIOEngine,
-    model: Type[Model],
+    model: type[Model],
     *queries: _Query,
     # odmantic related
     sort: Optional[Any] = None,
@@ -92,7 +92,7 @@ async def async_paginate(
 @overload
 async def paginate(
     engine: AIOEngine,
-    model: Type[Model],
+    model: type[Model],
     *queries: _Query,
     # odmantic related
     sort: Optional[Any] = None,
@@ -108,7 +108,7 @@ async def paginate(
 @overload
 def paginate(  # type: ignore
     engine: SyncEngine,
-    model: Type[Model],
+    model: type[Model],
     *queries: _Query,
     # odmantic related
     sort: Optional[Any] = None,
@@ -123,7 +123,7 @@ def paginate(  # type: ignore
 
 def paginate(
     engine: Union[SyncEngine, AIOEngine],
-    model: Type[Model],
+    model: type[Model],
     *queries: _Query,
     # odmantic related
     sort: Optional[Any] = None,
