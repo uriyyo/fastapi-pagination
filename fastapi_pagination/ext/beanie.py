@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 __all__ = ["paginate"]
 
-from typing import Any, List, Optional, Tuple, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Type, TypeVar, Union
 
 from beanie import Document
 from beanie.odm.enums import SortDirection
-from beanie.odm.interfaces.aggregate import ClientSession, DocumentProjectionType
+from beanie.odm.interfaces.aggregate import DocumentProjectionType
 from beanie.odm.queries.aggregation import AggregationQuery
 from beanie.odm.queries.find import FindMany
 
@@ -12,6 +14,10 @@ from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
+
+if TYPE_CHECKING:
+    from motor.motor_asyncio import AsyncIOMotorClientSession
+
 
 TDocument = TypeVar("TDocument", bound=Document)
 
@@ -24,7 +30,7 @@ async def paginate(
     additional_data: Optional[AdditionalData] = None,
     projection_model: Optional[Type[DocumentProjectionType]] = None,
     sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
-    session: Optional[ClientSession] = None,
+    session: Optional[AsyncIOMotorClientSession] = None,
     ignore_cache: bool = False,
     fetch_links: bool = False,
     lazy_parse: bool = False,

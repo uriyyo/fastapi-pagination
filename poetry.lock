@@ -182,13 +182,13 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "beanie"
-version = "1.26.0"
+version = "1.27.0"
 description = "Asynchronous Python ODM for MongoDB"
 optional = true
 python-versions = "<4.0,>=3.7"
 files = [
-    {file = "beanie-1.26.0-py3-none-any.whl", hash = "sha256:b45926c01d4a899c519c665c2a5f230990717e99f7fd68172a389ca33e7693b9"},
-    {file = "beanie-1.26.0.tar.gz", hash = "sha256:54016f4ec71ed0ea6ce0c7946a395090c45687f254dbbe1cf06eec608383f790"},
+    {file = "beanie-1.27.0-py3-none-any.whl", hash = "sha256:2cc6762bdd59b9040dd004ecbc7d4fd5ddd22e52743915e38d1f0f92f276bcaf"},
+    {file = "beanie-1.27.0.tar.gz", hash = "sha256:a5eee40f1e52214afeb8558c0823d7504856884770c3d56fc3cd5765efb87314"},
 ]
 
 [package.dependencies]
@@ -197,12 +197,19 @@ lazy-model = "0.2.0"
 motor = ">=2.5.0,<4.0.0"
 pydantic = ">=1.10,<3.0"
 toml = "*"
-typing-extensions = {version = ">=4.7", markers = "python_version < \"3.11\""}
+typing-extensions = ">=4.7"
 
 [package.extras]
+aws = ["motor[aws] (>=2.5.0,<4.0.0)"]
+ci = ["requests", "toml", "types-requests"]
 doc = ["Markdown (>=3.3)", "Pygments (>=2.8.0)", "jinja2 (>=3.0.3)", "mkdocs (>=1.4)", "mkdocs-material (>=9.0)", "pydoc-markdown (>=4.8)"]
+encryption = ["motor[encryption] (>=2.5.0,<4.0.0)"]
+gssapi = ["motor[gssapi] (>=2.5.0,<4.0.0)"]
+ocsp = ["motor[ocsp] (>=2.5.0,<4.0.0)"]
 queue = ["beanie-batteries-queue (>=0.2)"]
+snappy = ["motor[snappy] (>=2.5.0,<4.0.0)"]
 test = ["asgi-lifespan (>=1.0.1)", "dnspython (>=2.1.0)", "fastapi (>=0.100)", "flake8 (>=3)", "httpx (>=0.23.0)", "pre-commit (>=2.3.0)", "pydantic-extra-types (>=2)", "pydantic-settings (>=2)", "pydantic[email]", "pyright (>=0)", "pytest (>=6.0.0)", "pytest-asyncio (>=0.21.0)", "pytest-cov (>=2.8.1)"]
+zstd = ["motor[zstd] (>=2.5.0,<4.0.0)"]
 
 [[package]]
 name = "black"
