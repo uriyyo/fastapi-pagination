@@ -100,7 +100,7 @@ def _should_unwrap_scalars(query: Selectable) -> bool:
             expr, entity = [desc.get(key) for key in ("expr", "entity")]
 
             return expr is not None and expr is entity
-    except AttributeError:
+    except (AttributeError, NotImplementedError):
         return True
 
     return False
