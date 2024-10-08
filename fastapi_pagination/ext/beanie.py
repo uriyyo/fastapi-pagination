@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 __all__ = ["paginate"]
 
 from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Type, TypeVar, Union
