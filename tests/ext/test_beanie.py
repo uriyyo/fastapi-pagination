@@ -1,14 +1,19 @@
+from typing import List
+
 from beanie import Document, init_beanie
-from fastapi import FastAPI
+from beanie.odm.queries.find import FindMany
+from fastapi import FastAPI, status
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import Field
-from pytest import fixture
+from pydantic import Field, parse_obj_as
+from pytest import fixture, mark
 from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
+from fastapi_pagination.cursor import CursorPage
 from fastapi_pagination.ext.beanie import paginate
 
 from ..base import BasePaginationTestCase
+from ..schemas import UserOut
 from .utils import mongodb_test
 
 
@@ -59,9 +64,58 @@ def app(db_client, query, model_cls):
     async def route():
         return await paginate(query)
 
+    @app.get("/", response_model=CursorPage[Model], response_model_by_alias=False)
+    async def cursor():
+        return await paginate(query)
+
     return add_pagination(app)
 
 
 @mongodb_test
 class TestBeanie(BasePaginationTestCase):
-    pass
+    @mark.asyncio
+    async def test_cursor(self, app, client, entities, query):
+        entities = sorted(parse_obj_as(List[UserOut], entities), key=(lambda it: (it.id, it.name)))
+
+        items = []
+        cursor = None
+        while True:
+            params = {"cursor": cursor} if cursor else {}
+
+            resp = await client.get("/", params={**params, "size": 10})
+            assert resp.status_code == status.HTTP_200_OK
+            data = resp.json()
+
+            items.extend(parse_obj_as(List[UserOut], data["items"]))
+
+            if data["next_page"] is None:
+                break
+
+            _cursor = cursor
+
+            cursor = data["next_page"]
+
+        assert items == entities
+
+        # backwards paging doesn't work out of the box for FindMany queries
+        if isinstance(query, FindMany):
+            return
+
+        items = []
+        cursor = _cursor
+
+        while True:
+            params = {"cursor": cursor} if cursor else {}
+
+            resp = await client.get("/", params={**params, "size": 10})
+            assert resp.status_code == status.HTTP_200_OK
+            data = resp.json()
+
+            items = parse_obj_as(List[UserOut], data["items"]) + items
+
+            if data["previous_page"] is None:
+                break
+
+            cursor = data["previous_page"]
+
+        assert items == entities
