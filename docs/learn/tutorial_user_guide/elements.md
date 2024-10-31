@@ -3,7 +3,7 @@
 `fastapi-pagination` provide a set of elements that can be used to implement pagination in your FastAPI application.
 These elements are designed to be flexible and easy to use, allowing you to customize the pagination behavior to suit your needs.
 
-`fastaapi-pagination` provides implementation of different pagination techniques, such as `limit-offset`, `page-based`, and `cursor-based` pagination.
+`fastapi-pagination` provides implementation of different pagination techniques, such as `limit-offset`, `page-based`, and `cursor-based` pagination.
 
 By `default` `fastapi-pagination` refers to `page-based` pagination, but you can easily switch to other
 pagination techniques by importing the corresponding from corresponding module.
