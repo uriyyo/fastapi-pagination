@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-pagination"
-version = "0.12.31"
+version = "0.12.32"
 description = "FastAPI pagination"
 authors = [
     "Yurii Karabas <1998uriyyo@gmail.com>",
@@ -49,19 +49,19 @@ pytest-cov = "^5.0.0"
 pytest-asyncio = "^0.24.0"
 flaky = "^3.8.1"
 pre-commit = "^4.0.0"
-Faker = "^30.3.0"
-psycopg2-binary = "^2.9.9"
+Faker = "^33.0.0"
+psycopg2-binary = "^2.9.10"
 mkdocs = "^1.6.1"
-mkdocs-material = "^9.5.39"
-pymdown-extensions = "^10.11"
+mkdocs-material = "^9.5.44"
+pymdown-extensions = "^10.12"
 fontawesome-markdown = "^0.2.6"
 httpx = "^0.27.2"
 asgi-lifespan = "^2.1.0"
 requests = "^2.32.2"
-uvicorn = "^0.31.0"
+uvicorn = "^0.32.0"
 Jinja2 = "^3.1.4"
-mypy = "^1.11.2"
-ruff = "^0.6.9"
+mypy = "^1.13.0"
+ruff = "^0.7.3"
 
 [tool.poetry.extras]
 sqlmodel = ["sqlmodel", "sqlakeyset"]

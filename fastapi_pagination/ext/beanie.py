@@ -1,18 +1,23 @@
+from __future__ import annotations
+
 __all__ = ["paginate"]
 
-from typing import Any, List, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, List, Optional, TypeVar, Union
 
 from beanie import Document
 from beanie.odm.enums import SortDirection
 from beanie.odm.interfaces.aggregate import DocumentProjectionType
 from beanie.odm.queries.aggregation import AggregationQuery
 from beanie.odm.queries.find import FindMany
-from motor.motor_asyncio import AsyncIOMotorClientSession
 
 from ..api import apply_items_transformer, create_page
 from ..bases import AbstractParams
 from ..types import AdditionalData, AsyncItemsTransformer
 from ..utils import verify_params
+
+if TYPE_CHECKING:
+    from motor.motor_asyncio import AsyncIOMotorClientSession
+
 
 TDocument = TypeVar("TDocument", bound=Document)
 
