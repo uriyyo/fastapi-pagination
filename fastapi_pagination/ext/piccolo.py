@@ -2,7 +2,7 @@ __all__ = ["paginate"]
 
 from contextlib import suppress
 from copy import copy
-from typing import Any, Optional, Type, TypeVar, Union
+from typing import Any, Optional, TypeVar, Union
 
 from piccolo.query import Select
 from piccolo.query.methods.select import Count
@@ -30,7 +30,7 @@ def _copy_query(query: Select[T]) -> Select[T]:
 
 
 async def paginate(
-    query: Union[Select[T], Type[T]],
+    query: Union[Select[T], type[T]],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[SyncItemsTransformer] = None,

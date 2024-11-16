@@ -2,7 +2,7 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Any, List, Optional, TypeVar, Union
 
 from beanie import Document
 from beanie.odm.enums import SortDirection
@@ -28,8 +28,8 @@ async def paginate(
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
-    projection_model: Optional[Type[DocumentProjectionType]] = None,
-    sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
+    projection_model: Optional[type[DocumentProjectionType]] = None,
+    sort: Union[None, str, List[tuple[str, SortDirection]]] = None,
     session: Optional[AsyncIOMotorClientSession] = None,
     ignore_cache: bool = False,
     fetch_links: bool = False,

@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, List, Optional, Type, TypeVar, Union
+from typing import Any, List, Optional, TypeVar, Union
 
 from tortoise.models import Model
 from tortoise.query_utils import Prefetch
@@ -29,7 +29,7 @@ def _generate_query(
 
 
 async def paginate(
-    query: Union[QuerySet[TModel], Type[TModel]],
+    query: Union[QuerySet[TModel], type[TModel]],
     params: Optional[AbstractParams] = None,
     prefetch_related: Union[bool, List[Union[str, Prefetch]]] = False,
     *,

@@ -20,13 +20,11 @@ from typing import (
     TYPE_CHECKING,
     Any,
     ClassVar,
-    Dict,
     Generic,
     List,
     Optional,
     Sequence,
     Set,
-    Tuple,
     Type,
     TypeVar,
     cast,
@@ -145,15 +143,15 @@ def _check_for_old_sign(func: Any) -> bool:
 
 
 class AbstractPage(GenericModel, Generic[T], ABC):
-    __params_type__: ClassVar[Type[AbstractParams]]
+    __params_type__: ClassVar[type[AbstractParams]]
 
     # used by pydantic v2
-    __model_aliases__: ClassVar[Dict[str, str]] = {}
+    __model_aliases__: ClassVar[dict[str, str]] = {}
     __model_exclude__: ClassVar[Set[str]] = set()
 
     if TYPE_CHECKING:  # only for pydantic v1
         __concrete__: ClassVar[bool]
-        __parameters__: ClassVar[Tuple[Any, ...]]
+        __parameters__: ClassVar[tuple[Any, ...]]
 
     if IS_PYDANTIC_V2:
 
@@ -192,7 +190,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
     @classmethod
     @abstractmethod
     def create(
-        cls: Type[C],
+        cls: type[C],
         *args: Any,
         **kwargs: Any,
     ) -> C:
@@ -201,13 +199,13 @@ class AbstractPage(GenericModel, Generic[T], ABC):
     @classmethod
     def _old_customization(
         cls,
-        custom_params: Optional[Type[AbstractParams]] = None,
+        custom_params: Optional[type[AbstractParams]] = None,
         /,
         *,
         cls_name: Optional[str] = None,
         module: Optional[str] = None,
         **kwargs: Any,
-    ) -> Type[Self]:
+    ) -> type[Self]:
         from .customization import CustomizedPage, PageCustomizer, UseModule, UseName, UseParams, UseParamsFields
 
         args: List[PageCustomizer] = []
@@ -221,7 +219,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         if kwargs:
             args.append(UseParamsFields(**kwargs))
 
-        return cast(Type[Self], CustomizedPage[(cls, *args)])
+        return cast(type[Self], CustomizedPage[(cls, *args)])
 
     @classmethod
     @deprecated(
@@ -235,7 +233,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         cls_name: Optional[str] = None,
         module: Optional[str] = None,
         **kwargs: Any,
-    ) -> Type[Self]:
+    ) -> type[Self]:
         return cls._old_customization(
             cls_name=cls_name,
             module=module or get_caller(),
@@ -250,11 +248,11 @@ class AbstractPage(GenericModel, Generic[T], ABC):
     )
     def with_params(
         cls,
-        custom_params: Type[AbstractParams],
+        custom_params: type[AbstractParams],
         *,
         cls_name: Optional[str] = None,
         module: Optional[str] = None,
-    ) -> Type[Self]:
+    ) -> type[Self]:
         return cls._old_customization(
             custom_params,
             cls_name=cls_name,

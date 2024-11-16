@@ -26,12 +26,9 @@ from types import new_class
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Generic,
     Optional,
     Protocol,
-    Tuple,
-    Type,
     TypeVar,
     Union,
     no_type_check,
@@ -46,15 +43,15 @@ from typing_extensions import TypeAlias, Unpack, get_type_hints
 from .bases import AbstractPage, AbstractParams, BaseRawParams
 from .utils import IS_PYDANTIC_V2, get_caller
 
-ClsNamespace: TypeAlias = Dict[str, Any]
-PageCls: TypeAlias = "Type[AbstractPage[Any]]"
+ClsNamespace: TypeAlias = dict[str, Any]
+PageCls: TypeAlias = "type[AbstractPage[Any]]"
 
 TPage = TypeVar("TPage", bound=PageCls)
 
 
 @no_type_check
-def get_page_bases(cls: Type[TPage]) -> tuple[Type[Any], ...]:
-    bases: Tuple[Type[Any], ...]
+def get_page_bases(cls: type[TPage]) -> tuple[type[Any], ...]:
+    bases: tuple[type[Any], ...]
 
     if IS_PYDANTIC_V2:
         params = cls.__pydantic_generic_metadata__["parameters"]
@@ -69,7 +66,7 @@ def get_page_bases(cls: Type[TPage]) -> tuple[Type[Any], ...]:
     return bases
 
 
-def new_page_cls(cls: Type[TPage], new_ns: ClsNamespace) -> Type[TPage]:
+def new_page_cls(cls: type[TPage], new_ns: ClsNamespace) -> type[TPage]:
     return new_class(
         new_ns.get("__name__", cls.__name__),
         get_page_bases(cls),
@@ -175,7 +172,7 @@ class UseIncludeTotal(PageCustomizer):
 
 @dataclass
 class UseParams(PageCustomizer):
-    params: Type[AbstractParams]
+    params: type[AbstractParams]
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         if page_cls.__params_type__ is not ns["__params_type__"]:
@@ -187,7 +184,7 @@ class UseParams(PageCustomizer):
         ns["__params_type__"] = self.params
 
 
-def _get_model_fields(cls: Type[BaseModel]) -> ClsNamespace:
+def _get_model_fields(cls: type[BaseModel]) -> ClsNamespace:
     if IS_PYDANTIC_V2:
         return cls.model_fields  # type: ignore
 
@@ -219,7 +216,7 @@ else:
 
 
 @no_type_check
-def _update_params_fields(cls: Type[AbstractParams], fields: ClsNamespace) -> ClsNamespace:
+def _update_params_fields(cls: type[AbstractParams], fields: ClsNamespace) -> ClsNamespace:
     if not issubclass(cls, BaseModel):
         raise TypeError(f"{cls.__name__} must be subclass of BaseModel")
 
@@ -325,7 +322,7 @@ class UseFieldsAliases(PageCustomizer):
                 fields_config[name]["alias"] = alias
 
 
-_RawFieldDef: TypeAlias = Union[Any, Tuple[Any, Any]]
+_RawFieldDef: TypeAlias = Union[Any, tuple[Any, Any]]
 
 
 class UseAdditionalFields(PageCustomizer):

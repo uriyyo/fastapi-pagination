@@ -21,7 +21,7 @@ and use them to generate paginated responses that include the requested subset o
 The library supports a variety of pagination strategies, including cursor-based pagination and page-based pagination.
 
 `fastapi-pagination` is built on top of the popular `fastapi` library, and it works with a wide range 
-of SQL and NoSQL databases frameworks. It also supports async/await syntax and is compatible with Python 3.8 and higher.
+of SQL and NoSQL databases frameworks. It also supports async/await syntax and is compatible with Python 3.9 and higher.
 
 Features:
 
@@ -29,7 +29,7 @@ Features:
 * Supports a variety of pagination strategies, including cursor-based pagination and page-based pagination
 * Works with a wide range of SQL and NoSQL databases frameworks, including `SQLAlchemy`, `Tortoise ORM`, and `PyMongo`.
 * Supports async/await syntax.
-* Compatible with Python 3.8 and higher.
+* Compatible with Python 3.9 and higher.
 
 ----
 

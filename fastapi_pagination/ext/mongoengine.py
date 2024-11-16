@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Type, TypeVar, Union, cast
+from typing import Any, Optional, TypeVar, Union, cast
 
 from mongoengine import QuerySet
 from mongoengine.base.metaclasses import TopLevelDocumentMetaclass
@@ -14,7 +14,7 @@ T = TypeVar("T", bound=TopLevelDocumentMetaclass)
 
 
 def paginate(
-    query: Union[Type[T], QuerySet],
+    query: Union[type[T], QuerySet],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[SyncItemsTransformer] = None,
@@ -23,7 +23,7 @@ def paginate(
     params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, TopLevelDocumentMetaclass):
-        query = cast(Type[T], query).objects().all()
+        query = cast(type[T], query).objects().all()
 
     total = query.count() if raw_params.include_total else None
     cursor = query.skip(raw_params.offset).limit(raw_params.limit)

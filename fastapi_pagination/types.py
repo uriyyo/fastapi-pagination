@@ -1,4 +1,4 @@
-from typing import Any, Awaitable, Callable, Dict, Optional, Sequence, Union
+from typing import Any, Awaitable, Callable, Optional, Sequence, Union
 
 __all__ = [
     "Cursor",
@@ -16,7 +16,7 @@ from typing_extensions import TYPE_CHECKING, Literal, TypeAlias
 
 Cursor: TypeAlias = Union[str, bytes]
 ParamsType: TypeAlias = Literal["cursor", "limit-offset"]
-AdditionalData: TypeAlias = Optional[Dict[str, Any]]
+AdditionalData: TypeAlias = Optional[dict[str, Any]]
 
 AsyncItemsTransformer: TypeAlias = Callable[[Sequence[Any]], Union[Sequence[Any], Awaitable[Sequence[Any]]]]
 SyncItemsTransformer: TypeAlias = Callable[[Sequence[Any]], Sequence[Any]]
