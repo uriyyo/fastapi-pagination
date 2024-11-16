@@ -17,8 +17,9 @@ from typing import TYPE_CHECKING, Any, Optional, Sequence, Tuple, TypeVar, Union
 from sqlalchemy import func, select, text
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query, Session, noload, scoped_session
+from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import TextClause
-from typing_extensions import Literal, TypeAlias, deprecated, no_type_check
+from typing_extensions import Literal, TypeAlias, deprecated, get_args, no_type_check
 
 from ..api import apply_items_transformer, create_page
 from ..bases import AbstractPage, AbstractParams, is_cursor
@@ -29,7 +30,6 @@ from .utils import generic_query_apply_params, unwrap_scalars
 if TYPE_CHECKING:
     from sqlalchemy.engine import Connection
     from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
-    from sqlalchemy.sql import Select
 
 
 try:
@@ -77,11 +77,17 @@ UnwrapMode: TypeAlias = Literal[
     "unwrap",  # always unwrap
 ]
 
-Selectable: TypeAlias = "Union[Select, TextClause, FromStatement]"
+Selectable: TypeAlias = Union[Select, TextClause, FromStatement, CompoundSelect]
 
 
 @no_type_check
 def _should_unwrap_scalars(query: Selectable) -> bool:
+    if not isinstance(query, get_args(Selectable)):
+        return False
+
+    if isinstance(query, CompoundSelect):
+        return False
+
     try:
         cols_desc = query.column_descriptions
         all_cols = query._all_selected_columns
@@ -157,7 +163,7 @@ def create_count_query(query: Selectable, *, use_subquery: bool = True) -> Selec
     if use_subquery:
         return select(func.count()).select_from(query.subquery())
 
-    return query.with_only_columns(  # type: ignore[call-arg] # noqa: PIE804
+    return query.with_only_columns(  # type: ignore[call-arg,union-attr] # noqa: PIE804
         func.count(),
         maintain_column_froms=True,
     )
