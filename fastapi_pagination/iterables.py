@@ -2,10 +2,10 @@ from itertools import islice
 from typing import Any, Generic, Iterable, Optional, TypeVar
 
 __all__ = [
-    "Page",
-    "Params",
     "LimitOffsetPage",
     "LimitOffsetParams",
+    "Page",
+    "Params",
     "paginate",
 ]
 

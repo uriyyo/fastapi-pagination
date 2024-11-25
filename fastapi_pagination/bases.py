@@ -5,8 +5,8 @@ __all__ = [
     "AbstractParams",
     "BasePage",
     "BaseRawParams",
-    "RawParams",
     "CursorRawParams",
+    "RawParams",
     "is_cursor",
     "is_limit_offset",
 ]

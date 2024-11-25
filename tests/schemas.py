@@ -39,6 +39,6 @@ class UserWithOrderOut(BaseModel):
 __all__ = [
     "OrderOut",
     "UserOut",
-    "UserWithoutIDOut",
     "UserWithOrderOut",
+    "UserWithoutIDOut",
 ]
