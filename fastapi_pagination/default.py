@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 __all__ = [
-    "Params",
     "OptionalParams",
     "Page",
+    "Params",
 ]
 
 from math import ceil

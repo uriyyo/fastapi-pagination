@@ -1,7 +1,7 @@
 __all__ = [
+    "generic_query_apply_params",
     "unwrap_scalars",
     "wrap_scalars",
-    "generic_query_apply_params",
 ]
 
 from typing import Any, Optional, Protocol, Sequence, TypeVar, Union, no_type_check
