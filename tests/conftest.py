@@ -10,7 +10,7 @@ import asyncpg
 from asgi_lifespan import LifespanManager
 from cassandra.cluster import Cluster
 from fastapi import FastAPI
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from motor.motor_asyncio import AsyncIOMotorClient
 from pytest import FixtureRequest, Function, Parser, fixture
 from pytest_asyncio import fixture as async_fixture
@@ -268,5 +268,9 @@ def pytest_collection_modifyitems(items: List[Function]):
 
 @async_fixture(scope="class")
 async def client(app: FastAPI):
-    async with LifespanManager(app), AsyncClient(app=app, base_url="http://testserver", timeout=60) as c:
+    async with LifespanManager(app), AsyncClient(
+        transport=ASGITransport(app),
+        base_url="http://testserver",
+        timeout=60,
+    ) as c:
         yield c
