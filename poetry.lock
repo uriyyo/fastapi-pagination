@@ -2639,7 +2639,7 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 type = ["pytest-mypy"]
 
 [extras]
-all = ["SQLAlchemy", "asyncpg", "beanie", "bunnet", "databases", "django", "mongoengine", "motor", "orm", "piccolo", "pony", "scylla-driver", "sqlakeyset", "sqlmodel", "tortoise-orm"]
+all = ["SQLAlchemy", "asyncpg", "beanie", "bunnet", "databases", "django", "mongoengine", "motor", "odmantic", "orm", "piccolo", "pony", "scylla-driver", "sqlakeyset", "sqlmodel", "tortoise-orm"]
 asyncpg = ["SQLAlchemy", "asyncpg"]
 beanie = ["beanie"]
 bunnet = ["bunnet"]
@@ -2659,4 +2659,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "d7e4b1932ef5ba06f57d2bc6f160bb9499a4a6887a7ec6d738dc00d94b700cac"
+content-hash = "9f07f56ae07575f730af6ce875bd78ede70520ba4bd84a4caa762d340fb7c3c3"
