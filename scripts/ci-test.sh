@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -ex
+
+function _pip() {
+    poetry run pip "$@" || true
+}
+
+function _pytest() {
+    poetry run pytest "$@"              \
+      --cov=fastapi_pagination          \
+      --cov-append                      \
+      --cov-report=xml                  \
+      --cov-report=term-missing         \
+      --cassandra-dsn="${CQL_TEST_HOST}"
+}
+
+echo "Installing dependencies"
+poetry install -E all --sync
+
+echo "Config: fastapi<0.112.4=$FASTAPI_PRE_0_112_4, is-pydantic-v2=$PYDANTIC_V2"
+
+if [[ "$FASTAPI_PRE_0_112_4" == true ]]; then
+    _pip install "fastapi<0.112.4"
+else
+    _pip install -U "fastapi>=0.112.4"
+fi
+
+if [[ "$PYDANTIC_V2" == true ]]; then
+    _pip install -U "pydantic>2.0.0"
+else
+    _pip install "pydantic<2"
+fi
+
+echo "Running unit-tests"
+_pytest tests --ignore=tests/ext
+
+echo "Running integration tests"
+_pytest tests/ext
+
+echo "Running tests with SQLAlchemy<2"
+_pip install -U "sqlalchemy<2"
+_pytest tests -m "not sqlalchemy20"
+
+if [[ "$PYDANTIC_V2" == true ]]; then
+    echo "Running ormar tests"
+    _pip install -U ormar
+    _pytest tests -m ormar
+fi
+
+echo "Running tests GINO tests"
+_pip install -U "gino[starlette]"
+_pytest tests -m gino
