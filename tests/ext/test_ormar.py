@@ -1,7 +1,7 @@
 import databases
 import sqlalchemy
 from fastapi import FastAPI
-from ormar import Integer, Model, ModelMeta, String
+from ormar import Integer, Model, String
 from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -23,9 +23,10 @@ def meta(database_url):
 @fixture(scope="session")
 def User(meta, db):
     class User(Model):
-        class Meta(ModelMeta):
-            database = db
-            metadata = meta
+        ormar_config = {
+            "metadata": meta,
+            "database": db,
+        }
 
         id = Integer(primary_key=True)
         name = String(max_length=100)
