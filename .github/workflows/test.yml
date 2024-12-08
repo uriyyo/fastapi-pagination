@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.8", "3.9", "3.10", "3.11" ]  # , "3.12" ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
         pydantic_v2: [ "true", "false" ]
         fastapi_version: [ "<0.112.4", ">=0.112.4" ]
 
@@ -71,8 +71,7 @@ jobs:
         run: |
           poetry run pip install -U "pydantic<2" || true
 
-      - name: Unit tests pydantic v2
-        if: ${{ matrix.pydantic_v2 == 'true' }}
+      - name: Unit tests pydantic
         run: |
           poetry run pytest tests --ignore=tests/ext --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
