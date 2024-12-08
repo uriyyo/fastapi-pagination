@@ -78,5 +78,6 @@ def app(db, meta, User, query, model_cls):
     return add_pagination(app)
 
 
+@mark.ormar
 class TestOrmar(BasePaginationTestCase):
     pass

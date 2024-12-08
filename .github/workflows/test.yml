@@ -62,37 +62,32 @@ jobs:
         run: |
           poetry install -E all --sync
 
-      - name: Install pydantic v2
-        if: ${{ matrix.pydantic_v2 == 'true' }}
+      - name: Install pydantic v1
+        if: ${{ matrix.pydantic_v2 == 'false' }}
         run: |
-          poetry run pip install -U --pre fastapi pydantic
+          poetry run pip install --no-deps -U "pydantic<2"
 
       - name: Install FastAPI
         run : |
-          poetry run pip install -U "fastapi${{ matrix.fastapi_version }}"
+          poetry run pip install --no-deps -U "fastapi${{ matrix.fastapi_version }}"
 
       - name: Unit tests pydantic v2
         if: ${{ matrix.pydantic_v2 == 'true' }}
         run: |
-          poetry run pytest tests  --ignore=tests/ext --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
+          poetry run pytest tests --ignore=tests/ext --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
-      - name: Unit tests
+      - name: Unit tests SQLAlchemy<2.0
         if: ${{ matrix.pydantic_v2 == 'false' }}
         run: |
-          poetry run pytest tests -m "not gino" --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
+          poetry run pip install --no-deps -U "sqlalchemy<2"
+          poetry run pytest tests -m "not sqlalchemy20" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
-      - name: Unit tests SQLAlchemy 2.0
-        if: ${{ matrix.pydantic_v2 == 'false' }}
-        run: |
-          poetry run pip install -U "sqlalchemy>2.0.0"
-          poetry run pytest tests -m "sqlalchemy20" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
-
-      # TODO: remove it when ormar will support pydantic v2
-      - name: Unit tests Odmantic
+      # TODO: remove it when ormar will support sqlalchemy 2.0
+      - name: Unit tests ormar
         if: ${{ matrix.pydantic_v2 == 'true' }}
         run: |
-          poetry run pip install -U odmantic "pydantic<2.7"
-          poetry run pytest tests -m "odmantic" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
+          poetry run pip install --no-deps -U ormar
+          poetry run pytest tests -m "ormar" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
