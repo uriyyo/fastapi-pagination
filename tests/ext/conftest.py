@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Any, List, Union
+from typing import Any, Iterable, List, Union
 
-from pytest import File, Item, fixture, mark
+from _pytest import nodes
+from pytest import File, Item, Module, fixture, mark
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, relationship, sessionmaker
@@ -111,33 +112,29 @@ class _SkipExtItem(Item):
         pass
 
 
-class _SkipExtFile(File):
+class DummyModule(Module):
     def collect(self):
-        item = _SkipExtItem.from_parent(
-            self,
-            name=self.name,
-            path=self.path,
-            nodeid=self.path.name,
-        )
-        item.add_marker(mark.skip(reason=f"tests for {self.name} require additional dependencies"))
+        # return skipped item here
+        return []
 
-        yield item
+    def _getobj(self):
+        return __import__("tests.ext.test_dummy")
 
 
 ROOT = Path(__file__).parent
+DUMMY = ROOT / "test_dummy.py"
 
 
-# skip ext tests if it raises ImportError
-def pytest_collect_file(file_path: Path, parent):
-    p = file_path.relative_to(ROOT)
-    module = ".".join(p.parts).removesuffix(".py")
+def pytest_pycollect_makemodule(module_path, path, parent):
+    if not module_path.name.startswith("test_"):
+        return None
+
+    p = module_path.relative_to(ROOT)
+    module = ".".join(p.parts)
+    if module.endswith(".py"):
+        module = module[:-3]
 
     try:
         __import__(f"tests.ext.{module}")
-    except ImportError:
-        return _SkipExtFile.from_parent(
-            parent,
-            name=module,
-            path=file_path,
-            nodeid=module,
-        )
+    except (ImportError, ModuleNotFoundError):
+        return DummyModule.from_parent(parent, name=module, path=path, nodeid=module)
