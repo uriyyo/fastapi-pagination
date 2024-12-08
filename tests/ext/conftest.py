@@ -1,6 +1,8 @@
-from typing import List, Union
+from pathlib import Path
+from typing import Any, Iterable, List, Union
 
-from pytest import fixture
+from _pytest import nodes
+from pytest import File, Item, Module, fixture, mark
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, relationship, sessionmaker
@@ -100,3 +102,39 @@ def sm_order():
         name: str
 
     return Order
+
+
+class _SkipExtItem(Item):
+    def setup(self) -> None:
+        pass
+
+    def runtest(self) -> Any:
+        pass
+
+
+class DummyModule(Module):
+    def collect(self):
+        # return skipped item here
+        return []
+
+    def _getobj(self):
+        return __import__("tests.ext.test_dummy")
+
+
+ROOT = Path(__file__).parent
+DUMMY = ROOT / "test_dummy.py"
+
+
+def pytest_pycollect_makemodule(module_path, path, parent):
+    if not module_path.name.startswith("test_"):
+        return None
+
+    p = module_path.relative_to(ROOT)
+    module = ".".join(p.parts)
+    if module.endswith(".py"):
+        module = module[:-3]
+
+    try:
+        __import__(f"tests.ext.{module}")
+    except (ImportError, ModuleNotFoundError):
+        return DummyModule.from_parent(parent, name=module, path=path, nodeid=module)

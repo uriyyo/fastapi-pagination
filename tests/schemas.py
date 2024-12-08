@@ -2,38 +2,39 @@ from typing import List
 
 from pydantic import BaseModel
 
+from fastapi_pagination.utils import IS_PYDANTIC_V2
 
-class OrderOut(BaseModel):
+
+class BaseSchema(BaseModel):
+    if IS_PYDANTIC_V2:
+        model_config = {
+            "from_attributes": True,
+        }
+    else:
+
+        class Config:
+            orm_mode = True
+
+
+class OrderOut(BaseSchema):
     id: int
     name: str
 
-    class Config:
-        orm_mode = True
 
-
-class UserOut(BaseModel):
+class UserOut(BaseSchema):
     id: int
     name: str
 
-    class Config:
-        orm_mode = True
 
-
-class UserWithoutIDOut(BaseModel):
+class UserWithoutIDOut(BaseSchema):
     name: str
 
-    class Config:
-        orm_mode = True
 
-
-class UserWithOrderOut(BaseModel):
+class UserWithOrderOut(BaseSchema):
     id: int
     name: str
 
     orders: List[OrderOut]
-
-    class Config:
-        orm_mode = True
 
 
 __all__ = [

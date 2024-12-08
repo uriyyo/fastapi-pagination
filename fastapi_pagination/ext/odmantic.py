@@ -106,7 +106,7 @@ async def paginate(
 
 
 @overload
-def paginate(  # type: ignore
+def paginate(
     engine: SyncEngine,
     model: Type[Model],
     *queries: _Query,
@@ -136,11 +136,11 @@ def paginate(
     func = async_paginate if isinstance(engine, AIOEngine) else sync_paginate
 
     return func(
-        engine,
+        engine,  # type: ignore[arg-type]
         model,
         *queries,
         sort=sort,
-        session=session,
+        session=session,  # type: ignore[arg-type]
         params=params,
         transformer=transformer,  # type: ignore[arg-type]
         additional_data=additional_data,

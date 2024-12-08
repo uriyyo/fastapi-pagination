@@ -1,35 +1,16 @@
 from typing import Awaitable
 
 from fastapi import FastAPI
+from motor import MotorClient
+from motor.motor_asyncio import AsyncIOMotorClient
+from odmantic import AIOEngine, Model, SyncEngine
 from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
+from fastapi_pagination.ext.odmantic import paginate
 
 from ..base import BasePaginationTestCase
 from .utils import mongodb_test
-
-try:
-    from motor import MotorClient
-    from motor.motor_asyncio import AsyncIOMotorClient
-    from odmantic import AIOEngine, Model, SyncEngine
-
-    from fastapi_pagination.ext.odmantic import paginate
-
-    has_odmantic = True
-except ImportError:
-    Model = None
-    AIOEngine = None
-    SyncEngine = None
-    paginate = None
-    MotorClient = None
-    AsyncIOMotorClient = None
-
-    has_odmantic = False
-
-pytestmark = mark.skipif(
-    not has_odmantic,
-    reason="Odmantic is not installed",
-)
 
 
 @fixture(scope="session")

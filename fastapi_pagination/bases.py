@@ -38,11 +38,11 @@ from .utils import IS_PYDANTIC_V2, get_caller
 if IS_PYDANTIC_V2:
     from pydantic import BaseModel as GenericModel
 else:
-    from pydantic.generics import GenericModel
+    from pydantic.generics import GenericModel  # type: ignore[no-redef]
 
 
 try:
-    from pydantic import PydanticUndefinedAnnotation  # type: ignore[attr-defined]
+    from pydantic import PydanticUndefinedAnnotation
 except ImportError:
 
     class PydanticUndefinedAnnotation(Exception):  # type: ignore[no-redef]

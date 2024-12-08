@@ -189,9 +189,9 @@ class UseParams(PageCustomizer):
 
 def _get_model_fields(cls: Type[BaseModel]) -> ClsNamespace:
     if IS_PYDANTIC_V2:
-        return cls.model_fields  # type: ignore
+        return {**cls.model_fields}
 
-    return cls.__fields__
+    return {**cls.__fields__}  # type: ignore[dict-item]
 
 
 if IS_PYDANTIC_V2:
@@ -210,7 +210,7 @@ if IS_PYDANTIC_V2:
         return field
 
 else:
-    from pydantic.fields import ModelField as _PydanticField  # type: ignore[assignment]
+    from pydantic.fields import ModelField as _PydanticField  # type: ignore
 
     def _make_field_optional(field: Any) -> Any:
         assert isinstance(field, _PydanticField)
@@ -321,7 +321,7 @@ class UseFieldsAliases(PageCustomizer):
             fields_config = _pydantic_v1_get_inited_fields(ns["Config"], *self.aliases)
 
             for name, alias in self.aliases.items():
-                assert name in page_cls.__fields__, f"Unknown field {name!r}"
+                assert name in page_cls.__fields__, f"Unknown field {name!r}"  # type: ignore[operator]
                 fields_config[name]["alias"] = alias
 
 

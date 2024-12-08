@@ -1,21 +1,11 @@
 from typing import List
 
 from fastapi import FastAPI
-from pytest import fixture, mark
+from pytest import fixture
 from tortoise import Model
 from tortoise.backends.base.executor import EXECUTOR_CACHE
 from tortoise.contrib.fastapi import register_tortoise
-
-try:
-    from tortoise.contrib.pydantic import PydanticModel
-
-    tortoise_v20 = True
-except ImportError:
-    from pydantic import BaseModel as PydanticModel
-
-    tortoise_v20 = False
-
-
+from tortoise.contrib.pydantic import PydanticModel
 from tortoise.fields import (
     ForeignKeyField,
     IntField,
@@ -28,11 +18,6 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.tortoise import paginate
 
 from ..base import BasePaginationTestCase
-
-pytestmark = mark.skipif(
-    not tortoise_v20,
-    reason="Tortoise ORM v0.20+ required",
-)
 
 
 class Order(Model):

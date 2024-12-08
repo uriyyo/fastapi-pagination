@@ -2,21 +2,17 @@ from typing import Iterator, List
 
 from _pytest.python_api import raises
 from fastapi import Depends, FastAPI, status
-from pydantic import parse_obj_as
 from pytest import fixture, mark
 from sqlalchemy import select
 from sqlalchemy.orm.session import Session
 
 from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage
+from fastapi_pagination.ext.sqlalchemy_future import paginate
 
 from ..schemas import UserOut
+from ..utils import parse_obj_as
 from .utils import sqlalchemy20
-
-try:
-    from fastapi_pagination.ext.sqlalchemy_future import paginate
-except ImportError:
-    paginate = None
 
 
 @fixture(scope="session")
