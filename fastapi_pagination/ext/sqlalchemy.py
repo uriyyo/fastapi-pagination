@@ -78,6 +78,7 @@ UnwrapMode: TypeAlias = Literal[
 ]
 
 Selectable: TypeAlias = Union[Select, TextClause, FromStatement, CompoundSelect]
+SelectableOrQuery: TypeAlias = "Union[Selectable, Query[Any]]"
 
 
 @no_type_check
@@ -309,10 +310,10 @@ def paginate(
 @overload
 def paginate(
     conn: SyncConn,
-    query: Selectable,
+    query: SelectableOrQuery,
     params: Optional[AbstractParams] = None,
     *,
-    count_query: Optional[Selectable] = None,
+    count_query: Optional[SelectableOrQuery] = None,
     subquery_count: bool = True,
     unwrap_mode: Optional[UnwrapMode] = None,
     transformer: Optional[SyncItemsTransformer] = None,
@@ -445,4 +446,7 @@ def _new_paginate_sign(
     bool,
     Optional[UnwrapMode],
 ]:
+    with suppress(AttributeError):
+        query = query._statement_20()  # type: ignore[attr-defined]
+
     return query, count_query, conn, params, transformer, additional_data, unique, subquery_count, unwrap_mode
