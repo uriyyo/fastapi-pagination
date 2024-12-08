@@ -23,7 +23,7 @@ if IS_PYDANTIC_V2:
     def dump_obj(model: Type[T], obj: Any) -> dict:
         return model.model_dump(obj, by_alias=True)
 else:
-    from pydantic import _parse_obj_as
+    from pydantic import parse_obj_as as _parse_obj_as
 
     def parse_obj_as(tp: Any, obj: Any) -> Any:
         return _parse_obj_as(tp, obj)
