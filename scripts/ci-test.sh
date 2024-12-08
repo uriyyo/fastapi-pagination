@@ -3,7 +3,7 @@
 set -ex
 
 function _pip() {
-    poetry run pip "$@" || true
+    poetry run pip "$@" || true > /dev/null
 }
 
 function _pytest() {
