@@ -3,8 +3,8 @@
 set -ex
 
 CQL_TEST_HOST="${CQL_TEST_HOST:-localhost}"
-FASTAPI_PRE_0_112_4="${FASTAPI_PRE_0_112_4:-false}"
 PYDANTIC_V2="${PYDANTIC_V2:-true}"
+FASTAPI_PRE_0_112_4="${FASTAPI_PRE_0_112_4:-false}"
 
 function _pip() {
     poetry run pip "$@" || true > /dev/null
@@ -15,7 +15,6 @@ function _pytest() {
       --cov=fastapi_pagination          \
       --cov-append                      \
       --cov-report=xml                  \
-      --cov-report=term-missing         \
       --cassandra-dsn="${CQL_TEST_HOST}"
 }
 
@@ -40,7 +39,7 @@ echo "Running unit-tests"
 _pytest tests --ignore=tests/ext
 
 echo "Running integration tests"
-_pytest tests/ext
+_pytest tests/ext -m "not orm"
 
 echo "Running tests with SQLAlchemy<2"
 _pip install -U "sqlalchemy<2"
@@ -55,3 +54,7 @@ fi
 echo "Running tests GINO tests"
 _pip install -U "gino[starlette]"
 _pytest tests -m gino
+
+echo "Running orm tests"
+_pip install -U "databases<0.9.0" orm
+_pytest tests -m orm

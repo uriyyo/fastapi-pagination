@@ -1,13 +1,12 @@
 from databases import Database
 from fastapi import FastAPI
 from orm import Integer, Model, ModelRegistry, String
-from pytest import fixture
+from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.orm import paginate
 
 from ..base import BasePaginationTestCase
-from .utils import sqlalchemy20
 
 
 @fixture(scope="session")
@@ -45,6 +44,6 @@ def app(db, user, model_cls):
     return add_pagination(app)
 
 
-@sqlalchemy20
+@mark.orm
 class TestORM(BasePaginationTestCase):
     pass

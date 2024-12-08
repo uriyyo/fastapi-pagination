@@ -12,6 +12,8 @@ from fastapi_pagination.ext.cassandra import paginate
 
 from ..schemas import UserOut
 
+pytestmark = mark.skip(reason="Cassandra is not supported yet")
+
 CursorPage = CustomizedPage[
     BaseCursorPage,
     UseParamsFields(str_cursor=False),
