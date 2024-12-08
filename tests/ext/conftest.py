@@ -1,6 +1,7 @@
-from typing import List, Union
+from pathlib import Path
+from typing import Any, List, Union
 
-from pytest import fixture
+from pytest import File, Item, fixture, mark
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, relationship, sessionmaker
@@ -100,3 +101,43 @@ def sm_order():
         name: str
 
     return Order
+
+
+class _SkipExtItem(Item):
+    def setup(self) -> None:
+        pass
+
+    def runtest(self) -> Any:
+        pass
+
+
+class _SkipExtFile(File):
+    def collect(self):
+        item = _SkipExtItem.from_parent(
+            self,
+            name=self.name,
+            path=self.path,
+            nodeid=self.path.name,
+        )
+        item.add_marker(mark.skip(reason=f"tests for {self.name} require additional dependencies"))
+
+        yield item
+
+
+ROOT = Path(__file__).parent
+
+
+# skip ext tests if it raises ImportError
+def pytest_collect_file(file_path: Path, parent):
+    p = file_path.relative_to(ROOT)
+    module = ".".join(p.parts).removesuffix(".py")
+
+    try:
+        __import__(f"tests.ext.{module}")
+    except ImportError:
+        return _SkipExtFile.from_parent(
+            parent,
+            name=module,
+            path=file_path,
+            nodeid=module,
+        )

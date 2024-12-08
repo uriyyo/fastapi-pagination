@@ -80,7 +80,7 @@ jobs:
         if: ${{ matrix.pydantic_v2 == 'false' }}
         run: |
           poetry run pip install --no-deps -U "sqlalchemy<2"
-          poetry run pytest tests -m "not sqlalchemy20" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
+          poetry run pytest tests --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
       # TODO: remove it when ormar will support sqlalchemy 2.0
       - name: Unit tests ormar

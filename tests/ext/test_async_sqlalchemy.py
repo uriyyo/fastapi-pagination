@@ -3,20 +3,14 @@ from typing import AsyncIterator
 from fastapi import Depends, FastAPI
 from pytest import fixture
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
+from fastapi_pagination.ext.async_sqlalchemy import paginate
 
 from ..base import BasePaginationTestCase
 from .utils import sqlalchemy20
-
-try:
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from fastapi_pagination.ext.async_sqlalchemy import paginate
-except ImportError:
-    AsyncSession = None
-    paginate = None
 
 
 @fixture(scope="session")

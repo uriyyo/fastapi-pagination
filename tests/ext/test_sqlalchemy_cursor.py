@@ -9,14 +9,10 @@ from sqlalchemy.orm.session import Session
 
 from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage
+from fastapi_pagination.ext.sqlalchemy_future import paginate
 
 from ..schemas import UserOut
 from .utils import sqlalchemy20
-
-try:
-    from fastapi_pagination.ext.sqlalchemy_future import paginate
-except ImportError:
-    paginate = None
 
 
 @fixture(scope="session")

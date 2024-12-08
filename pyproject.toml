@@ -35,7 +35,7 @@ tortoise-orm = { version = ">=0.22.0", optional = true }
 asyncpg = { version = ">=0.24.0", optional = true }
 django = { version = "<5.0.0", optional = true}
 piccolo = { version = ">=0.89,<0.122", optional = true}
-motor =  { version = ">=2.5.1,<4.0.0", optional = true }
+motor =  { version = ">=3.6.0,<4.0.0", optional = true }
 mongoengine = {version = ">=0.23.1,<0.30.0", optional = true}
 sqlmodel = { version = ">=0.0.22", optional = true}
 pony = { version = "^0.7.16", optional = true}
@@ -88,7 +88,7 @@ all = [
     "databases",
     "orm",
 #    "ormar",
-    "odmatic",
+    "odmantic",
     "tortoise-orm",
     "asyncpg",
     "django",
