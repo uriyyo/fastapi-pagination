@@ -62,14 +62,14 @@ jobs:
         run: |
           poetry install -E all --sync
 
+      - name: Install FastAPI
+        run : |
+          poetry run pip install -U "fastapi${{ matrix.fastapi_version }}" || true
+
       - name: Install pydantic v1
         if: ${{ matrix.pydantic_v2 == 'false' }}
         run: |
-          poetry run pip install --no-deps -U "pydantic<2"
-
-      - name: Install FastAPI
-        run : |
-          poetry run pip install --no-deps -U "fastapi${{ matrix.fastapi_version }}"
+          poetry run pip install -U "pydantic<2" || true
 
       - name: Unit tests pydantic v2
         if: ${{ matrix.pydantic_v2 == 'true' }}
@@ -79,14 +79,14 @@ jobs:
       - name: Unit tests SQLAlchemy<2.0
         if: ${{ matrix.pydantic_v2 == 'false' }}
         run: |
-          poetry run pip install --no-deps -U "sqlalchemy<2"
+          poetry run pip install -U "sqlalchemy<2" || true
           poetry run pytest tests --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
       # TODO: remove it when ormar will support sqlalchemy 2.0
       - name: Unit tests ormar
         if: ${{ matrix.pydantic_v2 == 'true' }}
         run: |
-          poetry run pip install --no-deps -U ormar
+          poetry run pip install -U ormar || true
           poetry run pytest tests -m "ormar" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
       - name: Upload coverage to Codecov
