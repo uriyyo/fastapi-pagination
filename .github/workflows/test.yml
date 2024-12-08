@@ -88,6 +88,11 @@ jobs:
           poetry run pip install -U ormar || true
           poetry run pytest tests -m "ormar" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
 
+      - name: Test gino
+        run: |
+          poetry run pip install -U "gino[starlette]" || true
+          poetry run pytest tests -m "gino" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:

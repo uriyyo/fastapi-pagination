@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from gino_starlette import Gino
-from pytest import fixture
+from pytest import fixture, mark
 from sqlalchemy import Column, Integer, String
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -56,5 +56,6 @@ def app(db, User, query, model_cls):
     return add_pagination(app)
 
 
+@mark.gino
 class TestGino(BasePaginationTestCase):
     pass
