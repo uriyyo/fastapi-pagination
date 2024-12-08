@@ -1,8 +1,9 @@
 import databases
 import sqlalchemy
 from fastapi import FastAPI
-from ormar import Integer, Model, String
+from ormar import Integer, Model, OrmarConfig, String
 from pytest import fixture, mark
+from sqlalchemy.engine.create import create_engine
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.ormar import paginate
@@ -21,15 +22,21 @@ def meta(database_url):
 
 
 @fixture(scope="session")
-def User(meta, db):
-    class User(Model):
-        ormar_config = {
-            "metadata": meta,
-            "database": db,
-        }
+def engine(database_url):
+    return create_engine(database_url)
 
-        id = Integer(primary_key=True)
-        name = String(max_length=100)
+
+@fixture(scope="session")
+def User(meta, db, engine):
+    class User(Model):
+        ormar_config = OrmarConfig(
+            metadata=meta,
+            database=db,
+            engine=engine,
+        )
+
+        id: int = Integer(primary_key=True)
+        name: str = String(max_length=100)
 
     return User
 
