@@ -2,6 +2,10 @@
 
 set -ex
 
+CQL_TEST_HOST="${CQL_TEST_HOST:-localhost}"
+FASTAPI_PRE_0_112_4="${FASTAPI_PRE_0_112_4:-false}"
+PYDANTIC_V2="${PYDANTIC_V2:-true}"
+
 function _pip() {
     poetry run pip "$@" || true > /dev/null
 }

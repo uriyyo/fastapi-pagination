@@ -78,13 +78,15 @@ UnwrapMode: TypeAlias = Literal[
 ]
 
 TupleAny: TypeAlias = "Tuple[Any, ...]"
-Selectable: TypeAlias = "Union[Select[TupleAny], TextClause, FromStatement[TupleAny], CompoundSelect]"
+Selectable: TypeAlias = Union[Select[TupleAny], TextClause, FromStatement[TupleAny], CompoundSelect]
 SelectableOrQuery: TypeAlias = "Union[Selectable, Query[Any]]"
+
+_selectable_classes = (Select, TextClause, FromStatement, CompoundSelect)
 
 
 @no_type_check
 def _should_unwrap_scalars(query: Selectable) -> bool:
-    if not isinstance(query, get_args(Selectable)):
+    if not isinstance(query, _selectable_classes):
         return False
 
     if isinstance(query, CompoundSelect):
