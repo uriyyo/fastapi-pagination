@@ -39,7 +39,7 @@ echo "Running unit-tests"
 _pytest tests --ignore=tests/ext
 
 echo "Running integration tests"
-_pytest tests/ext -m "not orm"
+_pytest tests/ext
 
 echo "Running tests with SQLAlchemy<2"
 _pip install -U "sqlalchemy<2"
@@ -51,10 +51,10 @@ if [[ "$PYDANTIC_V2" == true ]]; then
     _pytest tests -m ormar
 fi
 
+echo "Running orm tests"
+_pip install "databases<0.9.0" orm
+_pytest tests -m orm
+
 echo "Running tests GINO tests"
 _pip install -U "gino[starlette]"
 _pytest tests -m gino
-
-echo "Running orm tests"
-_pip install -U "databases<0.9.0" orm
-_pytest tests -m orm
