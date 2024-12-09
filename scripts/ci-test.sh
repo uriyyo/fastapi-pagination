@@ -38,6 +38,11 @@ fi
 echo "Running unit-tests"
 _pytest tests --ignore=tests/ext
 
+# install greenlet for python 3.13 separately
+if [[ "$PY_VERSION" == "3.13" ]]; then
+  _pip install greenlet
+fi
+
 echo "Running integration tests"
 _pytest tests/ext
 

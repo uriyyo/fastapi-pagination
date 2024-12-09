@@ -63,6 +63,7 @@ jobs:
         shell: bash
         env:
           CQL_TEST_HOST: ${{ env.CQL_TEST_HOST }}
+          PY_VERSION: ${{ matrix.python-version }}
           PYDANTIC_V2: ${{ matrix.pydantic_v2 }}
           FASTAPI_PRE_0_112_4: ${{ matrix.fastapi_pre_0_112_4 }}
         run: |
