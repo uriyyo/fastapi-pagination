@@ -39,6 +39,11 @@ jobs:
             ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-py${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}-v1
 
+      - name: Cache Docker images
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-${{ runner.os }}-ci
+
       - name: Prepare DBs
         shell: bash
         run: |
