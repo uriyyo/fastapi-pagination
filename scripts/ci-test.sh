@@ -55,7 +55,7 @@ fi
 echo "Running tests GINO tests"
 _pip install -U "gino[starlette]"
 _pytest tests -m gino
-_pip uninstall -y gino
+_pip uninstall -y gino gino-starlette
 
 echo "Running orm tests"
 _pip install "databases<0.9.0" orm
