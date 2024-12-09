@@ -8,13 +8,9 @@ from pytest import fixture, mark
 from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage as BaseCursorPage
 from fastapi_pagination.customization import CustomizedPage, UseParamsFields
+from fastapi_pagination.ext.cassandra import paginate
 
 from ..schemas import UserOut
-
-try:
-    from fastapi_pagination.ext.cassandra import paginate
-except ImportError:
-    paginate = None
 
 CursorPage = CustomizedPage[
     BaseCursorPage,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
+from copy import copy
 from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Type, TypeVar, Union
 
 from beanie import Document
@@ -58,8 +59,12 @@ async def paginate(
         except IndexError:
             total = 0
     else:
+        # avoid original query mutation
+        count_query = copy(query)
+        query = copy(query)
+
         if raw_params.include_total:
-            total = await query.find(
+            total = await count_query.find(
                 {},
                 session=session,
                 ignore_cache=ignore_cache,

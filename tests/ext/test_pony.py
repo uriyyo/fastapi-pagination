@@ -3,11 +3,11 @@ from contextlib import suppress
 
 from fastapi import FastAPI
 from pony.orm import Database, Required, Set, db_session, select
-from pydantic import validator
 from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.pony import paginate
+from fastapi_pagination.utils import IS_PYDANTIC_V2
 
 from ..base import BasePaginationTestCase
 
@@ -46,6 +46,16 @@ def pony_order(pony_db, pony_user):
     return Order
 
 
+if IS_PYDANTIC_V2:
+    from pydantic import field_validator
+
+    _field_validator = field_validator("orders", mode="before")
+else:
+    from pydantic import validator
+
+    _field_validator = validator("orders", pre=True, allow_reuse=True)
+
+
 @fixture(scope="session")
 def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
     app = FastAPI()
@@ -54,7 +64,7 @@ def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
         pony_db.generate_mapping(create_tables=False)
 
     class model_pony_with_rel_cls(model_with_rel_cls):
-        @validator("orders", pre=True, allow_reuse=True)
+        @_field_validator
         def pony_set_to_list(cls, values):
             if not isinstance(values, list):
                 return sorted([v.to_dict() for v in values], key=lambda x: x["id"])

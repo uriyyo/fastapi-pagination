@@ -1,31 +1,14 @@
 import databases
 import sqlalchemy
 from fastapi import FastAPI
+from ormar import Integer, Model, OrmarConfig, String
 from pytest import fixture, mark
+from sqlalchemy.engine.create import create_engine
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
+from fastapi_pagination.ext.ormar import paginate
 
 from ..base import BasePaginationTestCase
-
-try:
-    from ormar import Integer, Model, ModelMeta, String
-
-    from fastapi_pagination.ext.ormar import paginate
-
-    has_ormar = True
-except ImportError:
-    Integer = None
-    Model = None
-    ModelMeta = None
-    String = None
-
-    has_ormar = False
-
-
-pytestmark = mark.skipif(
-    not has_ormar,
-    reason="Ormar is not installed",
-)
 
 
 @fixture(scope="session")
@@ -39,14 +22,21 @@ def meta(database_url):
 
 
 @fixture(scope="session")
-def User(meta, db):
-    class User(Model):
-        class Meta(ModelMeta):
-            database = db
-            metadata = meta
+def engine(database_url):
+    return create_engine(database_url)
 
-        id = Integer(primary_key=True)
-        name = String(max_length=100)
+
+@fixture(scope="session")
+def User(meta, db, engine):
+    class User(Model):
+        ormar_config = OrmarConfig(
+            metadata=meta,
+            database=db,
+            engine=engine,
+        )
+
+        id: int = Integer(primary_key=True)
+        name: str = String(max_length=100)
 
     return User
 
@@ -78,5 +68,6 @@ def app(db, meta, User, query, model_cls):
     return add_pagination(app)
 
 
+@mark.ormar
 class TestOrmar(BasePaginationTestCase):
     pass

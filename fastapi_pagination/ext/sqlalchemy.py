@@ -67,8 +67,8 @@ except ImportError:  # pragma: no cover
     paging = None  # type: ignore[assignment]
 
 
-AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection, async_scoped_session]"
-SyncConn: TypeAlias = "Union[Session, Connection, scoped_session]"
+AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection, async_scoped_session[Any]]"
+SyncConn: TypeAlias = "Union[Session, Connection, scoped_session[Any]]"
 
 UnwrapMode: TypeAlias = Literal[
     "auto",  # default, unwrap only if select is select(model)
@@ -77,13 +77,16 @@ UnwrapMode: TypeAlias = Literal[
     "unwrap",  # always unwrap
 ]
 
-Selectable: TypeAlias = Union[Select, TextClause, FromStatement, CompoundSelect]
+TupleAny: TypeAlias = "Tuple[Any, ...]"
+Selectable: TypeAlias = "Union[Select[TupleAny], TextClause, FromStatement[TupleAny], CompoundSelect]"
 SelectableOrQuery: TypeAlias = "Union[Selectable, Query[Any]]"
+
+_selectable_classes = (Select, TextClause, FromStatement, CompoundSelect)
 
 
 @no_type_check
 def _should_unwrap_scalars(query: Selectable) -> bool:
-    if not isinstance(query, get_args(Selectable)):
+    if not isinstance(query, _selectable_classes):
         return False
 
     if isinstance(query, CompoundSelect):
@@ -134,13 +137,13 @@ def create_count_query_from_text(query: str) -> str:
     "please use fastapi_pagination.ext.sqlalchemy.create_paginate_query function instead"
     "This function will be removed in the next major release (0.13.0).",
 )
-def paginate_query(query: Select, params: AbstractParams) -> Select:
+def paginate_query(query: Select[TupleAny], params: AbstractParams) -> Select[TupleAny]:
     return create_paginate_query(query, params)  # type: ignore[return-value]
 
 
-def _paginate_from_statement(query: FromStatement, params: AbstractParams) -> FromStatement:
-    query = query._generate()  # type: ignore[attr-defined]
-    query.element = create_paginate_query(query.element, params)
+def _paginate_from_statement(query: FromStatement[TupleAny], params: AbstractParams) -> FromStatement[TupleAny]:
+    query = query._generate()
+    query.element = create_paginate_query(query.element, params)  # type: ignore[arg-type]
     return query
 
 
@@ -157,14 +160,14 @@ def create_count_query(query: Selectable, *, use_subquery: bool = True) -> Selec
     if isinstance(query, TextClause):
         return text(create_count_query_from_text(query.text))
     if isinstance(query, FromStatement):
-        return create_count_query(query.element)
+        return create_count_query(query.element)  # type: ignore[arg-type]
 
     query = query.order_by(None).options(noload("*"))
 
     if use_subquery:
         return select(func.count()).select_from(query.subquery())
 
-    return query.with_only_columns(  # type: ignore[call-arg,union-attr] # noqa: PIE804
+    return query.with_only_columns(  # type: ignore[union-attr]
         func.count(),
         maintain_column_froms=True,
     )
@@ -245,7 +248,7 @@ def exec_pagination(
         if not getattr(query, "_order_by_clauses", True):
             raise ValueError("Cursor pagination requires ordering")
 
-        page = paging.select_page(  # type: ignore
+        page = paging.select_page(
             conn,  # type: ignore[arg-type]
             selectable=query,  # type: ignore[arg-type]
             per_page=raw_params.size,
@@ -396,7 +399,7 @@ def _old_paginate_sign(
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
 ) -> Tuple[
-    Select,
+    Select[TupleAny],
     Optional[Selectable],
     SyncConn,
     Optional[AbstractParams],
@@ -419,14 +422,14 @@ def _old_paginate_sign(
     session = query.session
 
     with suppress(AttributeError):
-        query = query._statement_20()  # type: ignore[attr-defined]
+        query = query._statement_20()  # type: ignore[assignment]
 
     return query, None, session, params, transformer, additional_data, unique, subquery_count, unwrap_mode  # type: ignore
 
 
 def _new_paginate_sign(
     conn: SyncConn,
-    query: Select,
+    query: Select[TupleAny],
     params: Optional[AbstractParams] = None,
     *,
     subquery_count: bool = True,
@@ -436,7 +439,7 @@ def _new_paginate_sign(
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
 ) -> Tuple[
-    Select,
+    Select[TupleAny],
     Optional[Selectable],
     SyncConn,
     Optional[AbstractParams],

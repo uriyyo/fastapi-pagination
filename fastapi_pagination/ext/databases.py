@@ -2,7 +2,7 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Tuple
 
 from databases import Database
 from sqlalchemy.sql import Select
@@ -16,7 +16,7 @@ from .sqlalchemy import create_count_query, create_paginate_query
 
 async def paginate(
     db: Database,
-    query: Select,
+    query: Select[Tuple[Any, ...]],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,

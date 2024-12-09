@@ -1,12 +1,11 @@
 from fastapi import FastAPI
+from gino_starlette import Gino
 from pytest import fixture, mark
 from sqlalchemy import Column, Integer, String
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 
 from ..base import BasePaginationTestCase
-
-pytestmark = mark.gino
 
 
 @fixture(scope="session")
@@ -16,8 +15,6 @@ def db_type():
 
 @fixture(scope="session")
 def db(database_url):
-    from gino_starlette import Gino
-
     return Gino(dsn=database_url)
 
 
@@ -59,5 +56,6 @@ def app(db, User, query, model_cls):
     return add_pagination(app)
 
 
+@mark.gino
 class TestGino(BasePaginationTestCase):
     pass

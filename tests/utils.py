@@ -12,6 +12,10 @@ faker = Faker()
 T = TypeVar("T", bound=BaseModel)
 
 if IS_PYDANTIC_V2:
+    from pydantic import TypeAdapter
+
+    def parse_obj_as(tp: Any, obj: Any) -> Any:
+        return TypeAdapter(tp).validate_python(obj, from_attributes=True)
 
     def parse_obj(model: Type[T], obj: Any) -> T:
         return model.model_validate(obj, from_attributes=True)
@@ -19,6 +23,10 @@ if IS_PYDANTIC_V2:
     def dump_obj(model: Type[T], obj: Any) -> dict:
         return model.model_dump(obj, by_alias=True)
 else:
+    from pydantic import parse_obj_as as _parse_obj_as
+
+    def parse_obj_as(tp: Any, obj: Any) -> Any:
+        return _parse_obj_as(tp, obj)
 
     def parse_obj(model: Type[T], obj: Any) -> T:
         return model.parse_obj(obj)
@@ -42,4 +50,5 @@ __all__ = [
     "faker",
     "normalize",
     "parse_obj",
+    "parse_obj_as",
 ]

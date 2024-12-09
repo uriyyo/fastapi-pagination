@@ -12,12 +12,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    name: "py${{ matrix.python-version }}; pydantic-${{ matrix.pydantic_v2 == 'true' && 'v2' || 'v1' }}; fastapi${{ matrix.fastapi_pre_0_112_4 == 'true' && '<0.12.4' || '>=0.12.4' }}"
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.8", "3.9", "3.10", "3.11" ]  # , "3.12" ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
         pydantic_v2: [ "true", "false" ]
-        fastapi_version: [ "<0.112.4", ">=0.112.4" ]
+        fastapi_pre_0_112_4: [ "true", "false" ]
 
     steps:
       - uses: actions/checkout@v4
@@ -58,41 +59,15 @@ jobs:
             ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-py${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}-v1
 
-      - name: Install dependencies
+      - name: Run tests
+        shell: bash
+        env:
+          CQL_TEST_HOST: ${{ env.CQL_TEST_HOST }}
+          PY_VERSION: ${{ matrix.python-version }}
+          PYDANTIC_V2: ${{ matrix.pydantic_v2 }}
+          FASTAPI_PRE_0_112_4: ${{ matrix.fastapi_pre_0_112_4 }}
         run: |
-          poetry install -E all --sync
-
-      - name: Install pydantic v2
-        if: ${{ matrix.pydantic_v2 == 'true' }}
-        run: |
-          poetry run pip install -U --pre fastapi pydantic
-
-      - name: Install FastAPI
-        run : |
-          poetry run pip install -U "fastapi${{ matrix.fastapi_version }}"
-
-      - name: Unit tests pydantic v2
-        if: ${{ matrix.pydantic_v2 == 'true' }}
-        run: |
-          poetry run pytest tests  --ignore=tests/ext --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
-
-      - name: Unit tests
-        if: ${{ matrix.pydantic_v2 == 'false' }}
-        run: |
-          poetry run pytest tests -m "not gino" --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
-
-      - name: Unit tests SQLAlchemy 2.0
-        if: ${{ matrix.pydantic_v2 == 'false' }}
-        run: |
-          poetry run pip install -U "sqlalchemy>2.0.0"
-          poetry run pytest tests -m "sqlalchemy20" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
-
-      # TODO: remove it when ormar will support pydantic v2
-      - name: Unit tests Odmantic
-        if: ${{ matrix.pydantic_v2 == 'true' }}
-        run: |
-          poetry run pip install -U odmantic "pydantic<2.7"
-          poetry run pytest tests -m "odmantic" --cov-append --cov-report=xml --cassandra-dsn=${CQL_TEST_HOST}
+          bash scripts/ci-test.sh
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
