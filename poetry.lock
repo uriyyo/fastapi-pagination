@@ -209,20 +209,20 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "beanie"
-version = "1.27.0"
+version = "1.28.0"
 description = "Asynchronous Python ODM for MongoDB"
 optional = true
-python-versions = "<4.0,>=3.7"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "beanie-1.27.0-py3-none-any.whl", hash = "sha256:2cc6762bdd59b9040dd004ecbc7d4fd5ddd22e52743915e38d1f0f92f276bcaf"},
-    {file = "beanie-1.27.0.tar.gz", hash = "sha256:a5eee40f1e52214afeb8558c0823d7504856884770c3d56fc3cd5765efb87314"},
+    {file = "beanie-1.28.0-py3-none-any.whl", hash = "sha256:6dfc4caae2f5ea647d050a9259e222c55cfa6894ca625edf1c44c956548c2b21"},
+    {file = "beanie-1.28.0.tar.gz", hash = "sha256:6b7a221bc3cbf00d463252ed613e54934973917d978329c5cdd2ec629a1c8559"},
 ]
 
 [package.dependencies]
 click = ">=7"
 lazy-model = "0.2.0"
 motor = ">=2.5.0,<4.0.0"
-pydantic = ">=1.10,<3.0"
+pydantic = ">=1.10.18,<3.0"
 toml = "*"
 typing-extensions = ">=4.7"
 
@@ -235,7 +235,7 @@ gssapi = ["motor[gssapi] (>=2.5.0,<4.0.0)"]
 ocsp = ["motor[ocsp] (>=2.5.0,<4.0.0)"]
 queue = ["beanie-batteries-queue (>=0.2)"]
 snappy = ["motor[snappy] (>=2.5.0,<4.0.0)"]
-test = ["asgi-lifespan (>=1.0.1)", "dnspython (>=2.1.0)", "fastapi (>=0.100)", "flake8 (>=3)", "httpx (>=0.23.0)", "pre-commit (>=2.3.0)", "pydantic-extra-types (>=2)", "pydantic-settings (>=2)", "pydantic[email]", "pyright (>=0)", "pytest (>=6.0.0)", "pytest-asyncio (>=0.21.0)", "pytest-cov (>=2.8.1)"]
+test = ["asgi-lifespan (>=1.0.1)", "dnspython (>=2.1.0)", "fastapi (>=0.100)", "httpx (>=0.23.0)", "pre-commit (>=3.5.0)", "pydantic-extra-types (>=2)", "pydantic-settings (>=2)", "pydantic[email]", "pyright (>=0)", "pytest (>=8.3.3)", "pytest-asyncio (>=0.24.0)", "pytest-cov (>=5.0.0)"]
 zstd = ["motor[zstd] (>=2.5.0,<4.0.0)"]
 
 [[package]]
@@ -1184,13 +1184,13 @@ pyyaml = ">=5.1"
 
 [[package]]
 name = "mkdocs-material"
-version = "9.5.47"
+version = "9.5.48"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocs_material-9.5.47-py3-none-any.whl", hash = "sha256:53fb9c9624e7865da6ec807d116cd7be24b3cb36ab31b1d1d1a9af58c56009a2"},
-    {file = "mkdocs_material-9.5.47.tar.gz", hash = "sha256:fc3b7a8e00ad896660bd3a5cc12ca0cb28bdc2bcbe2a946b5714c23ac91b0ede"},
+    {file = "mkdocs_material-9.5.48-py3-none-any.whl", hash = "sha256:b695c998f4b939ce748adbc0d3bff73fa886a670ece948cf27818fa115dc16f8"},
+    {file = "mkdocs_material-9.5.48.tar.gz", hash = "sha256:a582531e8b34f4c7ed38c29d5c44763053832cf2a32f7409567e0c74749a47db"},
 ]
 
 [package.dependencies]
@@ -2659,4 +2659,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "9f07f56ae07575f730af6ce875bd78ede70520ba4bd84a4caa762d340fb7c3c3"
+content-hash = "5109dc678b3c89e5677ef3ffdc07797a6a9f669be45b977dbdcdf1dfc3c50ec2"
