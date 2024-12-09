@@ -2,7 +2,6 @@
 
 set -ex
 
-CQL_TEST_HOST="${CQL_TEST_HOST:-localhost}"
 PYDANTIC_V2="${PYDANTIC_V2:-true}"
 FASTAPI_PRE_0_112_4="${FASTAPI_PRE_0_112_4:-false}"
 
@@ -14,8 +13,7 @@ function _pytest() {
     poetry run pytest "$@"              \
       --cov=fastapi_pagination          \
       --cov-append                      \
-      --cov-report=xml                  \
-      --cassandra-dsn="${CQL_TEST_HOST}"
+      --cov-report=xml
 }
 
 echo "Installing dependencies"
@@ -66,3 +64,6 @@ echo "Running orm tests"
 _pip install "databases<0.9.0" orm
 _pytest tests -m orm
 _pip uninstall -y orm
+
+echo "Restore env"
+poetry install -E all --sync
