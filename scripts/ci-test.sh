@@ -51,10 +51,10 @@ if [[ "$PYDANTIC_V2" == true ]]; then
     _pytest tests -m ormar
 fi
 
-echo "Running orm tests"
-_pip install "databases<0.9.0" orm
-_pytest tests -m orm
-
 echo "Running tests GINO tests"
 _pip install -U "gino[starlette]"
 _pytest tests -m gino
+
+echo "Running orm tests"
+_pip install "databases<0.9.0" orm
+_pytest tests -m orm
