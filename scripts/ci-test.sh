@@ -64,3 +64,6 @@ echo "Running orm tests"
 _pip install "databases<0.9.0" orm
 _pytest tests -m orm
 _pip uninstall -y orm
+
+echo "Restore env"
+poetry install -E all --sync
