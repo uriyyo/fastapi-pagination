@@ -2455,20 +2455,20 @@ files = [
 
 [[package]]
 name = "tortoise-orm"
-version = "0.22.1"
+version = "0.22.2"
 description = "Easy async ORM for python, built with relations in mind"
 optional = true
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "tortoise_orm-0.22.1-py3-none-any.whl", hash = "sha256:96b8dbc10956cb5cfb6f02841b238035924a6011b5a9737774a22859e1b7bcbf"},
-    {file = "tortoise_orm-0.22.1.tar.gz", hash = "sha256:50cce7ab3eee5321553810ee31f411abde7a1806312655a377801c91e1b2cb77"},
+    {file = "tortoise_orm-0.22.2-py3-none-any.whl", hash = "sha256:1369f3286b33b509e36953c4147a6f5e6c9cd40b95c58dc7054ef463ab69971a"},
+    {file = "tortoise_orm-0.22.2.tar.gz", hash = "sha256:f1e808bc27265b3e4682dae89b725a66d8311cc20c206d512c57dd8a1c78096b"},
 ]
 
 [package.dependencies]
 aiosqlite = ">=0.16.0,<0.21.0"
 iso8601 = ">=2.1.0,<3.0.0"
 pydantic = ">=2.0,<2.7.0 || >2.7.0,<3.0"
-pypika-tortoise = ">=0.3.0,<0.4.0"
+pypika-tortoise = ">=0.3.2,<0.4.0"
 pytz = "*"
 
 [package.extras]
