@@ -28,26 +28,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Set up Postgresql
-        uses: harmon758/postgresql-action@v1
-        with:
-          postgresql db: 'postgres'
-          postgresql user: 'postgres'
-          postgresql password: 'postgres'
-
-      - name: Set up MongoDB
-        uses: supercharge/mongodb-github-action@1.11.0
-
-      - name: Set up Scylla
-        run: |
-          export DOCKER_ID=$(docker run -d scylladb/scylla:latest --cluster-name test )
-          export CQL_TEST_HOST=$(docker inspect --format='{{ .NetworkSettings.IPAddress }}' ${DOCKER_ID})
-          while ! nc -z ${CQL_TEST_HOST} 9042; do   
-            sleep 0.1 # wait for 1/10 of the second before check again
-          done
-
-          echo "CQL_TEST_HOST=${CQL_TEST_HOST}" >> $GITHUB_ENV
-
       - name: Install Poetry
         uses: snok/install-poetry@v1.4.1
 
@@ -59,10 +39,19 @@ jobs:
             ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-py${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}-v1
 
+      - name: Cache Docker images
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-${{ runner.os }}-ci
+
+      - name: Prepare DBs
+        shell: bash
+        run: |
+          bash scripts/ci-prepare.sh
+
       - name: Run tests
         shell: bash
         env:
-          CQL_TEST_HOST: ${{ env.CQL_TEST_HOST }}
           PY_VERSION: ${{ matrix.python-version }}
           PYDANTIC_V2: ${{ matrix.pydantic_v2 }}
           FASTAPI_PRE_0_112_4: ${{ matrix.fastapi_pre_0_112_4 }}
@@ -72,4 +61,4 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
