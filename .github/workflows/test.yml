@@ -59,6 +59,6 @@ jobs:
           bash scripts/ci-test.sh
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v5.1.1
         with:
           files: ./coverage.xml
