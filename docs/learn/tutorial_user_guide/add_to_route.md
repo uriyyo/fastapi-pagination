@@ -1,7 +1,8 @@
 ## Default
 
-By default, if you are using `add_pagination` function then only things you need to do is to use `response_model` or
-set return type annotation to by subclass of `AbstractPage`.
+By default, if you are using the `add_pagination` function, then the only thing you need to do is to use the
+`response_model` or set the return type annotation to be a subclass of `AbstractPage`.
+
 
 ```py
 from fastapi import FastAPI
@@ -25,8 +26,8 @@ async def route():
 
 ## Non-Page response model
 
-If you want to return a non-Page response model, you can use `set_page` function to set the response model, but
-than you will need to explicitly specify params value in route handler.
+If you want to return a non-Page response model, you can use the `set_page` function to set the response model, but
+then you will need to explicitly specify the params value in the route handler.
 
 ```py
 from typing import Annotated
@@ -47,8 +48,8 @@ async def route(params: Annotated[Params, Depends()]) -> list[int]:
 
 ## Multiple Page response models for a single route handler
 
-If you want to return multiple Page response models for a single route handler, you can use `response_model` parameter
-in route declaration.
+If you want to return multiple Page response models for a single route handler, you can use the `response_model` parameter
+in the route declaration.
 
 ```py
 from typing import Any
