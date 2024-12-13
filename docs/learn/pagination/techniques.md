@@ -1,5 +1,3 @@
-from sqlparse.utils import offset
-
 # Page-Based Pagination
 
 ## What is Page-Based Pagination?
