@@ -120,8 +120,6 @@ class BasePaginationTestCase:
         additional_params,
         result_model_cls,
     ):
-        print(f"call with {params.dict()}")
-
         response = await client.get(path, params={**params.dict(), **additional_params})
         response.raise_for_status()
 
