@@ -1,4 +1,4 @@
-from typing import Iterator, List
+from typing import Iterator, List, TypeVar
 
 from _pytest.python_api import raises
 from fastapi import Depends, FastAPI, status
@@ -8,34 +8,46 @@ from sqlalchemy.orm.session import Session
 
 from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage
-from fastapi_pagination.ext.sqlalchemy_future import paginate
+from fastapi_pagination.customization import CustomizedPage, UseQuotedCursor
+from fastapi_pagination.ext.sqlalchemy import paginate
 
 from ..schemas import UserOut
 from ..utils import parse_obj_as
 from .utils import sqlalchemy20
 
 
+@fixture(scope="session", params=[True, False], ids=["quoted", "unquoted"])
+def quoted_cursor(request) -> bool:
+    return request.param
+
+
 @fixture(scope="session")
-def app(sa_user, sa_order, sa_session):
+def app(sa_user, sa_order, sa_session, quoted_cursor):
     app = FastAPI()
+
+    _T = TypeVar("_T")
+    _CursorPage = CustomizedPage[
+        CursorPage[_T],
+        UseQuotedCursor(quoted_cursor),
+    ]
 
     def get_db() -> Iterator[Session]:
         with sa_session() as db:
             yield db
 
-    @app.get("/", response_model=CursorPage[UserOut])
+    @app.get("/", response_model=_CursorPage[UserOut])
     def route(db: Session = Depends(get_db)):
         return paginate(db, select(sa_user).order_by(sa_user.id, sa_user.name))
 
-    @app.get("/first-85", response_model=CursorPage[UserOut])
+    @app.get("/first-85", response_model=_CursorPage[UserOut])
     def route_first(db: Session = Depends(get_db)):
         return paginate(db, select(sa_user).where(sa_user.id <= 85).order_by(sa_user.id, sa_user.name))
 
-    @app.get("/last-85", response_model=CursorPage[UserOut])
+    @app.get("/last-85", response_model=_CursorPage[UserOut])
     def route_last(db: Session = Depends(get_db)):
         return paginate(db, select(sa_user).where(sa_user.id > 15).order_by(sa_user.id, sa_user.name))
 
-    @app.get("/no-order", response_model=CursorPage[UserOut])
+    @app.get("/no-order", response_model=_CursorPage[UserOut])
     def route_on_order(db: Session = Depends(get_db)):
         return paginate(db, select(sa_user))
 
