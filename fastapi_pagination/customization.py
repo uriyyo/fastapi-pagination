@@ -174,6 +174,7 @@ class UseIncludeTotal(PageCustomizer):
         ns["__params_type__"] = CustomizedParams
 
 
+@dataclass
 class UseQuotedCursor(PageCustomizer):
     quoted_cursor: bool = True
 
