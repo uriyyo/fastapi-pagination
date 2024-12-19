@@ -7,6 +7,7 @@ __all__ = [
 
 import binascii
 from base64 import b64decode, b64encode
+from functools import partial
 from typing import (
     Any,
     ClassVar,
@@ -81,7 +82,7 @@ class CursorParams(BaseModel, AbstractParams):
 
     def to_raw_params(self) -> CursorRawParams:
         return CursorRawParams(
-            cursor=decode_cursor(self.cursor, to_str=self.str_cursor),
+            cursor=decode_cursor(self.cursor, to_str=self.str_cursor, quoted=self.quoted_cursor),
             size=self.size,
         )
 
@@ -112,12 +113,16 @@ class CursorPage(AbstractPage[T], Generic[T]):
         previous: Optional[Cursor] = None,
         **kwargs: Any,
     ) -> CursorPage[T]:
+        if not isinstance(params, CursorParams):
+            raise TypeError("CursorPage should be used with CursorParams")
+
+        encoder = partial(encode_cursor, quoted=params.quoted_cursor)
         return create_pydantic_model(
             cls,
             items=items,
-            current_page=encode_cursor(current),
-            current_page_backwards=encode_cursor(current_backwards),
-            next_page=encode_cursor(next_),
-            previous_page=encode_cursor(previous),
+            current_page=encoder(current),
+            current_page_backwards=encoder(current_backwards),
+            next_page=encoder(next_),
+            previous_page=encoder(previous),
             **kwargs,
         )
