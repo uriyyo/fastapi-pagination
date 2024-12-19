@@ -161,9 +161,8 @@ def test_use_include_total(include_total):
 @mark.parametrize("quoted_cursor", [True, False])
 def test_use_quoted_cursor(quoted_cursor):
     CustomPage = CustomizedPage[Page, UseQuotedCursor(quoted_cursor)]
-    raw_params = CustomPage.__params_type__().to_raw_params()
 
-    assert raw_params.quoted_cursor == quoted_cursor
+    assert CustomPage.__params_type__.quoted_cursor == quoted_cursor
 
 
 def test_custom_customizer():
