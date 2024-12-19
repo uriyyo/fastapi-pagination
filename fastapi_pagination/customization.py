@@ -27,6 +27,7 @@ from types import new_class
 from typing import (
     TYPE_CHECKING,
     Any,
+    ClassVar,
     Dict,
     Generic,
     Optional,
@@ -180,12 +181,12 @@ class UseQuotedCursor(PageCustomizer):
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         if TYPE_CHECKING:
-            from .cursor import CursorRawParams
+            from .cursor import CursorParams
         else:
-            CursorRawParams = ns["__params_type__"]
+            CursorParams = ns["__params_type__"]
 
-        class CustomizedParams(CursorRawParams):
-            quoted_cursor = self.quoted_cursor
+        class CustomizedParams(CursorParams):
+            quoted_cursor: ClassVar[bool] = self.quoted_cursor
 
         ns["__params_type__"] = CustomizedParams
 
