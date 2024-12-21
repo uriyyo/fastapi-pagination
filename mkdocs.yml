@@ -72,6 +72,7 @@ nav:
           - "UseName": customization/customizers/use_name.md
           - "UseModule": customization/customizers/use_module.md
           - "UseIncludeTotal": customization/customizers/use_include_total.md
+          - "UseQuotedCursor": customization/customizers/use_quoted_cursor.md
           - "UseParams": customization/customizers/use_params.md
           - "UseParamsFields": customization/customizers/use_params_fields.md
           - "UseOptionalParams": customization/customizers/use_optional_params.md
