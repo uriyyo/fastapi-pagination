@@ -1,5 +1,3 @@
-from typing import Any, Awaitable, Callable, Dict, Optional, Sequence, Union
-
 __all__ = [
     "AdditionalData",
     "AsyncItemsTransformer",
@@ -10,9 +8,10 @@ __all__ = [
     "ParamsType",
     "SyncItemsTransformer",
 ]
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, Optional, Sequence, Union
 
 from pydantic import conint
-from typing_extensions import TYPE_CHECKING, Literal, TypeAlias
+from typing_extensions import Literal, TypeAlias
 
 Cursor: TypeAlias = Union[str, bytes]
 ParamsType: TypeAlias = Literal["cursor", "limit-offset"]
