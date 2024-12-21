@@ -7,6 +7,7 @@ __all__ = [
 
 import binascii
 from base64 import b64decode, b64encode
+from functools import partial
 from typing import (
     Any,
     ClassVar,
@@ -30,24 +31,25 @@ T = TypeVar("T")
 
 
 @overload
-def decode_cursor(cursor: Optional[str], *, to_str: Literal[True] = True) -> Optional[str]:
+def decode_cursor(cursor: Optional[str], *, to_str: Literal[True] = True, quoted: bool = True) -> Optional[str]:
     pass
 
 
 @overload
-def decode_cursor(cursor: Optional[str], *, to_str: Literal[False]) -> Optional[bytes]:
+def decode_cursor(cursor: Optional[str], *, to_str: Literal[False], quoted: bool = True) -> Optional[bytes]:
     pass
 
 
 @overload
-def decode_cursor(cursor: Optional[str], *, to_str: bool) -> Optional[Cursor]:
+def decode_cursor(cursor: Optional[str], *, to_str: bool, quoted: bool = True) -> Optional[Cursor]:
     pass
 
 
-def decode_cursor(cursor: Optional[str], *, to_str: bool = True) -> Optional[Cursor]:
+def decode_cursor(cursor: Optional[str], *, to_str: bool = True, quoted: bool = True) -> Optional[Cursor]:
     if cursor:
         try:
-            res = b64decode(unquote(cursor).encode())
+            cursor = unquote(cursor) if quoted else cursor
+            res = b64decode(cursor.encode())
             return res.decode() if to_str else res
         except binascii.Error:
             raise HTTPException(
@@ -58,10 +60,15 @@ def decode_cursor(cursor: Optional[str], *, to_str: bool = True) -> Optional[Cur
     return None
 
 
-def encode_cursor(cursor: Optional[Cursor]) -> Optional[str]:
+def encode_cursor(cursor: Optional[Cursor], quoted: bool = True) -> Optional[str]:
     if cursor:
         cursor = cursor.encode() if isinstance(cursor, str) else cursor
-        return quote(b64encode(cursor).decode())
+        encoded = b64encode(cursor).decode()
+
+        if quoted:
+            encoded = quote(encoded)
+
+        return encoded
 
     return None
 
@@ -71,10 +78,11 @@ class CursorParams(BaseModel, AbstractParams):
     size: int = Query(50, ge=0, le=100, description="Page size")
 
     str_cursor: ClassVar[bool] = True
+    quoted_cursor: ClassVar[bool] = True
 
     def to_raw_params(self) -> CursorRawParams:
         return CursorRawParams(
-            cursor=decode_cursor(self.cursor, to_str=self.str_cursor),
+            cursor=decode_cursor(self.cursor, to_str=self.str_cursor, quoted=self.quoted_cursor),
             size=self.size,
         )
 
@@ -105,12 +113,16 @@ class CursorPage(AbstractPage[T], Generic[T]):
         previous: Optional[Cursor] = None,
         **kwargs: Any,
     ) -> CursorPage[T]:
+        if not isinstance(params, CursorParams):
+            raise TypeError("CursorPage should be used with CursorParams")
+
+        encoder = partial(encode_cursor, quoted=params.quoted_cursor)
         return create_pydantic_model(
             cls,
             items=items,
-            current_page=encode_cursor(current),
-            current_page_backwards=encode_cursor(current_backwards),
-            next_page=encode_cursor(next_),
-            previous_page=encode_cursor(previous),
+            current_page=encoder(current),
+            current_page_backwards=encoder(current_backwards),
+            next_page=encoder(next_),
+            previous_page=encoder(previous),
             **kwargs,
         )

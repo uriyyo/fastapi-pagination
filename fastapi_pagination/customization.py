@@ -15,6 +15,7 @@ __all__ = [
     "UseOptionalParams",
     "UseParams",
     "UseParamsFields",
+    "UseQuotedCursor",
     "get_page_bases",
     "new_page_cls",
 ]
@@ -26,6 +27,7 @@ from types import new_class
 from typing import (
     TYPE_CHECKING,
     Any,
+    ClassVar,
     Dict,
     Generic,
     Optional,
@@ -169,6 +171,22 @@ class UseIncludeTotal(PageCustomizer):
                 raw_params.include_total = include_total
 
                 return raw_params
+
+        ns["__params_type__"] = CustomizedParams
+
+
+@dataclass
+class UseQuotedCursor(PageCustomizer):
+    quoted_cursor: bool = True
+
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        if TYPE_CHECKING:
+            from .cursor import CursorParams
+        else:
+            CursorParams = ns["__params_type__"]
+
+        class CustomizedParams(CursorParams):
+            quoted_cursor: ClassVar[bool] = self.quoted_cursor
 
         ns["__params_type__"] = CustomizedParams
 
