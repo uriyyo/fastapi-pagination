@@ -30,7 +30,6 @@ from typing import (
     Type,
     TypeVar,
     cast,
-    no_type_check,
 )
 
 from .utils import IS_PYDANTIC_V2, get_caller
@@ -158,7 +157,6 @@ class AbstractPage(GenericModel, Generic[T], ABC):
     if IS_PYDANTIC_V2:
 
         @classmethod
-        @no_type_check
         def __pydantic_init_subclass__(cls, **kwargs: Any) -> None:
             super().__pydantic_init_subclass__(**kwargs)
 

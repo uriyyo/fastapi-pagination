@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Generic, Optional, Type, TypeVar, Union, no_type_check, overload
+from typing import Any, Generic, Optional, Type, TypeVar, Union, overload
 
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlmodel import Session, SQLModel, select
@@ -141,9 +141,8 @@ async def paginate(
     pass
 
 
-@no_type_check
 def paginate(
-    session: Session,
+    session: Union[AsyncSession, AsyncConnection, Session],
     query: Any,
     params: Optional[AbstractParams] = None,
     *,
@@ -156,13 +155,13 @@ def paginate(
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    return _paginate(
-        session,
+    return _paginate(  # type: ignore
+        session,  # type: ignore[arg-type]
         query,
         params,
         count_query=count_query,
         subquery_count=subquery_count,
-        transformer=transformer,
+        transformer=transformer,  # type: ignore[arg-type]
         additional_data=additional_data,
         unique=unique,
     )

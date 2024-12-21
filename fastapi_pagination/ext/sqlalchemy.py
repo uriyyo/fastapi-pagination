@@ -19,7 +19,7 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query, Session, noload, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import TextClause
-from typing_extensions import Literal, TypeAlias, deprecated, get_args, no_type_check
+from typing_extensions import Literal, TypeAlias, deprecated
 
 from ..api import apply_items_transformer, create_page
 from ..bases import AbstractPage, AbstractParams, is_cursor
@@ -84,7 +84,6 @@ SelectableOrQuery: TypeAlias = "Union[Selectable, Query[Any]]"
 _selectable_classes = (Select, TextClause, FromStatement, CompoundSelect)
 
 
-@no_type_check
 def _should_unwrap_scalars(query: Selectable) -> bool:
     if not isinstance(query, _selectable_classes):
         return False
@@ -93,8 +92,8 @@ def _should_unwrap_scalars(query: Selectable) -> bool:
         return False
 
     try:
-        cols_desc = query.column_descriptions
-        all_cols = query._all_selected_columns
+        cols_desc = query.column_descriptions  # type: ignore[union-attr]
+        all_cols = [*query._all_selected_columns]
 
         # we have select(a, b, c) no need to unwrap
         if len(cols_desc) != 1:
@@ -203,13 +202,13 @@ def _unwrap_items(
         unwrap_mode = unwrap_mode or "auto"
 
     if unwrap_mode == "legacy":
-        items = unwrap_scalars(items)
+        items = unwrap_scalars(items)  # type: ignore[assignment]
     elif unwrap_mode == "no-unwrap":
         pass
     elif unwrap_mode == "unwrap":
-        items = unwrap_scalars(items, force_unwrap=True)
+        items = unwrap_scalars(items, force_unwrap=True)  # type: ignore[assignment]
     elif unwrap_mode == "auto" and _should_unwrap_scalars(query):
-        items = unwrap_scalars(items, force_unwrap=True)
+        items = unwrap_scalars(items, force_unwrap=True)  # type: ignore[assignment]
 
     return items
 

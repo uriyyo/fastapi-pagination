@@ -4,7 +4,7 @@ __all__ = [
     "wrap_scalars",
 ]
 
-from typing import Any, Optional, Protocol, Sequence, TypeVar, Union, no_type_check
+from typing import Any, Optional, Protocol, Sequence, TypeVar, Union, cast
 
 from typing_extensions import Self
 
@@ -20,16 +20,17 @@ def len_or_none(obj: Any) -> Optional[int]:
         return None
 
 
-@no_type_check
 def unwrap_scalars(
     items: Sequence[Sequence[T]],
     *,
     force_unwrap: bool = False,
 ) -> Union[Sequence[T], Sequence[Sequence[T]]]:
-    return [item[0] if force_unwrap or len_or_none(item) == 1 else item for item in items]
+    return cast(
+        Union[Sequence[T], Sequence[Sequence[T]]],
+        [item[0] if force_unwrap or len_or_none(item) == 1 else item for item in items],
+    )
 
 
-@no_type_check
 def wrap_scalars(items: Sequence[Any]) -> Sequence[Sequence[Any]]:
     return [item if len_or_none(item) is not None else [item] for item in items]
 

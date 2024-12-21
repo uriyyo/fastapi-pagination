@@ -42,7 +42,7 @@ from fastapi.dependencies.utils import (
 from fastapi.routing import APIRoute, APIRouter
 from pydantic import BaseModel
 from starlette.routing import request_response
-from typing_extensions import deprecated, no_type_check
+from typing_extensions import deprecated
 
 from .bases import AbstractPage, AbstractParams
 from .default import Page
@@ -338,7 +338,6 @@ def pagination_ctx(
     return _page_ctx_dependency
 
 
-@no_type_check
 def _bet_body_field(route: APIRoute) -> Optional[Any]:
     try:
         # starting from fastapi 0.113.0 get_body_field changed its signature
@@ -348,7 +347,10 @@ def _bet_body_field(route: APIRoute) -> Optional[Any]:
             embed_body_fields=route._embed_body_fields,
         )
     except (TypeError, AttributeError):
-        return get_body_field(dependant=route.dependant, name=route.unique_id)
+        return get_body_field(
+            dependant=route.dependant,  # type: ignore[call-arg]
+            name=route.unique_id,
+        )
 
 
 ParentT = TypeVar("ParentT", APIRouter, FastAPI)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Union, no_type_check
+from typing import Any, Optional, Tuple, Union
 
 from gino.crud import CRUDModel
 from sqlalchemy import func, literal_column
@@ -15,9 +15,8 @@ from ..utils import verify_params
 from .sqlalchemy import create_paginate_query
 
 
-@no_type_check
 async def paginate(
-    query: Union[Select, CRUDModel],
+    query: Union[Select[Tuple[Any, ...]], CRUDModel],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
@@ -26,15 +25,16 @@ async def paginate(
     params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, type) and issubclass(query, CRUDModel):
-        query = query.query
+        query = query.query  # type: ignore[attr-defined]
 
     if raw_params.include_total:
-        total = await func.count(literal_column("*")).select().select_from(query.order_by(None).alias()).gino.scalar()
+        count_query = func.count(literal_column("*")).select().select_from(query.order_by(None).alias())
+        total = await count_query.gino.scalar()  # type: ignore[attr-defined]
     else:
         total = None
 
     query = create_paginate_query(query, params)
-    items = await query.gino.all()
+    items = await query.gino.all()  # type: ignore[union-attr]
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
     return create_page(

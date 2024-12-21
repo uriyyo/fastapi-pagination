@@ -1,8 +1,7 @@
 from pathlib import Path
-from typing import Any, Iterable, List, Union
+from typing import Any, List, Union
 
-from _pytest import nodes
-from pytest import File, Item, Module, fixture, mark
+from pytest import Item, Module, fixture
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, relationship, sessionmaker

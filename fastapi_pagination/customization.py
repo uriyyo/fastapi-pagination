@@ -36,7 +36,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
-    no_type_check,
+    cast,
     runtime_checkable,
 )
 
@@ -54,29 +54,30 @@ PageCls: TypeAlias = "Type[AbstractPage[Any]]"
 TPage = TypeVar("TPage", bound=PageCls)
 
 
-@no_type_check
-def get_page_bases(cls: Type[TPage]) -> tuple[Type[Any], ...]:
+def get_page_bases(cls: TPage) -> Tuple[Type[Any], ...]:
     bases: Tuple[Type[Any], ...]
 
     if IS_PYDANTIC_V2:
         params = cls.__pydantic_generic_metadata__["parameters"]
-        bases = (cls,) if not params else (cls[params], Generic[params])
+        bases = (cls,) if not params else (cls[params], Generic[params])  # type: ignore
     else:
         if cls.__concrete__:
             bases = (cls,)
         else:
             params = tuple(cls.__parameters__)
-            bases = (cls[params], Generic[params])
+            bases = (cls[params], Generic[params])  # type: ignore
 
     return bases
 
 
-def new_page_cls(cls: Type[TPage], new_ns: ClsNamespace) -> Type[TPage]:
-    return new_class(
+def new_page_cls(cls: TPage, new_ns: ClsNamespace) -> TPage:
+    new_cls = new_class(
         new_ns.get("__name__", cls.__name__),
         get_page_bases(cls),
         exec_body=lambda ns: ns.update(new_ns),
     )
+
+    return cast(TPage, new_cls)
 
 
 if TYPE_CHECKING:
@@ -215,13 +216,12 @@ def _get_model_fields(cls: Type[BaseModel]) -> ClsNamespace:
 if IS_PYDANTIC_V2:
     from pydantic.fields import FieldInfo as _PydanticField
 
-    @no_type_check
     def _make_field_optional(field: Any) -> Any:
         assert isinstance(field, _PydanticField)
 
         field = copy(field)
 
-        field.annotation = Optional[field.annotation]
+        field.annotation = Optional[field.annotation]  # type: ignore[assignment]
         field.default = None
         field.default_factory = None
 
@@ -236,7 +236,6 @@ else:
         return None
 
 
-@no_type_check
 def _update_params_fields(cls: Type[AbstractParams], fields: ClsNamespace) -> ClsNamespace:
     if not issubclass(cls, BaseModel):
         raise TypeError(f"{cls.__name__} must be subclass of BaseModel")
