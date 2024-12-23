@@ -63,7 +63,7 @@ httpx = "^0.28.1"
 asgi-lifespan = "^2.1.0"
 requests = "^2.32.2"
 uvicorn = "^0.33.0"
-Jinja2 = "^3.1.4"
+Jinja2 = "^3.1.5"
 mypy = "^1.13.0"
 ruff = "^0.8.4"
 
