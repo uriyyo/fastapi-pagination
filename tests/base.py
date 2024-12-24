@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, List, Type
+from typing import Any, ClassVar
 
 from pytest import fixture, mark
 from typing_extensions import Literal, TypeAlias
@@ -55,13 +55,13 @@ PaginationTestCaseType: TypeAlias = Literal[
 
 @mark.usefixtures("db_type")
 class BasePaginationTestCase:
-    pagination_types: ClassVar[List[PaginationTestCaseType]] = ["default"]
+    pagination_types: ClassVar[list[PaginationTestCaseType]] = ["default"]
 
-    page: ClassVar[Type[Page]] = Page
-    limit_offset_page: ClassVar[Type[LimitOffsetPage]] = LimitOffsetPage
+    page: ClassVar[type[Page]] = Page
+    limit_offset_page: ClassVar[type[LimitOffsetPage]] = LimitOffsetPage
 
-    optional_page: ClassVar[Type[Page]] = OptionalPage
-    optional_limit_offset_page: ClassVar[Type[LimitOffsetPage]] = OptionalLimitOffsetPage
+    optional_page: ClassVar[type[Page]] = OptionalPage
+    optional_limit_offset_page: ClassVar[type[LimitOffsetPage]] = OptionalLimitOffsetPage
 
     def __init_subclass__(cls, **kwargs):
         if cls.pagination_types is not BasePaginationTestCase.pagination_types:
@@ -89,7 +89,7 @@ class BasePaginationTestCase:
         return prefix + base
 
     @fixture(scope="session")
-    def additional_params(self) -> Dict[str, Any]:
+    def additional_params(self) -> dict[str, Any]:
         return {}
 
     @fixture(scope="session")

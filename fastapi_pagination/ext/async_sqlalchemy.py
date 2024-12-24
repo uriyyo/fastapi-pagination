@@ -2,14 +2,15 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlalchemy.sql import Select
 from typing_extensions import deprecated
 
-from ..bases import AbstractParams
-from ..types import AdditionalData, AsyncItemsTransformer
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
+
 from .sqlalchemy import paginate as _paginate
 
 
@@ -20,7 +21,7 @@ from .sqlalchemy import paginate as _paginate
 )
 async def paginate(
     conn: Union[AsyncSession, AsyncConnection],
-    query: Select[Tuple[Any, ...]],
+    query: Select[tuple[Any, ...]],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,

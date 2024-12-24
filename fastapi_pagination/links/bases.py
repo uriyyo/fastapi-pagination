@@ -1,12 +1,13 @@
 __all__ = ["Links", "create_links", "validation_decorator"]
 
-from typing import TYPE_CHECKING, Any, Mapping, Optional
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any, Optional
 
 from pydantic import BaseModel, Field
 from starlette.requests import URL
 
-from ..api import request
-from ..utils import IS_PYDANTIC_V2
+from fastapi_pagination.api import request
+from fastapi_pagination.utils import IS_PYDANTIC_V2
 
 _link_field = (
     Field(examples=["/api/v1/users?limit=1&offset1"])
@@ -40,7 +41,7 @@ def _update_path(url: URL, to_update: Optional[Mapping[str, Any]]) -> Optional[s
 def create_links(
     first: Mapping[str, Any],
     last: Mapping[str, Any],
-    next: Optional[Mapping[str, Any]],
+    next: Optional[Mapping[str, Any]],  # noqa: A002
     prev: Optional[Mapping[str, Any]],
 ) -> Links:
     req = request()
@@ -63,12 +64,11 @@ if TYPE_CHECKING:
     def validation_decorator(func: TCallable) -> TCallable:
         return func
 
+elif IS_PYDANTIC_V2:
+    from pydantic import model_validator
+
+    validation_decorator = model_validator(mode="before")
 else:
-    if IS_PYDANTIC_V2:
-        from pydantic import model_validator
+    from pydantic import root_validator
 
-        validation_decorator = model_validator(mode="before")
-    else:
-        from pydantic import root_validator
-
-        validation_decorator = root_validator(pre=True)
+    validation_decorator = root_validator(pre=True)

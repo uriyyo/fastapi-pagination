@@ -1,13 +1,14 @@
 __all__ = ["paginate"]
 
-from typing import Any, Generic, Optional, Type, TypeVar, Union, overload
+from typing import Any, Generic, Optional, TypeVar, Union, overload
 
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlmodel import Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
-from ..bases import AbstractParams
-from ..types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
+
 from .sqlalchemy import paginate as _paginate
 
 try:
@@ -56,7 +57,7 @@ def paginate(
 @overload
 def paginate(
     session: Session,
-    query: Type[TSQLModel],
+    query: type[TSQLModel],
     params: Optional[AbstractParams] = None,
     *,
     count_query: Optional[TSQLModel] = None,
@@ -116,10 +117,10 @@ async def paginate(
 @overload
 async def paginate(
     session: Union[AsyncSession, AsyncConnection],
-    query: Type[TSQLModel],
+    query: type[TSQLModel],
     params: Optional[AbstractParams] = None,
     *,
-    count_query: Optional[Type[TSQLModel]] = None,
+    count_query: Optional[type[TSQLModel]] = None,
     subquery_count: bool = True,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
@@ -133,7 +134,7 @@ async def paginate(
     query: SelectBase[TSQLModel],
     params: Optional[AbstractParams] = None,
     *,
-    count_query: Optional[Type[TSQLModel]] = None,
+    count_query: Optional[type[TSQLModel]] = None,
     subquery_count: bool = True,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
@@ -155,7 +156,7 @@ def paginate(
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
 
-    return _paginate(  # type: ignore
+    return _paginate(  # type: ignore[misc]
         session,  # type: ignore[arg-type]
         query,
         params,

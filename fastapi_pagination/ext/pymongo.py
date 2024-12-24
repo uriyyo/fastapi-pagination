@@ -2,22 +2,23 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
-from typing import Any, Dict, Mapping, Optional, Sequence, TypeVar
+from collections.abc import Mapping, Sequence
+from typing import Any, Optional, TypeVar
 
 from pymongo.collection import Collection
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractParams
-from ..types import AdditionalData, SyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
+from fastapi_pagination.utils import verify_params
 
 T = TypeVar("T", bound=Mapping[str, Any])
 
 
 def paginate(
     collection: Collection[T],
-    query_filter: Optional[Dict[Any, Any]] = None,
-    filter_fields: Optional[Dict[Any, Any]] = None,
+    query_filter: Optional[dict[Any, Any]] = None,
+    filter_fields: Optional[dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     sort: Optional[Sequence[Any]] = None,
     *,

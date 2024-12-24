@@ -1,9 +1,9 @@
-from . import patch  # noqa  # isort: skip  # DO NOT REMOVE THIS LINE.
+from . import patch  # noqa: F401  # isort: skip  # DO NOT REMOVE THIS LINE.
 from asyncio import new_event_loop
 from itertools import count
 from pathlib import Path
 from random import randint
-from typing import Any, Dict, List
+from typing import Any
 
 import aiosqlite
 import asyncpg
@@ -19,7 +19,7 @@ from typing_extensions import TypeAlias
 from .schemas import UserWithOrderOut
 from .utils import faker
 
-RawData: TypeAlias = List[Dict[str, Any]]
+RawData: TypeAlias = list[dict[str, Any]]
 
 
 def pytest_addoption(parser: Parser):
@@ -65,7 +65,7 @@ def raw_data() -> RawData:
     user_ids = count(1)
     order_ids = count(1)
 
-    def generate_one() -> Dict[str, Any]:
+    def generate_one() -> dict[str, Any]:
         """Generate a single user with unique user id"""
         id_ = next(user_ids)
 
@@ -86,7 +86,7 @@ def raw_data() -> RawData:
 
 
 @fixture(scope="session")
-def entities(raw_data: RawData) -> List[UserWithOrderOut]:
+def entities(raw_data: RawData) -> list[UserWithOrderOut]:
     return [UserWithOrderOut(**data) for data in raw_data]
 
 
@@ -262,15 +262,18 @@ def event_loop():
     return new_event_loop()
 
 
-def pytest_collection_modifyitems(items: List[Function]):
+def pytest_collection_modifyitems(items: list[Function]):
     items.sort(key=lambda it: (it.path, it.name))
 
 
 @async_fixture(scope="class")
 async def client(app: FastAPI):
-    async with LifespanManager(app), AsyncClient(
-        transport=ASGITransport(app),
-        base_url="http://testserver",
-        timeout=60,
-    ) as c:
+    async with (
+        LifespanManager(app),
+        AsyncClient(
+            transport=ASGITransport(app),
+            base_url="http://testserver",
+            timeout=60,
+        ) as c,
+    ):
         yield c

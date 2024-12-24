@@ -1,5 +1,6 @@
+from collections.abc import Iterator
 from contextlib import closing
-from typing import Any, Iterator, Type
+from typing import Any
 
 from fastapi import Depends, FastAPI
 from pytest import fixture, mark, skip
@@ -8,9 +9,9 @@ from sqlalchemy.orm.session import Session
 
 from fastapi_pagination import LimitOffsetPage, Page, Params, add_pagination, set_page
 from fastapi_pagination.ext.sqlalchemy import paginate
+from tests.base import BasePaginationTestCase
+from tests.schemas import UserOut, UserWithoutIDOut
 
-from ..base import BasePaginationTestCase
-from ..schemas import UserOut, UserWithoutIDOut
 from .utils import is_sqlalchemy20, sqlalchemy20
 
 
@@ -27,7 +28,7 @@ def use_subquery_count(request):
 
 
 @fixture(scope="session")
-def app(sa_user, sa_session: Type[Session], model_cls: Type[object], use_subquery_count: bool):
+def app(sa_user, sa_session: type[Session], model_cls: type[object], use_subquery_count: bool):
     app = FastAPI()
 
     def get_db() -> Iterator[Session]:

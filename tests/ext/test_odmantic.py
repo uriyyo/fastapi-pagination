@@ -1,4 +1,4 @@
-from typing import Awaitable
+from collections.abc import Awaitable
 
 from fastapi import FastAPI
 from motor import MotorClient
@@ -8,8 +8,8 @@ from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.odmantic import paginate
+from tests.base import BasePaginationTestCase
 
-from ..base import BasePaginationTestCase
 from .utils import mongodb_test
 
 

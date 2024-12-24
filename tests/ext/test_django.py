@@ -9,8 +9,7 @@ from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.django import paginate
-
-from ..base import BasePaginationTestCase
+from tests.base import BasePaginationTestCase
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "True"
 
@@ -38,7 +37,7 @@ def db(database_url):
 
 
 @fixture(scope="session")
-def User(db):
+def user_cls(db):
     class User(models.Model):
         id = models.IntegerField(primary_key=True)
         name = models.TextField()
@@ -46,6 +45,9 @@ def User(db):
         class Meta:
             app_label = "test"
             db_table = "users"
+
+        def __str__(self):
+            return self.name
 
     return User
 
@@ -55,15 +57,15 @@ def User(db):
     params=[True, False],
     ids=["model", "query"],
 )
-def query(request, User):
+def query(request, user_cls):
     if request.param:
-        return User
+        return user_cls
 
-    return User.objects.all()
+    return user_cls.objects.all()
 
 
 @fixture(scope="session")
-def app(db, User, query, model_cls):
+def app(db, user_cls, query, model_cls):
     app = FastAPI()
 
     @app.get("/default", response_model=Page[model_cls])

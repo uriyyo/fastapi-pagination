@@ -1,4 +1,4 @@
-from typing import ClassVar, Generic, Type, TypeVar
+from typing import ClassVar, Generic, TypeVar
 
 from fastapi import Query
 from pytest import mark, raises
@@ -25,7 +25,7 @@ from fastapi_pagination.utils import IS_PYDANTIC_V2
 
 
 class _NoopCustomizer(PageCustomizer):
-    def customize_page_ns(self, page_cls: Type[AbstractPage], ns: ClsNamespace) -> None:
+    def customize_page_ns(self, page_cls: type[AbstractPage], ns: ClsNamespace) -> None:
         pass
 
 
@@ -167,7 +167,7 @@ def test_use_quoted_cursor(quoted_cursor):
 
 def test_custom_customizer():
     class CustomCustomizer(PageCustomizer):
-        def customize_page_ns(self, page_cls: Type[AbstractPage], ns: ClsNamespace) -> None:
+        def customize_page_ns(self, page_cls: type[AbstractPage], ns: ClsNamespace) -> None:
             ns["__customized__"] = True
 
     CustomPage = CustomizedPage[Page, CustomCustomizer()]

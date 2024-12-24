@@ -2,10 +2,12 @@ from __future__ import annotations
 
 __all__ = ["LimitOffsetPage"]
 
+from collections.abc import MutableMapping
 from math import floor
-from typing import Any, Generic, MutableMapping, TypeVar
+from typing import Any, Generic, TypeVar
 
-from ..limit_offset import LimitOffsetPage as BasePage
+from fastapi_pagination.limit_offset import LimitOffsetPage as BasePage
+
 from .bases import Links, create_links, validation_decorator
 
 T = TypeVar("T")

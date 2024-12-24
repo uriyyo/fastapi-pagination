@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, List, Union
+from typing import Any, Union
 
 from pytest import Item, Module, fixture
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
@@ -86,7 +86,7 @@ def sm_user(sm_order):
         id: int = Field(primary_key=True)
         name: str
 
-        orders: List[sm_order] = Relationship()
+        orders: list[sm_order] = Relationship()
 
     return User
 

@@ -5,8 +5,7 @@ from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.orm import paginate
-
-from ..base import BasePaginationTestCase
+from tests.base import BasePaginationTestCase
 
 if tuple(map(int, __version__.split("."))) >= (0, 9, 0):
     raise ImportError("This test is only for databases<0.9.0")

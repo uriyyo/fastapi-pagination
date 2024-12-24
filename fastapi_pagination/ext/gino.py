@@ -2,21 +2,22 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 from gino.crud import CRUDModel
 from sqlalchemy import func, literal_column
 from sqlalchemy.sql import Select
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractParams
-from ..types import AdditionalData, AsyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
+from fastapi_pagination.utils import verify_params
+
 from .sqlalchemy import create_paginate_query
 
 
 async def paginate(
-    query: Union[Select[Tuple[Any, ...]], CRUDModel],
+    query: Union[Select[tuple[Any, ...]], CRUDModel],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,

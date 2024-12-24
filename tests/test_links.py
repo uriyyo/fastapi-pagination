@@ -120,7 +120,7 @@ add_pagination(app)
         "limit-offset-custom-offset",
     ],
 )
-def test_links(self, prev, next, first, last):
+def test_links(self, prev, next, first, last):  # noqa: A002
     response = client.get(self)
 
     assert response.status_code == status.HTTP_200_OK
@@ -135,7 +135,6 @@ def test_links(self, prev, next, first, last):
 
 def test_revalidation_default():
     response = client.get("/revalidate/default")
-    print(response.json())
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {

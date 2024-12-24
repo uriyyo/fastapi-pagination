@@ -2,23 +2,24 @@ __all__ = ["paginate"]
 
 from contextlib import suppress
 from copy import copy
-from typing import Any, Optional, Type, TypeVar, Union
+from typing import Any, Optional, TypeVar, Union
 
 from piccolo.query import Select
 from piccolo.query.methods.select import Count
 from piccolo.table import Table
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractParams
-from ..types import AdditionalData, SyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
+from fastapi_pagination.utils import verify_params
+
 from .utils import generic_query_apply_params
 
-T = TypeVar("T", bound=Table, covariant=True)
+TTable_co = TypeVar("TTable_co", bound=Table, covariant=True)
 
 
 # TODO: there should be a better way to copy query object
-def _copy_query(query: Select[T]) -> Select[T]:
+def _copy_query(query: Select[TTable_co]) -> Select[TTable_co]:
     select_cls = type(query)
     q = select_cls(query.table)
 
@@ -30,7 +31,7 @@ def _copy_query(query: Select[T]) -> Select[T]:
 
 
 async def paginate(
-    query: Union[Select[T], Type[T]],
+    query: Union[Select[TTable_co], type[TTable_co]],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[SyncItemsTransformer] = None,
@@ -48,7 +49,7 @@ async def paginate(
     count_query = _copy_query(query)
     count_query.columns_delegate.selected_columns = []
     # reset order by to avoid errors in count query
-    count_query.order_by_delegate._order_by.order_by_items = []  # noqa
+    count_query.order_by_delegate._order_by.order_by_items = []
 
     total = None
     if raw_params.include_total and (row := await count_query.columns(Count()).first()):

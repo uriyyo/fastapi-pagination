@@ -4,8 +4,7 @@ from pytest import fixture, mark
 from sqlalchemy import Column, Integer, String
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-
-from ..base import BasePaginationTestCase
+from tests.base import BasePaginationTestCase
 
 
 @fixture(scope="session")
@@ -19,7 +18,7 @@ def db(database_url):
 
 
 @fixture(scope="session")
-def User(db):
+def user_cls(db):
     class User(db.Model):
         __tablename__ = "users"
 
@@ -34,15 +33,15 @@ def User(db):
     params=[True, False],
     ids=["model", "query"],
 )
-def query(request, User):
+def query(request, user_cls):
     if request.param:
-        return User
+        return user_cls
 
-    return User.query
+    return user_cls.query
 
 
 @fixture(scope="session")
-def app(db, User, query, model_cls):
+def app(db, user_cls, query, model_cls):
     from fastapi_pagination.ext.gino import paginate
 
     app = FastAPI()

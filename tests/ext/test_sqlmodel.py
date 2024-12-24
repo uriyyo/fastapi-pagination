@@ -7,8 +7,7 @@ from sqlmodel import Session, select
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlmodel import paginate
-
-from ..base import BasePaginationTestCase
+from tests.base import BasePaginationTestCase
 
 
 @fixture(scope="session")

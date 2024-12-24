@@ -1,5 +1,6 @@
 import re
-from typing import ClassVar, Generic, Optional, Sequence, TypeVar
+from collections.abc import Sequence
+from typing import ClassVar, Generic, Optional, TypeVar
 
 from fastapi import FastAPI, Query, status
 from fastapi.testclient import TestClient
@@ -148,7 +149,7 @@ def test_params_cast():
 def test_deprecated_signature():
     massage = re.compile(
         r"^The signature of the `AbstractPage\.create` method has changed\. Please, update it to the new one\. "
-        r"\(items: 'Sequence\[T\]', params: 'AbstractParams', \*\*kwargs: 'Any'\) \-\> 'Type'"
+        r"\(items: 'Sequence\[T\]', params: 'AbstractParams', \*\*kwargs: 'Any'\) \-\> 'type'"
         r"\nSupport of old signature will be removed in the next major release \(0\.13\.0\)\.$",
         re.DOTALL | re.MULTILINE,
     )
@@ -239,7 +240,7 @@ def test_deprecated_signature():
 
         class P7(Page[T], Generic[T]):
             def create(
-                cls,
+                self,
                 data: Sequence[T],
                 params: AbstractParams,
                 **kwargs,
