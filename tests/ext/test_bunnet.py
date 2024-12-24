@@ -6,8 +6,8 @@ from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.bunnet import paginate
+from tests.base import BasePaginationTestCase
 
-from ..base import BasePaginationTestCase
 from .utils import mongodb_test
 
 

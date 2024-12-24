@@ -22,8 +22,6 @@ from typing import (
     ClassVar,
     Generic,
     Optional,
-    Sequence,
-    Type,
     TypeVar,
     cast,
 )
@@ -43,6 +41,8 @@ except ImportError:
     class PydanticUndefinedAnnotation(Exception):  # type: ignore[no-redef]
         pass
 
+
+from collections.abc import Sequence
 
 from typing_extensions import Self, TypeGuard, deprecated
 
@@ -215,7 +215,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
         if kwargs:
             args.append(UseParamsFields(**kwargs))
 
-        return cast(Type[Self], CustomizedPage[(cls, *args)])
+        return cast(type[Self], CustomizedPage[(cls, *args)])
 
     @classmethod
     @deprecated(

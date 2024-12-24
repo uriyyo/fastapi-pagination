@@ -17,10 +17,11 @@ import asyncio
 import functools
 import inspect
 import warnings
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Optional, TypeVar, cast, overload
+from collections.abc import Awaitable
+from typing import TYPE_CHECKING, Annotated, Any, Callable, Optional, TypeVar, cast, overload
 
 from pydantic import VERSION, BaseModel
-from typing_extensions import Annotated, Literal, ParamSpec, get_origin
+from typing_extensions import Literal, ParamSpec, get_origin
 
 if TYPE_CHECKING:
     from .bases import AbstractParams, BaseRawParams, CursorRawParams, RawParams
@@ -136,7 +137,7 @@ _CHECK_INSTALLED_EXTENSIONS = True
 
 
 def disable_installed_extensions_check() -> None:
-    global _CHECK_INSTALLED_EXTENSIONS
+    global _CHECK_INSTALLED_EXTENSIONS  # noqa: PLW0603
     _CHECK_INSTALLED_EXTENSIONS = False
 
 

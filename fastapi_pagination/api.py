@@ -15,19 +15,14 @@ __all__ = [
 
 import inspect
 import warnings
-from contextlib import ExitStack, asynccontextmanager, contextmanager, suppress
+from collections.abc import AsyncIterator, Iterator, Sequence
+from contextlib import AbstractContextManager, ExitStack, asynccontextmanager, contextmanager, suppress
 from contextvars import ContextVar
 from typing import (
     Any,
-    AsyncIterator,
     Callable,
-    ContextManager,
-    Dict,
-    Iterator,
     Literal,
     Optional,
-    Sequence,
-    Type,
     TypeVar,
     cast,
     overload,
@@ -50,10 +45,10 @@ from .types import AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 from .utils import IS_PYDANTIC_V2, is_async_callable, unwrap_annotated
 
 T = TypeVar("T")
-TAbstractParams = TypeVar("TAbstractParams", covariant=True, bound=AbstractParams)
+TAbstractParams_co = TypeVar("TAbstractParams_co", covariant=True, bound=AbstractParams)
 
 _params_val: ContextVar[AbstractParams] = ContextVar("_params_val")
-_page_val: ContextVar[Type[AbstractPage[Any]]] = ContextVar("_page_val", default=Page)
+_page_val: ContextVar[type[AbstractPage[Any]]] = ContextVar("_page_val", default=Page)
 
 _rsp_val: ContextVar[Response] = ContextVar("_rsp_val")
 _req_val: ContextVar[Request] = ContextVar("_req_val")
@@ -62,10 +57,10 @@ _items_val: ContextVar[Sequence[Any]] = ContextVar("_items_val")
 _items_transformer_val: ContextVar[Optional[ItemsTransformer]] = ContextVar("_items_transformer_val", default=None)
 
 
-def resolve_params(params: Optional[TAbstractParams] = None) -> TAbstractParams:
+def resolve_params(params: Optional[TAbstractParams_co] = None) -> TAbstractParams_co:
     if params is None:
         try:
-            return cast(TAbstractParams, _params_val.get())
+            return cast(TAbstractParams_co, _params_val.get())
         except LookupError:
             raise RuntimeError("Use params, add_pagination or pagination_ctx") from None
 
@@ -196,7 +191,7 @@ def request() -> Request:
         raise RuntimeError("request context var must be set") from None
 
 
-def _ctx_var_with_reset(var: ContextVar[T], value: T) -> ContextManager[None]:
+def _ctx_var_with_reset(var: ContextVar[T], value: T) -> AbstractContextManager[None]:
     token = var.set(value)
 
     @contextmanager
@@ -209,15 +204,15 @@ def _ctx_var_with_reset(var: ContextVar[T], value: T) -> ContextManager[None]:
     return _reset_ctx()
 
 
-def set_params(params: AbstractParams) -> ContextManager[None]:
+def set_params(params: AbstractParams) -> AbstractContextManager[None]:
     return _ctx_var_with_reset(_params_val, params)
 
 
-def set_page(page: Type[AbstractPage[Any]]) -> ContextManager[None]:
+def set_page(page: type[AbstractPage[Any]]) -> AbstractContextManager[None]:
     return _ctx_var_with_reset(_page_val, page)
 
 
-def set_items_transformer(transformer: ItemsTransformer) -> ContextManager[None]:
+def set_items_transformer(transformer: ItemsTransformer) -> AbstractContextManager[None]:
     return _ctx_var_with_reset(_items_transformer_val, transformer)
 
 
@@ -272,9 +267,9 @@ def apply_items_transformer(
 
 
 def _create_params_dependency(
-    params: Type[TAbstractParams],
-) -> Callable[[TAbstractParams], AsyncIterator[TAbstractParams]]:
-    async def _pagination_params(*args: Any, **kwargs: Any) -> AsyncIterator[TAbstractParams]:
+    params: type[TAbstractParams_co],
+) -> Callable[[TAbstractParams_co], AsyncIterator[TAbstractParams_co]]:
+    async def _pagination_params(*args: Any, **kwargs: Any) -> AsyncIterator[TAbstractParams_co]:
         val = params(*args, **kwargs)
         with set_params(val):
             yield val
@@ -306,8 +301,8 @@ async def _noop_dep() -> None:
 
 
 def pagination_ctx(
-    page: Optional[Type[AbstractPage[Any]]] = None,
-    params: Optional[Type[AbstractParams]] = None,
+    page: Optional[type[AbstractPage[Any]]] = None,
+    params: Optional[type[AbstractParams]] = None,
     transformer: Optional[ItemsTransformer] = None,
     __page_ctx_dep__: bool = False,
 ) -> Callable[..., AsyncIterator[AbstractParams]]:
@@ -365,7 +360,7 @@ def _update_route(route: APIRoute) -> None:
     if not lenient_issubclass(page_cls, AbstractPage):
         return
 
-    cls = cast(Type[AbstractPage[Any]], page_cls)
+    cls = cast(type[AbstractPage[Any]], page_cls)
     dep = Depends(pagination_ctx(cls, __page_ctx_dep__=True))
 
     route.dependencies.append(dep)
@@ -380,7 +375,7 @@ def _update_route(route: APIRoute) -> None:
     route.app = request_response(route.get_route_handler())
 
 
-def _patch_openapi(dst: Dict[str, Any], src: Dict[str, Any]) -> None:
+def _patch_openapi(dst: dict[str, Any], src: dict[str, Any]) -> None:
     with suppress(KeyError):
         dst["paths"].update(src["paths"])
 

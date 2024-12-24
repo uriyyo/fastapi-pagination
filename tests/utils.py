@@ -1,4 +1,4 @@
-from typing import Any, List, Type, TypeVar
+from typing import Any, TypeVar
 
 from faker import Faker
 from pydantic import BaseModel
@@ -17,10 +17,10 @@ if IS_PYDANTIC_V2:
     def parse_obj_as(tp: Any, obj: Any) -> Any:
         return TypeAdapter(tp).validate_python(obj, from_attributes=True)
 
-    def parse_obj(model: Type[T], obj: Any) -> T:
+    def parse_obj(model: type[T], obj: Any) -> T:
         return model.model_validate(obj, from_attributes=True)
 
-    def dump_obj(model: Type[T], obj: Any) -> dict:
+    def dump_obj(model: type[T], obj: Any) -> dict:
         return model.model_dump(obj, by_alias=True)
 else:
     from pydantic import parse_obj_as as _parse_obj_as
@@ -28,14 +28,14 @@ else:
     def parse_obj_as(tp: Any, obj: Any) -> Any:
         return _parse_obj_as(tp, obj)
 
-    def parse_obj(model: Type[T], obj: Any) -> T:
+    def parse_obj(model: type[T], obj: Any) -> T:
         return model.parse_obj(obj)
 
-    def dump_obj(model: Type[T], obj: Any) -> dict:
+    def dump_obj(model: type[T], obj: Any) -> dict:
         return model.dump(obj, by_alias=True)
 
 
-def normalize(model: Type[T], *models: Any) -> List[T]:
+def normalize(model: type[T], *models: Any) -> list[T]:
     return [parse_obj(model, m) for m in models]
 
 

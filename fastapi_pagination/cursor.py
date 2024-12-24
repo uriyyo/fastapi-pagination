@@ -7,13 +7,13 @@ __all__ = [
 
 import binascii
 from base64 import b64decode, b64encode
+from collections.abc import Sequence
 from functools import partial
 from typing import (
     Any,
     ClassVar,
     Generic,
     Optional,
-    Sequence,
     TypeVar,
     overload,
 )

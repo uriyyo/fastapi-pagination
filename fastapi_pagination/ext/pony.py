@@ -5,11 +5,10 @@ from typing import Any, Optional
 from pony.orm.core import Query
 
 from fastapi_pagination import create_page
-
-from ..api import apply_items_transformer
-from ..bases import AbstractParams
-from ..types import AdditionalData, SyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
+from fastapi_pagination.utils import verify_params
 
 
 def paginate(

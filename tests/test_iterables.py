@@ -1,5 +1,5 @@
 from contextlib import suppress
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import FastAPI, Query
 from pytest import fixture
@@ -29,7 +29,7 @@ class TestIterablesPagination(BasePaginationTestCase):
         params=[True, False],
         ids=["with-len", "without-len"],
     )
-    def additional_params(self, request) -> Dict[str, Any]:
+    def additional_params(self, request) -> dict[str, Any]:
         self._should_normalize_expected = request.param
         return {"skip_len": True} if request.param else {}
 

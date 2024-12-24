@@ -63,7 +63,7 @@ asgi-lifespan = "^2.1.0"
 requests = "^2.32.2"
 uvicorn = "^0.33.0"
 Jinja2 = "^3.1.5"
-mypy = "^1.13.0"
+mypy = "^1.14.0"
 ruff = "^0.8.4"
 
 [tool.poetry.extras]
@@ -112,33 +112,40 @@ target-version = "py39"
 
 [tool.ruff.lint]
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
-    "S",  # flake8-bandit
-    "G",  # flake8-logging-format
-    "PIE", # flake8-pie
-    "COM", # flake8-commas
-    "PT", # flake8-pytest-style
-    "Q",  # flake8-quotes
-    "RSE", # flake8-raise
-    "RET", # flake8-return
-    "SIM", # flake8-simplify
-    "TRY", # tryceratops
-    "RUF", # ruff specific rules
+    "ALL",  # select all checks by default
 ]
 ignore = [
-    "B008",  # do not perform function calls in argument defaults
-    "S101",  # use of assert detected
-    "PT013", # allow from pytest import thing
-    "SIM114", # allow have multiplie ifs with same body
-    "TRY003", # allow long exc message
-    "RUF100", # allow unused noqa
-    "RUF012", # allow mutable class var
-    "COM812", # will be handled by ruff format
+    # single rule exclude
+    "B008",    # do not perform function calls in argument defaults
+    "S101",    # use of assert detected
+    "PT013",   # allow from pytest import thing
+    "SIM114",  # allow have multiplie ifs with same body
+    "TRY003",  # allow long exc message
+    "RUF100",  # allow unused noqa
+    "RUF012",  # allow mutable class var
+    "COM812",  # will be handled by ruff format
+    "ISC001",  # will be handled by ruff format
+    "SLF001",  # allow access to private member
+    "N806",    # allow variable name to start from uppercase letter
+    "N805",    # ignore first argument name check
+    "N818",    # ignore exception name should ends with Error suffix
+    "FAST002", # allow to use non-annotated dependencies
+    "PLR0913",  # allow more than 5 arguments
+    "PLR2004", # allow to compare with "magic numbers"
+    "UP007",   # ignore X | Y annotation suggestion
+    "TC001",   # ignore moving things to if TYPE_CHECKING block
+    "TC002",   # ignore moving things to if TYPE_CHECKING block
+    "TC003",   # ignore moving things to if TYPE_CHECKING block
+
+    # full rule exclude
+    "D",    # ignore docstrings
+    "FA",  # ignore future annotations
+    "ANN", # ignore annotations
+    "FIX", # ignore FIXMEs
+    "TD",  # ignore all TODOs
+    "ARG", # ignore unused arguments
+    "FBT", # ignore flake8-boolean-trap
+    "EM",  # ignore error message formatting
 ]
 exclude = [
     ".bzr",

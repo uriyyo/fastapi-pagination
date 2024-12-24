@@ -4,7 +4,8 @@ __all__ = [
     "wrap_scalars",
 ]
 
-from typing import Any, Optional, Protocol, Sequence, TypeVar, Union, cast
+from collections.abc import Sequence
+from typing import Any, Optional, Protocol, TypeVar, Union, cast
 
 from typing_extensions import Self
 

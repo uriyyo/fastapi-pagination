@@ -11,8 +11,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import Select
 from typing_extensions import deprecated
 
-from ..bases import AbstractParams
-from ..types import AdditionalData, SyncItemsTransformer
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
+
 from .sqlalchemy import paginate as _paginate
 
 

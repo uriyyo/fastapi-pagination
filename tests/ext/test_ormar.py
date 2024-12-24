@@ -7,8 +7,7 @@ from sqlalchemy.engine.create import create_engine
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.ormar import paginate
-
-from ..base import BasePaginationTestCase
+from tests.base import BasePaginationTestCase
 
 
 @fixture(scope="session")
@@ -27,7 +26,7 @@ def engine(database_url):
 
 
 @fixture(scope="session")
-def User(meta, db, engine):
+def user_cls(meta, db, engine):
     class User(Model):
         ormar_config = OrmarConfig(
             metadata=meta,
@@ -46,15 +45,15 @@ def User(meta, db, engine):
     params=[True, False],
     ids=["model", "query"],
 )
-def query(request, User):
+def query(request, user_cls):
     if request.param:
-        return User
+        return user_cls
 
-    return User.objects
+    return user_cls.objects
 
 
 @fixture(scope="session")
-def app(db, meta, User, query, model_cls):
+def app(db, meta, user_cls, query, model_cls):
     app = FastAPI()
 
     app.add_event_handler("startup", db.connect)

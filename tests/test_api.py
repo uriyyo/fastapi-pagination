@@ -1,12 +1,12 @@
+from collections.abc import AsyncIterator, Sequence
 from contextlib import asynccontextmanager
-from typing import Any, AsyncIterator, Generic, Sequence, TypeVar
+from typing import Annotated, Any, Generic, TypeVar
 
 from fastapi import Depends, FastAPI, Request, Response, status
 from fastapi.routing import APIRouter
 from fastapi.testclient import TestClient
 from pydantic import Field
 from pytest import fixture
-from typing_extensions import Annotated
 
 try:
     from pydantic.generics import GenericModel

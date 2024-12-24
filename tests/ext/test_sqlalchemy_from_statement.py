@@ -1,4 +1,4 @@
-from typing import Iterator, Type
+from collections.abc import Iterator
 
 from fastapi import Depends, FastAPI
 from pytest import fixture
@@ -7,13 +7,12 @@ from sqlalchemy.orm.session import Session
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy import paginate
-
-from ..base import BasePaginationTestCase
-from ..utils import OptionalLimitOffsetPage, OptionalPage
+from tests.base import BasePaginationTestCase
+from tests.utils import OptionalLimitOffsetPage, OptionalPage
 
 
 @fixture(scope="session")
-def app(sa_user, sa_session: Type[Session], model_cls: Type[object]):
+def app(sa_user, sa_session: type[Session], model_cls: type[object]):
     app = FastAPI()
 
     def get_db() -> Iterator[Session]:

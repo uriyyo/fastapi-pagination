@@ -1,14 +1,14 @@
 __all__ = ["paginate"]
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from motor.core import AgnosticCollection
 from typing_extensions import TypeAlias
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractParams
-from ..types import AdditionalData, AsyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
+from fastapi_pagination.utils import verify_params
 
 if TYPE_CHECKING:
     _AgnosticCollection: TypeAlias = AgnosticCollection[Any]
@@ -18,7 +18,7 @@ else:
 
 async def paginate(
     collection: _AgnosticCollection,
-    query_filter: Optional[Dict[Any, Any]] = None,
+    query_filter: Optional[dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     sort: Optional[Any] = None,
     *,
@@ -47,7 +47,7 @@ async def paginate(
 
 async def paginate_aggregate(
     collection: _AgnosticCollection,
-    aggregate_pipeline: Optional[List[Dict[Any, Any]]] = None,
+    aggregate_pipeline: Optional[list[dict[Any, Any]]] = None,
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,

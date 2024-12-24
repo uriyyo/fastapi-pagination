@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import FastAPI
 from pytest import fixture
 from tortoise import Model
@@ -16,8 +14,7 @@ from tortoise.query_utils import Prefetch
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.tortoise import paginate
-
-from ..base import BasePaginationTestCase
+from tests.base import BasePaginationTestCase
 
 
 class Order(Model):
@@ -47,7 +44,7 @@ class OrderOut(PydanticModel):
 class UserWithRelationOut(PydanticModel):
     id: int
     name: str
-    orders: List[OrderOut]
+    orders: list[OrderOut]
 
 
 @fixture(

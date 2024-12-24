@@ -11,32 +11,31 @@ __all__ = [
 ]
 
 import warnings
+from collections.abc import Sequence
 from contextlib import suppress
-from typing import TYPE_CHECKING, Any, Optional, Sequence, Tuple, TypeVar, Union, overload
+from typing import Any, Optional, TypeVar, Union, cast, overload
 
 from sqlalchemy import func, select, text
+from sqlalchemy.engine import Connection
 from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlalchemy.orm import Query, Session, noload, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import TextClause
 from typing_extensions import Literal, TypeAlias, deprecated
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractPage, AbstractParams, is_cursor
-from ..types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractPage, AbstractParams, is_cursor
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
+from fastapi_pagination.utils import verify_params
+
 from .utils import generic_query_apply_params, unwrap_scalars
-
-if TYPE_CHECKING:
-    from sqlalchemy.engine import Connection
-    from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
-
 
 try:
     from sqlalchemy.orm import FromStatement
 except ImportError:
 
-    class FromStatement:  # type: ignore
+    class FromStatement:  # type: ignore[no-redef]
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             raise ImportError("sqlalchemy.orm.FromStatement is not available")
 
@@ -45,10 +44,10 @@ try:
     from sqlalchemy.util import await_only, greenlet_spawn
 except ImportError:  # pragma: no cover
 
-    async def greenlet_spawn(*_: Any, **__: Any) -> Any:  # type: ignore
+    async def greenlet_spawn(*_: Any, **__: Any) -> Any:  # type: ignore[misc]
         raise ImportError("sqlalchemy.util.greenlet_spawn is not available")
 
-    def await_only(*_: Any, **__: Any) -> Any:  # type: ignore
+    def await_only(*_: Any, **__: Any) -> Any:  # type: ignore[misc]
         raise ImportError("sqlalchemy.util.await_only is not available")
 
 
@@ -56,7 +55,7 @@ try:
     from sqlalchemy.ext.asyncio import async_scoped_session
 except ImportError:  # pragma: no cover
 
-    class async_scoped_session:  # type: ignore
+    class async_scoped_session:  # type: ignore[no-redef]  # noqa: N801
         def __init__(self, *_: Any, **__: Any) -> None:
             raise ImportError("sqlalchemy.ext.asyncio is not available")
 
@@ -77,11 +76,33 @@ UnwrapMode: TypeAlias = Literal[
     "unwrap",  # always unwrap
 ]
 
-TupleAny: TypeAlias = "Tuple[Any, ...]"
+TupleAny: TypeAlias = "tuple[Any, ...]"
 Selectable: TypeAlias = "Union[Select[TupleAny], TextClause, FromStatement[TupleAny], CompoundSelect]"
 SelectableOrQuery: TypeAlias = "Union[Selectable, Query[Any]]"
 
 _selectable_classes = (Select, TextClause, FromStatement, CompoundSelect)
+
+
+def _should_unwrap_scalars_for_query(query: Selectable) -> bool:
+    cols_desc = query.column_descriptions  # type: ignore[union-attr]
+    all_cols = [*query._all_selected_columns]
+
+    # we have select(a, b, c) no need to unwrap
+    if len(cols_desc) != 1:
+        return False
+
+    # select one thing and it has more than one column, unwrap
+    if len(all_cols) > 1:
+        return True
+
+    # select one thing and it has only one column, check if it actually is a select(model)
+    if len(all_cols) == 1:
+        (desc,) = cols_desc
+        expr, entity = [desc.get(key) for key in ("expr", "entity")]
+
+        return expr is not None and expr is entity
+
+    return False
 
 
 def _should_unwrap_scalars(query: Selectable) -> bool:
@@ -92,23 +113,7 @@ def _should_unwrap_scalars(query: Selectable) -> bool:
         return False
 
     try:
-        cols_desc = query.column_descriptions  # type: ignore[union-attr]
-        all_cols = [*query._all_selected_columns]
-
-        # we have select(a, b, c) no need to unwrap
-        if len(cols_desc) != 1:
-            return False
-
-        # select one thing and it has more than one column, unwrap
-        if len(all_cols) > 1:
-            return True
-
-        # select one thing and it has only one column, check if it actually is a select(model)
-        if len(all_cols) == 1:
-            (desc,) = cols_desc
-            expr, entity = [desc.get(key) for key in ("expr", "entity")]
-
-            return expr is not None and expr is entity
+        return _should_unwrap_scalars_for_query(query)
     except (AttributeError, NotImplementedError):
         return True
 
@@ -286,10 +291,10 @@ def _get_sync_conn_from_async(conn: Any) -> SyncConn:  # pragma: no cover
         conn = conn()
 
     with suppress(AttributeError):
-        return conn.sync_session  # type: ignore
+        return cast(Session, conn.sync_session)
 
     with suppress(AttributeError):
-        return conn.sync_connection  # type: ignore
+        return cast(Connection, conn.sync_connection)
 
     raise TypeError("conn must be an AsyncConnection or AsyncSession")
 
@@ -423,7 +428,7 @@ def _old_paginate_sign(
     with suppress(AttributeError):
         query = query._statement_20()  # type: ignore[assignment]
 
-    return query, None, session, params, transformer, additional_data, unique, subquery_count, unwrap_mode  # type: ignore
+    return query, None, session, params, transformer, additional_data, unique, subquery_count, unwrap_mode  # type: ignore[return-value]
 
 
 def _new_paginate_sign(

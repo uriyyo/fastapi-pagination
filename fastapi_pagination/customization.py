@@ -28,28 +28,26 @@ from typing import (
     TYPE_CHECKING,
     Any,
     ClassVar,
-    Dict,
     Generic,
     Optional,
     Protocol,
-    Tuple,
-    Type,
     TypeVar,
     Union,
     cast,
+    get_type_hints,
     runtime_checkable,
 )
 
 from fastapi import Query
 from fastapi.params import Param
 from pydantic import BaseModel, ConfigDict, create_model
-from typing_extensions import TypeAlias, Unpack, get_type_hints
+from typing_extensions import TypeAlias, Unpack
 
 from .bases import AbstractPage, AbstractParams, BaseRawParams
 from .utils import IS_PYDANTIC_V2, get_caller
 
-ClsNamespace: TypeAlias = Dict[str, Any]
-PageCls: TypeAlias = "Type[AbstractPage[Any]]"
+ClsNamespace: TypeAlias = dict[str, Any]
+PageCls: TypeAlias = "type[AbstractPage[Any]]"
 
 TPage = TypeVar("TPage", bound=PageCls)
 
@@ -59,13 +57,12 @@ def get_page_bases(cls: TPage) -> tuple[type[Any], ...]:
 
     if IS_PYDANTIC_V2:
         params = cls.__pydantic_generic_metadata__["parameters"]
-        bases = (cls,) if not params else (cls[params], Generic[params])  # type: ignore
+        bases = (cls,) if not params else (cls[params], Generic[params])  # type: ignore[assignment,index]
+    elif cls.__concrete__:
+        bases = (cls,)
     else:
-        if cls.__concrete__:
-            bases = (cls,)
-        else:
-            params = tuple(cls.__parameters__)
-            bases = (cls[params], Generic[params])  # type: ignore
+        params = tuple(cls.__parameters__)
+        bases = (cls[params], Generic[params])  # type: ignore[assignment,index]
 
     return bases
 
@@ -81,7 +78,7 @@ def new_page_cls(cls: TPage, new_ns: ClsNamespace) -> TPage:
 
 
 if TYPE_CHECKING:
-    from typing_extensions import Annotated as CustomizedPage
+    from typing import Annotated as CustomizedPage
 else:
 
     class CustomizedPage:
@@ -228,7 +225,7 @@ if IS_PYDANTIC_V2:
         return field
 
 else:
-    from pydantic.fields import ModelField as _PydanticField  # type: ignore
+    from pydantic.fields import ModelField as _PydanticField  # type: ignore[no-redef,attr-defined]
 
     def _make_field_optional(field: Any) -> Any:
         assert isinstance(field, _PydanticField)
@@ -342,7 +339,7 @@ class UseFieldsAliases(PageCustomizer):
                 fields_config[name]["alias"] = alias
 
 
-_RawFieldDef: TypeAlias = Union[Any, Tuple[Any, Any]]
+_RawFieldDef: TypeAlias = Union[Any, tuple[Any, Any]]
 
 
 class UseAdditionalFields(PageCustomizer):

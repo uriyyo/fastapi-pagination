@@ -4,10 +4,11 @@ from typing import Any, Optional
 
 from asyncpg import Connection
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractParams
-from ..types import AdditionalData, AsyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
+from fastapi_pagination.utils import verify_params
+
 from .sqlalchemy import create_count_query_from_text, create_paginate_query_from_text
 
 

@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Optional, TypeVar, Union
 
 from bunnet import Document
 from bunnet.odm.enums import SortDirection
@@ -8,10 +8,10 @@ from bunnet.odm.interfaces.aggregate import ClientSession, DocumentProjectionTyp
 from bunnet.odm.queries.aggregation import AggregationQuery
 from bunnet.odm.queries.find import FindMany
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractParams
-from ..types import AdditionalData, SyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
+from fastapi_pagination.utils import verify_params
 
 TDocument = TypeVar("TDocument", bound=Document)
 
@@ -22,8 +22,8 @@ def paginate(
     *,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
-    projection_model: Optional[Type[DocumentProjectionType]] = None,
-    sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
+    projection_model: Optional[type[DocumentProjectionType]] = None,
+    sort: Union[None, str, list[tuple[str, SortDirection]]] = None,
     session: Optional[ClientSession] = None,
     ignore_cache: bool = False,
     fetch_links: bool = False,
@@ -33,7 +33,7 @@ def paginate(
     params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, AggregationQuery):
-        aggregation_query = query.clone()  # type: ignore
+        aggregation_query = query.clone()  # type: ignore[no-untyped-call]
         paginate_data = []
         if raw_params.limit is not None:
             paginate_data.append({"$limit": raw_params.limit + (raw_params.offset or 0)})

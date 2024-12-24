@@ -1,4 +1,5 @@
-from typing import Any, Callable, Optional, Sequence, TypeVar
+from collections.abc import Sequence
+from typing import Any, Callable, Optional, TypeVar
 
 __all__ = ["paginate"]
 

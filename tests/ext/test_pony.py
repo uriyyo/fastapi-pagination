@@ -8,8 +8,7 @@ from pytest import fixture, mark
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.pony import paginate
 from fastapi_pagination.utils import IS_PYDANTIC_V2
-
-from ..base import BasePaginationTestCase
+from tests.base import BasePaginationTestCase
 
 
 @fixture(scope="session")
@@ -63,7 +62,7 @@ def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
     with suppress(Exception):
         pony_db.generate_mapping(create_tables=False)
 
-    class model_pony_with_rel_cls(model_with_rel_cls):
+    class PonyModelWithDel(model_with_rel_cls):
         @_field_validator
         def pony_set_to_list(cls, values):
             if not isinstance(values, list):
@@ -73,8 +72,8 @@ def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
 
     @app.get("/default", response_model=Page[model_cls])
     @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    @app.get("/relationship/default", response_model=Page[model_pony_with_rel_cls])
-    @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[model_pony_with_rel_cls])
+    @app.get("/relationship/default", response_model=Page[PonyModelWithDel])
+    @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[PonyModelWithDel])
     def route():
         with db_session:
             return paginate(select(p for p in pony_user))

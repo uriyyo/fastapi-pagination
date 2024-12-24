@@ -2,10 +2,12 @@ from __future__ import annotations
 
 __all__ = ["Page"]
 
+from collections.abc import MutableMapping
 from math import ceil
-from typing import Any, Generic, MutableMapping, TypeVar
+from typing import Any, Generic, TypeVar
 
-from ..default import Page as BasePage
+from fastapi_pagination.default import Page as BasePage
+
 from .bases import Links, create_links, validation_decorator
 
 T = TypeVar("T")

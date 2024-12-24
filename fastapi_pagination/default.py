@@ -6,8 +6,9 @@ __all__ = [
     "Params",
 ]
 
+from collections.abc import Sequence
 from math import ceil
-from typing import Any, Generic, Optional, Sequence, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel

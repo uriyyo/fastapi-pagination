@@ -1,4 +1,4 @@
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 
 from fastapi import Depends, FastAPI
 from pytest import fixture
@@ -8,8 +8,8 @@ from sqlalchemy.orm import selectinload
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.async_sqlalchemy import paginate
+from tests.base import BasePaginationTestCase
 
-from ..base import BasePaginationTestCase
 from .utils import sqlalchemy20
 
 

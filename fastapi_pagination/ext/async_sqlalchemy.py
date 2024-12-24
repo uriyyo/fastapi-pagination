@@ -8,8 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlalchemy.sql import Select
 from typing_extensions import deprecated
 
-from ..bases import AbstractParams
-from ..types import AdditionalData, AsyncItemsTransformer
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
+
 from .sqlalchemy import paginate as _paginate
 
 

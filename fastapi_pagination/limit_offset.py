@@ -6,7 +6,8 @@ __all__ = [
     "OptionalLimitOffsetParams",
 ]
 
-from typing import Any, Generic, Optional, Sequence, TypeVar
+from collections.abc import Sequence
+from typing import Any, Generic, Optional, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel

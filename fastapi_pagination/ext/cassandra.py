@@ -1,22 +1,23 @@
 __all__ = ["paginate"]
 
-from typing import Any, Dict, Mapping, Optional, Type, TypeVar
+from collections.abc import Mapping
+from typing import Any, Optional, TypeVar
 
 from cassandra.cluster import SimpleStatement
 from cassandra.cqlengine import connection
 from cassandra.cqlengine.models import Model
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractParams
-from ..types import AdditionalData, SyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
+from fastapi_pagination.utils import verify_params
 
 T = TypeVar("T", bound=Mapping[str, Any])
 
 
 def paginate(
-    model: Type[Model],
-    query_filter: Optional[Dict[Any, Any]] = None,
+    model: type[Model],
+    query_filter: Optional[dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[SyncItemsTransformer] = None,

@@ -1,5 +1,3 @@
-from typing import List
-
 from cassandra.cqlengine import columns, connection, management, models
 from fastapi import FastAPI, status
 from pydantic import parse_obj_as
@@ -9,8 +7,7 @@ from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage as BaseCursorPage
 from fastapi_pagination.customization import CustomizedPage, UseParamsFields
 from fastapi_pagination.ext.cassandra import paginate
-
-from ..schemas import UserOut
+from tests.schemas import UserOut
 
 CursorPage = CustomizedPage[
     BaseCursorPage,
@@ -46,7 +43,7 @@ def app(cassandra_session, raw_data):
 
 @mark.asyncio(loop_scope="session")
 async def test_cursor(app, client, entities):
-    entities = sorted(parse_obj_as(List[UserOut], entities), key=(lambda it: (it.id, it.name)))
+    entities = sorted(parse_obj_as(list[UserOut], entities), key=(lambda it: (it.id, it.name)))
 
     items = []
 
@@ -58,7 +55,7 @@ async def test_cursor(app, client, entities):
         assert resp.status_code == status.HTTP_200_OK
         data = resp.json()
 
-        items.extend(parse_obj_as(List[UserOut], data["items"]))
+        items.extend(parse_obj_as(list[UserOut], data["items"]))
 
         if data["next_page"] is None:
             break

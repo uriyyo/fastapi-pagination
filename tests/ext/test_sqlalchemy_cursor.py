@@ -1,4 +1,5 @@
-from typing import Iterator, List, TypeVar
+from collections.abc import Iterator
+from typing import TypeVar
 
 from _pytest.python_api import raises
 from fastapi import Depends, FastAPI, status
@@ -10,9 +11,9 @@ from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage
 from fastapi_pagination.customization import CustomizedPage, UseQuotedCursor
 from fastapi_pagination.ext.sqlalchemy import paginate
+from tests.schemas import UserOut
+from tests.utils import parse_obj_as
 
-from ..schemas import UserOut
-from ..utils import parse_obj_as
 from .utils import sqlalchemy20
 
 
@@ -57,7 +58,7 @@ def app(sa_user, sa_order, sa_session, quoted_cursor):
 @sqlalchemy20
 @mark.asyncio(loop_scope="session")
 async def test_cursor(app, client, entities):
-    entities = sorted(parse_obj_as(List[UserOut], entities), key=(lambda it: (it.id, it.name)))
+    entities = sorted(parse_obj_as(list[UserOut], entities), key=(lambda it: (it.id, it.name)))
 
     items = []
 
@@ -69,7 +70,7 @@ async def test_cursor(app, client, entities):
         assert resp.status_code == status.HTTP_200_OK
         data = resp.json()
 
-        items.extend(parse_obj_as(List[UserOut], data["items"]))
+        items.extend(parse_obj_as(list[UserOut], data["items"]))
 
         if data["next_page"] is None:
             break
@@ -87,7 +88,7 @@ async def test_cursor(app, client, entities):
         assert resp.status_code == status.HTTP_200_OK
         data = resp.json()
 
-        items = parse_obj_as(List[UserOut], data["items"]) + items
+        items = parse_obj_as(list[UserOut], data["items"]) + items
 
         if data["previous_page"] is None:
             break
@@ -99,8 +100,8 @@ async def test_cursor(app, client, entities):
 
 @sqlalchemy20
 @mark.asyncio(loop_scope="session")
-async def test_cursor_refetch(app, client, entities, postgres_url):
-    entities = sorted(parse_obj_as(List[UserOut], entities), key=(lambda it: (it.id, it.name)))
+async def test_cursor_refetch(app, client, entities, postgres_url):  # noqa: PLR0915
+    entities = sorted(parse_obj_as(list[UserOut], entities), key=(lambda it: (it.id, it.name)))
     first_85_entities = entities[:85]
     last_85_entities = entities[15:]
 
@@ -115,7 +116,7 @@ async def test_cursor_refetch(app, client, entities, postgres_url):
         assert resp.status_code == status.HTTP_200_OK
         data = resp.json()
 
-        items.extend(parse_obj_as(List[UserOut], data["items"]))
+        items.extend(parse_obj_as(list[UserOut], data["items"]))
 
         current = data["current_page"]
 
@@ -137,7 +138,7 @@ async def test_cursor_refetch(app, client, entities, postgres_url):
         assert resp.status_code == status.HTTP_200_OK
         data = resp.json()
 
-        items.extend(parse_obj_as(List[UserOut], data["items"]))
+        items.extend(parse_obj_as(list[UserOut], data["items"]))
 
         if data["next_page"] is None:
             break
@@ -155,7 +156,7 @@ async def test_cursor_refetch(app, client, entities, postgres_url):
         assert resp.status_code == status.HTTP_200_OK
         data = resp.json()
 
-        items = parse_obj_as(List[UserOut], data["items"]) + items
+        items = parse_obj_as(list[UserOut], data["items"]) + items
 
         current = data["current_page_backwards"]
 
@@ -177,7 +178,7 @@ async def test_cursor_refetch(app, client, entities, postgres_url):
         assert resp.status_code == status.HTTP_200_OK
         data = resp.json()
 
-        items = parse_obj_as(List[UserOut], data["items"]) + items
+        items = parse_obj_as(list[UserOut], data["items"]) + items
 
         if data["previous_page"] is None:
             break

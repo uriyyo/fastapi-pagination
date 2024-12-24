@@ -1,14 +1,15 @@
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Type, TypeVar, overload
+from typing import Any, Optional, TypeVar, overload
 
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select, SelectOfScalar
 from typing_extensions import deprecated
 
-from ..bases import AbstractParams
-from ..types import AdditionalData, AsyncItemsTransformer
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
+
 from .sqlmodel import paginate as _paginate
 
 T = TypeVar("T")
@@ -59,7 +60,7 @@ async def paginate(
 )
 async def paginate(
     session: AsyncSession,
-    query: Type[TSQLModel],
+    query: type[TSQLModel],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,

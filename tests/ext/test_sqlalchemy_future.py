@@ -1,4 +1,4 @@
-from typing import Iterator
+from collections.abc import Iterator
 
 from fastapi import Depends, FastAPI
 from pytest import fixture
@@ -8,8 +8,8 @@ from sqlalchemy.orm.session import Session
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy_future import paginate
+from tests.base import BasePaginationTestCase
 
-from ..base import BasePaginationTestCase
 from .utils import sqlalchemy20
 
 

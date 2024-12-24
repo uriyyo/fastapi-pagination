@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import BaseModel
 
 from fastapi_pagination.utils import IS_PYDANTIC_V2
@@ -34,7 +32,7 @@ class UserWithOrderOut(BaseSchema):
     id: int
     name: str
 
-    orders: List[OrderOut]
+    orders: list[OrderOut]
 
 
 __all__ = [

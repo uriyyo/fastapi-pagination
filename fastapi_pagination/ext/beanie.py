@@ -3,22 +3,19 @@ from __future__ import annotations
 __all__ = ["paginate"]
 
 from copy import copy
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
+from typing import Any, Optional, TypeVar, Union
 
 from beanie import Document
 from beanie.odm.enums import SortDirection
 from beanie.odm.interfaces.aggregate import DocumentProjectionType
 from beanie.odm.queries.aggregation import AggregationQuery
 from beanie.odm.queries.find import FindMany
+from motor.motor_asyncio import AsyncIOMotorClientSession
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractParams
-from ..types import AdditionalData, AsyncItemsTransformer
-from ..utils import verify_params
-
-if TYPE_CHECKING:
-    from motor.motor_asyncio import AsyncIOMotorClientSession
-
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
+from fastapi_pagination.utils import verify_params
 
 TDocument = TypeVar("TDocument", bound=Document)
 
@@ -40,7 +37,7 @@ async def paginate(
     params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, AggregationQuery):
-        aggregation_query = query.clone()  # type: ignore
+        aggregation_query = query.clone()  # type: ignore[no-untyped-call]
         paginate_data = []
         if raw_params.limit is not None:
             paginate_data.append({"$limit": raw_params.limit + (raw_params.offset or 0)})

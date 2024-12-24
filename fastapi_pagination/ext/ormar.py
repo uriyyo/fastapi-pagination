@@ -1,20 +1,21 @@
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Type, TypeVar, Union
+from typing import Any, Optional, TypeVar, Union
 
 from ormar import Model, QuerySet
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractParams
-from ..types import AdditionalData, AsyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
+from fastapi_pagination.utils import verify_params
+
 from .utils import generic_query_apply_params
 
 TModel = TypeVar("TModel", bound=Model)
 
 
 async def paginate(
-    query: Union[QuerySet[TModel], Type[TModel]],
+    query: Union[QuerySet[TModel], type[TModel]],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,

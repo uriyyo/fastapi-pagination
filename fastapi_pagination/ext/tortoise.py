@@ -1,15 +1,16 @@
 __all__ = ["paginate"]
 
-from typing import Any, List, Optional, Type, TypeVar, Union
+from typing import Any, Optional, TypeVar, Union
 
 from tortoise.models import Model
 from tortoise.query_utils import Prefetch
 from tortoise.queryset import QuerySet
 
-from ..api import apply_items_transformer, create_page
-from ..bases import AbstractParams
-from ..types import AdditionalData, AsyncItemsTransformer
-from ..utils import verify_params
+from fastapi_pagination.api import apply_items_transformer, create_page
+from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
+from fastapi_pagination.utils import verify_params
+
 from .utils import generic_query_apply_params
 
 TModel = TypeVar("TModel", bound=Model)
@@ -17,7 +18,7 @@ TModel = TypeVar("TModel", bound=Model)
 
 def _generate_query(
     query: QuerySet[TModel],
-    prefetch_related: Union[bool, List[Union[str, Prefetch]]],
+    prefetch_related: Union[bool, list[Union[str, Prefetch]]],
 ) -> QuerySet[TModel]:
     if prefetch_related:
         if prefetch_related is True:
@@ -29,9 +30,9 @@ def _generate_query(
 
 
 async def paginate(
-    query: Union[QuerySet[TModel], Type[TModel]],
+    query: Union[QuerySet[TModel], type[TModel]],
     params: Optional[AbstractParams] = None,
-    prefetch_related: Union[bool, List[Union[str, Prefetch]]] = False,
+    prefetch_related: Union[bool, list[Union[str, Prefetch]]] = False,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
