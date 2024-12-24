@@ -17,7 +17,7 @@ import asyncio
 import functools
 import inspect
 import warnings
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Optional, Tuple, Type, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Optional, TypeVar, cast, overload
 
 from pydantic import VERSION, BaseModel
 from typing_extensions import Annotated, Literal, ParamSpec, get_origin
@@ -33,21 +33,21 @@ IS_PYDANTIC_V2 = VERSION.startswith("2.")
 
 
 @overload
-def verify_params(params: Optional[TParams], *params_types: Literal["limit-offset"]) -> Tuple[TParams, RawParams]:
+def verify_params(params: Optional[TParams], *params_types: Literal["limit-offset"]) -> tuple[TParams, RawParams]:
     pass
 
 
 @overload
-def verify_params(params: Optional[TParams], *params_types: Literal["cursor"]) -> Tuple[TParams, CursorRawParams]:
+def verify_params(params: Optional[TParams], *params_types: Literal["cursor"]) -> tuple[TParams, CursorRawParams]:
     pass
 
 
 @overload
-def verify_params(params: Optional[TParams], *params_types: ParamsType) -> Tuple[TParams, BaseRawParams]:
+def verify_params(params: Optional[TParams], *params_types: ParamsType) -> tuple[TParams, BaseRawParams]:
     pass
 
 
-def verify_params(params: Optional[TParams], *params_types: ParamsType) -> Tuple[TParams, BaseRawParams]:
+def verify_params(params: Optional[TParams], *params_types: ParamsType) -> tuple[TParams, BaseRawParams]:
     from .api import resolve_params
 
     params = resolve_params(params)
@@ -166,7 +166,7 @@ def get_caller(depth: int = 1) -> Optional[str]:
     return cast(Optional[str], frame and frame.f_globals.get("__name__"))
 
 
-def create_pydantic_model(model_cls: Type[TModel], /, **kwargs: Any) -> TModel:
+def create_pydantic_model(model_cls: type[TModel], /, **kwargs: Any) -> TModel:
     if IS_PYDANTIC_V2:
         return model_cls.model_validate(kwargs, from_attributes=True)
 

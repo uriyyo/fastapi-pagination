@@ -2,7 +2,7 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 from gino.crud import CRUDModel
 from sqlalchemy import func, literal_column
@@ -16,7 +16,7 @@ from .sqlalchemy import create_paginate_query
 
 
 async def paginate(
-    query: Union[Select[Tuple[Any, ...]], CRUDModel],
+    query: Union[Select[tuple[Any, ...]], CRUDModel],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,

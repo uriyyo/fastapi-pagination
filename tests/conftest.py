@@ -268,9 +268,12 @@ def pytest_collection_modifyitems(items: List[Function]):
 
 @async_fixture(scope="class")
 async def client(app: FastAPI):
-    async with LifespanManager(app), AsyncClient(
-        transport=ASGITransport(app),
-        base_url="http://testserver",
-        timeout=60,
-    ) as c:
+    async with (
+        LifespanManager(app),
+        AsyncClient(
+            transport=ASGITransport(app),
+            base_url="http://testserver",
+            timeout=60,
+        ) as c,
+    ):
         yield c

@@ -397,7 +397,7 @@ def _old_paginate_sign(
     transformer: Optional[ItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
-) -> Tuple[
+) -> tuple[
     Select[TupleAny],
     Optional[Selectable],
     SyncConn,
@@ -437,7 +437,7 @@ def _new_paginate_sign(
     transformer: Optional[ItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
-) -> Tuple[
+) -> tuple[
     Select[TupleAny],
     Optional[Selectable],
     SyncConn,

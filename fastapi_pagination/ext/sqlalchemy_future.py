@@ -4,7 +4,7 @@ __all__ = [
     "paginate",
 ]
 
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 from sqlalchemy.future import Connection
 from sqlalchemy.orm import Session
@@ -23,7 +23,7 @@ from .sqlalchemy import paginate as _paginate
 )
 def paginate(
     conn: Union[Connection, Session],
-    query: Select[Tuple[Any, ...]],
+    query: Select[tuple[Any, ...]],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[SyncItemsTransformer] = None,

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 __all__ = ["paginate"]
 
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlalchemy.sql import Select
@@ -20,7 +20,7 @@ from .sqlalchemy import paginate as _paginate
 )
 async def paginate(
     conn: Union[AsyncSession, AsyncConnection],
-    query: Select[Tuple[Any, ...]],
+    query: Select[tuple[Any, ...]],
     params: Optional[AbstractParams] = None,
     *,
     transformer: Optional[AsyncItemsTransformer] = None,

@@ -54,8 +54,8 @@ PageCls: TypeAlias = "Type[AbstractPage[Any]]"
 TPage = TypeVar("TPage", bound=PageCls)
 
 
-def get_page_bases(cls: TPage) -> Tuple[Type[Any], ...]:
-    bases: Tuple[Type[Any], ...]
+def get_page_bases(cls: TPage) -> tuple[type[Any], ...]:
+    bases: tuple[type[Any], ...]
 
     if IS_PYDANTIC_V2:
         params = cls.__pydantic_generic_metadata__["parameters"]
@@ -194,7 +194,7 @@ class UseQuotedCursor(PageCustomizer):
 
 @dataclass
 class UseParams(PageCustomizer):
-    params: Type[AbstractParams]
+    params: type[AbstractParams]
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         if page_cls.__params_type__ is not ns["__params_type__"]:
@@ -206,7 +206,7 @@ class UseParams(PageCustomizer):
         ns["__params_type__"] = self.params
 
 
-def _get_model_fields(cls: Type[BaseModel]) -> ClsNamespace:
+def _get_model_fields(cls: type[BaseModel]) -> ClsNamespace:
     if IS_PYDANTIC_V2:
         return {**cls.model_fields}
 
@@ -236,7 +236,7 @@ else:
         return None
 
 
-def _update_params_fields(cls: Type[AbstractParams], fields: ClsNamespace) -> ClsNamespace:
+def _update_params_fields(cls: type[AbstractParams], fields: ClsNamespace) -> ClsNamespace:
     if not issubclass(cls, BaseModel):
         raise TypeError(f"{cls.__name__} must be subclass of BaseModel")
 
