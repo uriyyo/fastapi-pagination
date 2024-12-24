@@ -2,18 +2,16 @@ from collections.abc import AsyncIterator, Sequence
 from contextlib import asynccontextmanager
 from typing import Annotated, Any, Generic, TypeVar
 
+import pytest
 from fastapi import Depends, FastAPI, Request, Response, status
 from fastapi.routing import APIRouter
 from fastapi.testclient import TestClient
 from pydantic import Field
-from pytest import fixture
 
 try:
     from pydantic.generics import GenericModel
 except ImportError:  # pragma: no cover
     from pydantic import BaseModel as GenericModel
-
-from pytest import raises
 
 from fastapi_pagination import (
     Page,
@@ -46,10 +44,10 @@ def test_set_response_request():
 
 
 def test_get_empty_response_request():
-    with raises(RuntimeError, match=r"^response context var must be set$"):
+    with pytest.raises(RuntimeError, match=r"^response context var must be set$"):
         response()
 
-    with raises(RuntimeError, match=r"^request context var must be set$"):
+    with pytest.raises(RuntimeError, match=r"^request context var must be set$"):
         request()
 
 
@@ -152,7 +150,7 @@ def test_add_pagination_additional_dependencies():
 
 
 def test_pagination_items_outside_create_page():
-    with raises(
+    with pytest.raises(
         RuntimeError,
         match=r"^pagination_items must be called inside create_page$",
     ):
@@ -160,10 +158,10 @@ def test_pagination_items_outside_create_page():
 
 
 def test_create_page_duplicate_params():
-    with raises(TypeError):
+    with pytest.raises(TypeError):
         create_page([], 1, Params(), total=0)
 
-    with raises(TypeError):
+    with pytest.raises(TypeError):
         create_page([], 1, Params(), params=None)
 
 
@@ -233,7 +231,7 @@ def test_apply_items_transformer_sync_with_async_transformer():
     async def async_transformer(items):
         return [i * 2 for i in items]
 
-    with raises(
+    with pytest.raises(
         ValueError,
         match=r"^apply_items_transformer called with async_=False but transformer is async$",
     ):
@@ -275,7 +273,7 @@ def test_unwrap_annotated():
 
 
 class TestLifespan:
-    @fixture(scope="class")
+    @pytest.fixture(scope="class")
     def app(self):
         @asynccontextmanager
         async def lifespan(_: Any) -> AsyncIterator[None]:
@@ -304,7 +302,7 @@ class TestLifespan:
 
 
 class TestPatchOpenAPI:
-    @fixture(scope="class")
+    @pytest.fixture(scope="class")
     def app(self):
         app = FastAPI()
         app.openapi()["info"]["title"] = "Custom Title"

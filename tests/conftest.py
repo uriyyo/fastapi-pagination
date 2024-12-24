@@ -7,12 +7,12 @@ from typing import Any
 
 import aiosqlite
 import asyncpg
+import pytest
 from asgi_lifespan import LifespanManager
 from cassandra.cluster import Cluster
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from motor.motor_asyncio import AsyncIOMotorClient
-from pytest import FixtureRequest, Function, Parser, fixture
 from pytest_asyncio import fixture as async_fixture
 from typing_extensions import TypeAlias
 
@@ -22,7 +22,7 @@ from .utils import faker
 RawData: TypeAlias = list[dict[str, Any]]
 
 
-def pytest_addoption(parser: Parser):
+def pytest_addoption(parser: pytest.Parser):
     parser.addoption(
         "--postgres-dsn",
         type=str,
@@ -50,17 +50,17 @@ def pytest_addoption(parser: Parser):
     )
 
 
-@fixture(scope="session")
-def is_unit_tests_run(request: FixtureRequest) -> bool:
+@pytest.fixture(scope="session")
+def is_unit_tests_run(request: pytest.FixtureRequest) -> bool:
     return request.config.getoption("--unit-tests")
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def is_sql_tests_run(request):
     return request.config.getoption("--sql-tests")
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def raw_data() -> RawData:
     user_ids = count(1)
     order_ids = count(1)
@@ -85,12 +85,12 @@ def raw_data() -> RawData:
     return [generate_one() for _ in range(100)]
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def entities(raw_data: RawData) -> list[UserWithOrderOut]:
     return [UserWithOrderOut(**data) for data in raw_data]
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def cassandra_session(cassandra_address: str, is_unit_tests_run: bool, is_sql_tests_run: bool):
     if is_unit_tests_run or is_sql_tests_run:
         return
@@ -208,45 +208,45 @@ async def _setup_mongodb(mongodb_url: str, raw_data: RawData, is_unit_tests_run:
     client.close()
 
 
-@fixture(scope="session")
-def mongodb_url(request: FixtureRequest) -> str:
+@pytest.fixture(scope="session")
+def mongodb_url(request: pytest.FixtureRequest) -> str:
     return request.config.getoption("--mongodb-dsn")
 
 
-@fixture(scope="session")
-def postgres_url(request: FixtureRequest) -> str:
+@pytest.fixture(scope="session")
+def postgres_url(request: pytest.FixtureRequest) -> str:
     return request.config.getoption("--postgres-dsn")
 
 
-@fixture(scope="session")
-def cassandra_address(request: FixtureRequest) -> str:
+@pytest.fixture(scope="session")
+def cassandra_address(request: pytest.FixtureRequest) -> str:
     return request.config.getoption("--cassandra-dsn")
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def sqlite_file() -> str:
     return str(Path("./test_db.sqlite").resolve().absolute())
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def sqlite_url(sqlite_file: str) -> str:
     return f"sqlite:///{sqlite_file}"
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def is_async_db() -> bool:
     return False
 
 
-@fixture(
+@pytest.fixture(
     scope="session",
     params=["postgres", "sqlite"],
 )
-def db_type(request: FixtureRequest) -> str:
+def db_type(request: pytest.FixtureRequest) -> str:
     return request.param
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def database_url(db_type: str, postgres_url: str, sqlite_url: str, is_async_db: bool) -> str:
     url = postgres_url if db_type == "postgres" else sqlite_url
 
@@ -257,12 +257,12 @@ def database_url(db_type: str, postgres_url: str, sqlite_url: str, is_async_db: 
     return url
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def event_loop():
     return new_event_loop()
 
 
-def pytest_collection_modifyitems(items: list[Function]):
+def pytest_collection_modifyitems(items: list[pytest.Function]):
     items.sort(key=lambda it: (it.path, it.name))
 
 

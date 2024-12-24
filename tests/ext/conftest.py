@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, Union
 
-from pytest import Item, Module, fixture
+import pytest
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, relationship, sessionmaker
@@ -27,12 +27,12 @@ except ImportError:
 PossiblyAsyncEngine: TypeAlias = Union[Engine, AsyncEngine]
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def sa_engine_params(database_url: str) -> dict:
     return {}
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def sa_engine(database_url: str, sa_engine_params: dict, is_async_db: bool) -> PossiblyAsyncEngine:
     if is_async_db:
         return create_async_engine(database_url, **sa_engine_params)
@@ -40,18 +40,18 @@ def sa_engine(database_url: str, sa_engine_params: dict, is_async_db: bool) -> P
     return create_engine(database_url, **sa_engine_params)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def sa_session(sa_engine: PossiblyAsyncEngine, is_async_db: bool):
     session_cls = AsyncSession if is_async_db else Session
     return sessionmaker(bind=sa_engine, class_=session_cls)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def sa_base(sa_engine: PossiblyAsyncEngine):
     return declarative_base()
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def sa_order(sa_base):
     class Order(sa_base):
         __tablename__ = "orders"
@@ -65,7 +65,7 @@ def sa_order(sa_base):
     return Order
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def sa_user(sa_base, sa_order):
     class User(sa_base):
         __tablename__ = "users"
@@ -78,7 +78,7 @@ def sa_user(sa_base, sa_order):
     return User
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def sm_user(sm_order):
     class User(SQLModel, table=True):
         __tablename__ = "users"
@@ -91,7 +91,7 @@ def sm_user(sm_order):
     return User
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def sm_order():
     class Order(SQLModel, table=True):
         __tablename__ = "orders"
@@ -103,7 +103,7 @@ def sm_order():
     return Order
 
 
-class _SkipExtItem(Item):
+class _SkipExtItem(pytest.Item):
     def setup(self) -> None:
         pass
 
@@ -111,7 +111,7 @@ class _SkipExtItem(Item):
         pass
 
 
-class DummyModule(Module):
+class DummyModule(pytest.Module):
     def collect(self):
         # return skipped item here
         return []

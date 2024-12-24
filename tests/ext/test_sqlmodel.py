@@ -1,7 +1,7 @@
 from functools import partial
 
+import pytest
 from fastapi import FastAPI
-from pytest import fixture
 from sqlalchemy.orm import selectinload
 from sqlmodel import Session, select
 
@@ -10,18 +10,18 @@ from fastapi_pagination.ext.sqlmodel import paginate
 from tests.base import BasePaginationTestCase
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def session(sa_engine):
     return partial(Session, sa_engine)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app():
     return FastAPI()
 
 
 class TestSQLModelDefault(BasePaginationTestCase):
-    @fixture(
+    @pytest.fixture(
         scope="session",
         params=[True, False],
         ids=["model", "query"],
@@ -32,7 +32,7 @@ class TestSQLModelDefault(BasePaginationTestCase):
 
         return select(sm_user)
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def app(self, app, query, session, model_cls):
         @app.get("/default", response_model=Page[model_cls])
         @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
@@ -46,7 +46,7 @@ class TestSQLModelDefault(BasePaginationTestCase):
 class TestSQLModelRelationship(BasePaginationTestCase):
     pagination_types = ["relationship"]
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def app(self, app, session, sm_user, model_with_rel_cls):
         @app.get("/relationship/default", response_model=Page[model_with_rel_cls])
         @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[model_with_rel_cls])

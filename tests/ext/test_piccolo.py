@@ -3,12 +3,12 @@ from itertools import count
 from pathlib import Path
 from typing import cast
 
+import pytest
 from fastapi import FastAPI
 from piccolo.columns import Integer, Text
 from piccolo.conf.apps import AppConfig, AppRegistry
 from piccolo.engine import SQLiteEngine, engine_finder
 from piccolo.table import Table
-from pytest import fixture
 from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -26,7 +26,7 @@ class User(Table, tablename="users"):
     name = Text(required=False, null=True)
 
 
-@fixture(
+@pytest.fixture(
     scope="session",
     params=[True, False],
     ids=["model", "query"],
@@ -48,7 +48,7 @@ APP_CONFIG = AppConfig(
 )
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def database_url():
     return "piccolo.sqlite"
 
@@ -65,7 +65,7 @@ async def engine(database_url):
     await User.create_table().run()
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(query, engine, model_cls):
     app = FastAPI()
 

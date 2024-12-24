@@ -1,9 +1,9 @@
 from typing import Any
 
+import pytest
 from fastapi import Depends, FastAPI, status
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
-from pytest import mark
 
 from fastapi_pagination import add_pagination, paginate, pagination_ctx
 from fastapi_pagination.links import LimitOffsetPage, Page
@@ -49,7 +49,7 @@ async def route_3():
 add_pagination(app)
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     ("self", "prev", "next", "first", "last"),
     [
         (

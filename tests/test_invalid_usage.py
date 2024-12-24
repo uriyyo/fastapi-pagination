@@ -1,6 +1,6 @@
+import pytest
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
-from pytest import raises
 
 from fastapi_pagination import LimitOffsetParams, add_pagination
 from fastapi_pagination.paginator import paginate
@@ -14,7 +14,7 @@ def test_params_not_set():
     def route():
         return paginate([])
 
-    with raises(RuntimeError, match="Use params, add_pagination or pagination_ctx"):
+    with pytest.raises(RuntimeError, match="Use params, add_pagination or pagination_ctx"):
         client.get("/")
 
 
@@ -27,5 +27,5 @@ def test_default_page_with_limit_offset():
         return paginate([], params)
 
     add_pagination(app)
-    with raises(TypeError, match="Page should be used with Params"):
+    with pytest.raises(TypeError, match="Page should be used with Params"):
         client.get("/")

@@ -2,8 +2,8 @@ from collections.abc import Iterator
 from contextlib import closing
 from typing import Any
 
+import pytest
 from fastapi import Depends, FastAPI
-from pytest import fixture, mark, skip
 from sqlalchemy import select
 from sqlalchemy.orm.session import Session
 
@@ -15,19 +15,19 @@ from tests.schemas import UserOut, UserWithoutIDOut
 from .utils import is_sqlalchemy20, sqlalchemy20
 
 
-@fixture(
+@pytest.fixture(
     scope="session",
     params=[True, False],
     ids=["subquery_count", "no_subquery_count"],
 )
 def use_subquery_count(request):
     if request.param and not is_sqlalchemy20:
-        skip("subquery_count is not supported for SQLAlchemy<2.0")
+        pytest.skip("subquery_count is not supported for SQLAlchemy<2.0")
 
     return request.param
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(sa_user, sa_session: type[Session], model_cls: type[object], use_subquery_count: bool):
     app = FastAPI()
 
@@ -60,7 +60,7 @@ class TestSQLAlchemy(BasePaginationTestCase):
 
         assert page.dict()["items"] == [{"id": entry.id, "name": entry.name} for entry in entities[:10]]
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ("query", "validate"),
         [
             (
@@ -94,7 +94,7 @@ class TestSQLAlchemy(BasePaginationTestCase):
         assert page.items
         assert validate(sa_user, page.items[0])
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ("unwrap_mode", "validate"),
         [
             (None, lambda item, sa_user: isinstance(item, sa_user)),
@@ -115,7 +115,7 @@ class TestSQLAlchemy(BasePaginationTestCase):
 
         assert validate(page.items[0], sa_user)
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ("unwrap_mode", "validate"),
         [
             (None, lambda item, sa_user: len(item) == 1),
@@ -136,7 +136,7 @@ class TestSQLAlchemy(BasePaginationTestCase):
 
         assert validate(page.items[0], sa_user)
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ("unwrap_mode", "validate"),
         [
             (None, lambda item, sa_user: len(item) == 2),

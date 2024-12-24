@@ -1,8 +1,8 @@
 from contextlib import suppress
 from typing import Any
 
+import pytest
 from fastapi import FastAPI, Query
-from pytest import fixture
 
 from fastapi_pagination import add_pagination
 from fastapi_pagination.iterables import LimitOffsetPage, Page, paginate
@@ -25,7 +25,7 @@ class TestIterablesPagination(BasePaginationTestCase):
 
         return result
 
-    @fixture(
+    @pytest.fixture(
         params=[True, False],
         ids=["with-len", "without-len"],
     )
@@ -33,7 +33,7 @@ class TestIterablesPagination(BasePaginationTestCase):
         self._should_normalize_expected = request.param
         return {"skip_len": True} if request.param else {}
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def app(self, model_cls, entities):
         app = FastAPI()
 

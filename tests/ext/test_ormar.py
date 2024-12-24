@@ -1,8 +1,8 @@
 import databases
+import pytest
 import sqlalchemy
 from fastapi import FastAPI
 from ormar import Integer, Model, OrmarConfig, String
-from pytest import fixture, mark
 from sqlalchemy.engine.create import create_engine
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -10,22 +10,22 @@ from fastapi_pagination.ext.ormar import paginate
 from tests.base import BasePaginationTestCase
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def db(database_url):
     return databases.Database(database_url)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def meta(database_url):
     return sqlalchemy.MetaData()
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def engine(database_url):
     return create_engine(database_url)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def user_cls(meta, db, engine):
     class User(Model):
         ormar_config = OrmarConfig(
@@ -40,7 +40,7 @@ def user_cls(meta, db, engine):
     return User
 
 
-@fixture(
+@pytest.fixture(
     scope="session",
     params=[True, False],
     ids=["model", "query"],
@@ -52,7 +52,7 @@ def query(request, user_cls):
     return user_cls.objects
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(db, meta, user_cls, query, model_cls):
     app = FastAPI()
 
@@ -67,6 +67,6 @@ def app(db, meta, user_cls, query, model_cls):
     return add_pagination(app)
 
 
-@mark.ormar
+@pytest.mark.ormar
 class TestOrmar(BasePaginationTestCase):
     pass

@@ -1,7 +1,7 @@
 from collections.abc import AsyncIterator
 
+import pytest
 from fastapi import Depends, FastAPI
-from pytest import fixture
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -13,12 +13,12 @@ from tests.base import BasePaginationTestCase
 from .utils import sqlalchemy20
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def is_async_db():
     return True
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(sa_session, sa_user, model_cls, model_with_rel_cls):
     app = FastAPI()
 

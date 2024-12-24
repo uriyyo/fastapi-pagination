@@ -1,7 +1,7 @@
 from typing import Generic, TypeVar
 
+import pytest
 from fastapi import FastAPI
-from pytest import fixture, mark
 
 from fastapi_pagination import (
     LimitOffsetPage,
@@ -20,7 +20,7 @@ from .utils import OptionalLimitOffsetPage, OptionalPage
 
 
 class TestPaginationParams(BasePaginationTestCase):
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def app(self, model_cls, entities):
         app = FastAPI()
 
@@ -33,7 +33,7 @@ class TestPaginationParams(BasePaginationTestCase):
 
         return add_pagination(app)
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ("path", "cls_name", "params"),
         [
             ("/optional/default", "optional_page", OptionalParams()),

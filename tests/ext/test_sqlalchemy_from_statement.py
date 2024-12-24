@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 
+import pytest
 from fastapi import Depends, FastAPI
-from pytest import fixture
 from sqlalchemy import select, text
 from sqlalchemy.orm.session import Session
 
@@ -11,7 +11,7 @@ from tests.base import BasePaginationTestCase
 from tests.utils import OptionalLimitOffsetPage, OptionalPage
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(sa_user, sa_session: type[Session], model_cls: type[object]):
     app = FastAPI()
 

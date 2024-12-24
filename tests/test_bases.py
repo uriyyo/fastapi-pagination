@@ -2,9 +2,9 @@ import re
 from collections.abc import Sequence
 from typing import ClassVar, Generic, Optional, TypeVar
 
+import pytest
 from fastapi import FastAPI, Query, status
 from fastapi.testclient import TestClient
-from pytest import mark, raises, warns
 
 from fastapi_pagination import Page, Params, add_pagination, paginate
 from fastapi_pagination.bases import AbstractParams, RawParams
@@ -22,15 +22,15 @@ def test_custom_page_invalid_params_cls():
     class CustomPage(Page[T], Generic[T]):
         __params_type__ = CustomParams
 
-    with raises(TypeError, match="^CustomParams must be subclass of BaseModel$"):
+    with pytest.raises(TypeError, match="^CustomParams must be subclass of BaseModel$"):
         CustomPage.with_custom_options(size=10)
 
 
 def test_custom_page_invalid_values():
-    with raises(ValueError, match="^Unknown field smth_wrong$"):
+    with pytest.raises(ValueError, match="^Unknown field smth_wrong$"):
         Page.with_custom_options(smth_wrong=100)
 
-    with raises(ValueError, match="^Unknown fields a, b, c"):
+    with pytest.raises(ValueError, match="^Unknown fields a, b, c"):
         Page.with_custom_options(a=1, b=2, c=3)
 
 
@@ -38,7 +38,7 @@ class MultipleParamsPage(Page[T], Generic[T, C]):
     sub_items: Sequence[C]
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "cls",
     [Page, Page[int], MultipleParamsPage],
     ids=["non-concrete", "concrete", "non-concrete-multiple-params"],
@@ -129,10 +129,10 @@ def test_zero_size():
 
 
 def test_invalid_params_cast():
-    with raises(ValueError, match="^Not a 'limit-offset' params$"):
+    with pytest.raises(ValueError, match="^Not a 'limit-offset' params$"):
         CursorParams().to_raw_params().as_limit_offset()
 
-    with raises(ValueError, match="^Not a 'cursor' params$"):
+    with pytest.raises(ValueError, match="^Not a 'cursor' params$"):
         Params().to_raw_params().as_cursor()
 
 
@@ -155,7 +155,7 @@ def test_deprecated_signature():
     )
 
     # old signature
-    with warns(DeprecationWarning, match=massage):
+    with pytest.warns(DeprecationWarning, match=massage):
 
         class P1(Page[T], Generic[T]):
             @classmethod
@@ -168,7 +168,7 @@ def test_deprecated_signature():
                 pass
 
     # no kwargs
-    with warns(DeprecationWarning, match=massage):
+    with pytest.warns(DeprecationWarning, match=massage):
 
         class P2(Page[T], Generic[T]):
             @classmethod
@@ -180,7 +180,7 @@ def test_deprecated_signature():
                 pass
 
     # positional only
-    with warns(DeprecationWarning, match=massage):
+    with pytest.warns(DeprecationWarning, match=massage):
 
         class P3(Page[T], Generic[T]):
             @classmethod
@@ -194,7 +194,7 @@ def test_deprecated_signature():
                 pass
 
     # positional var
-    with warns(DeprecationWarning, match=massage):
+    with pytest.warns(DeprecationWarning, match=massage):
 
         class P4(Page[T], Generic[T]):
             @classmethod
@@ -208,7 +208,7 @@ def test_deprecated_signature():
                 pass
 
     # keyword only no default
-    with warns(DeprecationWarning, match=massage):
+    with pytest.warns(DeprecationWarning, match=massage):
 
         class P5(Page[T], Generic[T]):
             @classmethod
@@ -223,7 +223,7 @@ def test_deprecated_signature():
                 pass
 
     # wrong params
-    with warns(DeprecationWarning, match=massage):
+    with pytest.warns(DeprecationWarning, match=massage):
 
         class P6(Page[T], Generic[T]):
             @classmethod
@@ -236,7 +236,7 @@ def test_deprecated_signature():
                 pass
 
     # not a classmethod
-    with warns(DeprecationWarning, match=massage):
+    with pytest.warns(DeprecationWarning, match=massage):
 
         class P7(Page[T], Generic[T]):
             def create(

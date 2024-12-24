@@ -1,6 +1,6 @@
+import pytest
 from fastapi import FastAPI
 from mongoengine import Document, connect, fields
-from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.mongoengine import paginate
@@ -9,12 +9,12 @@ from tests.base import BasePaginationTestCase
 from .utils import mongodb_test
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def db_connect(database_url):
     connect(host=database_url)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def user(db_connect):
     class User(Document):
         name = fields.StringField()
@@ -28,7 +28,7 @@ def user(db_connect):
     return User
 
 
-@fixture(
+@pytest.fixture(
     scope="session",
     params=[True, False],
     ids=["model", "query"],
@@ -40,7 +40,7 @@ def query(request, user):
     return user.objects.all()
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(db_connect, query, model_cls):
     app = FastAPI()
 

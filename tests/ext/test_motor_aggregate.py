@@ -1,6 +1,6 @@
+import pytest
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
-from pytest import fixture
 from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -10,14 +10,14 @@ from tests.base import BasePaginationTestCase
 from .utils import mongodb_test
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def db_client(database_url):
     client = AsyncIOMotorClient(database_url)
     yield client
     client.close()
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(db_client, model_cls, raw_data):
     app = FastAPI()
 

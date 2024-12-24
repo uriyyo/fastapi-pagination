@@ -1,7 +1,7 @@
+import pytest
 from cassandra.cqlengine import columns, connection, management, models
 from fastapi import FastAPI, status
 from pydantic import parse_obj_as
-from pytest import fixture, mark
 
 from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage as BaseCursorPage
@@ -23,7 +23,7 @@ class User(models.Model):
     name = columns.Text()
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(cassandra_session, raw_data):
     connection.register_connection("cluster1", session=cassandra_session, default=True)
     management.sync_table(model=User, keyspaces=("ks",))
@@ -41,7 +41,7 @@ def app(cassandra_session, raw_data):
     return add_pagination(app)
 
 
-@mark.asyncio(loop_scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cursor(app, client, entities):
     entities = sorted(parse_obj_as(list[UserOut], entities), key=(lambda it: (it.id, it.name)))
 

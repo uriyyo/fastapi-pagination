@@ -1,10 +1,10 @@
 from collections.abc import Awaitable
 
+import pytest
 from fastapi import FastAPI
 from motor import MotorClient
 from motor.motor_asyncio import AsyncIOMotorClient
 from odmantic import AIOEngine, Model, SyncEngine
-from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.odmantic import paginate
@@ -13,7 +13,7 @@ from tests.base import BasePaginationTestCase
 from .utils import mongodb_test
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def db_model():
     class User(Model):
         name: str
@@ -25,7 +25,7 @@ def db_model():
     return User
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(db_engine, db_model, model_cls):
     app = FastAPI()
 
@@ -42,29 +42,29 @@ def app(db_engine, db_model, model_cls):
     return add_pagination(app)
 
 
-@mark.odmantic
+@pytest.mark.odmantic
 @mongodb_test
 class TestOdmanticAsync(BasePaginationTestCase):
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def db_client(self, database_url):
         client = AsyncIOMotorClient(database_url)
         yield client
         client.close()
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def db_engine(self, db_client):
         return AIOEngine(db_client, database="test")
 
 
-@mark.odmantic
+@pytest.mark.odmantic
 @mongodb_test
 class TestOdmanticSync(BasePaginationTestCase):
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def db_client(self, database_url):
         client = MotorClient(database_url)
         yield client
         client.close()
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def db_engine(self, db_client):
         return SyncEngine(db_client, database="test")

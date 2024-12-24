@@ -1,7 +1,7 @@
+import pytest
 from bunnet import Document, init_bunnet
 from fastapi import FastAPI
 from pymongo import MongoClient
-from pytest import fixture
 from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
@@ -11,7 +11,7 @@ from tests.base import BasePaginationTestCase
 from .utils import mongodb_test
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def be_user():
     class User(Document):
         name: str
@@ -30,7 +30,7 @@ def db_client(database_url, be_user):
     client.close()
 
 
-@fixture(
+@pytest.fixture(
     scope="session",
     params=[True, False],
     ids=["model", "query"],
@@ -42,7 +42,7 @@ def query(request, be_user):
     return be_user.find()
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(db_client, query, model_cls):
     app = FastAPI()
 

@@ -1,7 +1,7 @@
 from typing import ClassVar, Generic, TypeVar
 
+import pytest
 from fastapi import Query
-from pytest import mark, raises
 
 from fastapi_pagination import Page, Params
 from fastapi_pagination.bases import AbstractPage, AbstractParams
@@ -51,7 +51,7 @@ def test_customization_no_args():
 
 
 def test_customization_incorrect_customizer():
-    with raises(TypeError, match="^Expected PageCustomizer, got .*$"):
+    with pytest.raises(TypeError, match="^Expected PageCustomizer, got .*$"):
         _ = CustomizedPage[Page, object()]
 
 
@@ -87,7 +87,7 @@ def test_customization_use_params_after_use_include_total():
     class CustomParams(AbstractParams):
         pass
 
-    with raises(ValueError, match=r"^Params type was already customized, cannot customize it again\..*$"):
+    with pytest.raises(ValueError, match=r"^Params type was already customized, cannot customize it again\..*$"):
         _ = CustomizedPage[Page, UseIncludeTotal(True), UseParams(CustomParams)]
 
 
@@ -101,10 +101,10 @@ def test_customization_use_params_fields():
 
 
 def test_customization_use_unknown_field():
-    with raises(ValueError, match="^Unknown field unknown_field$"):
+    with pytest.raises(ValueError, match="^Unknown field unknown_field$"):
         _ = CustomizedPage[Page, UseParamsFields(unknown_field=10)]
 
-    with raises(ValueError, match="^Unknown fields a, b$"):
+    with pytest.raises(ValueError, match="^Unknown fields a, b$"):
         _ = CustomizedPage[Page, UseParamsFields(a=10, b=1)]
 
 
@@ -137,7 +137,7 @@ def test_customization_use_params_fields_non_pydantic_params():
     class CustomPage(Page[T]):
         __params_type__ = object
 
-    with raises(TypeError, match="^.* must be subclass of BaseModel$"):
+    with pytest.raises(TypeError, match="^.* must be subclass of BaseModel$"):
         _ = CustomizedPage[CustomPage, UseParamsFields(page=10, size=20)]
 
 
@@ -150,7 +150,7 @@ def test_customize_use_optional_params():
     assert params.size is None
 
 
-@mark.parametrize("include_total", [True, False])
+@pytest.mark.parametrize("include_total", [True, False])
 def test_use_include_total(include_total):
     CustomPage = CustomizedPage[Page, UseIncludeTotal(include_total)]
     raw_params = CustomPage.__params_type__().to_raw_params()
@@ -158,7 +158,7 @@ def test_use_include_total(include_total):
     assert raw_params.include_total == include_total
 
 
-@mark.parametrize("quoted_cursor", [True, False])
+@pytest.mark.parametrize("quoted_cursor", [True, False])
 def test_use_quoted_cursor(quoted_cursor):
     CustomPage = CustomizedPage[Page, UseQuotedCursor(quoted_cursor)]
 

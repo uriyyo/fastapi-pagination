@@ -1,23 +1,23 @@
+import pytest
 from fastapi import FastAPI
 from gino_starlette import Gino
-from pytest import fixture, mark
 from sqlalchemy import Column, Integer, String
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from tests.base import BasePaginationTestCase
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def db_type():
     return "postgres"
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def db(database_url):
     return Gino(dsn=database_url)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def user_cls(db):
     class User(db.Model):
         __tablename__ = "users"
@@ -28,7 +28,7 @@ def user_cls(db):
     return User
 
 
-@fixture(
+@pytest.fixture(
     scope="session",
     params=[True, False],
     ids=["model", "query"],
@@ -40,7 +40,7 @@ def query(request, user_cls):
     return user_cls.query
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(db, user_cls, query, model_cls):
     from fastapi_pagination.ext.gino import paginate
 
@@ -55,6 +55,6 @@ def app(db, user_cls, query, model_cls):
     return add_pagination(app)
 
 
-@mark.gino
+@pytest.mark.gino
 class TestGino(BasePaginationTestCase):
     pass

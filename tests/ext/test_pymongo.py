@@ -1,6 +1,6 @@
+import pytest
 from fastapi import FastAPI
 from pymongo import MongoClient
-from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.pymongo import paginate
@@ -9,18 +9,18 @@ from tests.base import BasePaginationTestCase
 from .utils import mongodb_test
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def database_url(mongodb_url) -> str:
     return mongodb_url
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def db_client(database_url):
     with MongoClient(database_url) as client:
         yield client
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(db_client, model_cls):
     app = FastAPI()
 

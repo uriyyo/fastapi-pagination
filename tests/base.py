@@ -1,6 +1,6 @@
 from typing import Any, ClassVar
 
-from pytest import fixture, mark
+import pytest
 from typing_extensions import Literal, TypeAlias
 
 from fastapi_pagination import set_page
@@ -53,7 +53,7 @@ PaginationTestCaseType: TypeAlias = Literal[
 ]
 
 
-@mark.usefixtures("db_type")
+@pytest.mark.usefixtures("db_type")
 class BasePaginationTestCase:
     pagination_types: ClassVar[list[PaginationTestCaseType]] = ["default"]
 
@@ -65,13 +65,13 @@ class BasePaginationTestCase:
 
     def __init_subclass__(cls, **kwargs):
         if cls.pagination_types is not BasePaginationTestCase.pagination_types:
-            mark.parametrize("pagination_type", cls.pagination_types, scope="session")(cls)
+            pytest.mark.parametrize("pagination_type", cls.pagination_types, scope="session")(cls)
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def pagination_type(self):
         return "default"
 
-    @fixture
+    @pytest.fixture
     def path(self, cls_name, pagination_type):
         base = "default" if cls_name == "page" else "limit-offset"
 
@@ -88,22 +88,22 @@ class BasePaginationTestCase:
 
         return prefix + base
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def additional_params(self) -> dict[str, Any]:
         return {}
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def model_cls(self, db_type, pagination_type):
         if db_type == "mongodb":
             return UserWithoutIDOut
 
         return UserOut
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def model_with_rel_cls(self):
         return UserWithOrderOut
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def result_model_cls(self, model_cls, model_with_rel_cls, pagination_type):
         if pagination_type == "relationship":
             return model_with_rel_cls
@@ -131,7 +131,7 @@ class BasePaginationTestCase:
         a, b = normalize(cls[result_model_cls], expected, response.json())
         assert a == b
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ("params", "cls_name"),
         [
             *[(p, "page") for p in _default_params],
@@ -142,7 +142,7 @@ class BasePaginationTestCase:
             *[f"limit-offset-{key}" for key in _params_desc],
         ],
     )
-    @mark.asyncio(loop_scope="session")
+    @pytest.mark.asyncio(loop_scope="session")
     async def test_pagination(
         self,
         client,

@@ -1,6 +1,6 @@
+import pytest
 from databases import Database
 from fastapi import FastAPI
-from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.databases import paginate
@@ -9,12 +9,12 @@ from tests.base import BasePaginationTestCase
 from .utils import sqlalchemy20
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def db(database_url):
     return Database(database_url)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(db, sa_user, model_cls):
     app = FastAPI()
 

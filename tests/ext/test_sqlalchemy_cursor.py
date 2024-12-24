@@ -1,9 +1,8 @@
 from collections.abc import Iterator
 from typing import TypeVar
 
-from _pytest.python_api import raises
+import pytest
 from fastapi import Depends, FastAPI, status
-from pytest import fixture, mark
 from sqlalchemy import select
 from sqlalchemy.orm.session import Session
 
@@ -17,12 +16,12 @@ from tests.utils import parse_obj_as
 from .utils import sqlalchemy20
 
 
-@fixture(scope="session", params=[True, False], ids=["quoted", "unquoted"])
+@pytest.fixture(scope="session", params=[True, False], ids=["quoted", "unquoted"])
 def quoted_cursor(request) -> bool:
     return request.param
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(sa_user, sa_order, sa_session, quoted_cursor):
     app = FastAPI()
 
@@ -56,7 +55,7 @@ def app(sa_user, sa_order, sa_session, quoted_cursor):
 
 
 @sqlalchemy20
-@mark.asyncio(loop_scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cursor(app, client, entities):
     entities = sorted(parse_obj_as(list[UserOut], entities), key=(lambda it: (it.id, it.name)))
 
@@ -99,7 +98,7 @@ async def test_cursor(app, client, entities):
 
 
 @sqlalchemy20
-@mark.asyncio(loop_scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cursor_refetch(app, client, entities, postgres_url):  # noqa: PLR0915
     entities = sorted(parse_obj_as(list[UserOut], entities), key=(lambda it: (it.id, it.name)))
     first_85_entities = entities[:85]
@@ -189,9 +188,9 @@ async def test_cursor_refetch(app, client, entities, postgres_url):  # noqa: PLR
 
 
 @sqlalchemy20
-@mark.asyncio(loop_scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_no_order(app, client, entities):
-    with raises(
+    with pytest.raises(
         ValueError,
         match="^Cursor pagination requires ordering$",
     ):

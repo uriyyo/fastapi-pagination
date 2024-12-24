@@ -1,5 +1,5 @@
+import pytest
 from fastapi import FastAPI
-from pytest import fixture
 
 from fastapi_pagination import (
     LimitOffsetPage,
@@ -17,11 +17,11 @@ async def _len_func(seq):
 
 
 class TestAsyncPaginationParams(BasePaginationTestCase):
-    @fixture(scope="session", params=[len, _len_func], ids=["sync", "async"])
+    @pytest.fixture(scope="session", params=[len, _len_func], ids=["sync", "async"])
     def len_function(self, request):
         return request.param
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def app(self, model_cls, entities, len_function):
         app = FastAPI()
 

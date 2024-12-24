@@ -1,30 +1,30 @@
 from contextlib import AsyncExitStack
 
+import pytest
 from asyncpg import create_pool
 from fastapi import FastAPI
-from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.asyncpg import paginate
 from tests.base import BasePaginationTestCase
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def db_type():
     return "postgres"
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def database_url(postgres_url):
     return postgres_url
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def pool(database_url):
     return create_pool(database_url)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(pool, model_cls):
     app = FastAPI()
     stack = AsyncExitStack()

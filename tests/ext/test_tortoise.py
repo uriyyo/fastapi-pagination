@@ -1,5 +1,5 @@
+import pytest
 from fastapi import FastAPI
-from pytest import fixture
 from tortoise import Model
 from tortoise.backends.base.executor import EXECUTOR_CACHE
 from tortoise.contrib.fastapi import register_tortoise
@@ -47,7 +47,7 @@ class UserWithRelationOut(PydanticModel):
     orders: list[OrderOut]
 
 
-@fixture(
+@pytest.fixture(
     scope="session",
     params=[True, False],
     ids=["model", "query"],
@@ -59,7 +59,7 @@ def query(request):
     return lambda: User.all()
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def database_url(database_url, sqlite_file):
     if database_url.startswith("postgresql://"):
         database_url = database_url.replace("postgresql://", "postgres://")
@@ -69,7 +69,7 @@ def database_url(database_url, sqlite_file):
     return database_url
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(database_url, query):
     app = FastAPI()
 
@@ -86,7 +86,7 @@ def app(database_url, query):
 class TestTortoiseDefault(BasePaginationTestCase):
     pagination_types = ["default"]
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def app(self, query, app, model_cls):
         @app.get("/default", response_model=Page[model_cls])
         @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
@@ -99,11 +99,11 @@ class TestTortoiseDefault(BasePaginationTestCase):
 class TestTortoiseRelationship(BasePaginationTestCase):
     pagination_types = ["relationship"]
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def model_with_rel_cls(self):
         return UserWithRelationOut
 
-    @fixture(scope="session")
+    @pytest.fixture(scope="session")
     def app(self, app, query, model_with_rel_cls, pagination_params):
         @app.get("/relationship/default", response_model=Page[model_with_rel_cls])
         @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[model_with_rel_cls])
@@ -112,7 +112,7 @@ class TestTortoiseRelationship(BasePaginationTestCase):
 
         return add_pagination(app)
 
-    @fixture(
+    @pytest.fixture(
         scope="session",
         params=[
             lambda: True,

@@ -1,9 +1,9 @@
 import sys
 from contextlib import suppress
 
+import pytest
 from fastapi import FastAPI
 from pony.orm import Database, Required, Set, db_session, select
-from pytest import fixture, mark
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.pony import paginate
@@ -11,7 +11,7 @@ from fastapi_pagination.utils import IS_PYDANTIC_V2
 from tests.base import BasePaginationTestCase
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def pony_db(db_type, database_url, sqlite_file):
     db = Database()
 
@@ -23,7 +23,7 @@ def pony_db(db_type, database_url, sqlite_file):
     return db
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def pony_user(pony_db):
     class User(pony_db.Entity):
         _table_ = "users"
@@ -34,7 +34,7 @@ def pony_user(pony_db):
     return User
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def pony_order(pony_db, pony_user):
     class Order(pony_db.Entity):
         _table_ = "orders"
@@ -55,7 +55,7 @@ else:
     _field_validator = validator("orders", pre=True, allow_reuse=True)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
     app = FastAPI()
 
@@ -81,7 +81,7 @@ def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
     return add_pagination(app)
 
 
-@mark.skipif(
+@pytest.mark.skipif(
     sys.version_info >= (3, 11),
     reason="skip pony tests for python 3.11",
 )

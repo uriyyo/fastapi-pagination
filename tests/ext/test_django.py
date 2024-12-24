@@ -1,11 +1,11 @@
 import os
 import sqlite3
 
+import pytest
 from django import setup
 from django.conf import settings
 from django.db import models
 from fastapi import FastAPI
-from pytest import fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.django import paginate
@@ -14,13 +14,13 @@ from tests.base import BasePaginationTestCase
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "True"
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def database_url(sqlite_url) -> str:
     *_, dbname = sqlite_url.split("/")
     return dbname
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def db(database_url):
     settings.configure(
         DATABASES={
@@ -36,7 +36,7 @@ def db(database_url):
     sqlite3.connect(database_url)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def user_cls(db):
     class User(models.Model):
         id = models.IntegerField(primary_key=True)
@@ -52,7 +52,7 @@ def user_cls(db):
     return User
 
 
-@fixture(
+@pytest.fixture(
     scope="session",
     params=[True, False],
     ids=["model", "query"],
@@ -64,7 +64,7 @@ def query(request, user_cls):
     return user_cls.objects.all()
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(db, user_cls, query, model_cls):
     app = FastAPI()
 

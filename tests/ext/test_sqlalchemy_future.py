@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 
+import pytest
 from fastapi import Depends, FastAPI
-from pytest import fixture
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.session import Session
@@ -13,7 +13,7 @@ from tests.base import BasePaginationTestCase
 from .utils import sqlalchemy20
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(sa_user, sa_order, sa_session, model_cls, model_with_rel_cls):
     app = FastAPI()
 
