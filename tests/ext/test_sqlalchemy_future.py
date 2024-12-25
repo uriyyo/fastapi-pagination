@@ -8,7 +8,7 @@ from sqlalchemy.orm.session import Session
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 from .utils import sqlalchemy20
 
@@ -40,5 +40,5 @@ def app(sa_user, sa_order, sa_session, model_cls, model_with_rel_cls):
 
 
 @sqlalchemy20
-class TestSQLAlchemyFuture(BasePaginationTestCase):
-    pagination_types = ["default", "non-scalar", "relationship"]
+class TestSQLAlchemyFuture(BasePaginationTestSuite):
+    case_types = ["default", "non-scalar", "relationship"]

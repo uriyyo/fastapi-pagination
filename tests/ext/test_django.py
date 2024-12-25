@@ -5,11 +5,9 @@ import pytest
 from django import setup
 from django.conf import settings
 from django.db import models
-from fastapi import FastAPI
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.django import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "True"
 
@@ -64,17 +62,11 @@ def query(request, user_cls):
     return user_cls.objects.all()
 
 
-@pytest.fixture(scope="session")
-def app(db, user_cls, query, model_cls):
-    app = FastAPI()
+class TestDjango(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def app(self, builder, db, user_cls, query):
+        @builder.both.default
+        def route():
+            return paginate(query)
 
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    def route():
-        return paginate(query)
-
-    return add_pagination(app)
-
-
-class TestDjango(BasePaginationTestCase):
-    pass
+        return builder.build()

@@ -44,6 +44,7 @@ sqlakeyset = { version = "^2.0.1680321678", optional = true }
 scylla-driver = {version = "^3.25.6", optional = true}
 bunnet = {version = "^1.1.0", optional = true}
 odmantic = {version = "^1.0.2", optional = true}
+tornado = { version = "^6.4.2", optional = true }
 
 [tool.poetry.dev-dependencies]
 fastapi = ">=0.93.0"
@@ -81,7 +82,7 @@ bunnet = ["bunnet"]
 mongoengine = ["mongoengine"]
 beanie =  ["beanie"]
 scylla-driver = ["scylla-driver"]
-odmantic = ["odmantic"]
+odmantic = ["odmantic", "tornado"]
 all = [
     "sqlmodel",
     "SQLAlchemy",
@@ -89,6 +90,7 @@ all = [
     "orm",
 #    "ormar",
     "odmantic",
+    "tornado",
     "tortoise-orm",
     "asyncpg",
     "django",

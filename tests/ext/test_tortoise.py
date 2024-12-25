@@ -14,7 +14,7 @@ from tortoise.query_utils import Prefetch
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.tortoise import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 
 class Order(Model):
@@ -83,8 +83,8 @@ def app(database_url, query):
     return app
 
 
-class TestTortoiseDefault(BasePaginationTestCase):
-    pagination_types = ["default"]
+class TestTortoiseDefault(BasePaginationTestSuite):
+    case_types = ["default"]
 
     @pytest.fixture(scope="session")
     def app(self, query, app, model_cls):
@@ -96,8 +96,8 @@ class TestTortoiseDefault(BasePaginationTestCase):
         return add_pagination(app)
 
 
-class TestTortoiseRelationship(BasePaginationTestCase):
-    pagination_types = ["relationship"]
+class TestTortoiseRelationship(BasePaginationTestSuite):
+    case_types = ["relationship"]
 
     @pytest.fixture(scope="session")
     def model_with_rel_cls(self):

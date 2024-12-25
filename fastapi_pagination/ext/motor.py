@@ -1,4 +1,7 @@
-__all__ = ["paginate"]
+__all__ = [
+    "paginate",
+    "paginate_aggregate",
+]
 
 from typing import TYPE_CHECKING, Any, Optional
 

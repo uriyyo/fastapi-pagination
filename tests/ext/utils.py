@@ -1,5 +1,8 @@
 import pytest
 
+from tests.base import SuiteBuilder
+from tests.schemas import UserWithoutIDOut
+
 try:
     from sqlalchemy import __version__ as sqlalchemy_version
 
@@ -19,12 +22,18 @@ only_sqlalchemy20 = pytest.mark.skipif(
 
 class _MongoDBTestCase:
     @pytest.fixture(scope="session")
+    def db_type(self):
+        return "mongodb"
+
+    @pytest.fixture(scope="session")
     def database_url(self, mongodb_url):
         return mongodb_url
 
-    @pytest.fixture(scope="session")
-    def db_type(self):
-        return "mongodb"
+    @classmethod
+    def create_builder(cls) -> SuiteBuilder:
+        return SuiteBuilder().with_classes(
+            model=UserWithoutIDOut,
+        )
 
 
 def mongodb_test(cls):

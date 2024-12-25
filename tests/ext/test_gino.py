@@ -1,10 +1,9 @@
 import pytest
-from fastapi import FastAPI
 from gino_starlette import Gino
 from sqlalchemy import Column, Integer, String
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from tests.base import BasePaginationTestCase
+from fastapi_pagination.ext.gino import paginate
+from tests.base import BasePaginationTestSuite
 
 
 @pytest.fixture(scope="session")
@@ -40,21 +39,15 @@ def query(request, user_cls):
     return user_cls.query
 
 
-@pytest.fixture(scope="session")
-def app(db, user_cls, query, model_cls):
-    from fastapi_pagination.ext.gino import paginate
-
-    app = FastAPI()
-    db.init_app(app)
-
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    async def route():
-        return await paginate(query)
-
-    return add_pagination(app)
-
-
 @pytest.mark.gino
-class TestGino(BasePaginationTestCase):
-    pass
+class TestGino(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def app(self, builder, db, query):
+        @builder.both.default
+        async def route():
+            return await paginate(query)
+
+        app = builder.build()
+        db.init_app(app)
+
+        return app

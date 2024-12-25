@@ -6,7 +6,7 @@ from sqlalchemy.orm.session import Session
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 from .utils import sqlalchemy20
 
@@ -31,5 +31,5 @@ def app(sa_user, sa_session, model_cls):
 
 
 @sqlalchemy20
-class TestSQLAlchemy(BasePaginationTestCase):
+class TestSQLAlchemy(BasePaginationTestSuite):
     pass

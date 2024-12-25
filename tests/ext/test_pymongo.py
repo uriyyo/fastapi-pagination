@@ -4,7 +4,7 @@ from pymongo import MongoClient
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.pymongo import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 from .utils import mongodb_test
 
@@ -33,5 +33,5 @@ def app(db_client, model_cls):
 
 
 @mongodb_test
-class TestPymongo(BasePaginationTestCase):
+class TestPymongo(BasePaginationTestSuite):
     pass

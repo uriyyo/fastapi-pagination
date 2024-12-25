@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlmodel import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 
 @pytest.fixture(scope="session")
@@ -20,7 +20,7 @@ def app():
     return FastAPI()
 
 
-class TestSQLModelDefault(BasePaginationTestCase):
+class TestSQLModelDefault(BasePaginationTestSuite):
     @pytest.fixture(
         scope="session",
         params=[True, False],
@@ -43,8 +43,8 @@ class TestSQLModelDefault(BasePaginationTestCase):
         return add_pagination(app)
 
 
-class TestSQLModelRelationship(BasePaginationTestCase):
-    pagination_types = ["relationship"]
+class TestSQLModelRelationship(BasePaginationTestSuite):
+    case_types = ["relationship"]
 
     @pytest.fixture(scope="session")
     def app(self, app, session, sm_user, model_with_rel_cls):

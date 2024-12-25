@@ -8,7 +8,7 @@ from pony.orm import Database, Required, Set, db_session, select
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.pony import paginate
 from fastapi_pagination.utils import IS_PYDANTIC_V2
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 
 @pytest.fixture(scope="session")
@@ -85,5 +85,5 @@ def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
     sys.version_info >= (3, 11),
     reason="skip pony tests for python 3.11",
 )
-class TestPony(BasePaginationTestCase):
-    pagination_types = ["default", "relationship"]
+class TestPony(BasePaginationTestSuite):
+    case_types = ["default", "relationship"]

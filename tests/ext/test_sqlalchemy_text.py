@@ -7,7 +7,7 @@ from sqlalchemy.orm.session import Session
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 from tests.utils import OptionalLimitOffsetPage, OptionalPage
 
 
@@ -32,5 +32,5 @@ def app(sa_user, sa_session: type[Session], model_cls: type[object]):
     return add_pagination(app)
 
 
-class TestSQLAlchemyRaw(BasePaginationTestCase):
-    pagination_types = ["default", "optional"]
+class TestSQLAlchemyRaw(BasePaginationTestSuite):
+    case_types = ["default", "optional"]

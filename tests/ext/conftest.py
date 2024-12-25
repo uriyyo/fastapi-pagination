@@ -125,6 +125,8 @@ DUMMY = ROOT / "test_dummy.py"
 
 
 def pytest_pycollect_makemodule(module_path, path, parent):
+    return None
+
     if not module_path.name.startswith("test_"):
         return None
 

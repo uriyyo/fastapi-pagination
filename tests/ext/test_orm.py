@@ -5,7 +5,7 @@ from orm import Integer, Model, ModelRegistry, String
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.orm import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 if tuple(map(int, __version__.split("."))) >= (0, 9, 0):
     raise ImportError("This test is only for databases<0.9.0")
@@ -47,5 +47,5 @@ def app(db, user, model_cls):
 
 
 @pytest.mark.orm
-class TestORM(BasePaginationTestCase):
+class TestORM(BasePaginationTestSuite):
     pass

@@ -7,7 +7,7 @@ from sqlalchemy.engine.create import create_engine
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.ormar import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 
 @pytest.fixture(scope="session")
@@ -68,5 +68,5 @@ def app(db, meta, user_cls, query, model_cls):
 
 
 @pytest.mark.ormar
-class TestOrmar(BasePaginationTestCase):
+class TestOrmar(BasePaginationTestSuite):
     pass

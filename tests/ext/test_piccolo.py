@@ -13,7 +13,7 @@ from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.piccolo import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 from tests.utils import faker
 
 _counter = count().__next__
@@ -77,7 +77,7 @@ def app(query, engine, model_cls):
     return add_pagination(app)
 
 
-class TestPiccolo(BasePaginationTestCase):
+class TestPiccolo(BasePaginationTestSuite):
     @async_fixture(scope="class")
     async def entities(self, query, client):
         await User.insert(*(User(name=faker.name()) for _ in range(100))).run()
