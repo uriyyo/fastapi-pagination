@@ -7,7 +7,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.async_sqlmodel import paginate
+from fastapi_pagination.ext.sqlmodel import paginate
 from tests.base import BasePaginationTestCase
 
 

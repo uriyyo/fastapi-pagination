@@ -7,7 +7,6 @@ __all__ = [
     "create_paginate_query",
     "create_paginate_query_from_text",
     "paginate",
-    "paginate_query",
 ]
 
 import warnings
@@ -22,7 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlalchemy.orm import Query, Session, noload, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import TextClause
-from typing_extensions import Literal, TypeAlias, deprecated
+from typing_extensions import Literal, TypeAlias
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractPage, AbstractParams, is_cursor
@@ -134,15 +133,6 @@ def create_paginate_query_from_text(query: str, params: AbstractParams) -> str:
 
 def create_count_query_from_text(query: str) -> str:
     return f"SELECT count(*) FROM ({query}) AS __count_query__"  # noqa: S608
-
-
-@deprecated(
-    "fastapi_pagination.ext.sqlalchemy.paginate_query function is deprecated, "
-    "please use fastapi_pagination.ext.sqlalchemy.create_paginate_query function instead"
-    "This function will be removed in the next major release (0.13.0).",
-)
-def paginate_query(query: Select[TupleAny], params: AbstractParams) -> Select[TupleAny]:
-    return create_paginate_query(query, params)  # type: ignore[return-value]
 
 
 def _paginate_from_statement(query: FromStatement[TupleAny], params: AbstractParams) -> FromStatement[TupleAny]:

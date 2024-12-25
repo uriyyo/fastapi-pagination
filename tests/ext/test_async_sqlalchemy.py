@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.async_sqlalchemy import paginate
+from fastapi_pagination.ext.sqlalchemy import paginate
 from tests.base import BasePaginationTestCase
 
 from .utils import sqlalchemy20

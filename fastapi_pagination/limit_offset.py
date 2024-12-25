@@ -3,7 +3,6 @@ from __future__ import annotations
 __all__ = [
     "LimitOffsetPage",
     "LimitOffsetParams",
-    "OptionalLimitOffsetParams",
 ]
 
 from collections.abc import Sequence
@@ -11,7 +10,6 @@ from typing import Any, Generic, Optional, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
-from typing_extensions import deprecated
 
 from .bases import AbstractParams, BasePage, RawParams
 from .types import GreaterEqualOne, GreaterEqualZero
@@ -29,16 +27,6 @@ class LimitOffsetParams(BaseModel, AbstractParams):
             limit=self.limit,
             offset=self.offset,
         )
-
-
-@deprecated(
-    "`OptionalLimitOffsetParams` class is deprecated, please use "
-    "`CustomizePage[LimitOffsetPage, UseOptionalParams()]` instead. "
-    "This class will be removed in the next major release (0.13.0)."
-)
-class OptionalLimitOffsetParams(LimitOffsetParams):
-    limit: Optional[int] = Query(None, ge=1, le=100, description="Page size limit")  # type: ignore[assignment]
-    offset: Optional[int] = Query(None, ge=0, description="Page offset")  # type: ignore[assignment]
 
 
 class LimitOffsetPage(BasePage[T], Generic[T]):
