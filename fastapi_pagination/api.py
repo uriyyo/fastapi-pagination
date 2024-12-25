@@ -14,7 +14,6 @@ __all__ = [
 ]
 
 import inspect
-import warnings
 from collections.abc import AsyncIterator, Iterator, Sequence
 from contextlib import AbstractContextManager, ExitStack, asynccontextmanager, contextmanager, suppress
 from contextvars import ContextVar
@@ -37,7 +36,6 @@ from fastapi.dependencies.utils import (
 from fastapi.routing import APIRoute, APIRouter
 from pydantic import BaseModel
 from starlette.routing import request_response
-from typing_extensions import deprecated
 
 from .bases import AbstractPage, AbstractParams
 from .default import Page
@@ -81,97 +79,23 @@ def pagination_items() -> Sequence[Any]:
         raise RuntimeError("pagination_items must be called inside create_page") from None
 
 
-_DEPRECATED_PARAM_MSG = """
-'{param}' is no longer can be passed as a positional argument, use keyword argument instead.
-Positional arguments are deprecated and will be removed in the next major release (0.13.0).
-"""
-
-_SENTINEL: Any = object()
-
-
-@overload
 def create_page(
     items: Sequence[T],
     /,
-    **kwargs: Any,
-) -> AbstractPage[T]:
-    pass
-
-
-@overload
-@deprecated(
-    "'total' and 'params' are deprecated parameters, use keyword arguments instead. "
-    "These parameters are deprecated and will be removed in the next major release (0.13.0).",
-)
-def create_page(
-    items: Sequence[T],
-    total: Optional[int] = _SENTINEL,
-    params: Optional[AbstractParams] = _SENTINEL,
-    /,
-    **kwargs: Any,
-) -> AbstractPage[T]:
-    pass
-
-
-def create_page(
-    items: Sequence[T],
-    total: Optional[int] = _SENTINEL,
-    params: Optional[AbstractParams] = _SENTINEL,
-    /,
+    total: Optional[int] = None,
+    params: Optional[AbstractParams] = None,
     **kwargs: Any,
 ) -> AbstractPage[T]:
     """
     Creates an instance of AbstractPage with provided items and optional parameters.
 
-    This function uses positional-only arguments for `items`, `total`, and `params` to enforce explicit naming
-    of these parameters when calling the function.
-    The use of positional-only arguments also prevents the caller from providing these arguments more than once.
-
-    The `total` and `params` parameters are deprecated and may be removed in future versions.
-    Their use will emit a DeprecationWarning.
-
-    Args:
-        items (Sequence[T]): A sequence of items to be included in the page.
-        total (Optional[int], deprecated): The total number of items. If not provided, defaults to _SENTINEL.
-            If 'total' is specified in kwargs, it will raise a TypeError.
-        params (Optional[AbstractParams], deprecated): The parameters for the page.
-        If not provided, defaults to _SENTINEL.
-            If 'params' is specified in kwargs, it will raise a TypeError.
-
-    Keyword Args:
-        **kwargs (Any): Additional parameters. 'total' and 'params' are not allowed in kwargs.
-
     Returns:
         AbstractPage[T]: An instance of AbstractPage containing the provided items and additional parameters.
-
-    Raises:
-        TypeError: If 'total' or 'params' are specified more than once (either as named arguments or in kwargs).
-        DeprecationWarning: If 'total' or 'params' are provided (as these are deprecated parameters).
     """
-
-    if params is not _SENTINEL:
-        if "params" in kwargs:
-            raise TypeError("create_page() got multiple values for argument 'params'")
-
-        kwargs["params"] = params
-
-        warnings.warn(
-            _DEPRECATED_PARAM_MSG.format(param="params"),
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-    if total is not _SENTINEL:
-        if "total" in kwargs:
-            raise TypeError("create_page() got multiple values for argument 'total'")
-
+    if total is not None:
         kwargs["total"] = total
-
-        warnings.warn(
-            _DEPRECATED_PARAM_MSG.format(param="total"),
-            DeprecationWarning,
-            stacklevel=2,
-        )
+    if params is not None:
+        kwargs["params"] = params
 
     with _ctx_var_with_reset(_items_val, items):
         return _page_val.get().create(items, **kwargs)

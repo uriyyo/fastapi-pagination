@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 __all__ = [
-    "OptionalParams",
     "Page",
     "Params",
 ]
@@ -12,7 +11,6 @@ from typing import Any, Generic, Optional, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
-from typing_extensions import deprecated
 
 from .bases import AbstractParams, BasePage, RawParams
 from .types import GreaterEqualOne, GreaterEqualZero
@@ -30,16 +28,6 @@ class Params(BaseModel, AbstractParams):
             limit=self.size if self.size is not None else None,
             offset=self.size * (self.page - 1) if self.page is not None and self.size is not None else None,
         )
-
-
-@deprecated(
-    "`OptionalParams` class is deprecated, please use "
-    "`CustomizePage[Page, UseOptionalParams()]` instead. "
-    "This class will be removed in the next major release (0.13.0)."
-)
-class OptionalParams(Params):
-    page: Optional[int] = Query(None, ge=1, description="Page number")  # type: ignore[assignment]
-    size: Optional[int] = Query(None, ge=1, le=100, description="Page size")  # type: ignore[assignment]
 
 
 class Page(BasePage[T], Generic[T]):
