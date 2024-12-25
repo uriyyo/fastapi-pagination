@@ -1378,13 +1378,13 @@ files = [
 
 [[package]]
 name = "piccolo"
-version = "1.21.0"
+version = "1.22.0"
 description = "A fast, user friendly ORM and query builder which supports asyncio."
 optional = true
-python-versions = ">=3.8.0"
+python-versions = ">=3.9.0"
 files = [
-    {file = "piccolo-1.21.0-py3-none-any.whl", hash = "sha256:763e033547dcdb5ef602dc562fc75296101d78e0d3e1289135d25820afb3b118"},
-    {file = "piccolo-1.21.0.tar.gz", hash = "sha256:0e639b0aa3a43d8a7644b396770acf1bf473dc125de6ce565cc5998a5395f5d5"},
+    {file = "piccolo-1.22.0-py3-none-any.whl", hash = "sha256:410e451e5f7c418b08b71666554008a1252ad7d33f754a2078dd2fd973aa57c1"},
+    {file = "piccolo-1.22.0.tar.gz", hash = "sha256:cf8c11dddb8b8ef92526217e073c55f3ab067912b775e3e093fbc2d3749195e1"},
 ]
 
 [package.dependencies]
@@ -1397,10 +1397,10 @@ targ = ">=0.3.7"
 typing-extensions = ">=4.3.0"
 
 [package.extras]
-all = ["aiosqlite (>=0.16.0)", "asyncpg (>=0.21.0)", "ipython", "orjson (>=3.5.1)", "uvloop (>=0.12.0)"]
+all = ["aiosqlite (>=0.16.0)", "asyncpg (>=0.30.0)", "ipython", "orjson (>=3.5.1)", "uvloop (>=0.12.0)"]
 orjson = ["orjson (>=3.5.1)"]
 playground = ["ipython"]
-postgres = ["asyncpg (>=0.21.0)"]
+postgres = ["asyncpg (>=0.30.0)"]
 sqlite = ["aiosqlite (>=0.16.0)"]
 uvloop = ["uvloop (>=0.12.0)"]
 
@@ -2609,4 +2609,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4.0"
-content-hash = "e287cd3c30086c12d0105b466b758ccca75a7af7d07151362645d1a36bfbdc06"
+content-hash = "9c1ee75920e48f1b5d7cac2331f08903fe6232dfed9664fee004eed4c17e8d9b"
