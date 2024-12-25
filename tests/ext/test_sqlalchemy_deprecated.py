@@ -13,8 +13,6 @@ from .utils import sqlalchemy20
 
 @sqlalchemy20
 class TestSQLAlchemy(BasePaginationTestSuite):
-    is_async = False
-
     @pytest.fixture(scope="session")
     def app(self, builder, sa_user, sa_session):
         def get_db() -> Iterator[Session]:

@@ -2,14 +2,13 @@ import pytest
 
 from fastapi_pagination.async_paginator import paginate
 
-from .base import BasePaginationTestSuite, SuiteBuilder, add_cases
+from .base import BasePaginationTestSuite, SuiteBuilder
 
 
 async def _len_func(seq):
     return len(seq)
 
 
-@add_cases("optional")
 class TestAsyncPaginationParams(BasePaginationTestSuite):
     @pytest.fixture(
         scope="session",

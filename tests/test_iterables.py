@@ -31,7 +31,7 @@ class _IterablesSuiteMixin:
 
     @pytest.fixture(scope="session")
     def app(self, builder, entities):
-        @builder.both
+        @builder.both.default
         async def route():
             kwargs = {"total": len(entities)} if self.with_total else {}
             return paginate((entity for entity in entities), **kwargs)

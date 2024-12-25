@@ -6,7 +6,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from fastapi_pagination.ext.sqlmodel import paginate
-from tests.base import BasePaginationTestSuite, only_cases
+from tests.base import BasePaginationTestSuite, async_testsuite
 
 
 @pytest.fixture(scope="session")
@@ -14,9 +14,8 @@ def session(sa_engine):
     return partial(AsyncSession, sa_engine)
 
 
+@async_testsuite
 class TestSQLModelDefault(BasePaginationTestSuite):
-    is_async = True
-
     @pytest.fixture(
         scope="session",
         params=[True, False],
@@ -40,10 +39,8 @@ class TestSQLModelDefault(BasePaginationTestSuite):
         return builder.build()
 
 
-@only_cases("relationship")
+@async_testsuite
 class TestSQLModelRelationship(BasePaginationTestSuite):
-    is_async = True
-
     @pytest.fixture(scope="session")
     def app(self, session, sm_user, builder):
         @builder.both.relationship

@@ -13,7 +13,7 @@ from tortoise.fields import (
 from tortoise.query_utils import Prefetch
 
 from fastapi_pagination.ext.tortoise import paginate
-from tests.base import BasePaginationTestSuite, only_cases
+from tests.base import BasePaginationTestSuite
 
 
 class Order(Model):
@@ -83,8 +83,6 @@ def app(database_url, query):
 
 
 class TestTortoiseDefault(BasePaginationTestSuite):
-    is_async = False
-
     @pytest.fixture(scope="session")
     def app(self, app, builder, query):
         builder.app = app
@@ -96,10 +94,7 @@ class TestTortoiseDefault(BasePaginationTestSuite):
         return builder.build()
 
 
-@only_cases("relationship")
 class TestTortoiseRelationship(BasePaginationTestSuite):
-    is_async = False
-
     @pytest.fixture(scope="session")
     def app(self, app, builder, query, pagination_params):
         builder.app = app

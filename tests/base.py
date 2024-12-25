@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import ast
+import inspect
+import textwrap
 from collections.abc import Callable, Iterable
 from contextlib import AsyncExitStack, asynccontextmanager
 from dataclasses import dataclass, field, replace
 from functools import cache
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Optional, TypeVar, get_args
 
 import pytest
 from fastapi.applications import FastAPI
@@ -88,7 +91,7 @@ TRoute = TypeVar("TRoute", bound=Callable[..., Any])
 class TestCaseBuilder:
     _builder: SuiteBuilder
     _pagination_types: set[PaginationType]
-    _case_types: set[PaginationCaseType] = field(default_factory=lambda: {"default"})
+    _case_types: set[PaginationCaseType] = field(default_factory=set)
     _add_kwargs: dict[str, Any] = field(default_factory=dict)
 
     def _add_case(self, case_type: PaginationCaseType) -> set[PaginationCaseType]:
@@ -241,7 +244,7 @@ class SuiteBuilder:
             raise ValueError(f"Unknown pagination type {pagination_type}")
 
         if case_type == "optional":
-            page_cls = MakeOptionalPage[self._page_size_cls]
+            page_cls = MakeOptionalPage[page_cls]
 
         return page_cls
 
@@ -319,14 +322,17 @@ SuiteDecl: TypeAlias = tuple[
 
 @pytest.mark.usefixtures("db_type")
 class BasePaginationTestSuite:
-    is_async: ClassVar[bool] = True
-    markers: ClassVar[set[str]] = set()
-
     pagination_types: ClassVar[set[PaginationType]] = {"page-size", "limit-offset"}
-    case_types: ClassVar[set[PaginationCaseType]] = {"default"}
+    case_types: ClassVar[set[PaginationCaseType]] = {}
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
+
+        if cls.__module__ == __name__:
+            return
+
+        if not cls.case_types:
+            cases.auto(cls)
 
         marker = pytest.mark.parametrize(
             ("params", "pagination_type", "pagination_case_type"),
@@ -358,14 +364,6 @@ class BasePaginationTestSuite:
 
         cls.test_pagination = _run_pagination
 
-        is_async = cls.is_async
-
-        @pytest.fixture(scope="session")
-        def is_async_db(_):
-            return is_async
-
-        cls.is_async_db = is_async_db
-
     @classmethod
     def generate_suites(cls) -> Iterable[SuiteDecl]:
         if "page-size" in cls.pagination_types:
@@ -374,7 +372,12 @@ class BasePaginationTestSuite:
                     yield param, "page-size", case, f"page-size-{case}-{name}"
 
             if "optional" in cls.case_types:
-                yield MakeOptionalPage[Page].__params_type__(), "page-size", "optional", "page-size-optional"
+                yield (
+                    MakeOptionalPage[Page].__params_type__(),
+                    "page-size",
+                    "optional",
+                    "page-size-optional",
+                )
 
         if "limit-offset" in cls.pagination_types:
             for case in {*cls.case_types} - {"optional"}:
@@ -423,29 +426,89 @@ class BasePaginationTestSuite:
         return result
 
 
-TBasePaginationTestCase = TypeVar("TBasePaginationTestCase", bound=type[BasePaginationTestSuite])
+TBasePaginationTestSuite = TypeVar("TBasePaginationTestSuite", bound=type[BasePaginationTestSuite])
 
 
-def add_cases(*cases: PaginationCaseType) -> Callable[[TBasePaginationTestCase], TBasePaginationTestCase]:
-    def decorator(cls: TBasePaginationTestCase) -> TBasePaginationTestCase:
-        cls.case_types = {*cls.case_types, *cases}
+def _iter_decorators(cls: TBasePaginationTestSuite) -> Iterable[ast.expr]:
+    root = ast.parse(textwrap.dedent(inspect.getsource(cls.app)))
+    func_body = root.body[0].body
+
+    for func in func_body:
+        if not isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+
+        for dec in func.decorator_list:
+            yield from ast.walk(dec)
+
+
+def _collect_cases(cls: TBasePaginationTestSuite) -> set[PaginationCaseType]:
+    _cases = set()
+
+    for node in _iter_decorators(cls):
+        if not isinstance(node, ast.Attribute):
+            continue
+
+        name = node.attr.replace("_", "-")
+
+        if name in get_args(PaginationCaseType):
+            _cases.add(name)
+
+    assert _cases, f"No cases found in {cls}"
+    return _cases
+
+
+@dataclass
+class _Cases:
+    _cases: set[PaginationCaseType] = field(default_factory=set)
+
+    def _add(self, case: PaginationCaseType) -> Self:
+        return replace(self, _cases={*self._cases, case})
+
+    @property
+    def default(self) -> Self:
+        return self._add("default")
+
+    @property
+    def non_scalar(self) -> Self:
+        return self._add("non-scalar")
+
+    @property
+    def relationship(self) -> Self:
+        return self._add("relationship")
+
+    @property
+    def optional(self) -> Self:
+        return self._add("optional")
+
+    @property
+    def only(self) -> Self:
+        return replace(self, _cases=set())
+
+    def auto(self, cls: TBasePaginationTestSuite) -> TBasePaginationTestSuite:
+        cls.case_types = _collect_cases(cls)
         return cls
 
-    return decorator
-
-
-def only_cases(*cases: PaginationCaseType) -> Callable[[TBasePaginationTestCase], TBasePaginationTestCase]:
-    def decorator(cls: TBasePaginationTestCase) -> TBasePaginationTestCase:
-        cls.case_types = {*cases}
+    def __call__(self, cls: TBasePaginationTestSuite) -> TBasePaginationTestSuite:
+        cls.case_types = {*self._cases}
         return cls
 
-    return decorator
+
+cases = _Cases({"default"})
+
+
+def async_testsuite(cls: TBasePaginationTestSuite) -> TBasePaginationTestSuite:
+    @pytest.fixture(scope="session")
+    def is_async_db(self):
+        return True
+
+    cls.is_async_db = is_async_db
+    return cls
 
 
 __all__ = [
     "BasePaginationTestSuite",
     "MakeOptionalPage",
     "SuiteBuilder",
-    "add_cases",
-    "only_cases",
+    "async_testsuite",
+    "cases",
 ]

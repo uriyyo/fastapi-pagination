@@ -9,10 +9,9 @@ from fastapi_pagination import (
 from fastapi_pagination.api import set_items_transformer
 from fastapi_pagination.customization import CustomizedPage, UseAdditionalFields
 
-from .base import BasePaginationTestSuite, add_cases
+from .base import BasePaginationTestSuite
 
 
-@add_cases("optional")
 class TestPaginationParams(BasePaginationTestSuite):
     @pytest.fixture(scope="session")
     def app(self, builder, entities):

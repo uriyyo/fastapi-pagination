@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import Session, select
 
 from fastapi_pagination.ext.sqlmodel import paginate
-from tests.base import BasePaginationTestSuite, only_cases
+from tests.base import BasePaginationTestSuite
 
 
 @pytest.fixture(scope="session")
@@ -14,8 +14,6 @@ def session(sa_engine):
 
 
 class TestSQLModelDefault(BasePaginationTestSuite):
-    is_async = False
-
     @pytest.fixture(
         scope="session",
         params=[True, False],
@@ -37,10 +35,7 @@ class TestSQLModelDefault(BasePaginationTestSuite):
         return builder.build()
 
 
-@only_cases("relationship")
 class TestSQLModelRelationship(BasePaginationTestSuite):
-    is_async = False
-
     @pytest.fixture(scope="session")
     def app(self, builder, session, sm_user):
         @builder.both.relationship

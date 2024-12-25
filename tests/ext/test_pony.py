@@ -7,7 +7,7 @@ from sqlalchemy.engine.url import make_url
 
 from fastapi_pagination.ext.pony import paginate
 from fastapi_pagination.utils import IS_PYDANTIC_V2
-from tests.base import BasePaginationTestSuite, add_cases
+from tests.base import BasePaginationTestSuite
 
 
 @pytest.fixture(scope="session")
@@ -66,7 +66,6 @@ else:
     sys.version_info >= (3, 11),
     reason="skip pony tests for python 3.11",
 )
-@add_cases("relationship")
 class TestPony(BasePaginationTestSuite):
     @pytest.fixture(scope="session")
     def app(self, builder, pony_db, pony_user, pony_order):

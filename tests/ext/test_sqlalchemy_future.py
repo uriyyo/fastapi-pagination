@@ -7,16 +7,13 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.session import Session
 
 from fastapi_pagination.ext.sqlalchemy import paginate
-from tests.base import BasePaginationTestSuite, add_cases
+from tests.base import BasePaginationTestSuite
 
 from .utils import sqlalchemy20
 
 
 @sqlalchemy20
-@add_cases("non-scalar", "relationship")
 class TestSQLAlchemyFuture(BasePaginationTestSuite):
-    is_async = False
-
     @pytest.fixture(scope="session")
     def app(self, builder, sa_user, sa_order, sa_session):
         def get_db() -> Iterator[Session]:

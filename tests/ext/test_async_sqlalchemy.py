@@ -7,16 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from fastapi_pagination.ext.sqlalchemy import paginate
-from tests.base import BasePaginationTestSuite, add_cases
+from tests.base import BasePaginationTestSuite, async_testsuite
 
 from .utils import sqlalchemy20
 
 
 @sqlalchemy20
-@add_cases("non-scalar", "relationship")
+@async_testsuite
 class TestAsyncSQLAlchemy(BasePaginationTestSuite):
-    is_async = True
-
     @pytest.fixture(scope="session")
     def app(self, sa_session, sa_user, builder):
         async def get_db() -> AsyncIterator[AsyncSession]:

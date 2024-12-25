@@ -55,7 +55,7 @@ class TestBeanie(BasePaginationTestSuite):
 
         builder = builder.classes.update(model=Model)
 
-        @builder.both.with_kwargs(response_model_by_alias=False)
+        @builder.both.default.with_kwargs(response_model_by_alias=False)
         async def route():
             return await paginate(query)
 
