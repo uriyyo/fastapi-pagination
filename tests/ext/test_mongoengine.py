@@ -40,6 +40,7 @@ def query(request, user):
 
 @mongodb_test
 class TestMongoEngine(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
     def app(self, builder, db_connect, query):
         @builder.both.default
         def route():

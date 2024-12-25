@@ -16,11 +16,7 @@ def db(database_url):
 class TestDatabases(BasePaginationTestSuite):
     @pytest.fixture(scope="session")
     def app(self, builder, db, sa_user):
-        @builder.lifespan
-        async def lifespan():
-            await db.connect()
-            yield
-            await db.disconnect()
+        builder.lifespan(db)
 
         @builder.both.default
         async def route():

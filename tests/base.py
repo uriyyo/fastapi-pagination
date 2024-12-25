@@ -288,12 +288,14 @@ class SuiteBuilder:
         @asynccontextmanager
         async def _lifespan_context(*args: Any):
             async with AsyncExitStack() as stack:
-                state = {}
+                state = await stack.enter_async_context(old_lifespan(*args))
 
-                if new_state := await stack.enter_async_context(old_lifespan(*args)):
-                    state.update(new_state)
-                if new_state := await stack.enter_async_context(asynccontextmanager(lifespan)()):
-                    state.update(new_state)
+                if hasattr(lifespan, "__aenter__"):  # noqa: SIM108
+                    ctx = lifespan
+                else:
+                    ctx = asynccontextmanager(lifespan)()
+
+                await stack.enter_async_context(ctx)
 
                 yield state
 
@@ -356,9 +358,11 @@ class BasePaginationTestSuite:
 
         cls.test_pagination = _run_pagination
 
+        is_async = cls.is_async
+
         @pytest.fixture(scope="session")
-        def is_async_db(self):
-            return cls.is_async
+        def is_async_db(_):
+            return is_async
 
         cls.is_async_db = is_async_db
 

@@ -4,14 +4,12 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from fastapi import FastAPI
 from piccolo.columns import Integer, Text
 from piccolo.conf.apps import AppConfig, AppRegistry
 from piccolo.engine import SQLiteEngine, engine_finder
 from piccolo.table import Table
 from pytest_asyncio import fixture as async_fixture
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.piccolo import paginate
 from tests.base import BasePaginationTestSuite
 from tests.utils import faker
@@ -65,21 +63,17 @@ async def engine(database_url):
     await User.create_table().run()
 
 
-@pytest.fixture(scope="session")
-def app(query, engine, model_cls):
-    app = FastAPI()
-
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    async def route():
-        return await paginate(query)
-
-    return add_pagination(app)
-
-
 class TestPiccolo(BasePaginationTestSuite):
     @async_fixture(scope="class")
     async def entities(self, query, client):
         await User.insert(*(User(name=faker.name()) for _ in range(100))).run()
 
         return await User.select()
+
+    @pytest.fixture(scope="session")
+    def app(self, builder, query, engine):
+        @builder.both.default
+        async def route():
+            return await paginate(query)
+
+        return builder.build()

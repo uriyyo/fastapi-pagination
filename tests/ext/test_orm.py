@@ -1,9 +1,7 @@
 import pytest
 from databases import Database, __version__
-from fastapi import FastAPI
 from orm import Integer, Model, ModelRegistry, String
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.orm import paginate
 from tests.base import BasePaginationTestSuite
 
@@ -31,21 +29,14 @@ def user(db):
     return User
 
 
-@pytest.fixture(scope="session")
-def app(db, user, model_cls):
-    app = FastAPI()
-
-    app.add_event_handler("startup", db.connect)
-    app.add_event_handler("shutdown", db.disconnect)
-
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    async def route():
-        return await paginate(user.objects)
-
-    return add_pagination(app)
-
-
 @pytest.mark.orm
 class TestORM(BasePaginationTestSuite):
-    pass
+    @pytest.fixture(scope="session")
+    def app(self, builder, db, user):
+        builder.lifespan(db)
+
+        @builder.both.default
+        async def route():
+            return await paginate(user.objects)
+
+        return builder.build()

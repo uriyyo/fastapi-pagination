@@ -12,9 +12,8 @@ from tortoise.fields import (
 )
 from tortoise.query_utils import Prefetch
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.tortoise import paginate
-from tests.base import BasePaginationTestSuite
+from tests.base import BasePaginationTestSuite, only_cases
 
 
 class Order(Model):
@@ -84,33 +83,33 @@ def app(database_url, query):
 
 
 class TestTortoiseDefault(BasePaginationTestSuite):
-    case_types = ["default"]
+    is_async = False
 
     @pytest.fixture(scope="session")
-    def app(self, query, app, model_cls):
-        @app.get("/default", response_model=Page[model_cls])
-        @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
+    def app(self, app, builder, query):
+        builder.app = app
+
+        @builder.both.default
         async def route():
             return await paginate(query(), prefetch_related=False)
 
-        return add_pagination(app)
+        return builder.build()
 
 
+@only_cases("relationship")
 class TestTortoiseRelationship(BasePaginationTestSuite):
-    case_types = ["relationship"]
+    is_async = False
 
     @pytest.fixture(scope="session")
-    def model_with_rel_cls(self):
-        return UserWithRelationOut
+    def app(self, app, builder, query, pagination_params):
+        builder.app = app
+        builder = builder.classes.update(model_with_rel=UserWithRelationOut)
 
-    @pytest.fixture(scope="session")
-    def app(self, app, query, model_with_rel_cls, pagination_params):
-        @app.get("/relationship/default", response_model=Page[model_with_rel_cls])
-        @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[model_with_rel_cls])
+        @builder.both.relationship
         async def route():
             return await paginate(query(), **pagination_params())
 
-        return add_pagination(app)
+        return builder.build()
 
     @pytest.fixture(
         scope="session",

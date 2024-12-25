@@ -2,13 +2,12 @@ import sys
 from contextlib import suppress
 
 import pytest
-from fastapi import FastAPI
 from pony.orm import Database, Required, Set, db_session, select
+from sqlalchemy.engine.url import make_url
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.pony import paginate
 from fastapi_pagination.utils import IS_PYDANTIC_V2
-from tests.base import BasePaginationTestSuite
+from tests.base import BasePaginationTestSuite, add_cases
 
 
 @pytest.fixture(scope="session")
@@ -18,7 +17,15 @@ def pony_db(db_type, database_url, sqlite_file):
     if db_type == "sqlite":
         db.bind("sqlite", sqlite_file)
     else:
-        db.bind(db_type, database_url)
+        url = make_url(database_url)
+        db.bind(
+            "postgres",
+            user=url.username,
+            password=url.password,
+            host=url.host,
+            port=url.port,
+            database=url.database,
+        )
 
     return db
 
@@ -55,35 +62,30 @@ else:
     _field_validator = validator("orders", pre=True, allow_reuse=True)
 
 
-@pytest.fixture(scope="session")
-def app(pony_db, pony_user, pony_order, model_cls, model_with_rel_cls):
-    app = FastAPI()
-
-    with suppress(Exception):
-        pony_db.generate_mapping(create_tables=False)
-
-    class PonyModelWithDel(model_with_rel_cls):
-        @_field_validator
-        def pony_set_to_list(cls, values):
-            if not isinstance(values, list):
-                return sorted([v.to_dict() for v in values], key=lambda x: x["id"])
-
-            return values
-
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    @app.get("/relationship/default", response_model=Page[PonyModelWithDel])
-    @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[PonyModelWithDel])
-    def route():
-        with db_session:
-            return paginate(select(p for p in pony_user))
-
-    return add_pagination(app)
-
-
 @pytest.mark.skipif(
     sys.version_info >= (3, 11),
     reason="skip pony tests for python 3.11",
 )
+@add_cases("relationship")
 class TestPony(BasePaginationTestSuite):
-    case_types = ["default", "relationship"]
+    @pytest.fixture(scope="session")
+    def app(self, builder, pony_db, pony_user, pony_order):
+        with suppress(Exception):
+            pony_db.generate_mapping(create_tables=False)
+
+        class PonyModelWithRel(builder.classes.model_with_rel):
+            @_field_validator
+            def pony_set_to_list(cls, values):
+                if not isinstance(values, list):
+                    return sorted([v.to_dict() for v in values], key=lambda x: x["id"])
+
+                return values
+
+        builder = builder.classes.update(model_with_rel=PonyModelWithRel)
+
+        @builder.both.default.relationship
+        def route():
+            with db_session:
+                return paginate(select(p for p in pony_user))
+
+        return builder.build()

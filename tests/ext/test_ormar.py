@@ -1,11 +1,9 @@
 import databases
 import pytest
 import sqlalchemy
-from fastapi import FastAPI
 from ormar import Integer, Model, OrmarConfig, String
 from sqlalchemy.engine.create import create_engine
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.ormar import paginate
 from tests.base import BasePaginationTestSuite
 
@@ -52,21 +50,14 @@ def query(request, user_cls):
     return user_cls.objects
 
 
-@pytest.fixture(scope="session")
-def app(db, meta, user_cls, query, model_cls):
-    app = FastAPI()
-
-    app.add_event_handler("startup", db.connect)
-    app.add_event_handler("shutdown", db.disconnect)
-
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    async def route():
-        return await paginate(query)
-
-    return add_pagination(app)
-
-
 @pytest.mark.ormar
 class TestOrmar(BasePaginationTestSuite):
-    pass
+    @pytest.fixture(scope="session")
+    def app(self, builder, db, meta, user_cls, query):
+        builder.lifespan(db)
+
+        @builder.both.default
+        async def route():
+            return await paginate(query)
+
+        return builder.build()
