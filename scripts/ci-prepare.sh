@@ -2,8 +2,12 @@
 
 set -x
 
-function is_docker_container_running() {
+function is_docker_container_exists() {
   docker ps -a --format '{{.Names}}' | grep -q "$1"
+}
+
+function is_docker_container_running() {
+    [ $(docker container inspect -f '{{.State.Running}}' "$1") == "true" ]
 }
 
 function wait_for_port() {
@@ -30,7 +34,7 @@ POSTGRES_NAME="${DOCKER_NAME_PREFIX}-postgres"
 CASSANDRA_NAME="${DOCKER_NAME_PREFIX}-cassandra"
 MONGO_NAME="${DOCKER_NAME_PREFIX}-mongo"
 
-if ! is_docker_container_running "${POSTGRES_NAME}"; then
+if ! is_docker_container_exists "${POSTGRES_NAME}"; then
   echo "Starting PostgreSQL"
 
   POSTGRES_DB="${POSTGRES_DB:-postgres}"
@@ -43,25 +47,39 @@ if ! is_docker_container_running "${POSTGRES_NAME}"; then
     -e POSTGRES_USER="${POSTGRES_USER}"         \
     -e POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
     --name="${POSTGRES_NAME}"                   \
-    postgres:${POSTGRES_VERSION}
+    postgres:${POSTGRES_VERSION} &
+elif ! is_docker_container_running "${POSTGRES_NAME}"; then
+  echo "Starting PostgreSQL container"
+
+  docker start "${POSTGRES_NAME}" &
 fi
 
-if ! is_docker_container_running "${CASSANDRA_NAME}"; then
+if ! is_docker_container_exists "${CASSANDRA_NAME}"; then
   echo "Starting ScyllaDB"
 
   docker run -d -p 9042:9042                    \
     --name="${CASSANDRA_NAME}"                  \
-    scylladb/scylla:latest
+    scylladb/scylla:latest &
+elif ! is_docker_container_running "${CASSANDRA_NAME}"; then
+  echo "Starting ScyllaDB container"
+
+  docker start "${CASSANDRA_NAME}" &
 fi
 
-if ! is_docker_container_running "${MONGO_NAME}"; then
+if ! is_docker_container_exists "${MONGO_NAME}"; then
   echo "Starting MongoDB"
 
   docker run -d -p 27017:27017                  \
     --name="${MONGO_NAME}"                      \
-    mongo:latest
+    mongo:latest &
+elif ! is_docker_container_running "${MONGO_NAME}"; then
+  echo "Starting MongoDB container"
+
+  docker start "${MONGO_NAME}" &
 fi
 
-wait_for_port 5432
-wait_for_port 9042
-wait_for_port 27017
+wait_for_port 5432  &
+wait_for_port 9042  &
+wait_for_port 27017 &
+
+wait;

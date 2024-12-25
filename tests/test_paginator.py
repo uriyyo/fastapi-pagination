@@ -12,8 +12,6 @@ from fastapi_pagination import (
     set_page,
 )
 from fastapi_pagination.api import set_items_transformer
-from fastapi_pagination.default import OptionalParams
-from fastapi_pagination.limit_offset import OptionalLimitOffsetParams
 
 from .base import BasePaginationTestCase
 from .utils import OptionalLimitOffsetPage, OptionalPage
@@ -36,8 +34,8 @@ class TestPaginationParams(BasePaginationTestCase):
     @pytest.mark.parametrize(
         ("path", "cls_name", "params"),
         [
-            ("/optional/default", "optional_page", OptionalParams()),
-            ("/optional/limit-offset", "optional_limit_offset_page", OptionalLimitOffsetParams()),
+            ("/optional/default", "optional_page", Page.__params_type__()),
+            ("/optional/limit-offset", "optional_limit_offset_page", LimitOffsetPage.__params_type__()),
         ],
         ids=[
             "default",
