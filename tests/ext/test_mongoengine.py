@@ -1,10 +1,8 @@
 import pytest
-from fastapi import FastAPI
 from mongoengine import Document, connect, fields
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.mongoengine import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 from .utils import mongodb_test
 
@@ -40,18 +38,12 @@ def query(request, user):
     return user.objects.all()
 
 
-@pytest.fixture(scope="session")
-def app(db_connect, query, model_cls):
-    app = FastAPI()
-
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    def route():
-        return paginate(query)
-
-    return add_pagination(app)
-
-
 @mongodb_test
-class TestMongoEngine(BasePaginationTestCase):
-    pass
+class TestMongoEngine(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def app(self, builder, db_connect, query):
+        @builder.both.default
+        def route():
+            return paginate(query)
+
+        return builder.build()

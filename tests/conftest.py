@@ -71,12 +71,12 @@ def raw_data() -> RawData:
 
         return {
             "id": id_,
-            "name": faker.name(),
+            "name": faker.unique.name(),
             "orders": [
                 {
                     "id": next(order_ids),
                     "user_id": id_,
-                    "name": faker.name(),
+                    "name": faker.unique.name(),
                 }
                 for _ in range(randint(1, 10))  # noqa: S311
             ],
@@ -95,11 +95,7 @@ def cassandra_session(cassandra_address: str, is_unit_tests_run: bool, is_sql_te
     if is_unit_tests_run or is_sql_tests_run:
         return
 
-    with Cluster(
-        [
-            cassandra_address,
-        ],
-    ).connect() as session:
+    with Cluster([cassandra_address]).connect() as session:
         ddl = "DROP KEYSPACE IF EXISTS  ks"
         session.execute(ddl)
 

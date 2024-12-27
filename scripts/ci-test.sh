@@ -46,12 +46,12 @@ _pytest tests/ext
 
 echo "Running tests with SQLAlchemy<2"
 _pip install -U "sqlalchemy<2"
-_pytest tests -m "not sqlalchemy20"
+_pytest tests/ext -m "not sqlalchemy20"
 
 if [[ "$PYDANTIC_V2" == true ]]; then
     echo "Running ormar tests"
     _pip install -U ormar
-    _pytest tests -m ormar
+    _pytest tests/ext -m ormar
     _pip uninstall -y ormar
 fi
 
@@ -62,7 +62,7 @@ fi
 
 echo "Running orm tests"
 _pip install "databases<0.9.0" orm
-_pytest tests -m orm
+_pytest tests/ext -m orm
 _pip uninstall -y orm
 
 echo "Restore env"

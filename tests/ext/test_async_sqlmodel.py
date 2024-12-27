@@ -1,19 +1,12 @@
 from functools import partial
 
 import pytest
-from fastapi import FastAPI
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.sqlmodel import paginate
-from tests.base import BasePaginationTestCase
-
-
-@pytest.fixture(scope="session")
-def is_async_db():
-    return True
+from tests.base import BasePaginationTestSuite, async_testsuite
 
 
 @pytest.fixture(scope="session")
@@ -21,12 +14,8 @@ def session(sa_engine):
     return partial(AsyncSession, sa_engine)
 
 
-@pytest.fixture(scope="session")
-def app(session):
-    return FastAPI()
-
-
-class TestSQLModelDefault(BasePaginationTestCase):
+@async_testsuite
+class TestSQLModelDefault(BasePaginationTestSuite):
     @pytest.fixture(
         scope="session",
         params=[True, False],
@@ -39,25 +28,24 @@ class TestSQLModelDefault(BasePaginationTestCase):
         return select(sm_user)
 
     @pytest.fixture(scope="session")
-    def app(self, query, app, session, model_cls):
-        @app.get("/default", response_model=Page[model_cls])
-        @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
+    def app(self, query, session, builder):
+        builder = builder.new()
+
+        @builder.both.default
         async def route():
             async with session() as db:
                 return await paginate(db, query)
 
-        return add_pagination(app)
+        return builder.build()
 
 
-class TestSQLModelRelationship(BasePaginationTestCase):
-    pagination_types = ["relationship"]
-
+@async_testsuite
+class TestSQLModelRelationship(BasePaginationTestSuite):
     @pytest.fixture(scope="session")
-    def app(self, app, session, sm_user, model_with_rel_cls):
-        @app.get("/relationship/default", response_model=Page[model_with_rel_cls])
-        @app.get("/relationship/limit-offset", response_model=LimitOffsetPage[model_with_rel_cls])
+    def app(self, session, sm_user, builder):
+        @builder.both.relationship
         async def route():
             async with session() as db:
                 return await paginate(db, select(sm_user).options(selectinload(sm_user.orders)))
 
-        return add_pagination(app)
+        return builder.build()

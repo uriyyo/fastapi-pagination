@@ -1,11 +1,9 @@
 import pytest
-from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from pytest_asyncio import fixture as async_fixture
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.motor import paginate_aggregate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 from .utils import mongodb_test
 
@@ -17,26 +15,8 @@ def db_client(database_url):
     client.close()
 
 
-@pytest.fixture(scope="session")
-def app(db_client, model_cls, raw_data):
-    app = FastAPI()
-
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    async def route():
-        return await paginate_aggregate(
-            db_client.test_agg.users,
-            [
-                {"$group": {"_id": "$name", "name": {"$first": "$name"}}},
-                {"$sort": {"name": 1}},
-            ],
-        )
-
-    return add_pagination(app)
-
-
 @mongodb_test
-class TestMotorAggregate(BasePaginationTestCase):
+class TestMotorAggregate(BasePaginationTestSuite):
     @async_fixture(scope="session")
     async def entities(self, db_client, raw_data):
         await db_client.test_agg.users.delete_many({})
@@ -49,3 +29,17 @@ class TestMotorAggregate(BasePaginationTestCase):
             ],
         )
         return await cursor.to_list(length=None)
+
+    @pytest.fixture(scope="session")
+    def app(self, builder, db_client):
+        @builder.both.default
+        async def route():
+            return await paginate_aggregate(
+                db_client.test_agg.users,
+                [
+                    {"$group": {"_id": "$name", "name": {"$first": "$name"}}},
+                    {"$sort": {"name": 1}},
+                ],
+            )
+
+        return builder.build()

@@ -1,10 +1,8 @@
 import pytest
 from databases import Database
-from fastapi import FastAPI
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.databases import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 from .utils import sqlalchemy20
 
@@ -14,21 +12,14 @@ def db(database_url):
     return Database(database_url)
 
 
-@pytest.fixture(scope="session")
-def app(db, sa_user, model_cls):
-    app = FastAPI()
-
-    app.add_event_handler("startup", db.connect)
-    app.add_event_handler("shutdown", db.disconnect)
-
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    async def route():
-        return await paginate(db, sa_user.__table__.select())
-
-    return add_pagination(app)
-
-
 @sqlalchemy20
-class TestDatabases(BasePaginationTestCase):
-    pass
+class TestDatabases(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def app(self, builder, db, sa_user):
+        builder.lifespan(db)
+
+        @builder.both.default
+        async def route():
+            return await paginate(db, sa_user.__table__.select())
+
+        return builder.build()

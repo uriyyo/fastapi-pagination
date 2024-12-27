@@ -1,12 +1,10 @@
 import pytest
 from bunnet import Document, init_bunnet
-from fastapi import FastAPI
 from pymongo import MongoClient
 from pytest_asyncio import fixture as async_fixture
 
-from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.bunnet import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 
 from .utils import mongodb_test
 
@@ -42,18 +40,12 @@ def query(request, be_user):
     return be_user.find()
 
 
-@pytest.fixture(scope="session")
-def app(db_client, query, model_cls):
-    app = FastAPI()
-
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    def route():
-        return paginate(query)
-
-    return add_pagination(app)
-
-
 @mongodb_test
-class TestBunnet(BasePaginationTestCase):
-    pass
+class TestBunnet(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def app(self, builder, query, db_client):
+        @builder.both.default
+        def route():
+            return paginate(query)
+
+        return builder.build()

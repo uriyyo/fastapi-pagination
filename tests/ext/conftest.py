@@ -103,6 +103,22 @@ def sm_order():
     return Order
 
 
+@pytest.fixture(scope="session")
+def sm_session_ctx(sa_session, is_async_db):
+    if is_async_db:
+
+        async def ctx():
+            async with sa_session() as session:
+                yield session
+    else:
+
+        def ctx():
+            with sa_session() as session:
+                yield session
+
+    return ctx
+
+
 class _SkipExtItem(pytest.Item):
     def setup(self) -> None:
         pass

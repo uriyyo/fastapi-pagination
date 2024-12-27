@@ -3,13 +3,13 @@ from contextlib import closing
 from typing import Any
 
 import pytest
-from fastapi import Depends, FastAPI
+from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.orm.session import Session
 
-from fastapi_pagination import LimitOffsetPage, Page, Params, add_pagination, set_page
+from fastapi_pagination import Page, Params, set_page
 from fastapi_pagination.ext.sqlalchemy import paginate
-from tests.base import BasePaginationTestCase
+from tests.base import BasePaginationTestSuite
 from tests.schemas import UserOut, UserWithoutIDOut
 
 from .utils import is_sqlalchemy20, sqlalchemy20
@@ -27,27 +27,20 @@ def use_subquery_count(request):
     return request.param
 
 
-@pytest.fixture(scope="session")
-def app(sa_user, sa_session: type[Session], model_cls: type[object], use_subquery_count: bool):
-    app = FastAPI()
-
-    def get_db() -> Iterator[Session]:
-        db = sa_session()
-        try:
-            yield db
-        finally:
-            db.close()
-
-    @app.get("/default", response_model=Page[model_cls])
-    @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-    def route(db: Session = Depends(get_db)):
-        return paginate(db, select(sa_user), subquery_count=use_subquery_count)
-
-    return add_pagination(app)
-
-
 @sqlalchemy20
-class TestSQLAlchemy(BasePaginationTestCase):
+class TestSQLAlchemy(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def app(self, builder, sa_user, sa_session, use_subquery_count):
+        def get_db() -> Iterator[Session]:
+            with closing(sa_session()) as db:
+                yield db
+
+        @builder.both.default
+        def route(db: Session = Depends(get_db)):
+            return paginate(db, select(sa_user), subquery_count=use_subquery_count)
+
+        return builder.build()
+
     def test_scalar_not_unwrapped(self, sa_session, sa_user, entities):
         with closing(sa_session()) as session, set_page(Page[UserWithoutIDOut]):
             page = paginate(session, select(sa_user.name), params=Params(page=1, size=10))

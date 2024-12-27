@@ -1,47 +1,47 @@
 from contextlib import suppress
-from typing import Any
+from typing import ClassVar
 
 import pytest
-from fastapi import FastAPI, Query
 
-from fastapi_pagination import add_pagination
 from fastapi_pagination.iterables import LimitOffsetPage, Page, paginate
 
-from .base import BasePaginationTestCase
+from .base import BasePaginationTestSuite, SuiteBuilder
 
 
-class TestIterablesPagination(BasePaginationTestCase):
-    page = Page
-    limit_offset_page = LimitOffsetPage
-
-    _should_normalize_expected = False
+class _IterablesSuiteMixin:
+    with_total: ClassVar[bool]
 
     def _normalize_expected(self, result):
-        if self._should_normalize_expected:
-            result.total = None
+        if self.with_total:
+            return result
 
-            with suppress(ValueError):
-                result.pages = None
+        result.total = None
+
+        with suppress(ValueError):
+            result.pages = None
 
         return result
 
-    @pytest.fixture(
-        params=[True, False],
-        ids=["with-len", "without-len"],
-    )
-    def additional_params(self, request) -> dict[str, Any]:
-        self._should_normalize_expected = request.param
-        return {"skip_len": True} if request.param else {}
+    @classmethod
+    def create_builder(cls) -> SuiteBuilder:
+        return SuiteBuilder.with_classes(
+            page_size=Page,
+            limit_offset=LimitOffsetPage,
+        )
 
     @pytest.fixture(scope="session")
-    def app(self, model_cls, entities):
-        app = FastAPI()
-
-        @app.get("/default", response_model=Page[model_cls])
-        @app.get("/limit-offset", response_model=LimitOffsetPage[model_cls])
-        async def route(skip_len: bool = Query(False)):
-            kwargs = {} if skip_len else {"total": len(entities)}
-
+    def app(self, builder, entities):
+        @builder.both.default
+        async def route():
+            kwargs = {"total": len(entities)} if self.with_total else {}
             return paginate((entity for entity in entities), **kwargs)
 
-        return add_pagination(app)
+        return builder.build()
+
+
+class TestIterablesPaginationNoTotal(_IterablesSuiteMixin, BasePaginationTestSuite):
+    with_total = False
+
+
+class TestIterablesPaginationWithTotal(_IterablesSuiteMixin, BasePaginationTestSuite):
+    with_total = True
