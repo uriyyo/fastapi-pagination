@@ -1,13 +1,10 @@
 import pytest
 from cassandra.cqlengine import columns, connection, management, models
-from fastapi import FastAPI, status
-from pydantic import parse_obj_as
 
-from fastapi_pagination import add_pagination
 from fastapi_pagination.cursor import CursorPage as BaseCursorPage
 from fastapi_pagination.customization import CustomizedPage, UseParamsFields
 from fastapi_pagination.ext.cassandra import paginate
-from tests.schemas import UserOut
+from tests.base import BasePaginationTestSuite, SuiteBuilder
 
 CursorPage = CustomizedPage[
     BaseCursorPage,
@@ -23,8 +20,8 @@ class User(models.Model):
     name = columns.Text()
 
 
-@pytest.fixture(scope="session")
-def app(cassandra_session, raw_data):
+@pytest.fixture(scope="session", autouse=True)
+def _setup_cassandra(cassandra_session, raw_data):
     connection.register_connection("cluster1", session=cassandra_session, default=True)
     management.sync_table(model=User, keyspaces=("ks",))
 
@@ -32,57 +29,19 @@ def app(cassandra_session, raw_data):
     for user in users:
         user.save()
 
-    app = FastAPI()
 
-    @app.get("/", response_model=CursorPage[UserOut])
-    def route():
-        return paginate(User.objects().order_by("id").allow_filtering(), query_filter={"group": "GC"})
+class TestCasandra(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def builder(self) -> SuiteBuilder:
+        return SuiteBuilder.with_classes(cursor=CursorPage)
 
-    return add_pagination(app)
+    @pytest.fixture(scope="session")
+    def app(self, builder):
+        @builder.cursor.default
+        def route():
+            return paginate(
+                User.objects().order_by("id").allow_filtering(),
+                query_filter={"group": "GC"},
+            )
 
-
-@pytest.mark.asyncio(loop_scope="session")
-async def test_cursor(app, client, entities):
-    entities = sorted(parse_obj_as(list[UserOut], entities), key=(lambda it: (it.id, it.name)))
-
-    items = []
-
-    cursor = None
-    while True:
-        params = {"cursor": cursor} if cursor else {}
-
-        resp = await client.get("/", params={**params, "size": 10})
-        assert resp.status_code == status.HTTP_200_OK
-        data = resp.json()
-
-        items.extend(parse_obj_as(list[UserOut], data["items"]))
-
-        if data["next_page"] is None:
-            break
-
-        cursor = data["next_page"]
-
-    assert items == entities
-
-    """
-    backwards paging doesn't work out of the box
-    it's on the client to save those pages states
-
-    items = []
-
-    while True:
-        params = {"cursor": cursor} if cursor else {}
-
-        resp = await client.get(f"/", params={**params, "size": 10})
-        assert resp.status_code == status.HTTP_200_OK
-        data = resp.json()
-
-        items = parse_obj_as(List[UserOut], data["items"]) + items
-
-        if data["previous_page"] is None:
-            break
-
-        cursor = data["previous_page"]
-
-    assert items == entities
-    """
+        return builder.build()
