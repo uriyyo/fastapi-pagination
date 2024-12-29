@@ -10,6 +10,7 @@ import asyncpg
 import pytest
 from asgi_lifespan import LifespanManager
 from cassandra.cluster import Cluster
+from cassandra.cqlengine import columns, connection, management, models
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -120,9 +121,9 @@ def entities(raw_data: RawData) -> list[UserWithOrderOut]:
 
 
 @pytest.fixture(scope="session")
-def cassandra_session(_cassandra_address: str):
+def _setup_cassandra(_cassandra_address, raw_data):
     with Cluster([_cassandra_address]).connect() as session:
-        ddl = "DROP KEYSPACE IF EXISTS  ks"
+        ddl = "DROP KEYSPACE IF EXISTS ks"
         session.execute(ddl)
 
         ddl = (
@@ -130,7 +131,21 @@ def cassandra_session(_cassandra_address: str):
         )
         session.execute(ddl)
 
-        yield session
+        class User(models.Model):
+            __keyspace__ = "ks"
+
+            group = columns.Text(partition_key=True)
+            id = columns.Integer(primary_key=True)
+            name = columns.Text()
+
+        connection.register_connection("setup", session=session, default=True)
+        management.sync_table(model=User, keyspaces=("ks",))
+
+        users = [User(group="GC", id=user.get("id"), name=user.get("name")) for user in raw_data]
+        for user in users:
+            user.save()
+
+        connection.unregister_connection("setup")
 
 
 @async_fixture(scope="session", autouse=True)

@@ -1,5 +1,6 @@
 import pytest
-from cassandra.cqlengine import columns, connection, management, models
+from cassandra.cluster import Cluster
+from cassandra.cqlengine import columns, connection, models
 
 from fastapi_pagination.cursor import CursorPage as BaseCursorPage
 from fastapi_pagination.customization import CustomizedPage, UseParamsFields
@@ -20,16 +21,15 @@ class User(models.Model):
     name = columns.Text()
 
 
-@pytest.fixture(scope="session", autouse=True)
-def _setup_cassandra(cassandra_session, raw_data):
-    connection.register_connection("cluster1", session=cassandra_session, default=True)
-    management.sync_table(model=User, keyspaces=("ks",))
-
-    users = [User(group="GC", id=user.get("id"), name=user.get("name")) for user in raw_data]
-    for user in users:
-        user.save()
+@pytest.fixture(scope="session")
+def cassandra_session(cassandra_address):
+    with Cluster([cassandra_address]).connect() as session:
+        connection.register_connection("cassandra-test", session=session, default=True)
+        yield session
+        connection.unregister_connection("cassandra-test")
 
 
+@pytest.mark.usefixtures("cassandra_session")
 class TestCasandra(BasePaginationTestSuite):
     @pytest.fixture(scope="session")
     def builder(self) -> SuiteBuilder:
