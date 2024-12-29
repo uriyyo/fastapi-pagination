@@ -1,18 +1,53 @@
 from functools import partial
+from typing import Any
 
 import pytest
+from fastapi import Depends
 from sqlalchemy.orm import selectinload
-from sqlmodel import Session, select
+from sqlmodel import Field, Relationship, Session, SQLModel, select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from fastapi_pagination.ext.sqlmodel import paginate
-from tests.base import BasePaginationTestSuite
+from tests.base import BasePaginationTestSuite, async_sync_testsuite
+from tests.utils import create_ctx, maybe_async
 
 
 @pytest.fixture(scope="session")
-def session(sa_engine):
-    return partial(Session, sa_engine)
+def sm_session(sa_engine, is_async_db):
+    return partial(AsyncSession if is_async_db else Session, sa_engine)
 
 
+@pytest.fixture(scope="session")
+def sm_session_ctx(sm_session, is_async_db):
+    return create_ctx(sm_session, is_async_db)
+
+
+@pytest.fixture(scope="session")
+def sm_user(sm_order):
+    class User(SQLModel, table=True):
+        __tablename__ = "users"
+
+        id: int = Field(primary_key=True)
+        name: str
+
+        orders: list[sm_order] = Relationship()
+
+    return User
+
+
+@pytest.fixture(scope="session")
+def sm_order():
+    class Order(SQLModel, table=True):
+        __tablename__ = "orders"
+
+        id: int = Field(primary_key=True)
+        user_id: int = Field(foreign_key="users.id")
+        name: str
+
+    return Order
+
+
+@async_sync_testsuite
 class TestSQLModelDefault(BasePaginationTestSuite):
     @pytest.fixture(
         scope="session",
@@ -26,21 +61,22 @@ class TestSQLModelDefault(BasePaginationTestSuite):
         return select(sm_user)
 
     @pytest.fixture(scope="session")
-    def app(self, builder, query, session):
+    def app(self, builder, query, sm_session_ctx):
+        builder = builder.new()
+
         @builder.both.default
-        def route():
-            with session() as db:
-                return paginate(db, query)
+        async def route(db: Any = Depends(sm_session_ctx)):
+            return await maybe_async(paginate(db, query))
 
         return builder.build()
 
 
+@async_sync_testsuite
 class TestSQLModelRelationship(BasePaginationTestSuite):
     @pytest.fixture(scope="session")
-    def app(self, builder, session, sm_user):
+    def app(self, builder, sm_session_ctx, sm_user):
         @builder.both.relationship
-        def route():
-            with session() as db:
-                return paginate(db, select(sm_user).options(selectinload(sm_user.orders)))
+        async def route(db: Any = Depends(sm_session_ctx)):
+            return await maybe_async(paginate(db, select(sm_user).options(selectinload(sm_user.orders))))
 
         return builder.build()
