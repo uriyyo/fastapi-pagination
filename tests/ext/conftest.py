@@ -1,11 +1,12 @@
+from functools import partial
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import pytest
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session, relationship, sessionmaker
-from typing_extensions import TypeAlias
+from sqlalchemy.orm import Session, relationship
+
+from tests.utils import create_ctx
 
 try:
     from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
@@ -17,37 +18,24 @@ except ImportError:
 
     from sqlalchemy.ext.declarative import declarative_base
 
-try:
-    from sqlmodel import Field, Relationship, SQLModel
-except ImportError:
-    SQLModel = None
-    Field = None
-    Relationship = None
-
-PossiblyAsyncEngine: TypeAlias = Union[Engine, AsyncEngine]
-
 
 @pytest.fixture(scope="session")
-def sa_engine_params(database_url: str) -> dict:
-    return {}
-
-
-@pytest.fixture(scope="session")
-def sa_engine(database_url: str, sa_engine_params: dict, is_async_db: bool) -> PossiblyAsyncEngine:
+def sa_engine(database_url: str, is_async_db: bool):
     if is_async_db:
-        return create_async_engine(database_url, **sa_engine_params)
+        from sqlalchemy.ext.asyncio import create_async_engine
 
-    return create_engine(database_url, **sa_engine_params)
+        return create_async_engine(database_url)
 
-
-@pytest.fixture(scope="session")
-def sa_session(sa_engine: PossiblyAsyncEngine, is_async_db: bool):
-    session_cls = AsyncSession if is_async_db else Session
-    return sessionmaker(bind=sa_engine, class_=session_cls)
+    return create_engine(database_url)
 
 
 @pytest.fixture(scope="session")
-def sa_base(sa_engine: PossiblyAsyncEngine):
+def sa_session(sa_engine, is_async_db: bool):
+    return partial(AsyncSession if is_async_db else Session, sa_engine)
+
+
+@pytest.fixture(scope="session")
+def sa_base(sa_engine):
     return declarative_base()
 
 
@@ -79,44 +67,8 @@ def sa_user(sa_base, sa_order):
 
 
 @pytest.fixture(scope="session")
-def sm_user(sm_order):
-    class User(SQLModel, table=True):
-        __tablename__ = "users"
-
-        id: int = Field(primary_key=True)
-        name: str
-
-        orders: list[sm_order] = Relationship()
-
-    return User
-
-
-@pytest.fixture(scope="session")
-def sm_order():
-    class Order(SQLModel, table=True):
-        __tablename__ = "orders"
-
-        id: int = Field(primary_key=True)
-        user_id: int = Field(foreign_key="users.id")
-        name: str
-
-    return Order
-
-
-@pytest.fixture(scope="session")
-def sm_session_ctx(sa_session, is_async_db):
-    if is_async_db:
-
-        async def ctx():
-            async with sa_session() as session:
-                yield session
-    else:
-
-        def ctx():
-            with sa_session() as session:
-                yield session
-
-    return ctx
+def sa_session_ctx(sa_session, is_async_db):
+    return create_ctx(sa_session, is_async_db)
 
 
 class _SkipExtItem(pytest.Item):

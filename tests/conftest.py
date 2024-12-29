@@ -10,6 +10,7 @@ import asyncpg
 import pytest
 from asgi_lifespan import LifespanManager
 from cassandra.cluster import Cluster
+from cassandra.cqlengine import columns, connection, management, models
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -22,7 +23,7 @@ from .utils import faker
 RawData: TypeAlias = list[dict[str, Any]]
 
 
-def pytest_addoption(parser: pytest.Parser):
+def pytest_addoption(parser):
     parser.addoption(
         "--postgres-dsn",
         type=str,
@@ -38,26 +39,55 @@ def pytest_addoption(parser: pytest.Parser):
         type=str,
         required=True,
     )
-    parser.addoption(
-        "--unit-tests",
-        action="store_true",
-        default=False,
-    )
-    parser.addoption(
-        "--sql-tests",
-        action="store_true",
-        default=False,
-    )
 
 
 @pytest.fixture(scope="session")
-def is_unit_tests_run(request: pytest.FixtureRequest) -> bool:
-    return request.config.getoption("--unit-tests")
+def _mongodb_url(request) -> str:
+    return request.config.getoption("--mongodb-dsn")
 
 
 @pytest.fixture(scope="session")
-def is_sql_tests_run(request):
-    return request.config.getoption("--sql-tests")
+def mongodb_url(_mongodb_url, request) -> str:
+    request.getfixturevalue("_setup_mongodb")
+    return _mongodb_url
+
+
+@pytest.fixture(scope="session")
+def _postgres_url(request) -> str:
+    return request.config.getoption("--postgres-dsn")
+
+
+@pytest.fixture(scope="session")
+def postgres_url(_postgres_url, request) -> str:
+    request.getfixturevalue("_setup_postgres")
+    return _postgres_url
+
+
+@pytest.fixture(scope="session")
+def _cassandra_address(request) -> str:
+    return request.config.getoption("--cassandra-dsn")
+
+
+@pytest.fixture(scope="session")
+def cassandra_address(_cassandra_address, request) -> str:
+    request.getfixturevalue("_setup_cassandra")
+    return _cassandra_address
+
+
+@pytest.fixture(scope="session")
+def _sqlite_file() -> str:
+    return str(Path("./test_db.sqlite").resolve().absolute())
+
+
+@pytest.fixture(scope="session")
+def sqlite_file(_sqlite_file, request) -> str:
+    request.getfixturevalue("_setup_sqlite")
+    return _sqlite_file
+
+
+@pytest.fixture(scope="session")
+def sqlite_url(sqlite_file) -> str:
+    return f"sqlite:///{sqlite_file}"
 
 
 @pytest.fixture(scope="session")
@@ -91,12 +121,9 @@ def entities(raw_data: RawData) -> list[UserWithOrderOut]:
 
 
 @pytest.fixture(scope="session")
-def cassandra_session(cassandra_address: str, is_unit_tests_run: bool, is_sql_tests_run: bool):
-    if is_unit_tests_run or is_sql_tests_run:
-        return
-
-    with Cluster([cassandra_address]).connect() as session:
-        ddl = "DROP KEYSPACE IF EXISTS  ks"
+def _setup_cassandra(_cassandra_address, raw_data):
+    with Cluster([_cassandra_address]).connect() as session:
+        ddl = "DROP KEYSPACE IF EXISTS ks"
         session.execute(ddl)
 
         ddl = (
@@ -104,15 +131,26 @@ def cassandra_session(cassandra_address: str, is_unit_tests_run: bool, is_sql_te
         )
         session.execute(ddl)
 
-        yield session
+        class User(models.Model):
+            __keyspace__ = "ks"
+
+            group = columns.Text(partition_key=True)
+            id = columns.Integer(primary_key=True)
+            name = columns.Text()
+
+        connection.register_connection("setup", session=session, default=True)
+        management.sync_table(model=User, keyspaces=("ks",))
+
+        users = [User(group="GC", id=user.get("id"), name=user.get("name")) for user in raw_data]
+        for user in users:
+            user.save()
+
+        connection.unregister_connection("setup")
 
 
 @async_fixture(scope="session", autouse=True)
-async def _setup_postgres(postgres_url: str, raw_data: RawData, is_unit_tests_run: bool):
-    if is_unit_tests_run:
-        return
-
-    async with asyncpg.create_pool(postgres_url) as pool:
+async def _setup_postgres(_postgres_url: str, raw_data: RawData):
+    async with asyncpg.create_pool(_postgres_url) as pool:
         await pool.fetch("DROP TABLE IF EXISTS users CASCADE;")
         await pool.fetch("DROP TABLE IF EXISTS orders CASCADE;")
         await pool.fetch(
@@ -150,11 +188,8 @@ async def _setup_postgres(postgres_url: str, raw_data: RawData, is_unit_tests_ru
 
 
 @async_fixture(scope="session", autouse=True)
-async def _setup_sqlite(sqlite_file: str, raw_data: RawData, is_unit_tests_run: bool):
-    if is_unit_tests_run:
-        return
-
-    async with aiosqlite.connect(sqlite_file) as pool:
+async def _setup_sqlite(_sqlite_file: str, raw_data: RawData):
+    async with aiosqlite.connect(_sqlite_file) as pool:
         await pool.execute("DROP TABLE IF EXISTS orders;")
         await pool.execute("DROP TABLE IF EXISTS users;")
         await pool.execute(
@@ -192,41 +227,13 @@ async def _setup_sqlite(sqlite_file: str, raw_data: RawData, is_unit_tests_run: 
 
 
 @async_fixture(scope="session", autouse=True)
-async def _setup_mongodb(mongodb_url: str, raw_data: RawData, is_unit_tests_run: bool, is_sql_tests_run: bool):
-    if is_unit_tests_run or is_sql_tests_run:
-        return
+async def _setup_mongodb(_mongodb_url: str, raw_data: RawData):
+    motor = AsyncIOMotorClient(_mongodb_url)
 
-    client = AsyncIOMotorClient(mongodb_url)
+    await motor.test.users.delete_many({})
+    await motor.test.users.insert_many(raw_data)
 
-    await client.test.users.delete_many({})
-    await client.test.users.insert_many(raw_data)
-
-    client.close()
-
-
-@pytest.fixture(scope="session")
-def mongodb_url(request: pytest.FixtureRequest) -> str:
-    return request.config.getoption("--mongodb-dsn")
-
-
-@pytest.fixture(scope="session")
-def postgres_url(request: pytest.FixtureRequest) -> str:
-    return request.config.getoption("--postgres-dsn")
-
-
-@pytest.fixture(scope="session")
-def cassandra_address(request: pytest.FixtureRequest) -> str:
-    return request.config.getoption("--cassandra-dsn")
-
-
-@pytest.fixture(scope="session")
-def sqlite_file() -> str:
-    return str(Path("./test_db.sqlite").resolve().absolute())
-
-
-@pytest.fixture(scope="session")
-def sqlite_url(sqlite_file: str) -> str:
-    return f"sqlite:///{sqlite_file}"
+    motor.close()
 
 
 @pytest.fixture(scope="session")
@@ -238,13 +245,18 @@ def is_async_db() -> bool:
     scope="session",
     params=["postgres", "sqlite"],
 )
-def db_type(request: pytest.FixtureRequest) -> str:
+def db_type(request) -> str:
     return request.param
 
 
 @pytest.fixture(scope="session")
-def database_url(db_type: str, postgres_url: str, sqlite_url: str, is_async_db: bool) -> str:
-    url = postgres_url if db_type == "postgres" else sqlite_url
+def database_url(db_type: str, is_async_db: bool, request) -> str:
+    if db_type == "postgres":  # noqa: SIM108
+        url = request.getfixturevalue("postgres_url")
+    elif db_type == "sqlite":
+        url = request.getfixturevalue("sqlite_url")
+    else:
+        raise ValueError(f"Unknown database type: {db_type}")
 
     if is_async_db:
         url = url.replace("postgresql", "postgresql+asyncpg", 1)
@@ -259,7 +271,7 @@ def event_loop():
 
 
 def pytest_collection_modifyitems(items: list[pytest.Function]):
-    items.sort(key=lambda it: (it.path, it.name))
+    items.sort(key=lambda it: (it.path, it.nodeid))
 
 
 @async_fixture(scope="class")

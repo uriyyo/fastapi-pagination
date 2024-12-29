@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 __all__ = [
+    "async_sync_testsuite",
     "async_testsuite",
     "cases",
+    "sync_testsuite",
 ]
 
 from dataclasses import dataclass, field, replace
@@ -63,6 +65,28 @@ def async_testsuite(cls: TBasePaginationTestSuite) -> TBasePaginationTestSuite:
     @pytest.fixture(scope="session")
     def is_async_db(self):
         return True
+
+    cls.is_async_db = is_async_db
+    return cls
+
+
+def sync_testsuite(cls: TBasePaginationTestSuite) -> TBasePaginationTestSuite:
+    @pytest.fixture(scope="session")
+    def is_async_db(self):
+        return False
+
+    cls.is_async_db = is_async_db
+    return cls
+
+
+def async_sync_testsuite(cls: TBasePaginationTestSuite) -> TBasePaginationTestSuite:
+    @pytest.fixture(
+        scope="session",
+        params=[True, False],
+        ids=["async", "sync"],
+    )
+    def is_async_db(self, request):
+        return request.param
 
     cls.is_async_db = is_async_db
     return cls

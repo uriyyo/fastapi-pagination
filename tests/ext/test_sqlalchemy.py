@@ -1,46 +1,61 @@
-from collections.abc import Iterator
 from contextlib import closing
 from typing import Any
 
 import pytest
 from fastapi import Depends
-from sqlalchemy import select
-from sqlalchemy.orm.session import Session
+from sqlalchemy import select, text
+from sqlalchemy.orm import selectinload
 
-from fastapi_pagination import Page, Params, set_page
+from fastapi_pagination import Page, Params, set_page, set_params
+from fastapi_pagination.cursor import CursorPage
+from fastapi_pagination.customization import CustomizedPage, UseQuotedCursor
 from fastapi_pagination.ext.sqlalchemy import paginate
-from tests.base import BasePaginationTestSuite
+from tests.base import BasePaginationTestSuite, SuiteBuilder, async_sync_testsuite, sync_testsuite
+from tests.ext.utils import is_sqlalchemy20
 from tests.schemas import UserOut, UserWithoutIDOut
-
-from .utils import is_sqlalchemy20, sqlalchemy20
-
-
-@pytest.fixture(
-    scope="session",
-    params=[True, False],
-    ids=["subquery_count", "no_subquery_count"],
-)
-def use_subquery_count(request):
-    if request.param and not is_sqlalchemy20:
-        pytest.skip("subquery_count is not supported for SQLAlchemy<2.0")
-
-    return request.param
+from tests.utils import maybe_async
 
 
-@sqlalchemy20
-class TestSQLAlchemy(BasePaginationTestSuite):
+@async_sync_testsuite
+class TestSQLAlchemyBaseSuite(BasePaginationTestSuite):
+    @pytest.fixture(
+        scope="session",
+        params=[True, False],
+        ids=["subquery_count", "no_subquery_count"],
+    )
+    def use_subquery_count(self, request):
+        if request.param and not is_sqlalchemy20:
+            pytest.skip("subquery_count is not supported for SQLAlchemy<2.0")
+
+        return request.param
+
     @pytest.fixture(scope="session")
-    def app(self, builder, sa_user, sa_session, use_subquery_count):
-        def get_db() -> Iterator[Session]:
-            with closing(sa_session()) as db:
-                yield db
+    def app(self, sa_session, sa_user, sa_session_ctx, builder, use_subquery_count):
+        builder = builder.new()
+        kwargs = {"subquery_count": use_subquery_count}
 
         @builder.both.default
-        def route(db: Session = Depends(get_db)):
-            return paginate(db, select(sa_user), subquery_count=use_subquery_count)
+        async def route_default(db: Any = Depends(sa_session_ctx)):
+            return await maybe_async(
+                paginate(db, select(sa_user), **kwargs),
+            )
+
+        @builder.both.non_scalar
+        async def route_non_scalar(db: Any = Depends(sa_session_ctx)):
+            return await maybe_async(
+                paginate(db, select(sa_user.id, sa_user.name), **kwargs),
+            )
+
+        @builder.both.relationship
+        async def route_relationship(db: Any = Depends(sa_session_ctx)):
+            return await maybe_async(
+                paginate(db, select(sa_user).options(selectinload(sa_user.orders)), **kwargs),
+            )
 
         return builder.build()
 
+
+class TestSQLAlchemyUnwrap:
     def test_scalar_not_unwrapped(self, sa_session, sa_user, entities):
         with closing(sa_session()) as session, set_page(Page[UserWithoutIDOut]):
             page = paginate(session, select(sa_user.name), params=Params(page=1, size=10))
@@ -149,3 +164,74 @@ class TestSQLAlchemy(BasePaginationTestSuite):
             )
 
         assert validate(page.items[0], sa_user)
+
+
+@sync_testsuite
+class TestSQLAlchemyOldStyle(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def app(self, sa_session, sa_user, sa_session_ctx, builder):
+        builder = builder.new()
+
+        @builder.both.default
+        async def route(db: Any = Depends(sa_session_ctx)):
+            return await maybe_async(paginate(db.query(sa_user)))
+
+        return builder.build()
+
+
+@async_sync_testsuite
+class TestSQLAlchemyCursor(BasePaginationTestSuite):
+    @pytest.fixture(
+        scope="session",
+        params=[True, False],
+        ids=["quoted", "unquoted"],
+    )
+    def quoted_cursor(self, request) -> bool:
+        return request.param
+
+    @pytest.fixture(scope="session")
+    def builder(self, quoted_cursor) -> SuiteBuilder:
+        return SuiteBuilder.with_classes(
+            cursor=CustomizedPage[CursorPage, UseQuotedCursor(quoted_cursor)],
+        )
+
+    @pytest.fixture(scope="session")
+    def app(self, builder, sa_user, sa_order, sa_session, sa_session_ctx):
+        @builder.cursor.default
+        async def route(db: Any = Depends(sa_session_ctx)):
+            return await maybe_async(paginate(db, select(sa_user).order_by(sa_user.id)))
+
+        return builder.build()
+
+    @pytest.mark.asyncio(scope="session")
+    async def test_no_order(self, sa_session, sa_user):
+        with (
+            pytest.raises(ValueError, match=r"^Cursor pagination requires ordering$"),
+            set_page(CursorPage[UserOut]),
+            set_params(CursorPage.__params_type__()),
+        ):
+            await maybe_async(paginate(sa_session(), select(sa_user)))
+
+
+@async_sync_testsuite
+class TestSQLAlchemyFromStatement(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def app(self, builder, sa_user, sa_session_ctx):
+        @builder.both.default.optional
+        async def route(db: Any = Depends(sa_session_ctx)):
+            return await maybe_async(
+                paginate(db, select(sa_user).from_statement(text("SELECT * FROM users"))),
+            )
+
+        return builder.build()
+
+
+@async_sync_testsuite
+class TestSQLAlchemyRaw(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def app(self, builder, sa_user, sa_session_ctx):
+        @builder.both.default.optional
+        async def route(db: Any = Depends(sa_session_ctx)):
+            return await maybe_async(paginate(db, text("SELECT * FROM users")))
+
+        return builder.build()
