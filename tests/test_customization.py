@@ -46,6 +46,20 @@ def test_customization_happy_path():
     ]
 
 
+def test_customization_double():
+    First = CustomizedPage[
+        Page,
+        UseModule("first"),
+    ]
+
+    Second = CustomizedPage[
+        First,
+        UseModule("second"),
+    ]
+
+    assert Second.__name__ == "PageCustomized"
+
+
 def test_customization_no_args():
     assert CustomizedPage[Page] is Page
 

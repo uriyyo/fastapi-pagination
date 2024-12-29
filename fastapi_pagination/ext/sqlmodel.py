@@ -13,7 +13,7 @@ from .sqlalchemy import paginate as _paginate
 
 try:
     from sqlmodel.sql._expression_select_cls import SelectBase
-except ImportError:
+except ImportError:  # pragma: no cover
     _T = TypeVar("_T")
 
     class SelectBase(Generic[_T]):  # type: ignore[no-redef]

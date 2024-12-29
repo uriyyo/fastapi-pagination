@@ -18,10 +18,7 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
 
     @validation_decorator
     def __root_validator__(cls, value: Any) -> Any:
-        if not isinstance(value, MutableMapping):
-            return value
-
-        if "links" not in value:
+        if isinstance(value, MutableMapping) and "links" not in value:
             offset, limit, total = [value[k] for k in ("offset", "limit", "total")]
 
             # FIXME: it should not be so hard to calculate last page for limit-offset based pages

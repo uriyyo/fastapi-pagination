@@ -18,10 +18,7 @@ class Page(BasePage[T], Generic[T]):
 
     @validation_decorator
     def __root_validator__(cls, value: Any) -> Any:
-        if not isinstance(value, MutableMapping):
-            return value
-
-        if "links" not in value:
+        if isinstance(value, MutableMapping) and "links" not in value:
             page, size, total = [value[k] for k in ("page", "size", "total")]
 
             value["links"] = create_links(
