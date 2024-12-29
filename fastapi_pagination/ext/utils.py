@@ -1,5 +1,6 @@
 __all__ = [
     "generic_query_apply_params",
+    "len_or_none",
     "unwrap_scalars",
     "wrap_scalars",
 ]

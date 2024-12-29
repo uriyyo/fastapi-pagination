@@ -238,6 +238,14 @@ def test_apply_items_transformer_sync_with_async_transformer():
         apply_items_transformer([], async_transformer, async_=False)
 
 
+@pytest.mark.asyncio(loop_scope="session")
+async def test_async_items_transformer():
+    async def async_transformer(items):
+        return [i * 2 for i in items]
+
+    assert await apply_items_transformer([1, 2, 3], async_transformer, async_=True) == [2, 4, 6]
+
+
 def test_no_exception_on_validation_error():
     app = FastAPI()
     client = TestClient(app)
@@ -294,6 +302,7 @@ class TestLifespan:
 
         return app
 
+    @pytest.mark.asyncio(loop_scope="session")
     async def test_lifespan_wrap(self, app, client):
         rsp = await client.get("/")
         assert rsp.status_code == status.HTTP_200_OK
@@ -318,6 +327,7 @@ class TestPatchOpenAPI:
 
         return app
 
+    @pytest.mark.asyncio(loop_scope="session")
     async def test_patch_openapi(self, app, client):
         rsp = await client.get("/openapi.json")
         assert rsp.status_code == status.HTTP_200_OK

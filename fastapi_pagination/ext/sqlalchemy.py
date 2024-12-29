@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 
 try:
     from sqlalchemy.orm import FromStatement
-except ImportError:
+except ImportError:  # pragma: no cover
 
     class FromStatement:  # type: ignore[no-redef]
         def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -240,7 +240,7 @@ def exec_pagination(
         total = conn.scalar(count_query)
 
     if is_cursor(raw_params):
-        if paging is None:
+        if paging is None:  # pragma: no cover
             raise ImportError("sqlakeyset is not installed")
         if not getattr(query, "_order_by_clauses", True):
             raise ValueError("Cursor pagination requires ordering")
