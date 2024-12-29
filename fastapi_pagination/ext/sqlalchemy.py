@@ -12,12 +12,11 @@ __all__ = [
 import warnings
 from collections.abc import Sequence
 from contextlib import suppress
-from typing import Any, Optional, TypeVar, Union, cast, overload
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, cast, overload
 
 from sqlalchemy import func, select, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlalchemy.orm import Query, Session, noload, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import TextClause
@@ -29,6 +28,10 @@ from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, Item
 from fastapi_pagination.utils import verify_params
 
 from .utils import generic_query_apply_params, unwrap_scalars
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
+
 
 try:
     from sqlalchemy.orm import FromStatement

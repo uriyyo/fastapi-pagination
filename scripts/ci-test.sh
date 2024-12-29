@@ -55,15 +55,17 @@ if [[ "$PYDANTIC_V2" == true ]]; then
     _pip uninstall -y ormar
 fi
 
-#echo "Running tests GINO tests"
-#_pip install -U "gino[starlette]"
-#_pytest tests -m gino
-#_pip uninstall -y gino gino-starlette
-
 echo "Running orm tests"
 _pip install "databases<0.9.0" orm
 _pytest tests/ext -m orm
 _pip uninstall -y orm
+
+if [[ "$PYDANTIC_V2" == true ]]; then
+  echo "Running tests GINO tests"
+  _pip install -U "gino[starlette]" "sqlalchemy<1.4" "asyncpg"
+  _pytest tests -m gino
+  _pip uninstall -y gino gino-starlette
+fi
 
 echo "Restore env"
 poetry install -E all --sync

@@ -43,6 +43,8 @@ def query(request, user_cls):
 class TestGino(BasePaginationTestSuite):
     @pytest.fixture(scope="session")
     def app(self, builder, db, query):
+        builder = builder.new()
+
         @builder.both.default
         async def route():
             return await paginate(query)
