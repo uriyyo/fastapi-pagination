@@ -4,6 +4,7 @@ __all__ = [
     "IS_PYDANTIC_V2",
     "FastAPIPaginationWarning",
     "await_if_async",
+    "await_if_coro",
     "check_installed_extensions",
     "create_pydantic_model",
     "disable_installed_extensions_check",
@@ -18,7 +19,7 @@ import functools
 import inspect
 import warnings
 from collections.abc import Awaitable
-from typing import TYPE_CHECKING, Annotated, Any, Callable, Optional, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Annotated, Any, Callable, Optional, TypeVar, Union, cast, overload
 
 from pydantic import VERSION, BaseModel
 from typing_extensions import Literal, ParamSpec, get_origin
@@ -87,6 +88,13 @@ async def await_if_async(func: Callable[P, Any], /, *args: P.args, **kwargs: P.k
         return await func(*args, **kwargs)
 
     return func(*args, **kwargs)
+
+
+async def await_if_coro(coro: Union[Awaitable[R], R], /) -> R:
+    if asyncio.iscoroutine(coro):
+        return cast(R, await coro)
+
+    return cast(R, coro)
 
 
 _EXTENSIONS = [
