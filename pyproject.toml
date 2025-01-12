@@ -135,6 +135,7 @@ ignore = [
     "TC001",   # ignore moving things to if TYPE_CHECKING block
     "TC002",   # ignore moving things to if TYPE_CHECKING block
     "TC003",   # ignore moving things to if TYPE_CHECKING block
+    "A005",    # allow module name to shadow a Python standard-library module
 
     # full rule exclude
     "D",    # ignore docstrings
