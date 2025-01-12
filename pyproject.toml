@@ -64,7 +64,7 @@ requests = "^2.32.2"
 uvicorn = "^0.34.0"
 Jinja2 = "^3.1.5"
 mypy = "^1.14.1"
-ruff = "^0.8.6"
+ruff = "^0.9.0"
 
 [tool.poetry.extras]
 sqlmodel = ["sqlmodel", "sqlakeyset"]
@@ -135,6 +135,7 @@ ignore = [
     "TC001",   # ignore moving things to if TYPE_CHECKING block
     "TC002",   # ignore moving things to if TYPE_CHECKING block
     "TC003",   # ignore moving things to if TYPE_CHECKING block
+    "A005",    # allow module name to shadow a Python standard-library module
 
     # full rule exclude
     "D",    # ignore docstrings
