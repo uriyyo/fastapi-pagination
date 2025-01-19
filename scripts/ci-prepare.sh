@@ -33,6 +33,7 @@ DOCKER_NAME_PREFIX="${DOCKER_NAME_PREFIX:-fastapi-pagination}"
 POSTGRES_NAME="${DOCKER_NAME_PREFIX}-postgres"
 CASSANDRA_NAME="${DOCKER_NAME_PREFIX}-cassandra"
 MONGO_NAME="${DOCKER_NAME_PREFIX}-mongo"
+FIRESTORE_NAME="${DOCKER_NAME_PREFIX}-firestore"
 
 if ! is_docker_container_exists "${POSTGRES_NAME}"; then
   echo "Starting PostgreSQL"
@@ -78,8 +79,21 @@ elif ! is_docker_container_running "${MONGO_NAME}"; then
   docker start "${MONGO_NAME}" &
 fi
 
+if ! is_docker_container_exists "${FIRESTORE_NAME}"; then
+  echo "Starting Firestore Emulator"
+
+  docker run -d -p 8080:8080 \
+    --name "${FIRESTORE_NAME}" \
+    andreyka26/firebase-emulator:latest &
+elif ! is_docker_container_running "${FIRESTORE_NAME}"; then
+  echo "Starting Firestore Emulator container"
+
+  docker start "${FIRESTORE_NAME}" &
+fi
+
 wait_for_port 5432  &
 wait_for_port 9042  &
 wait_for_port 27017 &
+wait_for_port 8080 &
 
 wait;
