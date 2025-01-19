@@ -113,7 +113,7 @@ def _firebase_flow(
     else:
         query = generic_query_apply_params(query, raw_params.as_limit_offset())
 
-    raw_items = yield query.get(transaction=transaction)
+    raw_items = yield query.get(transaction=transaction)  # type: ignore[arg-type]
 
     if is_cursor(raw_params) and raw_items:
         additional_data["next_"] = raw_items[-1].id
