@@ -13,34 +13,49 @@ from typing_extensions import ParamSpec, TypeAlias
 from fastapi_pagination.utils import await_if_coro
 
 P = ParamSpec("P")
+
+TArg = TypeVar("TArg")
 R = TypeVar("R")
 
 Flow: TypeAlias = Generator[
-    Callable[[], Union[Any, Awaitable[Any]]],
-    Any,
+    Union[Awaitable[TArg], TArg],
+    TArg,
     R,
 ]
 
-TFlow = TypeVar("TFlow", bound=Flow[Any])
+TFlow = TypeVar("TFlow", bound=Flow[Any, Any])
 
 
 def flow(func: Callable[P, TFlow]) -> Callable[P, TFlow]:
     return func
 
 
-def run_sync_flow(gen: Flow[R], /) -> R:
+def run_sync_flow(gen: Flow[Any, R], /) -> R:
     try:
-        callback = gen.send(None)
+        res = gen.send(None)
+
         while True:
-            callback = gen.send(callback())
+            try:
+                res = gen.send(res)
+            except StopIteration:  # noqa: PERF203
+                raise
+            except BaseException as exc:  # noqa: BLE001
+                res = gen.throw(exc)
     except StopIteration as exc:
         return cast(R, exc.value)
 
 
-async def run_async_flow(gen: Flow[R], /) -> R:
+async def run_async_flow(gen: Flow[Any, R], /) -> R:
     try:
-        callback = gen.send(None)
+        res = gen.send(None)
+
         while True:
-            callback = gen.send(await await_if_coro(callback()))
+            try:
+                res = await await_if_coro(res)
+                gen.send(res)
+            except StopIteration:  # noqa: PERF203
+                raise
+            except BaseException as exc:  # noqa: BLE001
+                res = gen.throw(exc)
     except StopIteration as exc:
         return cast(R, exc.value)

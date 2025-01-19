@@ -44,7 +44,7 @@ def _convert_raw_items(
     *,
     raw: bool,
 ) -> Union[list[DocumentSnapshot], list[dict[str, Any]]]:
-    if raw:
+    if raw:  # pragma: no cover
         return items
 
     return [(doc.to_dict() or {}) | {"id": str(doc.id)} for doc in items]
@@ -55,9 +55,9 @@ def _get_total(
     async_: bool,
     query: Union[Query, AsyncQuery],
     transaction: Optional[Union[Transaction, AsyncTransaction]],
-) -> Flow[int]:
+) -> Flow[Any, int]:
     aggr_query = AsyncAggregationQuery if async_ else AggregationQuery
-    total_res = yield lambda: aggr_query(query).count("total").get(transaction=transaction)
+    total_res = yield aggr_query(query).count("total").get(transaction=transaction)
 
     return cast(int, total_res[0][0].value)
 
@@ -67,9 +67,9 @@ def _fetch_cursor(
     query: TQuery,
     params: CursorRawParams,
     transaction: Optional[Union[Transaction, AsyncTransaction]],
-) -> Flow[Optional[DocumentSnapshot]]:
+) -> Flow[Any, Optional[DocumentSnapshot]]:
     if cursor := params.cursor:
-        raw_doc = yield lambda: query._parent.document(cursor).get(transaction=transaction)
+        raw_doc = yield query._parent.document(cursor).get(transaction=transaction)
         return cast(DocumentSnapshot, raw_doc)
 
     return None
@@ -91,7 +91,7 @@ def _firebase_flow(
     transformer: Optional[ItemsTransformer],
     additional_data: Optional[AdditionalData],
     async_: bool,
-) -> Flow[Any]:
+) -> Flow[Any, Any]:
     params, raw_params = verify_params(params, "limit-offset", "cursor")
     additional_data = additional_data or {}
 
@@ -113,7 +113,7 @@ def _firebase_flow(
     else:
         query = generic_query_apply_params(query, raw_params.as_limit_offset())
 
-    raw_items = yield lambda: query.get(transaction=transaction)
+    raw_items = yield query.get(transaction=transaction)
 
     if is_cursor(raw_params) and raw_items:
         additional_data["next_"] = raw_items[-1].id

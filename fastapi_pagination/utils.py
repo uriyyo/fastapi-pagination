@@ -91,10 +91,10 @@ async def await_if_async(func: Callable[P, Any], /, *args: P.args, **kwargs: P.k
 
 
 async def await_if_coro(coro: Union[Awaitable[R], R], /) -> R:
-    if asyncio.iscoroutine(coro):
+    if isinstance(coro, Awaitable):
         return cast(R, await coro)
 
-    return cast(R, coro)
+    return coro
 
 
 _EXTENSIONS = [
