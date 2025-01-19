@@ -2888,4 +2888,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4.0"
-content-hash = "c1ef7e4fef6019bd66fa3d01078614185db7eda811060ff185a2310561549055"
+content-hash = "abd8ab024e6b9735cdb0fd7e78763144c4216ead282ebc46acadd9847885c797"
