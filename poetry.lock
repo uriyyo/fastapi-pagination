@@ -1782,13 +1782,13 @@ zstd = ["zstandard"]
 
 [[package]]
 name = "pypika-tortoise"
-version = "0.3.2"
+version = "0.5.0"
 description = "Forked from pypika and streamline just for tortoise-orm"
 optional = true
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "pypika_tortoise-0.3.2-py3-none-any.whl", hash = "sha256:c5c52bc4473fe6f3db36cf659340750246ec5dd0f980d04ae7811430e299c3a2"},
-    {file = "pypika_tortoise-0.3.2.tar.gz", hash = "sha256:f5d508e2ef00255e52ec6ac79ef889e10dbab328f218c55cd134c4d02ff9f6f4"},
+    {file = "pypika_tortoise-0.5.0-py3-none-any.whl", hash = "sha256:dbdc47eb52ce17407b05ce9f8560ce93b856d7b28beb01971d956b017846691f"},
+    {file = "pypika_tortoise-0.5.0.tar.gz", hash = "sha256:ed0f56761868dc222c03e477578638590b972280b03c7c45cd93345b18b61f58"},
 ]
 
 [[package]]
@@ -2110,25 +2110,37 @@ python-versions = "*"
 files = [
     {file = "scylla_driver-3.28.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:b4f26a77ac4772ae12de2a813ec0bc3f91b1fa24bc438d2b238c89cecb3d8272"},
     {file = "scylla_driver-3.28.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:d918d4bb0dd993aebf7d95c2c8d572ac625fd2b551eee625031dc087002318d7"},
+    {file = "scylla_driver-3.28.0-cp310-cp310-macosx_13_0_arm64.whl", hash = "sha256:90ca34ffafeadcec7c874e92ec24e145670dfde8249f7059bb0702b852adac41"},
+    {file = "scylla_driver-3.28.0-cp310-cp310-macosx_13_0_x86_64.whl", hash = "sha256:696611dd6e26de337da0e8d7c17fa33fd9f885769c6300b6acbf33b58bfe2418"},
     {file = "scylla_driver-3.28.0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:507bc38fe42cc67a92d05872569b33f34550180b4905c8ebeb82aa684e593d54"},
     {file = "scylla_driver-3.28.0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:51b895d056224be8d028f8c5a931a440d6cd8e29dca0d2cb5b8e9196f06a0add"},
     {file = "scylla_driver-3.28.0-cp310-cp310-win_amd64.whl", hash = "sha256:ec06f2accfe5b1cb6808351545f2c9c974efba7c26e33b8b4ba8cab963ce264f"},
     {file = "scylla_driver-3.28.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:c9096b9cba11d4b2b95e13e327b9c3cf13c417e5f7109fec15c3c56d939232cd"},
     {file = "scylla_driver-3.28.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:5bf1bf8ac4faacf46d2d304ddc52bc427350aba58af3c88181e63af53a39d911"},
+    {file = "scylla_driver-3.28.0-cp311-cp311-macosx_13_0_arm64.whl", hash = "sha256:59dc210c74945213d70225fac3771a97247d34fc473839b3331c8e14fd2b4c4d"},
+    {file = "scylla_driver-3.28.0-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:d6fd4262c3a53e39af18823dfb15754028db63fd42bf1853efa2bee2f8566bfb"},
     {file = "scylla_driver-3.28.0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:464365edf4cee527b1cd8fecd373880351b557b77827d3f47ff3149ae3e680cb"},
     {file = "scylla_driver-3.28.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:185a9e5ad92fa1d758b89a0fba43ce137b013ae430501b5db2302c93880829bb"},
     {file = "scylla_driver-3.28.0-cp311-cp311-win_amd64.whl", hash = "sha256:f05e8f5bbbc5b70928ea4d0e3cc5f153bfbdbaade8b0fb5aa2bcf850170fbea7"},
     {file = "scylla_driver-3.28.0-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:9d7ae4707dbbe14dbb746cdd7acd86ec55262f350ecab9f72b605b6fcb479c75"},
     {file = "scylla_driver-3.28.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:7fe537b8ad203bf4031ddad1da3617e8053794b38b30887f17edbc3ac80f947c"},
+    {file = "scylla_driver-3.28.0-cp312-cp312-macosx_13_0_arm64.whl", hash = "sha256:ce10c0e31f8be8dfdbd0164f9d737445a9e1500595accddd05ef95b4b8b772a0"},
+    {file = "scylla_driver-3.28.0-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:4da483e5ce27e74dec96c9a7c99b5940e1c67de8e56ee5d8b6d19ce4d499a063"},
     {file = "scylla_driver-3.28.0-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:0b259f1219492e91ec752559a9001989ec580502909475a215e4ad763108d601"},
     {file = "scylla_driver-3.28.0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:6d4b0b96bca5d49b9d83a24d4891f71f8806f4cb62111fdec8b16f600d3afaf5"},
     {file = "scylla_driver-3.28.0-cp312-cp312-win_amd64.whl", hash = "sha256:a4995debf516fff5d3c470933524adbcb0baabe04fd8cbb696863854c1d3972a"},
+    {file = "scylla_driver-3.28.0-cp313-cp313-macosx_13_0_arm64.whl", hash = "sha256:59c0c1530a1a5f34190e3e9898452a69ad109a0f6b9ab0c32b2d2d624170ff83"},
+    {file = "scylla_driver-3.28.0-cp313-cp313-macosx_13_0_x86_64.whl", hash = "sha256:79de91b544ab75e50f4aaa161eb473773f09ba31807eedce86b92f246454a844"},
+    {file = "scylla_driver-3.28.0-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:db0f9ea00128f69c2f5613766916bea6dc7446a4f3b2df6cfa4af5ed729eb5f8"},
+    {file = "scylla_driver-3.28.0-cp313-cp313-win_amd64.whl", hash = "sha256:4806066d797346788612f14cbc1593a696c6e505ec7c4b2542d6a22eebece9b1"},
     {file = "scylla_driver-3.28.0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:fb50ac783000dd9e76cacf1d409d9d95026fbc21d591edea703ab0024b28a21c"},
     {file = "scylla_driver-3.28.0-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:c631ac558d82725d16e7d3e0d1831d4aef28ffb3fb9827215f8a522034b98885"},
     {file = "scylla_driver-3.28.0-cp38-cp38-manylinux_2_28_x86_64.whl", hash = "sha256:855217e14f9f25d63a58dae416ff115697e4785441fee3dad4e250348ad748df"},
     {file = "scylla_driver-3.28.0-cp38-cp38-win_amd64.whl", hash = "sha256:300b6062b8e81ba421d277226854e8c1839c80d9644925df3328529414ec3cc2"},
     {file = "scylla_driver-3.28.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:3b6ea22be90103d7ac8e6c9853647cbf187fbd255324270af5791a3316c7aeac"},
     {file = "scylla_driver-3.28.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:d183634005d230486b39f7ec8b62a6833cd703f92e9f6084e2c22a4ee581ebf4"},
+    {file = "scylla_driver-3.28.0-cp39-cp39-macosx_13_0_arm64.whl", hash = "sha256:a4f1c30a9904b39f1dd6a3208f78c251a008bb53904445f5aa444f2d95214289"},
+    {file = "scylla_driver-3.28.0-cp39-cp39-macosx_13_0_x86_64.whl", hash = "sha256:7877ba8d68f4b01e746a6dbb08a63744a2e06e9fdd11a5285306bb1b6c797da8"},
     {file = "scylla_driver-3.28.0-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:d72411a4d84574b1b50d148911257a2bf342d14e2a35615ed1454e69fefbc542"},
     {file = "scylla_driver-3.28.0-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:14a64fac4a840e11f588882d525bb7836432952fbf29556cea8cb57c0381f12f"},
     {file = "scylla_driver-3.28.0-cp39-cp39-win_amd64.whl", hash = "sha256:fe849a6a64082ed61bb24e5966aaa6f9e72f782a25ca5ce89f09a3512dbd6194"},
@@ -2405,19 +2417,19 @@ files = [
 
 [[package]]
 name = "tortoise-orm"
-version = "0.23.0"
+version = "0.24.0"
 description = "Easy async ORM for python, built with relations in mind"
 optional = true
-python-versions = "<4.0,>=3.8"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "tortoise_orm-0.23.0-py3-none-any.whl", hash = "sha256:deaabed1619ea8aab6213508dff025571a701b7f34ee534473d7bb7661aa9f4f"},
-    {file = "tortoise_orm-0.23.0.tar.gz", hash = "sha256:f25d431ef4fb521a84edad582f4b9c53dccc5abf6cfbc6f228cbece5a13952fa"},
+    {file = "tortoise_orm-0.24.0-py3-none-any.whl", hash = "sha256:ee3b72b226767293b24c5c4906ae5f027d7cc84496cd503352c918564b4fd687"},
+    {file = "tortoise_orm-0.24.0.tar.gz", hash = "sha256:ae0704a93ea27931724fc899e57268c8081afce3b32b110b00037ec206553e7d"},
 ]
 
 [package.dependencies]
 aiosqlite = ">=0.16.0,<0.21.0"
 iso8601 = ">=2.1.0,<3.0.0"
-pypika-tortoise = ">=0.3.2,<0.4.0"
+pypika-tortoise = ">=0.5.0,<0.6.0"
 pytz = "*"
 
 [package.extras]
