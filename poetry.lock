@@ -1184,17 +1184,17 @@ test = ["Pillow (>=7.0.0)", "blinker", "coverage", "pytest", "pytest-cov"]
 
 [[package]]
 name = "motor"
-version = "3.6.1"
+version = "3.7.0"
 description = "Non-blocking MongoDB driver for Tornado or asyncio"
 optional = true
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "motor-3.6.1-py3-none-any.whl", hash = "sha256:7fe552353aded4fa9f05ae515a179df5b1d192b1da56726f422dbb2d8c3b5962"},
-    {file = "motor-3.6.1.tar.gz", hash = "sha256:ee2b18386292f9ceb3cc8279a4cd34e4c641c5ac8de3500c30374081c76a9d03"},
+    {file = "motor-3.7.0-py3-none-any.whl", hash = "sha256:61bdf1afded179f008d423f98066348157686f25a90776ea155db5f47f57d605"},
+    {file = "motor-3.7.0.tar.gz", hash = "sha256:0dfa1f12c812bd90819c519b78bed626b5a9dbb29bba079ccff2bfa8627e0fec"},
 ]
 
 [package.dependencies]
-pymongo = ">=4.9,<4.10"
+pymongo = ">=4.9,<5.0"
 
 [package.extras]
 aws = ["pymongo[aws] (>=4.5,<5)"]
