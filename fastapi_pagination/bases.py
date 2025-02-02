@@ -41,7 +41,7 @@ except ImportError:
 
 from collections.abc import Sequence
 
-from typing_extensions import Self, TypeGuard
+from typing_extensions import Self, TypeIs
 
 from .types import Cursor, GreaterEqualZero, ParamsType
 
@@ -68,11 +68,11 @@ class BaseRawParams:
         raise ValueError("Not a 'cursor' params")
 
 
-def is_limit_offset(params: BaseRawParams) -> TypeGuard[RawParams]:
+def is_limit_offset(params: BaseRawParams) -> TypeIs[RawParams]:
     return params.type == "limit-offset"
 
 
-def is_cursor(params: BaseRawParams) -> TypeGuard[CursorRawParams]:
+def is_cursor(params: BaseRawParams) -> TypeIs[CursorRawParams]:
     return params.type == "cursor"
 
 
