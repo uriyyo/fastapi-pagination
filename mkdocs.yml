@@ -88,6 +88,7 @@ nav:
           - "Paginate Function": integrations/sqlalchemy/paginate.md
           - "Cursor Pagination": integrations/sqlalchemy/cursor_pagination.md
           - "Relationships": integrations/sqlalchemy/relationships.md
+  - "Migration to v0.13.x": "v0_13_migration.md"
   - "FAQ":
       - "FAQ": faq/faq.md
   - "Contributing": contributing.md
