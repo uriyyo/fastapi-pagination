@@ -25,7 +25,7 @@ class _BaseFirestoreSuite:
 
 
 @async_sync_testsuite
-class TestFirestore(_BaseFirestoreSuite, BasePaginationTestSuite):
+class TestDefaultFirestore(_BaseFirestoreSuite, BasePaginationTestSuite):
     @pytest.fixture(scope="session")
     def app(self, builder, firestore, paginate_func):
         builder = builder.new()

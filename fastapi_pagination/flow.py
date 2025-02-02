@@ -52,7 +52,7 @@ async def run_async_flow(gen: Flow[Any, R], /) -> R:
         while True:
             try:
                 res = await await_if_coro(res)
-                gen.send(res)
+                res = gen.send(res)
             except StopIteration:  # noqa: PERF203
                 raise
             except BaseException as exc:  # noqa: BLE001

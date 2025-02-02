@@ -119,7 +119,7 @@ def _firebase_flow(
         additional_data["next_"] = raw_items[-1].id
 
     items = _convert_raw_items(raw_items, raw=raw)
-    t_items = yield lambda: apply_items_transformer(items, transformer, async_=async_)  # type: ignore[call-overload]
+    t_items = yield apply_items_transformer(items, transformer, async_=async_)  # type: ignore[call-overload]
 
     return create_page(
         t_items,
