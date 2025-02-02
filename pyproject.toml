@@ -45,18 +45,19 @@ scylla-driver = {version = "^3.25.6", optional = true}
 bunnet = {version = "^1.1.0", optional = true}
 odmantic = {version = "^1.0.2", optional = true}
 elasticsearch-dsl = {version = "^8.13.0", optional = true}
+google-cloud-firestore = {version = "^2.19.0", optional = true}
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 fastapi = ">=0.93.0"
 pytest = "^8.3.4"
 pytest-cov = "^6.0.0"
-pytest-asyncio = "^0.25.1"
+pytest-asyncio = "^0.25.3"
 flaky = "^3.8.1"
-pre-commit = "^4.0.1"
-Faker = "^33.3.0"
+pre-commit = "^4.1.0"
+Faker = "^35.2.0"
 psycopg2-binary = "^2.9.10"
 mkdocs = "^1.6.1"
-mkdocs-material = "^9.5.49"
+mkdocs-material = "^9.5.50"
 pymdown-extensions = "^10.14"
 fontawesome-markdown = "^0.2.6"
 httpx = "^0.28.1"
@@ -65,7 +66,7 @@ requests = "^2.32.2"
 uvicorn = "^0.34.0"
 Jinja2 = "^3.1.5"
 mypy = "^1.14.1"
-ruff = "^0.8.6"
+ruff = "^0.9.4"
 
 [tool.poetry.extras]
 sqlmodel = ["sqlmodel", "sqlakeyset"]
@@ -84,6 +85,7 @@ beanie =  ["beanie"]
 scylla-driver = ["scylla-driver"]
 odmantic = ["odmantic"]
 elasticsearch = ["elasticsearch-dsl"]
+firestore = ["google-cloud-firestore"]
 all = [
     "sqlmodel",
     "SQLAlchemy",
@@ -103,6 +105,7 @@ all = [
     "scylla-driver",
     "bunnet",
     "elasticsearch-dsl",
+    "google-cloud-firestore",
 ]
 
 [build-system]
@@ -138,6 +141,7 @@ ignore = [
     "TC001",   # ignore moving things to if TYPE_CHECKING block
     "TC002",   # ignore moving things to if TYPE_CHECKING block
     "TC003",   # ignore moving things to if TYPE_CHECKING block
+    "A005",    # allow module name to shadow a Python standard-library module
 
     # full rule exclude
     "D",    # ignore docstrings

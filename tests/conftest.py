@@ -1,3 +1,6 @@
+import os
+from copy import deepcopy
+
 from . import patch  # noqa: F401  # isort: skip  # DO NOT REMOVE THIS LINE.
 from asyncio import new_event_loop
 from itertools import count
@@ -36,6 +39,11 @@ def pytest_addoption(parser):
     )
     parser.addoption(
         "--cassandra-dsn",
+        type=str,
+        required=True,
+    )
+    parser.addoption(
+        "--firestore-dsn",
         type=str,
         required=True,
     )
@@ -91,6 +99,20 @@ def sqlite_url(sqlite_file) -> str:
 
 
 @pytest.fixture(scope="session")
+def _firestore_project_id() -> str:
+    return "dummy-project"
+
+
+@pytest.fixture(scope="session")
+def firestore_project_id(request, _firestore_project_id):
+    firestore_dsn = request.config.getoption("--firestore-dsn")
+    os.environ["FIRESTORE_EMULATOR_HOST"] = firestore_dsn
+
+    request.getfixturevalue("_setup_firestore")
+    return _firestore_project_id
+
+
+@pytest.fixture(scope="session")
 def raw_data() -> RawData:
     user_ids = count(1)
     order_ids = count(1)
@@ -141,7 +163,7 @@ def _setup_cassandra(_cassandra_address, raw_data):
         connection.register_connection("setup", session=session, default=True)
         management.sync_table(model=User, keyspaces=("ks",))
 
-        users = [User(group="GC", id=user.get("id"), name=user.get("name")) for user in raw_data]
+        users = [User(group="GC", id=user.get("id"), name=user.get("name")) for user in deepcopy(raw_data)]
         for user in users:
             user.save()
 
@@ -181,7 +203,7 @@ async def _setup_postgres(_postgres_url: str, raw_data: RawData):
             """
             INSERT INTO "orders" (id, user_id, name) VALUES ($1, $2, $3)
             """,
-            [(order["id"], order["user_id"], order["name"]) for user in raw_data for order in user["orders"]],
+            [(order["id"], order["user_id"], order["name"]) for user in deepcopy(raw_data) for order in user["orders"]],
         )
 
         await pool.fetch("COMMIT")
@@ -231,9 +253,22 @@ async def _setup_mongodb(_mongodb_url: str, raw_data: RawData):
     motor = AsyncIOMotorClient(_mongodb_url)
 
     await motor.test.users.delete_many({})
-    await motor.test.users.insert_many(raw_data)
+    await motor.test.users.insert_many(deepcopy(raw_data))
 
     motor.close()
+
+
+@pytest.fixture(scope="session")
+def _setup_firestore(_firestore_project_id: str, raw_data: RawData):
+    from google.cloud import firestore
+
+    db = firestore.Client(project=_firestore_project_id)
+
+    for doc in db.collection("users").stream():
+        doc.reference.delete()
+
+    for user in raw_data:
+        db.collection("users").add(user, document_id=str(user["id"]))
 
 
 @pytest.fixture(scope="session")

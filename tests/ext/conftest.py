@@ -98,8 +98,7 @@ def pytest_pycollect_makemodule(module_path, path, parent):
 
     p = module_path.relative_to(ROOT)
     module = ".".join(p.parts)
-    if module.endswith(".py"):
-        module = module[:-3]
+    module = module.removesuffix(".py")
 
     try:
         __import__(f"tests.ext.{module}")
