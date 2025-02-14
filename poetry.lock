@@ -689,18 +689,17 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "faker"
-version = "35.2.0"
+version = "36.1.1"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "Faker-35.2.0-py3-none-any.whl", hash = "sha256:609abe555761ff31b0e5e16f958696e9b65c9224a7ac612ac96bfc2b8f09fe35"},
-    {file = "faker-35.2.0.tar.gz", hash = "sha256:28c24061780f83b45d9cb15a72b8f143b09d276c9ff52eb557744b7a89e8ba19"},
+    {file = "Faker-36.1.1-py3-none-any.whl", hash = "sha256:ad1f1be7fd692ec0256517404a9d7f007ab36ac5d4674082fa72404049725eaa"},
+    {file = "faker-36.1.1.tar.gz", hash = "sha256:7cb2bbd4c8f040e4a340ae4019e9a48b6cf1db6a71bda4e5a61d8d13b7bef28d"},
 ]
 
 [package.dependencies]
-python-dateutil = ">=2.4"
-typing-extensions = "*"
+tzdata = "*"
 
 [[package]]
 name = "fastapi"
@@ -2789,7 +2788,7 @@ files = [
 name = "tzdata"
 version = "2025.1"
 description = "Provider of IANA time zone data"
-optional = true
+optional = false
 python-versions = ">=2"
 files = [
     {file = "tzdata-2025.1-py2.py3-none-any.whl", hash = "sha256:7e127113816800496f027041c570f50bcd464a020098a3b6b199517772303639"},
@@ -2936,4 +2935,4 @@ tortoise = ["tortoise-orm"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4.0"
-content-hash = "2c1cdd87cbc5492b0c64aa73e87ee35a3a18a7235b4d55e8500ef1e2e3e1e557"
+content-hash = "b204324985346ae9378cdfe5aa58052395f6bd44222e6224bdf219a6f5830bf6"
