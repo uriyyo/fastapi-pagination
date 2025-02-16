@@ -23,7 +23,7 @@ from sqlalchemy.sql.elements import TextClause
 from typing_extensions import Literal, TypeAlias
 
 from fastapi_pagination.api import apply_items_transformer, create_page
-from fastapi_pagination.bases import AbstractPage, AbstractParams, is_cursor
+from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams, is_cursor
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 from fastapi_pagination.utils import verify_params
 
@@ -122,8 +122,18 @@ def _should_unwrap_scalars(query: Selectable) -> bool:
     return False
 
 
-def create_paginate_query_from_text(query: str, params: AbstractParams) -> str:
-    raw_params = params.to_raw_params().as_limit_offset()
+AnyParams: TypeAlias = Union[AbstractParams, RawParams]
+
+
+def _unwrap_params(params: AnyParams) -> RawParams:
+    if isinstance(params, RawParams):
+        return params
+
+    return params.to_raw_params().as_limit_offset()
+
+
+def create_paginate_query_from_text(query: str, params: AnyParams) -> str:
+    raw_params = _unwrap_params(params)
 
     suffix = ""
     if raw_params.limit is not None:
@@ -138,19 +148,19 @@ def create_count_query_from_text(query: str) -> str:
     return f"SELECT count(*) FROM ({query}) AS __count_query__"  # noqa: S608
 
 
-def _paginate_from_statement(query: FromStatement[TupleAny], params: AbstractParams) -> FromStatement[TupleAny]:
+def _paginate_from_statement(query: FromStatement[TupleAny], params: AnyParams) -> FromStatement[TupleAny]:
     query = query._generate()
     query.element = create_paginate_query(query.element, params)  # type: ignore[arg-type]
     return query
 
 
-def create_paginate_query(query: Selectable, params: AbstractParams) -> Selectable:
+def create_paginate_query(query: Selectable, params: AnyParams) -> Selectable:
     if isinstance(query, TextClause):
         return text(create_paginate_query_from_text(query.text, params))
     if isinstance(query, FromStatement):
         return _paginate_from_statement(query, params)
 
-    return generic_query_apply_params(query, params.to_raw_params().as_limit_offset())
+    return generic_query_apply_params(query, _unwrap_params(params))
 
 
 def create_count_query(query: Selectable, *, use_subquery: bool = True) -> Selectable:

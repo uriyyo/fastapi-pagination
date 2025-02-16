@@ -1,15 +1,29 @@
 __all__ = ["paginate"]
 
+from functools import partial
 from typing import Any, Optional
 
 from asyncpg import Connection
 
-from fastapi_pagination.api import apply_items_transformer, create_page
-from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.bases import AbstractParams, RawParams
+from fastapi_pagination.config import Config
+from fastapi_pagination.flow import flow, flow_expr, run_async_flow
+from fastapi_pagination.flows import generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
-from fastapi_pagination.utils import verify_params
 
 from .sqlalchemy import create_count_query_from_text, create_paginate_query_from_text
+
+
+@flow
+def _asyncpg_limit_offset_flow(
+    conn: Connection,
+    query: str,
+    args: tuple[Any, ...],
+    raw_params: RawParams,
+) -> Any:
+    items = yield conn.fetch(create_paginate_query_from_text(query, raw_params), *args)
+
+    return [{**r} for r in items]
 
 
 # FIXME: find a way to parse raw sql queries
@@ -20,24 +34,15 @@ async def paginate(
     transformer: Optional[AsyncItemsTransformer] = None,
     params: Optional[AbstractParams] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
-    params, raw_params = verify_params(params, "limit-offset")
-
-    if raw_params.include_total:
-        total = await conn.fetchval(
-            create_count_query_from_text(query),
-            *args,
+    return await run_async_flow(
+        generic_flow(
+            limit_offset_flow=partial(_asyncpg_limit_offset_flow, conn, query, args),
+            total_flow=flow_expr(lambda: conn.fetchval(create_count_query_from_text(query), *args)),
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
         )
-    else:
-        total = None
-
-    items = await conn.fetch(create_paginate_query_from_text(query, params), *args)
-    items = [{**r} for r in items]
-    t_items = await apply_items_transformer(items, transformer, async_=True)
-
-    return create_page(
-        t_items,
-        total=total,
-        params=params,
-        **(additional_data or {}),
     )
