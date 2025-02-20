@@ -10,6 +10,7 @@ __all__ = [
     "disable_installed_extensions_check",
     "get_caller",
     "is_async_callable",
+    "is_coro",
     "unwrap_annotated",
     "verify_params",
 ]
@@ -88,6 +89,10 @@ async def await_if_async(func: Callable[P, Any], /, *args: P.args, **kwargs: P.k
         return await func(*args, **kwargs)
 
     return func(*args, **kwargs)
+
+
+def is_coro(obj: Any) -> bool:
+    return isinstance(obj, Awaitable)
 
 
 async def await_if_coro(coro: Union[Awaitable[R], R], /) -> R:
