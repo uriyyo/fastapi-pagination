@@ -2735,13 +2735,13 @@ files = [
 
 [[package]]
 name = "tortoise-orm"
-version = "0.24.0"
+version = "0.24.1"
 description = "Easy async ORM for python, built with relations in mind"
 optional = true
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "tortoise_orm-0.24.0-py3-none-any.whl", hash = "sha256:ee3b72b226767293b24c5c4906ae5f027d7cc84496cd503352c918564b4fd687"},
-    {file = "tortoise_orm-0.24.0.tar.gz", hash = "sha256:ae0704a93ea27931724fc899e57268c8081afce3b32b110b00037ec206553e7d"},
+    {file = "tortoise_orm-0.24.1-py3-none-any.whl", hash = "sha256:5ad15c516178cd5997c0f052207bb28d72e91abcae5eb039e1da1c3d24c5ae99"},
+    {file = "tortoise_orm-0.24.1.tar.gz", hash = "sha256:b9fd34133418d2cd3f4ac3df37a096b9a65754d06b08da0c56174b84fced875c"},
 ]
 
 [package.dependencies]
