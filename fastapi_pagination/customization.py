@@ -94,10 +94,7 @@ else:
             if not customizers:
                 return page_cls
 
-            original_name = page_cls.__name__
-            if original_name.endswith("Customized"):
-                original_name = original_name[: -len("Customized")]
-
+            original_name = page_cls.__name__.removesuffix("Customized")
             cls_name = f"{original_name}Customized"
 
             new_ns = {
