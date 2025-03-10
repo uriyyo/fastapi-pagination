@@ -10,14 +10,15 @@ __all__ = [
     "paginate",
 ]
 
-from .api import apply_items_transformer, create_page
 from .bases import AbstractParams
+from .config import Config
 from .default import Page as DefaultPage
 from .default import Params
+from .flow import flow_expr, run_sync_flow
+from .flows import generic_flow
 from .limit_offset import LimitOffsetPage as DefaultLimitOffsetPage
 from .limit_offset import LimitOffsetParams
 from .types import AdditionalData, SyncItemsTransformer
-from .utils import verify_params
 
 T = TypeVar("T")
 
@@ -37,17 +38,23 @@ def paginate(
     *,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
-    params, raw_params = verify_params(params, "limit-offset")
-
-    params_slice = raw_params.as_slice()
-
-    items = [*islice(iterable, params_slice.start, params_slice.stop)]
-    t_items = apply_items_transformer(items, transformer)
-
-    return create_page(
-        t_items,
-        total=total,
-        params=params,
-        **(additional_data or {}),
+    return run_sync_flow(
+        generic_flow(
+            limit_offset_flow=flow_expr(
+                lambda r: [
+                    *islice(
+                        iterable,
+                        r.as_slice().start,
+                        r.as_slice().stop,
+                    )
+                ],
+            ),
+            total_flow=flow_expr(lambda: total),
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
+        )
     )
