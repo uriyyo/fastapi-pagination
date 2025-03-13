@@ -43,7 +43,7 @@ async def paginate(
     if not isinstance(query, QuerySet):
         query = query.all()
 
-    return run_async_flow(
+    return await run_async_flow(
         generic_flow(
             async_=True,
             total_flow=flow_expr(lambda: query.count() if total is None else total),
