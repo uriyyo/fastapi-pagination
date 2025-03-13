@@ -10,7 +10,7 @@ from .api import apply_items_transformer, create_page, set_page
 from .bases import AbstractParams, CursorRawParams, RawParams, is_cursor, is_limit_offset
 from .config import Config
 from .flow import AnyFlow, flow
-from .types import ItemsTransformer, ParamsType
+from .types import AdditionalData, ItemsTransformer, ParamsType
 from .utils import verify_params
 
 
@@ -44,14 +44,15 @@ def create_page_flow(
 
 
 @flow
-def generic_flow(
+def generic_flow(  # noqa: C901
     *,
     limit_offset_flow: Optional[Callable[[RawParams], AnyFlow]] = None,
-    cursor_flow: Optional[Callable[[CursorRawParams], AnyFlow]] = None,
+    cursor_flow: Optional[Callable[[CursorRawParams, AdditionalData], AnyFlow]] = None,
     total_flow: Optional[Callable[[], AnyFlow]] = None,
     params: Optional[AbstractParams] = None,
+    inner_transformer: Optional[ItemsTransformer] = None,
     transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[dict[str, Any]] = None,
+    additional_data: Optional[AdditionalData] = None,
     config: Optional[Config] = None,
     async_: bool = False,
 ) -> Any:
@@ -65,6 +66,7 @@ def generic_flow(
         raise ValueError("At least one flow must be provided")
 
     params, raw_params = verify_params(params, *types)
+    additional_data = additional_data or {}
 
     total = None
     if raw_params.include_total:
@@ -82,9 +84,16 @@ def generic_flow(
         if cursor_flow is None:
             raise ValueError("cursor_flow is required for 'cursor' params")
 
-        items = yield from cursor_flow(raw_params)
+        items = yield from cursor_flow(raw_params, additional_data)
     else:
         raise ValueError("Invalid params type")
+
+    if inner_transformer:
+        items = yield apply_items_transformer(  # type: ignore[call-overload]
+            items,
+            inner_transformer,
+            async_=async_,
+        )
 
     page = yield from create_page_flow(
         items,

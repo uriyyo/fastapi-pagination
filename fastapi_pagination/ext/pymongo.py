@@ -7,10 +7,11 @@ from typing import Any, Optional, TypeVar
 
 from pymongo.collection import Collection
 
-from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.config import Config
+from fastapi_pagination.flow import flow_expr, run_sync_flow
+from fastapi_pagination.flows import generic_flow
 from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
-from fastapi_pagination.utils import verify_params
 
 T = TypeVar("T", bound=Mapping[str, Any])
 
@@ -24,30 +25,27 @@ def paginate(
     *,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
     **kwargs: Any,
 ) -> Any:
-    params, raw_params = verify_params(params, "limit-offset")
-
     query_filter = query_filter or {}
 
-    total = collection.count_documents(query_filter) if raw_params.include_total else None
-    cursor = collection.find(
-        query_filter,
-        filter_fields,
-        skip=raw_params.offset,
-        limit=raw_params.limit,
-        sort=sort,
-        **kwargs,
-    )
-    items = [*cursor]
-    t_items = apply_items_transformer(
-        items,
-        transformer,
-    )
-
-    return create_page(
-        t_items,
-        total=total,
-        params=params,
-        **(additional_data or {}),
+    return run_sync_flow(
+        generic_flow(
+            total_flow=flow_expr(lambda: collection.count_documents(query_filter)),
+            limit_offset_flow=flow_expr(
+                lambda raw_params: collection.find(
+                    query_filter,
+                    filter_fields,
+                    skip=raw_params.offset,
+                    limit=raw_params.limit,
+                    sort=sort,
+                    **kwargs,
+                ).to_list()
+            ),
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
+        )
     )

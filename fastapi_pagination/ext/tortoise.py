@@ -6,10 +6,11 @@ from tortoise.models import Model
 from tortoise.query_utils import Prefetch
 from tortoise.queryset import QuerySet
 
-from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.config import Config
+from fastapi_pagination.flow import flow_expr, run_async_flow
+from fastapi_pagination.flows import generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
-from fastapi_pagination.utils import verify_params
 
 from .utils import generic_query_apply_params
 
@@ -37,19 +38,24 @@ async def paginate(
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     total: Optional[int] = None,
+    config: Optional[Config] = None,
 ) -> Any:
-    params, raw_params = verify_params(params, "limit-offset")
-
     if not isinstance(query, QuerySet):
         query = query.all()
-    if total is None and raw_params.include_total:
-        total = await query.count()
-    items = await generic_query_apply_params(_generate_query(query, prefetch_related), raw_params).all()
-    t_items = await apply_items_transformer(items, transformer, async_=True)
 
-    return create_page(
-        t_items,
-        total=total,
-        params=params,
-        **(additional_data or {}),
+    return run_async_flow(
+        generic_flow(
+            async_=True,
+            total_flow=flow_expr(lambda: query.count() if total is None else total),
+            limit_offset_flow=flow_expr(
+                lambda raw_params: generic_query_apply_params(
+                    _generate_query(query, prefetch_related),
+                    raw_params,
+                ).all()
+            ),
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
+        ),
     )

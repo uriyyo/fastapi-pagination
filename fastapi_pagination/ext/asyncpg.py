@@ -38,6 +38,7 @@ async def paginate(
 ) -> Any:
     return await run_async_flow(
         generic_flow(
+            async_=True,
             limit_offset_flow=partial(_asyncpg_limit_offset_flow, conn, query, args),
             total_flow=flow_expr(lambda: conn.fetchval(create_count_query_from_text(query), *args)),
             params=params,

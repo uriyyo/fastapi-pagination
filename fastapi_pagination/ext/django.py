@@ -20,10 +20,10 @@ def paginate(
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
 ) -> Any:
-    params, raw_params = verify_params(params, "limit-offset")
-
     if isinstance(query, ModelBase):
         query = cast(type[T], query).objects.all()
+
+    params, raw_params = verify_params(params, "limit-offset")
 
     total = query.count() if raw_params.include_total else None
     query = query.all()[raw_params.as_slice()]
