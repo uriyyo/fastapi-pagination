@@ -104,7 +104,7 @@ def _cursor_flow(
     transaction: Optional[AnyTransaction],
     raw_params: CursorRawParams,
 ) -> CursorFlow:
-    snapshot = yield _fetch_cursor(query, raw_params, transaction)
+    snapshot = yield from _fetch_cursor(query, raw_params, transaction)
     query = _apply_cursor(query, raw_params, snapshot)  # type: ignore[type-var]
     items = yield query.get(transaction=transaction)  # type: ignore[arg-type]
 

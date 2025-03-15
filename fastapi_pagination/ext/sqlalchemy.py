@@ -380,9 +380,11 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
             total_flow=partial(_total_flow, query, conn, count_query, subquery_count),
             limit_offset_flow=partial(_limit_offset_flow, query, conn),
             cursor_flow=partial(_cursor_flow, query, res_conn, is_async),
+            params=params,
             inner_transformer=partial(_inner_transformer, query=query, unwrap_mode=unwrap_mode, unique=unique),
             transformer=transformer,
             additional_data=additional_data,
+            config=config,
         ),
     )
 
