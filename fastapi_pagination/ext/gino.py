@@ -10,7 +10,7 @@ from sqlalchemy.sql import Select
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
-from fastapi_pagination.flow import flow_expr, run_sync_flow
+from fastapi_pagination.flow import flow_expr, run_async_flow
 from fastapi_pagination.flows import generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 
@@ -28,7 +28,7 @@ async def paginate(
     if isinstance(query, type) and issubclass(query, CRUDModel):
         query = query.query  # type: ignore[attr-defined]
 
-    return run_sync_flow(
+    return await run_async_flow(
         generic_flow(
             total_flow=flow_expr(
                 lambda: func.count(literal_column("*"))
