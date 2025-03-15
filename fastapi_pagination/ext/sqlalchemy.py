@@ -82,7 +82,7 @@ UnwrapMode: TypeAlias = Literal[
 ]
 
 TupleAny: TypeAlias = "tuple[Any, ...]"
-Selectable: TypeAlias = "Union[Select[TupleAny], TextClause, FromStatement[TupleAny], CompoundSelect]"
+Selectable: TypeAlias = "Union[Select[TupleAny], TextClause, FromStatement[TupleAny], CompoundSelect[TupleAny]]"
 SelectableOrQuery: TypeAlias = "Union[Selectable, Query[Any]]"
 
 _selectable_classes = (Select, TextClause, FromStatement, CompoundSelect)
