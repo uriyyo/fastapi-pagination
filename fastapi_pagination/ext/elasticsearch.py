@@ -2,15 +2,36 @@ __all__ = [
     "paginate",
 ]
 
+from functools import partial
 from typing import Any, Optional
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 
-from fastapi_pagination.api import apply_items_transformer, create_page
-from fastapi_pagination.bases import AbstractParams, is_limit_offset
+from fastapi_pagination.bases import AbstractParams, CursorRawParams
+from fastapi_pagination.config import Config
+from fastapi_pagination.flow import flow, flow_expr, run_sync_flow
+from fastapi_pagination.flows import CursorFlow, generic_flow
 from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
-from fastapi_pagination.utils import verify_params
+
+
+@flow
+def _cursor_flow(
+    query: Search,
+    conn: Elasticsearch,
+    raw_params: CursorRawParams,
+) -> CursorFlow:
+    response: Any
+    if not raw_params.cursor:
+        response = yield query.params(scroll="1m").extra(size=raw_params.size).execute()
+        items = response.hits
+        next_ = response._scroll_id
+    else:
+        response = yield conn.scroll(scroll_id=raw_params.cursor, scroll="1m")  # type: ignore[arg-type]
+        next_ = response.get("_scroll_id")
+        items = [item.get("_source") for item in response["hits"]["hits"]]
+
+    return items, {"next_": next_}
 
 
 def paginate(
@@ -20,39 +41,16 @@ def paginate(
     *,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
-    params, raw_params = verify_params(params, "limit-offset", "cursor")
-
-    total = None
-    if raw_params.include_total:
-        total = query.using(conn).count()
-
-    kwargs = {}
-    items: Any
-
-    if is_limit_offset(raw_params):
-        items = query.using(conn)[raw_params.as_slice()].execute()
-    else:
-        raw_params = raw_params.as_cursor()
-
-        response: Any
-        if not raw_params.cursor:
-            response = query.params(scroll="1m").extra(size=raw_params.size).execute()
-            items = response.hits
-            next_ = response._scroll_id
-        else:
-            response = conn.scroll(scroll_id=raw_params.cursor, scroll="1m")  # type: ignore[arg-type]
-            next_ = response.get("_scroll_id")
-            items = [item.get("_source") for item in response["hits"]["hits"]]
-
-        kwargs["next_"] = next_
-
-    t_items = apply_items_transformer(items, transformer)
-
-    return create_page(
-        t_items,
-        total=total,
-        params=params,
-        **kwargs,
-        **(additional_data or {}),
+    return run_sync_flow(
+        generic_flow(
+            total_flow=flow_expr(lambda: query.using(conn).count()),
+            limit_offset_flow=flow_expr(lambda raw_params: query.using(conn)[raw_params.as_slice()].execute()),
+            cursor_flow=partial(_cursor_flow, query, conn),
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
+        )
     )

@@ -7,6 +7,7 @@ from sqlmodel import Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.config import Config
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 
 from .sqlalchemy import paginate as _paginate
@@ -35,6 +36,7 @@ def paginate(
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
+    config: Optional[Config] = None,
 ) -> Any:
     pass
 
@@ -50,6 +52,7 @@ def paginate(
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
+    config: Optional[Config] = None,
 ) -> Any:
     pass
 
@@ -65,6 +68,7 @@ def paginate(
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
+    config: Optional[Config] = None,
 ) -> Any:
     pass
 
@@ -80,6 +84,7 @@ def paginate(
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
+    config: Optional[Config] = None,
 ) -> Any:
     pass
 
@@ -95,6 +100,7 @@ async def paginate(
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
+    config: Optional[Config] = None,
 ) -> Any:
     pass
 
@@ -110,6 +116,7 @@ async def paginate(
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
+    config: Optional[Config] = None,
 ) -> Any:
     pass
 
@@ -124,6 +131,7 @@ async def paginate(
     subquery_count: bool = True,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
     pass
 
@@ -138,6 +146,7 @@ async def paginate(
     subquery_count: bool = True,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
     pass
 
@@ -152,6 +161,7 @@ def paginate(
     transformer: Optional[ItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
     unique: bool = True,
+    config: Optional[Config] = None,
 ) -> Any:
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)
@@ -165,4 +175,5 @@ def paginate(
         transformer=transformer,  # type: ignore[arg-type]
         additional_data=additional_data,
         unique=unique,
+        config=config,
     )

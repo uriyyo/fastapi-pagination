@@ -2,16 +2,18 @@ __all__ = ["paginate"]
 
 from contextlib import suppress
 from copy import copy
-from typing import Any, Optional, TypeVar, Union
+from functools import partial
+from typing import Any, Optional, TypeVar, Union, cast
 
 from piccolo.query import Select
 from piccolo.query.methods.select import Count
 from piccolo.table import Table
 
-from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.config import Config
+from fastapi_pagination.flow import flow, flow_expr, run_async_flow
+from fastapi_pagination.flows import TotalFlow, generic_flow
 from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
-from fastapi_pagination.utils import verify_params
 
 from .utils import generic_query_apply_params
 
@@ -30,37 +32,41 @@ def _copy_query(query: Select[TTable_co]) -> Select[TTable_co]:
     return q
 
 
-async def paginate(
-    query: Union[Select[TTable_co], type[TTable_co]],
-    params: Optional[AbstractParams] = None,
-    *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-) -> Any:
-    params, raw_params = verify_params(params, "limit-offset")
-
-    if not isinstance(query, Select):
-        query = query.select()
-
-    # query object is mutable, so we need deepcopy of it
-    query = _copy_query(query)
-
+@flow
+def _total_flow(query: Select[TTable_co]) -> TotalFlow:
     # need another copy for count query
     count_query = _copy_query(query)
     count_query.columns_delegate.selected_columns = []
     # reset order by to avoid errors in count query
     count_query.order_by_delegate._order_by.order_by_items = []
 
-    total = None
-    if raw_params.include_total and (row := await count_query.columns(Count()).first()):
-        total = row["count"]
+    row = yield count_query.columns(Count()).first()
 
-    items = await generic_query_apply_params(query, raw_params)
-    t_items = await apply_items_transformer(items, transformer, async_=True)
+    if row:
+        return cast(int, row["count"])
 
-    return create_page(
-        t_items,
-        total=total,
-        params=params,
-        **(additional_data or {}),
+    return None
+
+
+async def paginate(
+    query: Union[Select[TTable_co], type[TTable_co]],
+    params: Optional[AbstractParams] = None,
+    *,
+    transformer: Optional[SyncItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
+) -> Any:
+    if not isinstance(query, Select):
+        query = query.select()
+
+    return await run_async_flow(
+        generic_flow(
+            async_=True,
+            total_flow=partial(_total_flow, query),
+            limit_offset_flow=flow_expr(lambda raw_params: generic_query_apply_params(_copy_query(query), raw_params)),
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
+        )
     )

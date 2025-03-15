@@ -8,10 +8,11 @@ from gino.crud import CRUDModel
 from sqlalchemy import func, literal_column
 from sqlalchemy.sql import Select
 
-from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.config import Config
+from fastapi_pagination.flow import flow_expr, run_async_flow
+from fastapi_pagination.flows import generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
-from fastapi_pagination.utils import verify_params
 
 from .sqlalchemy import create_paginate_query
 
@@ -22,25 +23,28 @@ async def paginate(
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
-    params, raw_params = verify_params(params, "limit-offset")
-
     if isinstance(query, type) and issubclass(query, CRUDModel):
         query = query.query  # type: ignore[attr-defined]
 
-    if raw_params.include_total:
-        count_query = func.count(literal_column("*")).select().select_from(query.order_by(None).alias())
-        total = await count_query.gino.scalar()  # type: ignore[attr-defined]
-    else:
-        total = None
-
-    query = create_paginate_query(query, params)
-    items = await query.gino.all()  # type: ignore[union-attr]
-    t_items = await apply_items_transformer(items, transformer, async_=True)
-
-    return create_page(
-        t_items,
-        total=total,
-        params=params,
-        **(additional_data or {}),
+    return await run_async_flow(
+        generic_flow(
+            total_flow=flow_expr(
+                lambda: func.count(literal_column("*"))
+                .select()
+                .select_from(
+                    query.order_by(None).alias(),
+                )
+                .gino.scalar()  # type: ignore[attr-defined]
+            ),
+            limit_offset_flow=flow_expr(
+                lambda raw_params: create_paginate_query(query, raw_params).gino.all()  # type: ignore[union-attr]
+            ),
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
+            async_=True,
+        )
     )

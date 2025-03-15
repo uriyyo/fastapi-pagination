@@ -5,10 +5,11 @@ __all__ = ["paginate"]
 from django.db.models import Model, QuerySet
 from django.db.models.base import ModelBase
 
-from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.config import Config
+from fastapi_pagination.flow import flow_expr, run_sync_flow
+from fastapi_pagination.flows import generic_flow
 from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
-from fastapi_pagination.utils import verify_params
 
 T = TypeVar("T", bound=Model)
 
@@ -19,20 +20,18 @@ def paginate(
     *,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
-    params, raw_params = verify_params(params, "limit-offset")
-
     if isinstance(query, ModelBase):
         query = cast(type[T], query).objects.all()
 
-    total = query.count() if raw_params.include_total else None
-    query = query.all()[raw_params.as_slice()]
-    items = [*query]
-    t_items = apply_items_transformer(items, transformer)
-
-    return create_page(
-        t_items,
-        total=total,
-        params=params,
-        **(additional_data or {}),
+    return run_sync_flow(
+        generic_flow(
+            total_flow=flow_expr(lambda: query.count()),
+            limit_offset_flow=flow_expr(lambda raw_params: [*query[raw_params.as_slice()]]),
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
+        )
     )

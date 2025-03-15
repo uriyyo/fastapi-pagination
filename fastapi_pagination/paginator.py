@@ -3,10 +3,12 @@ from typing import Any, Callable, Optional, TypeVar
 
 __all__ = ["paginate"]
 
-from .api import apply_items_transformer, create_page
 from .bases import AbstractParams
+from .config import Config
+from .flow import flow_expr, run_sync_flow
+from .flows import generic_flow
 from .types import AdditionalData, SyncItemsTransformer
-from .utils import check_installed_extensions, verify_params
+from .utils import check_installed_extensions
 
 T = TypeVar("T")
 
@@ -19,18 +21,18 @@ def paginate(
     safe: bool = False,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
     if not safe:
         check_installed_extensions()
 
-    params, raw_params = verify_params(params, "limit-offset")
-
-    items = sequence[raw_params.as_slice()]
-    t_items = apply_items_transformer(items, transformer)
-
-    return create_page(
-        t_items,
-        total=length_function(sequence) if raw_params.include_total else None,
-        params=params,
-        **(additional_data or {}),
+    return run_sync_flow(
+        generic_flow(
+            limit_offset_flow=flow_expr(lambda r: sequence[r.as_slice()]),
+            total_flow=flow_expr(lambda: length_function(sequence)),
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
+        )
     )
