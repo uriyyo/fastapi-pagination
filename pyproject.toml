@@ -142,6 +142,7 @@ ignore = [
     "TC002",   # ignore moving things to if TYPE_CHECKING block
     "TC003",   # ignore moving things to if TYPE_CHECKING block
     "A005",    # allow module name to shadow a Python standard-library module
+    "TC006",   # ignore quotes in typing.cast calls
 
     # full rule exclude
     "D",    # ignore docstrings
