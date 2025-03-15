@@ -5,7 +5,7 @@ from orm import Integer, Model, ModelRegistry, String
 from fastapi_pagination.ext.orm import paginate
 from tests.base import BasePaginationTestSuite
 
-if tuple(map(int, __version__.split("."))) >= (0, 9, 0):
+if tuple(map(int, __version__.split("."))) >= (0, 9, 0):  # noqa: RUF048
     raise ImportError("This test is only for databases<0.9.0")
 
 
