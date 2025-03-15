@@ -90,7 +90,7 @@ def async_flow(func: Callable[P, Flow[Any, R]]) -> Callable[P, Awaitable[R]]:
     return wrapper
 
 
-def flow_expr(expr: Callable[P, R]) -> Callable[P, Flow[Any, R]]:
+def flow_expr(expr: Callable[P, Union[Awaitable[R], R]]) -> Callable[P, Flow[Any, R]]:
     @wraps(expr)
     def flow_wrapper(*args: P.args, **kwargs: P.kwargs) -> Flow[Any, R]:
         res = yield expr(*args, **kwargs)

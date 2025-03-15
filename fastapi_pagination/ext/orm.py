@@ -4,12 +4,12 @@ from typing import Any, Optional
 
 from orm.models import QuerySet
 
-from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.config import Config
+from fastapi_pagination.ext.utils import generic_query_apply_params
+from fastapi_pagination.flow import flow_expr, run_async_flow
+from fastapi_pagination.flows import generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
-from fastapi_pagination.utils import verify_params
-
-from .utils import generic_query_apply_params
 
 
 async def paginate(
@@ -18,16 +18,16 @@ async def paginate(
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
-    params, raw_params = verify_params(params, "limit-offset")
-
-    total = await query.count() if raw_params.include_total else None
-    items = await generic_query_apply_params(query, raw_params).all()
-    t_items = await apply_items_transformer(items, transformer, async_=True)
-
-    return create_page(
-        t_items,
-        total=total,
-        params=params,
-        **(additional_data or {}),
+    return await run_async_flow(
+        generic_flow(
+            async_=True,
+            total_flow=flow_expr(lambda: query.count()),
+            limit_offset_flow=flow_expr(lambda raw_params: generic_query_apply_params(query, raw_params).all()),
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
+        )
     )

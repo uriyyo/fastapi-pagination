@@ -1,4 +1,10 @@
 __all__ = [
+    "CursorFlow",
+    "CursorFlowFunc",
+    "LimitOffsetFlow",
+    "LimitOffsetFlowFunc",
+    "TotalFlow",
+    "TotalFlowFunc",
     "create_page_flow",
     "generic_flow",
 ]
@@ -6,12 +12,22 @@ __all__ = [
 from contextlib import ExitStack
 from typing import Any, Callable, Optional
 
+from typing_extensions import TypeAlias
+
 from .api import apply_items_transformer, create_page, set_page
 from .bases import AbstractParams, CursorRawParams, RawParams, is_cursor, is_limit_offset
 from .config import Config
 from .flow import AnyFlow, flow
 from .types import AdditionalData, ItemsTransformer, ParamsType
 from .utils import verify_params
+
+LimitOffsetFlow: TypeAlias = AnyFlow
+CursorFlow: TypeAlias = AnyFlow[tuple[Any, Optional[AdditionalData]]]
+TotalFlow: TypeAlias = AnyFlow[Optional[int]]
+
+LimitOffsetFlowFunc: TypeAlias = Callable[[RawParams], AnyFlow]
+CursorFlowFunc: TypeAlias = Callable[[CursorRawParams], AnyFlow[tuple[Any, Optional[AdditionalData]]]]
+TotalFlowFunc: TypeAlias = Callable[[], AnyFlow[Optional[int]]]
 
 
 @flow
@@ -46,9 +62,9 @@ def create_page_flow(
 @flow
 def generic_flow(  # noqa: C901
     *,
-    limit_offset_flow: Optional[Callable[[RawParams], AnyFlow]] = None,
-    cursor_flow: Optional[Callable[[CursorRawParams, AdditionalData], AnyFlow]] = None,
-    total_flow: Optional[Callable[[], AnyFlow]] = None,
+    limit_offset_flow: Optional[LimitOffsetFlowFunc] = None,
+    cursor_flow: Optional[CursorFlowFunc] = None,
+    total_flow: Optional[TotalFlowFunc] = None,
     params: Optional[AbstractParams] = None,
     inner_transformer: Optional[ItemsTransformer] = None,
     transformer: Optional[ItemsTransformer] = None,
@@ -84,7 +100,8 @@ def generic_flow(  # noqa: C901
         if cursor_flow is None:
             raise ValueError("cursor_flow is required for 'cursor' params")
 
-        items = yield from cursor_flow(raw_params, additional_data)
+        items, more_data = yield from cursor_flow(raw_params)
+        additional_data.update(more_data or {})
     else:
         raise ValueError("Invalid params type")
 
