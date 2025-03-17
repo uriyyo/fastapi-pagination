@@ -51,7 +51,7 @@ def decode_cursor(cursor: Optional[str], *, to_str: bool = True, quoted: bool = 
             cursor = unquote(cursor) if quoted else cursor
             res = b64decode(cursor.encode())
             return res.decode() if to_str else res
-        except binascii.Error:
+        except (binascii.Error, UnicodeDecodeError):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid cursor value",
