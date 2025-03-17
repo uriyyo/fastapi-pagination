@@ -6,18 +6,22 @@ PYDANTIC_V2="${PYDANTIC_V2:-true}"
 FASTAPI_PRE_0_112_4="${FASTAPI_PRE_0_112_4:-false}"
 
 function _pip() {
-    poetry run pip "$@" || true > /dev/null
+    uv pip "$@" || true > /dev/null
 }
 
 function _pytest() {
-    poetry run pytest "$@"              \
+    uv run pytest "$@"              \
       --cov=fastapi_pagination          \
       --cov-append                      \
       --cov-report=xml
 }
 
+function _restore_env() {
+    uv sync --all-extras --dev
+}
+
 echo "Installing dependencies"
-poetry install -E all --sync
+_restore_env
 
 echo "Config: fastapi<0.112.4=$FASTAPI_PRE_0_112_4, is-pydantic-v2=$PYDANTIC_V2"
 
@@ -68,4 +72,4 @@ if [[ "$PYDANTIC_V2" == true ]]; then
 fi
 
 echo "Restore env"
-poetry install -E all --sync
+_restore_env

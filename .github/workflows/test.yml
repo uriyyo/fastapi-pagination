@@ -23,21 +23,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1.4.1
-
-      - name: Setup cache
-        id: cached-poetry-dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-py${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}-v1
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras --dev
 
       - name: Cache Docker images
         uses: ScribeMD/docker-cache@0.5.0

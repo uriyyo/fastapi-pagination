@@ -1,116 +1,112 @@
-[tool.poetry]
+[project]
 name = "fastapi-pagination"
 version = "0.13.0a1"
 description = "FastAPI pagination"
 authors = [
-    "Yurii Karabas <1998uriyyo@gmail.com>",
+    { name = "Yurii Karabas", email = "1998uriyyo@gmail.com" },
 ]
-
-license = "MIT"
+requires-python = ">=3.9,<4.0"
 readme = "README.md"
-repository = "https://github.com/uriyyo/fastapi-pagination"
-
+license = "MIT"
 classifiers = [
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
-    'Programming Language :: Python :: 3.12',
-    'Programming Language :: Python :: 3.13',
-    'Programming Language :: Python :: 3 :: Only',
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = [
+    "fastapi>=0.93.0",
+    "pydantic>=1.9.1",
+    "typing-extensions>=4.8.0,<5",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.9,<4.0"
-pydantic = ">=1.9.1"
-typing-extensions = "^4.8.0"
-SQLAlchemy = { version = ">=1.3.20", optional = true }
-databases = { version = ">=0.6.0", optional = true }
-orm = { version = ">=0.3.1", optional = true }
-tortoise-orm = { version = ">=0.22.0", optional = true }
-# TODO: ormar still depends on sqlalchemy<2.0
-#ormar = { version = ">=0.20.2", optional = true}
-asyncpg = { version = ">=0.24.0", optional = true }
-django = { version = "<5.0.0", optional = true}
-piccolo = { version = ">=0.89,<1.25", optional = true}
-motor =  { version = ">=3.6.0,<4.0.0", optional = true }
-mongoengine = {version = ">=0.23.1,<0.30.0", optional = true}
-sqlmodel = { version = ">=0.0.22", optional = true}
-pony = { version = "^0.7.16", optional = true}
-beanie = { version = ">=1.25.0", optional = true}
-sqlakeyset = { version = "^2.0.1680321678", optional = true }
-scylla-driver = {version = "^3.25.6", optional = true}
-bunnet = {version = "^1.1.0", optional = true}
-odmantic = {version = "^1.0.2", optional = true}
-elasticsearch-dsl = {version = "^8.13.0", optional = true}
-google-cloud-firestore = {version = "^2.19.0", optional = true}
-
-[tool.poetry.group.dev.dependencies]
-fastapi = ">=0.93.0"
-pytest = "^8.3.4"
-pytest-cov = "^6.0.0"
-pytest-asyncio = "^0.25.3"
-flaky = "^3.8.1"
-pre-commit = "^4.1.0"
-Faker = ">=35.2,<38.0"
-psycopg2-binary = "^2.9.10"
-mkdocs = "^1.6.1"
-mkdocs-material = "^9.5.50"
-pymdown-extensions = "^10.14"
-fontawesome-markdown = "^0.2.6"
-httpx = "^0.28.1"
-asgi-lifespan = "^2.1.0"
-requests = "^2.32.2"
-uvicorn = "^0.34.0"
-Jinja2 = "^3.1.5"
-mypy = "^1.14.1"
-ruff = ">=0.9.4,<0.12.0"
-
-[tool.poetry.extras]
-sqlmodel = ["sqlmodel", "sqlakeyset"]
-sqlalchemy = ["SQLAlchemy", "sqlakeyset"]
-databases = ["databases"]
-orm = ["orm", "databases", "typesystem"]
+[project.optional-dependencies]
+sqlmodel = [
+    "sqlmodel>=0.0.22",
+    "sqlakeyset>=2.0.1680321678,<3",
+]
+sqlalchemy = [
+    "SQLAlchemy>=1.3.20",
+    "sqlakeyset>=2.0.1680321678,<3",
+]
+databases = ["databases>=0.6.0"]
+orm = [
+    "orm>=0.3.1",
+    "databases>=0.6.0",
+]
 ormar = []
-tortoise = ["tortoise-orm"]
-asyncpg = ["SQLAlchemy", "asyncpg"]
-django = ["django", "databases"]
-piccolo = ["piccolo"]
-motor = ["motor"]
-bunnet = ["bunnet"]
-mongoengine = ["mongoengine"]
-beanie =  ["beanie"]
-scylla-driver = ["scylla-driver"]
-odmantic = ["odmantic"]
-elasticsearch = ["elasticsearch-dsl"]
-firestore = ["google-cloud-firestore"]
+tortoise = ["tortoise-orm>=0.22.0"]
+asyncpg = [
+    "SQLAlchemy>=1.3.20",
+    "asyncpg>=0.24.0",
+]
+django = [
+    "django<5.0.0",
+    "databases>=0.6.0",
+]
+piccolo = ["piccolo>=0.89,<1.25"]
+motor = ["motor>=3.6.0,<4.0.0"]
+bunnet = ["bunnet>=1.1.0,<2"]
+mongoengine = ["mongoengine>=0.23.1,<0.30.0"]
+beanie = ["beanie>=1.25.0"]
+scylla-driver = ["scylla-driver>=3.25.6,<4"]
+odmantic = ["odmantic>=1.0.2,<2"]
+elasticsearch = ["elasticsearch-dsl>=8.13.0,<9"]
+firestore = ["google-cloud-firestore>=2.19.0,<3"]
 all = [
-    "sqlmodel",
-    "SQLAlchemy",
-    "databases",
-    "orm",
-#    "ormar",
-    "odmantic",
-    "tortoise-orm",
-    "asyncpg",
-    "django",
-    "piccolo",
-    "motor",
-    "mongoengine",
-    "pony",
-    "beanie",
-    "sqlakeyset",
-    "scylla-driver",
-    "bunnet",
-    "elasticsearch-dsl",
-    "google-cloud-firestore",
+    "sqlmodel>=0.0.22",
+    "SQLAlchemy>=1.3.20",
+    "databases>=0.6.0",
+    "orm>=0.3.1",
+    "odmantic>=1.0.2,<2",
+    "tortoise-orm>=0.22.0",
+    "asyncpg>=0.24.0",
+    "django<5.0.0",
+    "piccolo>=0.89,<1.25",
+    "motor>=3.6.0,<4.0.0",
+    "mongoengine>=0.23.1,<0.30.0",
+    "pony>=0.7.16,<0.8",
+    "beanie>=1.25.0",
+    "sqlakeyset>=2.0.1680321678,<3",
+    "scylla-driver>=3.25.6,<4",
+    "bunnet>=1.1.0,<2",
+    "elasticsearch-dsl>=8.13.0,<9",
+    "google-cloud-firestore>=2.19.0,<3",
+]
+
+[project.urls]
+Repository = "https://github.com/uriyyo/fastapi-pagination"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4,<9",
+    "pytest-cov>=6.0.0,<7",
+    "pytest-asyncio>=0.25.3,<0.26",
+    "flaky>=3.8.1,<4",
+    "pre-commit>=4.1.0,<5",
+    "Faker>=35.2,<38.0",
+    "psycopg2-binary>=2.9.10,<3",
+    "mkdocs>=1.6.1,<2",
+    "mkdocs-material>=9.5.50,<10",
+    "pymdown-extensions~=10.14",
+    "fontawesome-markdown>=0.2.6,<0.3",
+    "httpx>=0.28.1,<0.29",
+    "asgi-lifespan>=2.1.0,<3",
+    "requests>=2.32.2,<3",
+    "uvicorn>=0.34.0,<0.35",
+    "Jinja2>=3.1.5,<4",
+    "mypy>=1.14.1,<2",
+    "ruff>=0.9.4,<0.12.0",
 ]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 120
@@ -176,7 +172,7 @@ exclude = [
     "venv",
     ".venv",
 ]
-per-file-ignores = {}
+per-file-ignores = { }
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.lint.mccabe]
@@ -188,8 +184,8 @@ strict = true
 follow_imports = "normal"
 ignore_missing_imports = true
 no_implicit_reexport = false
-show_column_numbers= true
-show_error_codes= true
+show_column_numbers = true
+show_error_codes = true
 
 [tool.coverage.paths]
 source = ["fastapi_pagination"]

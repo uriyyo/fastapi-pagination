@@ -15,16 +15,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1.4.1
+      - name: Build
+        run: |
+          uv build
 
       - name: Publish
         env:
           PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
           PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: poetry publish --build -u "${{ env.PYPI_USERNAME }}" -p "${{ env.PYPI_PASSWORD }}"
+        run: |
+          uv publish --build -u "${{ env.PYPI_USERNAME }}" -p "${{ env.PYPI_PASSWORD }}"

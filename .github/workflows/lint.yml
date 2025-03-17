@@ -19,26 +19,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1.4.1
-
-      - name: Setup cache
-        id: cached-poetry-dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-py${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Install dependencies
         run: |
-          poetry install -E all --sync
+          uv sync --all-extras --dev
 
       - name: Lint
         run: |
-          poetry run pre-commit run --all-files --show-diff-on-failure
+          uv run pre-commit run --all-files --show-diff-on-failure
