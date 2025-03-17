@@ -11,8 +11,8 @@ The documentation is built using [mkdocs](https://www.mkdocs.org/). All document
 
 ### Step 1: prerequisites
 
-`fastapi-pagination` uses [poetry](https://python-poetry.org/) for dependency management.
-Please, install poetry before continuing.
+`fastapi-pagination` uses [uv](https://docs.astral.sh/uv/) for dependency management.
+Please, install uv before continuing.
 
 Minimum supported python version is `3.9`.
 
@@ -28,17 +28,17 @@ git clone https://github.com/uriyyo/fastapi-pagination
 
 To install all dependencies, run:
 ```sh
-poetry install -E all
+uv sync --dev --all-extras
 ```
 
 To install only basic dependencies, run:
 ```sh
-poetry install
+uv install --dev
 ```
 
 To install docs requirements, run:
 ```sh
-poetry run pip install -r docs_requirements.txt
+uv run pip install -r docs_requirements.txt
 ```
 
 ### Step 4: do your changes
@@ -85,36 +85,36 @@ You can run `mkdocs serve` to see your changes locally.
 
 Before creating a commit, please, run pre-commit hooks:
 ```sh
-poetry run pre-commit run --all-files
+uv run pre-commit run --all-files
 ```
 
 You can also install pre-commit hooks to run automatically before each commit:
 ```sh
-poetry run pre-commit install
+uv run pre-commit install
 ```
 
 ### Step 6: run tests
 
 To run tests, run:
 ```sh
-poetry run pytest tests
+uv run pytest tests
 ```
 
 If you want to run tests with coverage, run:
 ```sh
-poetry run pytest tests --cov=fastapi_pagination
+uv run pytest tests --cov=fastapi_pagination
 ```
 
 If you want to run only unit tests, run:
 ```sh
-poetry run pytest tests --unit-tests
+uv run pytest tests --unit-tests
 ```
 
 If you want to run only integration tests, then you will also will need to have `PostgreSQL`, `MongoDB` and `Casandra` running.
 
 To run integration tests, run:
 ```sh
-poetry run pytest tests/ext
+uv run pytest tests/ext
 ```
 
 ### Step 7: create a pull request

@@ -6,7 +6,7 @@ repos:
         name: ruff-format
         pass_filenames: false
         language_version: python3.9
-        entry: poetry run ruff format fastapi_pagination tests
+        entry: uv run ruff format fastapi_pagination tests
 
   - repo: local
     hooks:
@@ -15,7 +15,7 @@ repos:
         name: ruff
         pass_filenames: false
         language_version: python3.9
-        entry: poetry run ruff check --fix --exit-non-zero-on-fix --show-fixes fastapi_pagination tests
+        entry: uv run ruff check --fix --exit-non-zero-on-fix --show-fixes fastapi_pagination tests
 
   - repo: local
     hooks:
@@ -23,4 +23,4 @@ repos:
         language: python
         name: mypy
         pass_filenames: false
-        entry: poetry run mypy fastapi_pagination --show-error-codes
+        entry: uv run mypy fastapi_pagination --show-error-codes
