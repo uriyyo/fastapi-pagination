@@ -10,7 +10,7 @@ function _pip() {
 }
 
 function _pytest() {
-    uv run pytest "$@"              \
+    uv run --no-project pytest "$@"              \
       --cov=fastapi_pagination          \
       --cov-append                      \
       --cov-report=xml
