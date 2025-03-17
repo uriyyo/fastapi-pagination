@@ -19,7 +19,11 @@ def test_cursor_page_invalid_params_type():
         )
 
 
-def test_invalid_cursor():
+@pytest.mark.parametrize(
+    "cursor",
+    ["invalid", "null"],
+)
+def test_invalid_cursor(cursor):
     app = FastAPI()
     client = TestClient(app)
 
@@ -35,7 +39,7 @@ def test_invalid_cursor():
 
     add_pagination(app)
 
-    response = client.get("/route", params={"cursor": "invalid"})
+    response = client.get("/route", params={"cursor": cursor})
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json() == {"detail": "Invalid cursor value"}
