@@ -477,7 +477,7 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "5.1.7"
+version = "4.2.20"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
@@ -715,7 +715,7 @@ requires-dist = [
     { name = "databases", marker = "extra == 'django'", specifier = ">=0.6.0" },
     { name = "databases", marker = "extra == 'orm'", specifier = ">=0.6.0" },
     { name = "django", marker = "extra == 'all'", specifier = "<5.0.0" },
-    { name = "django", marker = "extra == 'django'", specifier = "<5.0.0" },
+    { name = "django", marker = "extra == 'django'", specifier = "<6.0.0" },
     { name = "elasticsearch-dsl", marker = "extra == 'all'", specifier = ">=8.13.0,<9" },
     { name = "elasticsearch-dsl", marker = "extra == 'elasticsearch'", specifier = ">=8.13.0,<9" },
     { name = "fastapi", specifier = ">=0.93.0" },
