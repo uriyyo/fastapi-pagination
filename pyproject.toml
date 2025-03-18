@@ -46,7 +46,7 @@ asyncpg = [
     "asyncpg>=0.24.0",
 ]
 django = [
-    "django<5.0.0",
+    "django<6.0.0",
     "databases>=0.6.0",
 ]
 piccolo = ["piccolo>=0.89,<1.25"]
