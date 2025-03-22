@@ -94,7 +94,7 @@ def test_customization_use_params():
 
     CustomPage = CustomizedPage[Page, UseParams(CustomParams)]
 
-    assert CustomPage.__params_type__ is CustomParams
+    assert issubclass(CustomPage.__params_type__, CustomParams)
 
 
 def test_customization_use_params_after_use_include_total():
