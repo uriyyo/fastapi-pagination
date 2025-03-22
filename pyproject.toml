@@ -66,7 +66,7 @@ all = [
     "odmantic>=1.0.2,<2",
     "tortoise-orm>=0.22.0",
     "asyncpg>=0.24.0",
-    "django<5.0.0",
+    "django<6.0.0",
     "piccolo>=0.89,<1.25",
     "motor>=3.6.0,<4.0.0",
     "mongoengine>=0.23.1,<0.30.0",
