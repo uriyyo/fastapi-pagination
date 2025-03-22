@@ -8,12 +8,17 @@ from fastapi.routing import APIRouter
 from fastapi.testclient import TestClient
 from pydantic import Field
 
+from fastapi_pagination.cursor import CursorPage, CursorParams
+from fastapi_pagination.errors import UninitializedConfigurationError
+
 try:
     from pydantic.generics import GenericModel
 except ImportError:  # pragma: no cover
     from pydantic import BaseModel as GenericModel
 
 from fastapi_pagination import (
+    LimitOffsetPage,
+    LimitOffsetParams,
     Page,
     Params,
     add_pagination,
@@ -21,8 +26,15 @@ from fastapi_pagination import (
     request,
     response,
 )
-from fastapi_pagination.api import apply_items_transformer, create_page, pagination_ctx, pagination_items
-from fastapi_pagination.bases import AbstractPage
+from fastapi_pagination.api import (
+    apply_items_transformer,
+    create_page,
+    pagination_ctx,
+    pagination_items,
+    resolve_page,
+    set_page,
+)
+from fastapi_pagination.bases import AbstractPage, AbstractParams, BaseRawParams, RawParams
 
 
 def test_set_response_request():
@@ -147,6 +159,34 @@ def test_add_pagination_additional_dependencies():
 
     assert len(r.dependencies) == 2
     assert len(r.dependant.dependencies) == 3
+
+
+def test_page_resolve_from_params_val() -> None:
+    assert resolve_page(Params()) is Page
+    assert resolve_page(LimitOffsetParams()) is LimitOffsetPage
+    assert resolve_page(CursorParams()) is CursorPage
+
+
+def test_page_resolve_set_page() -> None:
+    class CustomPage(AbstractPage[int]):
+        pass
+
+    with set_page(CustomPage):
+        assert resolve_page(Params()) is CustomPage
+        assert resolve_page(LimitOffsetParams()) is CustomPage
+        assert resolve_page(CursorParams()) is CustomPage
+
+
+def test_resolve_page_no_page_set() -> None:
+    with pytest.raises(UninitializedConfigurationError):
+        resolve_page()
+
+    class _UnconnectedParams(AbstractParams):
+        def to_raw_params(self) -> BaseRawParams:
+            return RawParams()
+
+    with pytest.raises(UninitializedConfigurationError):
+        resolve_page(_UnconnectedParams())
 
 
 def test_pagination_items_outside_create_page():

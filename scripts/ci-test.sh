@@ -10,7 +10,7 @@ function _pip() {
 }
 
 function _pytest() {
-    uv run --no-project pytest "$@"              \
+    uv run --no-project pytest "$@"     \
       --cov=fastapi_pagination          \
       --cov-append                      \
       --cov-report=xml
@@ -56,19 +56,19 @@ if [[ "$PYDANTIC_V2" == true ]]; then
     echo "Running ormar tests"
     _pip install -U ormar
     _pytest tests/ext -m ormar
-    _pip uninstall -y ormar
+    _pip uninstall ormar
 fi
 
 echo "Running orm tests"
 _pip install "databases<0.9.0" orm
 _pytest tests/ext -m orm
-_pip uninstall -y orm
+_pip uninstall orm
 
 if [[ "$PYDANTIC_V2" == true ]]; then
   echo "Running tests GINO tests"
   _pip install -U "gino[starlette]" "sqlalchemy<1.4" "asyncpg"
   _pytest tests -m gino
-  _pip uninstall -y gino gino-starlette
+  _pip uninstall gino gino-starlette
 fi
 
 echo "Restore env"

@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from itertools import islice
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Optional, TypeVar
 
 __all__ = [
     "LimitOffsetPage",
@@ -12,23 +12,13 @@ __all__ = [
 
 from .bases import AbstractParams
 from .config import Config
-from .default import Page as DefaultPage
-from .default import Params
+from .default import Page, Params
 from .flow import flow_expr, run_sync_flow
 from .flows import generic_flow
-from .limit_offset import LimitOffsetPage as DefaultLimitOffsetPage
-from .limit_offset import LimitOffsetParams
+from .limit_offset import LimitOffsetPage, LimitOffsetParams
 from .types import AdditionalData, SyncItemsTransformer
 
 T = TypeVar("T")
-
-
-class Page(DefaultPage[T], Generic[T]):
-    pass
-
-
-class LimitOffsetPage(DefaultLimitOffsetPage[T], Generic[T]):
-    pass
 
 
 def paginate(

@@ -6,6 +6,7 @@ __all__ = [
     "pagination_items",
     "request",
     "resolve_items_transformer",
+    "resolve_page",
     "resolve_params",
     "response",
     "set_items_transformer",
@@ -38,7 +39,7 @@ from pydantic import BaseModel
 from starlette.routing import request_response
 
 from .bases import AbstractPage, AbstractParams
-from .default import Page
+from .errors import UninitializedConfigurationError
 from .types import AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 from .utils import IS_PYDANTIC_V2, is_async_callable, unwrap_annotated
 
@@ -46,7 +47,7 @@ T = TypeVar("T")
 TAbstractParams_co = TypeVar("TAbstractParams_co", covariant=True, bound=AbstractParams)
 
 _params_val: ContextVar[AbstractParams] = ContextVar("_params_val")
-_page_val: ContextVar[type[AbstractPage[Any]]] = ContextVar("_page_val", default=Page)
+_page_val: ContextVar[type[AbstractPage[Any]]] = ContextVar("_page_val")
 
 _rsp_val: ContextVar[Response] = ContextVar("_rsp_val")
 _req_val: ContextVar[Request] = ContextVar("_req_val")
@@ -60,7 +61,7 @@ def resolve_params(params: Optional[TAbstractParams_co] = None) -> TAbstractPara
         try:
             return cast(TAbstractParams_co, _params_val.get())
         except LookupError:
-            raise RuntimeError("Use params, add_pagination or pagination_ctx") from None
+            raise UninitializedConfigurationError("Use params, add_pagination or pagination_ctx") from None
 
     return params
 
@@ -76,7 +77,7 @@ def pagination_items() -> Sequence[Any]:
     try:
         return _items_val.get()
     except LookupError:
-        raise RuntimeError("pagination_items must be called inside create_page") from None
+        raise UninitializedConfigurationError("pagination_items must be called inside create_page") from None
 
 
 def create_page(
@@ -98,7 +99,7 @@ def create_page(
         kwargs["params"] = params
 
     with _ctx_var_with_reset(_items_val, items):
-        return _page_val.get().create(items, **kwargs)
+        return resolve_page(params).create(items, **kwargs)
 
 
 def response() -> Response:
@@ -134,6 +135,19 @@ def set_params(params: AbstractParams) -> AbstractContextManager[None]:
 
 def set_page(page: type[AbstractPage[Any]]) -> AbstractContextManager[None]:
     return _ctx_var_with_reset(_page_val, page)
+
+
+def resolve_page(params: Optional[AbstractParams] = None, /) -> type[AbstractPage[Any]]:
+    try:
+        return _page_val.get()
+    except LookupError:
+        if params and (page := params.__page_type__):
+            return page
+
+        raise UninitializedConfigurationError(
+            "can't resolve page type, use set_page or pagination_ctx with page argument, or use "
+            "params that connected to page via set_page method"
+        ) from None
 
 
 def set_items_transformer(transformer: ItemsTransformer) -> AbstractContextManager[None]:

@@ -7,16 +7,17 @@ __all__ = [
 
 from collections.abc import Sequence
 from math import ceil
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, Optional
 
 from fastapi import Query
 from pydantic import BaseModel
+from typing_extensions import TypeVar
 
 from .bases import AbstractParams, BasePage, RawParams
 from .types import GreaterEqualOne, GreaterEqualZero
 from .utils import create_pydantic_model
 
-T = TypeVar("T")
+TAny = TypeVar("TAny", default=Any)
 
 
 class Params(BaseModel, AbstractParams):
@@ -30,7 +31,7 @@ class Params(BaseModel, AbstractParams):
         )
 
 
-class Page(BasePage[T], Generic[T]):
+class Page(BasePage[TAny], Generic[TAny]):
     page: Optional[GreaterEqualOne]
     size: Optional[GreaterEqualOne]
     pages: Optional[GreaterEqualZero] = None
@@ -40,12 +41,12 @@ class Page(BasePage[T], Generic[T]):
     @classmethod
     def create(
         cls,
-        items: Sequence[T],
+        items: Sequence[TAny],
         params: AbstractParams,
         *,
         total: Optional[int] = None,
         **kwargs: Any,
-    ) -> Page[T]:
+    ) -> Page[TAny]:
         if not isinstance(params, Params):
             raise TypeError("Page should be used with Params")
 

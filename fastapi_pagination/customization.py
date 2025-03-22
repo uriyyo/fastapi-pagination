@@ -77,6 +77,16 @@ def new_page_cls(cls: TPage, new_ns: ClsNamespace) -> TPage:
     return cast(TPage, new_cls)
 
 
+def new_params_cls(cls: type[AbstractParams], new_ns: ClsNamespace) -> type[AbstractParams]:
+    new_cls = new_class(
+        new_ns.get("__name__", cls.__name__),
+        (cls,),
+        exec_body=lambda ns: ns.update(new_ns),
+    )
+
+    return cast(type[AbstractParams], new_cls)
+
+
 if TYPE_CHECKING:
     from typing import Annotated as CustomizedPage
 else:
@@ -121,6 +131,7 @@ else:
                 else:
                     raise TypeError(f"Expected PageCustomizer, got {customizer!r}")
 
+            new_ns["__params_type__"] = new_params_cls(new_ns["__params_type__"], {"__page_type__": None})
             return new_page_cls(page_cls, new_ns)
 
 
