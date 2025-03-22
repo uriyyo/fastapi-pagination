@@ -4,6 +4,7 @@ import pytest
 from fastapi import Query
 
 from fastapi_pagination import Page, Params
+from fastapi_pagination.bases import AbstractPage, AbstractParams, BaseRawParams, RawParams
 from fastapi_pagination.cursor import CursorParams
 
 T = TypeVar("T")
@@ -50,3 +51,36 @@ def test_params_cast():
     p = Params().to_raw_params()
 
     assert p.as_limit_offset() is p
+
+
+def test_page_type_is_not_reinited():
+    class _Params(AbstractParams):
+        def to_raw_params(self) -> BaseRawParams:
+            return RawParams()
+
+    assert _Params.__page_type__ is None
+
+    class _FirstPage(AbstractPage[int]):
+        __params_type__ = _Params
+
+    assert _FirstPage.__params_type__ is _Params
+    assert _Params.__page_type__ is _FirstPage
+
+    class _SecondPage(AbstractPage[int]):
+        __params_type__ = _Params
+
+    assert _SecondPage.__params_type__ is _Params
+
+    # page is not re-inited for params
+    assert _Params.__page_type__ is _FirstPage
+
+    _Params.set_page(_SecondPage)
+
+    assert _Params.__page_type__ is _SecondPage
+    assert _SecondPage.__params_type__ is _Params
+
+    _FirstPage.set_params(_Params)
+
+    assert _FirstPage.__params_type__ is _Params
+    assert _Params.__page_type__ is _FirstPage
+    assert _SecondPage.__params_type__ is _Params

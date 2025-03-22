@@ -96,8 +96,13 @@ class CursorRawParams(BaseRawParams):
     type: ClassVar[ParamsType] = "cursor"
 
 
+def connect_page_and_params(page_cls: type[AbstractPage[Any]], params_cls: type[AbstractParams]) -> None:
+    page_cls.__params_type__ = params_cls
+    params_cls.__page_type__ = page_cls
+
+
 class AbstractParams(ABC):
-    __page_type__: ClassVar[type[AbstractPage[Any]] | None] = None
+    __page_type__: ClassVar[Optional[type[AbstractPage[Any]]]] = None
 
     @abstractmethod
     def to_raw_params(self) -> BaseRawParams:
@@ -105,8 +110,7 @@ class AbstractParams(ABC):
 
     @classmethod
     def set_page(cls, page_cls: type[AbstractPage[Any]]) -> None:
-        cls.__page_type__ = page_cls
-        page_cls.__params_type__ = cls
+        connect_page_and_params(page_cls, cls)
 
 
 class AbstractPage(GenericModel, Generic[TAny], ABC):
@@ -127,6 +131,10 @@ class AbstractPage(GenericModel, Generic[TAny], ABC):
             # call set_page only if params not yet connected to another page
             if cls.__params_type__ and cls.__params_type__.__page_type__ is None:
                 cls.__params_type__.set_page(cls)
+
+    @classmethod
+    def set_params(cls, params_cls: type[AbstractParams], /) -> None:
+        connect_page_and_params(cls, params_cls)
 
     if IS_PYDANTIC_V2:
 
