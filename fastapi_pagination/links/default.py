@@ -4,16 +4,18 @@ __all__ = ["Page"]
 
 from collections.abc import MutableMapping
 from math import ceil
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic
+
+from typing_extensions import TypeVar
 
 from fastapi_pagination.default import Page as BasePage
 
 from .bases import Links, create_links, validation_decorator
 
-T = TypeVar("T")
+TAny = TypeVar("TAny", default=Any)
 
 
-class Page(BasePage[T], Generic[T]):
+class Page(BasePage[TAny], Generic[TAny]):
     links: Links
 
     @validation_decorator

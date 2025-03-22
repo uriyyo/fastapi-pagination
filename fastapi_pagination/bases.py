@@ -20,7 +20,6 @@ from typing import (
     ClassVar,
     Generic,
     Optional,
-    TypeVar,
 )
 
 from .utils import IS_PYDANTIC_V2
@@ -41,14 +40,11 @@ except ImportError:
 
 from collections.abc import Sequence
 
-from typing_extensions import Self, TypeIs
+from typing_extensions import Self, TypeIs, TypeVar
 
 from .types import Cursor, GreaterEqualZero, ParamsType
 
-T = TypeVar("T")
-C = TypeVar("C")
-
-TAbstractPage = TypeVar("TAbstractPage", bound="AbstractPage[Any]")
+TAny = TypeVar("TAny", default=Any)
 
 
 class BaseRawParams:
@@ -101,12 +97,19 @@ class CursorRawParams(BaseRawParams):
 
 
 class AbstractParams(ABC):
+    __page_type__: ClassVar[type[AbstractPage[Any]] | None] = None
+
     @abstractmethod
     def to_raw_params(self) -> BaseRawParams:
         pass
 
+    @classmethod
+    def set_page(cls, page_cls: type[AbstractPage[Any]]) -> None:
+        cls.__page_type__ = page_cls
+        page_cls.__params_type__ = cls
 
-class AbstractPage(GenericModel, Generic[T], ABC):
+
+class AbstractPage(GenericModel, Generic[TAny], ABC):
     __params_type__: ClassVar[type[AbstractParams]]
 
     # used by pydantic v2
@@ -116,6 +119,14 @@ class AbstractPage(GenericModel, Generic[T], ABC):
     if TYPE_CHECKING:  # only for pydantic v1
         __concrete__: ClassVar[bool]
         __parameters__: ClassVar[tuple[Any, ...]]
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        super().__init_subclass__(**kwargs)
+
+        with suppress(AttributeError):
+            # call set_page only if params not yet connected to another page
+            if cls.__params_type__ and cls.__params_type__.__page_type__ is None:
+                cls.__params_type__.set_page(cls)
 
     if IS_PYDANTIC_V2:
 
@@ -137,7 +148,7 @@ class AbstractPage(GenericModel, Generic[T], ABC):
     @abstractmethod
     def create(
         cls,
-        items: Sequence[T],
+        items: Sequence[TAny],
         params: AbstractParams,
         **kwargs: Any,
     ) -> Self:
@@ -157,6 +168,6 @@ class AbstractPage(GenericModel, Generic[T], ABC):
             allow_population_by_field_name = True
 
 
-class BasePage(AbstractPage[T], Generic[T], ABC):
-    items: Sequence[T]
-    total: Optional[GreaterEqualZero]
+class BasePage(AbstractPage[TAny], Generic[TAny], ABC):
+    items: Sequence[TAny]
+    total: Optional[GreaterEqualZero] = None

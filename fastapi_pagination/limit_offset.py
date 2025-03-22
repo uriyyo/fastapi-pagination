@@ -6,16 +6,17 @@ __all__ = [
 ]
 
 from collections.abc import Sequence
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, Optional
 
 from fastapi import Query
 from pydantic import BaseModel
+from typing_extensions import TypeVar
 
 from .bases import AbstractParams, BasePage, RawParams
 from .types import GreaterEqualOne, GreaterEqualZero
 from .utils import create_pydantic_model
 
-T = TypeVar("T")
+TAny = TypeVar("TAny", default=Any)
 
 
 class LimitOffsetParams(BaseModel, AbstractParams):
@@ -29,7 +30,7 @@ class LimitOffsetParams(BaseModel, AbstractParams):
         )
 
 
-class LimitOffsetPage(BasePage[T], Generic[T]):
+class LimitOffsetPage(BasePage[TAny], Generic[TAny]):
     limit: Optional[GreaterEqualOne]
     offset: Optional[GreaterEqualZero]
 
@@ -38,12 +39,12 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
     @classmethod
     def create(
         cls,
-        items: Sequence[T],
+        items: Sequence[TAny],
         params: AbstractParams,
         *,
         total: Optional[int] = None,
         **kwargs: Any,
-    ) -> LimitOffsetPage[T]:
+    ) -> LimitOffsetPage[TAny]:
         raw_params = params.to_raw_params().as_limit_offset()
 
         return create_pydantic_model(

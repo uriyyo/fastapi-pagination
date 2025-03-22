@@ -14,20 +14,19 @@ from typing import (
     ClassVar,
     Generic,
     Optional,
-    TypeVar,
     overload,
 )
 from urllib.parse import quote, unquote
 
 from fastapi import HTTPException, Query, status
 from pydantic import BaseModel, Field
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeVar
 
-from .bases import AbstractPage, AbstractParams, CursorRawParams
+from .bases import AbstractParams, BasePage, CursorRawParams
 from .types import Cursor
 from .utils import create_pydantic_model
 
-T = TypeVar("T")
+TAny = TypeVar("TAny", default=Any)
 
 
 @overload
@@ -87,10 +86,7 @@ class CursorParams(BaseModel, AbstractParams):
         )
 
 
-class CursorPage(AbstractPage[T], Generic[T]):
-    items: Sequence[T]
-    total: Optional[int] = Field(None, description="Total items")
-
+class CursorPage(BasePage[TAny], Generic[TAny]):
     current_page: Optional[str] = Field(None, description="Cursor to refetch the current page")
     current_page_backwards: Optional[str] = Field(
         None,
@@ -104,7 +100,7 @@ class CursorPage(AbstractPage[T], Generic[T]):
     @classmethod
     def create(
         cls,
-        items: Sequence[T],
+        items: Sequence[TAny],
         params: AbstractParams,
         *,
         current: Optional[Cursor] = None,
@@ -112,7 +108,7 @@ class CursorPage(AbstractPage[T], Generic[T]):
         next_: Optional[Cursor] = None,
         previous: Optional[Cursor] = None,
         **kwargs: Any,
-    ) -> CursorPage[T]:
+    ) -> CursorPage[TAny]:
         if not isinstance(params, CursorParams):
             raise TypeError("CursorPage should be used with CursorParams")
 
