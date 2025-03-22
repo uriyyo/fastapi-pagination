@@ -2,11 +2,11 @@ class FastAPIPaginationError(Exception):
     pass
 
 
-class UninitializedPageError(FastAPIPaginationError, RuntimeError):
+class UninitializedConfigurationError(FastAPIPaginationError, RuntimeError):
     pass
 
 
 __all__ = [
     "FastAPIPaginationError",
-    "UninitializedPageError",
+    "UninitializedConfigurationError",
 ]

@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from pydantic import Field
 
 from fastapi_pagination.cursor import CursorPage, CursorParams
-from fastapi_pagination.errors import UninitializedPageError
+from fastapi_pagination.errors import UninitializedConfigurationError
 
 try:
     from pydantic.generics import GenericModel
@@ -178,14 +178,14 @@ def test_page_resolve_set_page() -> None:
 
 
 def test_resolve_page_no_page_set() -> None:
-    with pytest.raises(UninitializedPageError):
+    with pytest.raises(UninitializedConfigurationError):
         resolve_page()
 
     class _UnconnectedParams(AbstractParams):
         def to_raw_params(self) -> BaseRawParams:
             return RawParams()
 
-    with pytest.raises(UninitializedPageError):
+    with pytest.raises(UninitializedConfigurationError):
         resolve_page(_UnconnectedParams())
 
 

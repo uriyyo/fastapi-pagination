@@ -39,7 +39,7 @@ from pydantic import BaseModel
 from starlette.routing import request_response
 
 from .bases import AbstractPage, AbstractParams
-from .errors import UninitializedPageError
+from .errors import UninitializedConfigurationError
 from .types import AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 from .utils import IS_PYDANTIC_V2, is_async_callable, unwrap_annotated
 
@@ -61,7 +61,7 @@ def resolve_params(params: Optional[TAbstractParams_co] = None) -> TAbstractPara
         try:
             return cast(TAbstractParams_co, _params_val.get())
         except LookupError:
-            raise UninitializedPageError("Use params, add_pagination or pagination_ctx") from None
+            raise UninitializedConfigurationError("Use params, add_pagination or pagination_ctx") from None
 
     return params
 
@@ -77,7 +77,7 @@ def pagination_items() -> Sequence[Any]:
     try:
         return _items_val.get()
     except LookupError:
-        raise UninitializedPageError("pagination_items must be called inside create_page") from None
+        raise UninitializedConfigurationError("pagination_items must be called inside create_page") from None
 
 
 def create_page(
@@ -144,7 +144,7 @@ def resolve_page(params: Optional[AbstractParams] = None, /) -> type[AbstractPag
         if params and (page := params.__page_type__):
             return page
 
-        raise UninitializedPageError(
+        raise UninitializedConfigurationError(
             "can't resolve page type, use set_page or pagination_ctx with page argument, or use "
             "params that connected to page via set_page method"
         ) from None
