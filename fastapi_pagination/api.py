@@ -141,12 +141,8 @@ def resolve_page(params: Optional[AbstractParams] = None, /) -> type[AbstractPag
     try:
         return _page_val.get()
     except LookupError:
-        if params:
-            try:
-                if tp := params.__page_type__:
-                    return tp
-            except AttributeError:
-                pass
+        if params and (page := params.__page_type__):
+            return page
 
         raise UninitializedPageError(
             "can't resolve page type, use set_page or pagination_ctx with page argument, or use "
