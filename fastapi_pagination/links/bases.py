@@ -1,12 +1,22 @@
-__all__ = ["Links", "create_links", "validation_decorator"]
+__all__ = [
+    "BaseUseLinks",
+    "Links",
+    "create_links",
+]
 
+from abc import ABC, abstractmethod
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Optional
+from dataclasses import dataclass
+from typing import Any, Generic, Optional
 
 from pydantic import BaseModel, Field
 from starlette.requests import URL
+from typing_extensions import TypeVar
 
 from fastapi_pagination.api import request
+from fastapi_pagination.bases import AbstractPage
+from fastapi_pagination.customization import ClsNamespace, PageCls, PageCustomizer
+from fastapi_pagination.errors import UnsupportedFeatureError
 from fastapi_pagination.utils import IS_PYDANTIC_V2
 
 _link_field = (
@@ -56,19 +66,21 @@ def create_links(
     )
 
 
-if TYPE_CHECKING:
-    from typing import Callable, TypeVar
+TPage_contra = TypeVar("TPage_contra", bound=AbstractPage, contravariant=True, default=Any)
 
-    TCallable = TypeVar("TCallable", bound=Callable[..., Any])
 
-    def validation_decorator(func: TCallable) -> TCallable:
-        return func
+@dataclass
+class BaseUseLinks(PageCustomizer, Generic[TPage_contra], ABC):
+    field: str = "links"
 
-elif IS_PYDANTIC_V2:
-    from pydantic import model_validator
+    @abstractmethod
+    def resolve_links(self, _page: TPage_contra, /) -> Links:
+        pass
 
-    validation_decorator = model_validator(mode="before")
-else:
-    from pydantic import root_validator
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        if not IS_PYDANTIC_V2:
+            raise UnsupportedFeatureError("UseLinks customization is not supported for Pydantic v1")
 
-    validation_decorator = root_validator(pre=True)
+        from pydantic import computed_field
+
+        ns[self.field] = computed_field(return_type=Links)(lambda _self: self.resolve_links(_self))
