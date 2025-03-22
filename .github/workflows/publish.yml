@@ -31,4 +31,4 @@ jobs:
           PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
           PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          uv publish --build -u "${{ env.PYPI_USERNAME }}" -p "${{ env.PYPI_PASSWORD }}"
+          uv publish -u "${{ env.PYPI_USERNAME }}" -p "${{ env.PYPI_PASSWORD }}"
