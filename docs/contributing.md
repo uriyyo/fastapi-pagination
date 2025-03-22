@@ -38,7 +38,7 @@ uv install --dev
 
 To install docs requirements, run:
 ```sh
-uv run pip install -r docs_requirements.txt
+uv pip install -r docs_requirements.txt
 ```
 
 ### Step 4: do your changes
@@ -58,7 +58,7 @@ from fastapi_pagination.utils import verify_params
 
 
 async def paginate(
-    query: QuerySet,
+    query: Any,
     params: Optional[AbstractParams] = None,  # Optional params for pagination (if None, current params will be used)
     *,
     transformer: Optional[AsyncItemsTransformer] = None,  # Optional transformer for items
@@ -95,6 +95,11 @@ uv run pre-commit install
 
 ### Step 6: run tests
 
+Before running tests, you need to prepare env:
+```sh
+./scripts/ci-prepare.sh
+```
+
 To run tests, run:
 ```sh
 uv run pytest tests
@@ -115,6 +120,11 @@ If you want to run only integration tests, then you will also will need to have 
 To run integration tests, run:
 ```sh
 uv run pytest tests/ext
+```
+
+If you want to run whole test suite, run:
+```sh
+./scripts/ci-test.sh
 ```
 
 ### Step 7: create a pull request
