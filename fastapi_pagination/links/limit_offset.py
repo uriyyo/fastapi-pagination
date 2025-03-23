@@ -1,38 +1,65 @@
 from __future__ import annotations
 
-__all__ = ["LimitOffsetPage"]
+__all__ = [
+    "LimitOffsetPage",
+    "UseLimitOffsetHeaderLinks",
+    "UseLimitOffsetLinks",
+    "resolve_limit_offset_links",
+]
 
-from collections.abc import MutableMapping
-from math import floor
-from typing import Any, Generic, TypeVar
+from abc import ABC
+from math import floor, inf
+from typing import Any, cast
 
+from typing_extensions import TypeAlias, TypeVar
+
+from fastapi_pagination.customization import CustomizedPage
 from fastapi_pagination.limit_offset import LimitOffsetPage as BasePage
 
-from .bases import Links, create_links, validation_decorator
+from .bases import BaseLinksCustomizer, BaseUseHeaderLinks, BaseUseLinks, Links, create_links
 
-T = TypeVar("T")
+TAny = TypeVar("TAny", default=Any)
 
 
-class LimitOffsetPage(BasePage[T], Generic[T]):
-    links: Links
+def resolve_limit_offset_links(_page: BasePage, /) -> Links:
+    offset, limit, total = _page.offset, _page.limit, _page.total
 
-    @validation_decorator
-    def __root_validator__(cls, value: Any) -> Any:
-        if isinstance(value, MutableMapping) and "links" not in value:
-            offset, limit, total = [value[k] for k in ("offset", "limit", "total")]
+    if offset is None:
+        offset = 0
+    if limit is None:
+        limit = cast(int, inf)
+    if total is None:
+        total = cast(int, inf)
 
-            # FIXME: it should not be so hard to calculate last page for limit-offset based pages
-            start_offset = offset % limit
-            last = start_offset + floor((total - start_offset) / limit) * limit
+    # FIXME: it should not be so hard to calculate last page for limit-offset based pages
+    start_offset = offset % limit
+    last = start_offset + floor((total - start_offset) / limit) * limit
 
-            if last == total:
-                last = total - limit
+    if last == total:
+        last = total - limit
 
-            value["links"] = create_links(
-                first={"offset": 0},
-                last={"offset": last},
-                next={"offset": offset + limit} if offset + limit < total else None,
-                prev={"offset": offset - limit} if offset - limit >= 0 else None,
-            )
+    return create_links(
+        first={"offset": 0},
+        last={"offset": last},
+        next={"offset": offset + limit} if offset + limit < total else None,
+        prev={"offset": offset - limit} if offset - limit >= 0 else None,
+    )
 
-        return value
+
+class LimitOffsetLinksCustomizer(BaseLinksCustomizer, ABC):
+    def resolve_links(self, _page: BasePage, /) -> Links:
+        return resolve_limit_offset_links(_page)
+
+
+class UseLimitOffsetLinks(LimitOffsetLinksCustomizer, BaseUseLinks):
+    pass
+
+
+class UseLimitOffsetHeaderLinks(LimitOffsetLinksCustomizer, BaseUseHeaderLinks):
+    pass
+
+
+LimitOffsetPage: TypeAlias = CustomizedPage[
+    BasePage[TAny],
+    UseLimitOffsetLinks(),
+]
