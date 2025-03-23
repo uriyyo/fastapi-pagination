@@ -5,7 +5,7 @@ from fastapi import Query
 
 from fastapi_pagination import Page, Params
 from fastapi_pagination.bases import AbstractPage, AbstractParams
-from fastapi_pagination.cursor import CursorPage
+from fastapi_pagination.cursor import CursorPage, encode_cursor
 from fastapi_pagination.customization import (
     ClsNamespace,
     CustomizedPage,
@@ -254,26 +254,40 @@ def test_additional_fields():
         assert CustomPage.__fields__["b"].default == "my-default"
 
 
-def test_cursor_encoding():
-    def encode_cursor(params, cursor):
-        return "encoded"
-
-    def decode_cursor(params, cursor):
-        return "decoded"
-
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {},
+        {"encoder": lambda *_: "encoded"},
+        {"decoder": lambda *_: "decoded"},
+        {"encoder": lambda *_: "encoded", "decoder": lambda *_: "decoded"},
+    ],
+    ids=[
+        "no_encoder_decoder",
+        "encoder",
+        "decoder",
+        "encoder_decoder",
+    ],
+)
+def test_cursor_encoding(kwargs):
     CustomPage = CustomizedPage[
         CursorPage,
-        UseCursorEncoding(
-            encoder=encode_cursor,
-            decoder=decode_cursor,
-        ),
+        UseCursorEncoding(**kwargs),
     ]
 
     page = CustomPage.create([], CustomPage.__params_type__(), current="current")
-    assert page.current_page == "encoded"
 
-    decoded = CustomPage.__params_type__().decode_cursor("cursor")
-    assert decoded == "decoded"
+    if "encoder" in kwargs:
+        assert page.current_page == "encoded"
+    else:
+        assert page.current_page == encode_cursor("current")
+
+    decoded = CustomPage.__params_type__().decode_cursor(encode_cursor("current"))
+
+    if "decoder" in kwargs:
+        assert decoded == "decoded"
+    else:
+        assert decoded == "current"
 
 
 @pytest.mark.parametrize("str_cursor", [True, False])
