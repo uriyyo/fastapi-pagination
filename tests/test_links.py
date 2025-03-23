@@ -6,19 +6,33 @@ from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
 from fastapi_pagination import add_pagination, paginate, pagination_ctx
-from fastapi_pagination.links import LimitOffsetPage, Page
+from fastapi_pagination.customization import CustomizedPage
+from fastapi_pagination.links import LimitOffsetPage, Page, UseHeaderLinks, UseLimitOffsetHeaderLinks
 
 app = FastAPI()
 client = TestClient(app)
 
+PageDefaultLinks = CustomizedPage[
+    Page,
+    UseHeaderLinks(),
+]
+
+PageLimitOffsetHeaderLinks = CustomizedPage[
+    LimitOffsetPage,
+    UseLimitOffsetHeaderLinks(),
+]
+
 
 @app.get("/default", response_model=Page[int])
 @app.get("/limit-offset", response_model=LimitOffsetPage[int])
+@app.get("/default-header-links", response_model=PageDefaultLinks[int])
+@app.get("/limit-offset-header-links", response_model=PageLimitOffsetHeaderLinks[int])
 async def route_1():
     return paginate([*range(200)])
 
 
 @app.get("/default-empty", response_model=Page[int])
+@app.get("/default-header-links-empty", response_model=PageDefaultLinks[int])
 async def route_2():
     return paginate([])
 
@@ -131,6 +145,95 @@ def test_links(self, prev, next, first, last):  # noqa: A002
         "first": first,
         "last": last,
     }
+
+
+@pytest.mark.parametrize(
+    ("self", "prev", "next", "first", "last"),
+    [
+        (
+            "/default-header-links",
+            None,
+            "/default-header-links?page=2",
+            "/default-header-links?page=1",
+            "/default-header-links?page=4",
+        ),
+        (
+            "/default-header-links?page=2",
+            "/default-header-links?page=1",
+            "/default-header-links?page=3",
+            "/default-header-links?page=1",
+            "/default-header-links?page=4",
+        ),
+        (
+            "/default-header-links?page=4",
+            "/default-header-links?page=3",
+            None,
+            "/default-header-links?page=1",
+            "/default-header-links?page=4",
+        ),
+        (
+            "/default-header-links-empty",
+            None,
+            None,
+            "/default-header-links-empty?page=1",
+            "/default-header-links-empty?page=1",
+        ),
+        (
+            "/limit-offset-header-links",
+            None,
+            "/limit-offset-header-links?offset=50",
+            "/limit-offset-header-links?offset=0",
+            "/limit-offset-header-links?offset=150",
+        ),
+        (
+            "/limit-offset-header-links?offset=100",
+            "/limit-offset-header-links?offset=50",
+            "/limit-offset-header-links?offset=150",
+            "/limit-offset-header-links?offset=0",
+            "/limit-offset-header-links?offset=150",
+        ),
+        (
+            "/limit-offset-header-links?offset=150",
+            "/limit-offset-header-links?offset=100",
+            None,
+            "/limit-offset-header-links?offset=0",
+            "/limit-offset-header-links?offset=150",
+        ),
+        (
+            "/limit-offset-header-links?limit=30&offset=50",
+            "/limit-offset-header-links?limit=30&offset=20",
+            "/limit-offset-header-links?limit=30&offset=80",
+            "/limit-offset-header-links?limit=30&offset=0",
+            "/limit-offset-header-links?limit=30&offset=170",
+        ),
+    ],
+    ids=[
+        "default-header-links-first",
+        "default-header-links-middle",
+        "default-header-links-last",
+        "default-header-links-empty",
+        "limit-offset-header-links-first",
+        "limit-offset-header-links-middle",
+        "limit-offset-header-links-last",
+        "limit-offset-header-links-custom-offset",
+    ],
+)
+def test_header_links(self, prev, next, first, last):  # noqa: A002
+    parts = []
+    if first:
+        parts.append(f'<{first}>; rel="first"')
+    if last:
+        parts.append(f'<{last}>; rel="last"')
+    if next:
+        parts.append(f'<{next}>; rel="next"')
+    if prev:
+        parts.append(f'<{prev}>; rel="prev"')
+
+    response = client.get(self)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers.get("link") is not None
+    assert response.headers.get("link") == ", ".join(parts)
 
 
 def test_revalidation_default():

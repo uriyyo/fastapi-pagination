@@ -2,10 +2,12 @@ from __future__ import annotations
 
 __all__ = [
     "LimitOffsetPage",
+    "UseLimitOffsetHeaderLinks",
     "UseLimitOffsetLinks",
     "resolve_limit_offset_links",
 ]
 
+from abc import ABC
 from math import floor, inf
 from typing import Any, cast
 
@@ -14,7 +16,7 @@ from typing_extensions import TypeAlias, TypeVar
 from fastapi_pagination.customization import CustomizedPage
 from fastapi_pagination.limit_offset import LimitOffsetPage as BasePage
 
-from .bases import BaseUseLinks, Links, create_links
+from .bases import BaseLinksCustomizer, BaseUseHeaderLinks, BaseUseLinks, Links, create_links
 
 TAny = TypeVar("TAny", default=Any)
 
@@ -44,9 +46,17 @@ def resolve_limit_offset_links(_page: BasePage, /) -> Links:
     )
 
 
-class UseLimitOffsetLinks(BaseUseLinks):
+class LimitOffsetLinksCustomizer(BaseLinksCustomizer, ABC):
     def resolve_links(self, _page: BasePage, /) -> Links:
         return resolve_limit_offset_links(_page)
+
+
+class UseLimitOffsetLinks(LimitOffsetLinksCustomizer, BaseUseLinks):
+    pass
+
+
+class UseLimitOffsetHeaderLinks(LimitOffsetLinksCustomizer, BaseUseHeaderLinks):
+    pass
 
 
 LimitOffsetPage: TypeAlias = CustomizedPage[
