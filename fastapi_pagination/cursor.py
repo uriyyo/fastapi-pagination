@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 __all__ = [
+    "CursorDecoder",
+    "CursorEncoder",
     "CursorPage",
     "CursorParams",
 ]
@@ -8,9 +10,9 @@ __all__ = [
 import binascii
 from base64 import b64decode, b64encode
 from collections.abc import Sequence
-from functools import partial
 from typing import (
     Any,
+    Callable,
     ClassVar,
     Generic,
     Optional,
@@ -20,13 +22,16 @@ from urllib.parse import quote, unquote
 
 from fastapi import HTTPException, Query, status
 from pydantic import BaseModel, Field
-from typing_extensions import Literal, TypeVar
+from typing_extensions import Literal, TypeAlias, TypeVar
 
 from .bases import AbstractParams, BasePage, CursorRawParams
 from .types import Cursor
 from .utils import create_pydantic_model
 
 TAny = TypeVar("TAny", default=Any)
+
+CursorEncoder: TypeAlias = "Callable[[CursorParams, Optional[Cursor]], Optional[str]]"
+CursorDecoder: TypeAlias = "Callable[[CursorParams, Optional[str]], Optional[Cursor]]"
 
 
 @overload
@@ -59,10 +64,19 @@ def decode_cursor(cursor: Optional[str], *, to_str: bool = True, quoted: bool = 
     return None
 
 
-def encode_cursor(cursor: Optional[Cursor], quoted: bool = True) -> Optional[str]:
+def default_encoder(cursor: bytes) -> str:
+    return b64encode(cursor).decode()
+
+
+def encode_cursor(
+    cursor: Optional[Cursor],
+    *,
+    quoted: bool = True,
+    encoder: Callable[[bytes], str] = default_encoder,
+) -> Optional[str]:
     if cursor:
         cursor = cursor.encode() if isinstance(cursor, str) else cursor
-        encoded = b64encode(cursor).decode()
+        encoded = encoder(cursor)
 
         if quoted:
             encoded = quote(encoded)
@@ -81,9 +95,15 @@ class CursorParams(BaseModel, AbstractParams):
 
     def to_raw_params(self) -> CursorRawParams:
         return CursorRawParams(
-            cursor=decode_cursor(self.cursor, to_str=self.str_cursor, quoted=self.quoted_cursor),
+            cursor=self.decode_cursor(self.cursor),
             size=self.size,
         )
+
+    def encode_cursor(self, cursor: Optional[Cursor]) -> Optional[str]:
+        return encode_cursor(cursor, quoted=self.quoted_cursor)
+
+    def decode_cursor(self, cursor: Optional[str]) -> Optional[Cursor]:
+        return decode_cursor(cursor, to_str=self.str_cursor, quoted=self.quoted_cursor)
 
 
 class CursorPage(BasePage[TAny], Generic[TAny]):
@@ -112,13 +132,12 @@ class CursorPage(BasePage[TAny], Generic[TAny]):
         if not isinstance(params, CursorParams):
             raise TypeError("CursorPage should be used with CursorParams")
 
-        encoder = partial(encode_cursor, quoted=params.quoted_cursor)
         return create_pydantic_model(
             cls,
             items=items,
-            current_page=encoder(current),
-            current_page_backwards=encoder(current_backwards),
-            next_page=encoder(next_),
-            previous_page=encoder(previous),
+            current_page=params.encode_cursor(current),
+            current_page_backwards=params.encode_cursor(current_backwards),
+            next_page=params.encode_cursor(next_),
+            previous_page=params.encode_cursor(previous),
             **kwargs,
         )
