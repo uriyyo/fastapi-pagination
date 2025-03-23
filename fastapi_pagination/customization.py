@@ -6,6 +6,7 @@ __all__ = [
     "PageCls",
     "PageCustomizer",
     "UseAdditionalFields",
+    "UseCursorEncoding",
     "UseExcludedFields",
     "UseFieldsAliases",
     "UseIncludeTotal",
@@ -16,6 +17,7 @@ __all__ = [
     "UseParams",
     "UseParamsFields",
     "UseQuotedCursor",
+    "UseStrCursor",
     "get_page_bases",
     "new_page_cls",
 ]
@@ -44,6 +46,8 @@ from pydantic import BaseModel, ConfigDict, create_model
 from typing_extensions import TypeAlias, Unpack
 
 from .bases import AbstractPage, AbstractParams, BaseRawParams
+from .cursor import CursorDecoder, CursorEncoder
+from .types import Cursor
 from .utils import IS_PYDANTIC_V2, get_caller
 
 ClsNamespace: TypeAlias = dict[str, Any]
@@ -182,6 +186,38 @@ class UseIncludeTotal(PageCustomizer):
 
 
 @dataclass
+class UseCursorEncoding(PageCustomizer):
+    encoder: Optional[CursorEncoder] = None
+    decoder: Optional[CursorDecoder] = None
+
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        if not (self.encoder or self.decoder):
+            return
+
+        if TYPE_CHECKING:
+            from .cursor import CursorParams
+        else:
+            CursorParams = ns["__params_type__"]
+
+        src = self
+
+        class CustomizedParams(CursorParams):
+            def encode_cursor(self, cursor: Optional[Cursor]) -> Optional[str]:
+                if src.encoder:
+                    return src.encoder(self, cursor)
+
+                return super().encode_cursor(cursor)
+
+            def decode_cursor(self, cursor: Optional[str]) -> Optional[Cursor]:
+                if src.decoder:
+                    return src.decoder(self, cursor)
+
+                return super().decode_cursor(cursor)
+
+        ns["__params_type__"] = CustomizedParams
+
+
+@dataclass
 class UseQuotedCursor(PageCustomizer):
     quoted_cursor: bool = True
 
@@ -193,6 +229,22 @@ class UseQuotedCursor(PageCustomizer):
 
         class CustomizedParams(CursorParams):
             quoted_cursor: ClassVar[bool] = self.quoted_cursor
+
+        ns["__params_type__"] = CustomizedParams
+
+
+@dataclass
+class UseStrCursor(PageCustomizer):
+    str_cursor: bool = True
+
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        if TYPE_CHECKING:
+            from .cursor import CursorParams
+        else:
+            CursorParams = ns["__params_type__"]
+
+        class CustomizedParams(CursorParams):
+            str_cursor: ClassVar[bool] = self.str_cursor
 
         ns["__params_type__"] = CustomizedParams
 

@@ -5,11 +5,13 @@ from fastapi import Query
 
 from fastapi_pagination import Page, Params
 from fastapi_pagination.bases import AbstractPage, AbstractParams
+from fastapi_pagination.cursor import CursorPage
 from fastapi_pagination.customization import (
     ClsNamespace,
     CustomizedPage,
     PageCustomizer,
     UseAdditionalFields,
+    UseCursorEncoding,
     UseExcludedFields,
     UseFieldsAliases,
     UseIncludeTotal,
@@ -20,6 +22,7 @@ from fastapi_pagination.customization import (
     UseParams,
     UseParamsFields,
     UseQuotedCursor,
+    UseStrCursor,
 )
 from fastapi_pagination.utils import IS_PYDANTIC_V2
 
@@ -249,3 +252,35 @@ def test_additional_fields():
 
         assert CustomPage.__fields__["b"].type_ is str
         assert CustomPage.__fields__["b"].default == "my-default"
+
+
+def test_cursor_encoding():
+    def encode_cursor(params, cursor):
+        return "encoded"
+
+    def decode_cursor(params, cursor):
+        return "decoded"
+
+    CustomPage = CustomizedPage[
+        CursorPage,
+        UseCursorEncoding(
+            encoder=encode_cursor,
+            decoder=decode_cursor,
+        ),
+    ]
+
+    page = CustomPage.create([], CustomPage.__params_type__(), current="current")
+    assert page.current_page == "encoded"
+
+    decoded = CustomPage.__params_type__().decode_cursor("cursor")
+    assert decoded == "decoded"
+
+
+@pytest.mark.parametrize("str_cursor", [True, False])
+def test_str_cursor(str_cursor):
+    CustomPage = CustomizedPage[
+        CursorPage,
+        UseStrCursor(str_cursor),
+    ]
+
+    assert CustomPage.__params_type__.str_cursor == str_cursor
