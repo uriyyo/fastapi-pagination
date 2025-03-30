@@ -4,7 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import Field
 from pytest_asyncio import fixture as async_fixture
 
-from fastapi_pagination.ext.beanie import paginate
+from fastapi_pagination.ext.beanie import apaginate
 from tests.base import BasePaginationTestSuite
 
 from .utils import mongodb_test
@@ -57,10 +57,10 @@ class TestBeanie(BasePaginationTestSuite):
 
         @builder.cursor.default.with_kwargs(response_model_by_alias=False)
         async def cursor_route():
-            return await paginate(query)
+            return await apaginate(query)
 
         @builder.both.default.with_kwargs(response_model_by_alias=False)
         async def route():
-            return await paginate(query)
+            return await apaginate(query)
 
         return builder.build()

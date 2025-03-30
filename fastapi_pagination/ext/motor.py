@@ -1,4 +1,6 @@
 __all__ = [
+    "apaginate",
+    "apaginate_aggregate",
     "paginate",
     "paginate_aggregate",
 ]
@@ -6,7 +8,7 @@ __all__ = [
 from typing import TYPE_CHECKING, Any, Optional
 
 from motor.core import AgnosticCollection
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, deprecated
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
@@ -19,7 +21,8 @@ else:
     _AgnosticCollection = AgnosticCollection
 
 
-async def paginate(
+# TODO: refactor this function using flows
+async def apaginate(
     collection: _AgnosticCollection,
     query_filter: Optional[dict[Any, Any]] = None,
     params: Optional[AbstractParams] = None,
@@ -48,7 +51,7 @@ async def paginate(
     )
 
 
-async def paginate_aggregate(
+async def apaginate_aggregate(
     collection: _AgnosticCollection,
     aggregate_pipeline: Optional[list[dict[Any, Any]]] = None,
     params: Optional[AbstractParams] = None,
@@ -92,4 +95,44 @@ async def paginate_aggregate(
         total=total,
         params=params,
         **(additional_data or {}),
+    )
+
+
+@deprecated("Use `apaginate` instead. This function will be removed in v0.14.0")
+async def paginate(
+    collection: _AgnosticCollection,
+    query_filter: Optional[dict[Any, Any]] = None,
+    params: Optional[AbstractParams] = None,
+    sort: Optional[Any] = None,
+    *,
+    transformer: Optional[AsyncItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    **kwargs: Any,
+) -> Any:
+    return await apaginate(
+        collection=collection,
+        query_filter=query_filter,
+        params=params,
+        sort=sort,
+        transformer=transformer,
+        additional_data=additional_data,
+        **kwargs,
+    )
+
+
+@deprecated("Use `apaginate_aggregate` instead. This function will be removed in v0.14.0")
+async def paginate_aggregate(
+    collection: _AgnosticCollection,
+    aggregate_pipeline: Optional[list[dict[Any, Any]]] = None,
+    params: Optional[AbstractParams] = None,
+    *,
+    transformer: Optional[AsyncItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+) -> Any:
+    return await apaginate_aggregate(
+        collection=collection,
+        aggregate_pipeline=aggregate_pipeline,
+        params=params,
+        transformer=transformer,
+        additional_data=additional_data,
     )

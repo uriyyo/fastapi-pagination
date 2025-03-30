@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import Field, Relationship, Session, SQLModel, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from fastapi_pagination.ext.sqlmodel import paginate
+from fastapi_pagination.ext.sqlmodel import apaginate, paginate
 from tests.base import BasePaginationTestSuite, async_sync_testsuite
 from tests.utils import create_ctx, maybe_async
 
@@ -47,8 +47,17 @@ def sm_order():
     return Order
 
 
+class _SQLModelPaginateFunc:
+    @pytest.fixture(scope="session")
+    def paginate_func(self, is_async_db):
+        if is_async_db:
+            return apaginate
+
+        return paginate
+
+
 @async_sync_testsuite
-class TestSQLModelDefault(BasePaginationTestSuite):
+class TestSQLModelDefault(_SQLModelPaginateFunc, BasePaginationTestSuite):
     @pytest.fixture(
         scope="session",
         params=[True, False],
@@ -61,22 +70,24 @@ class TestSQLModelDefault(BasePaginationTestSuite):
         return select(sm_user)
 
     @pytest.fixture(scope="session")
-    def app(self, builder, query, sm_session_ctx):
+    def app(self, builder, query, sm_session_ctx, paginate_func):
         builder = builder.new()
 
         @builder.both.default
         async def route(db: Any = Depends(sm_session_ctx)):
-            return await maybe_async(paginate(db, query))
+            return await maybe_async(paginate_func(db, query))
 
         return builder.build()
 
 
 @async_sync_testsuite
-class TestSQLModelRelationship(BasePaginationTestSuite):
+class TestSQLModelRelationship(_SQLModelPaginateFunc, BasePaginationTestSuite):
     @pytest.fixture(scope="session")
-    def app(self, builder, sm_session_ctx, sm_user):
+    def app(self, builder, sm_session_ctx, sm_user, paginate_func):
+        builder = builder.new()
+
         @builder.both.relationship
         async def route(db: Any = Depends(sm_session_ctx)):
-            return await maybe_async(paginate(db, select(sm_user).options(selectinload(sm_user.orders))))
+            return await maybe_async(paginate_func(db, select(sm_user).options(selectinload(sm_user.orders))))
 
         return builder.build()

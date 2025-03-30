@@ -1,16 +1,17 @@
-__all__ = ["paginate"]
+__all__ = ["apaginate", "paginate"]
 
+import warnings
 from functools import partial
 from typing import Any, Optional, Union, overload
 
 from odmantic import AIOEngine, Model, SyncEngine
 from odmantic.engine import AIOSessionType, SyncSessionType
 from odmantic.query import QueryExpression
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, deprecated
 
 from fastapi_pagination.bases import AbstractParams, RawParams
 from fastapi_pagination.config import Config
-from fastapi_pagination.flow import flow, flow_expr, run_async_flow, run_sync_flow
+from fastapi_pagination.flow import AnyFlow, flow, flow_expr, run_async_flow, run_sync_flow
 from fastapi_pagination.flows import LimitOffsetFlow, generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 
@@ -38,7 +39,49 @@ def _limit_offset_flow(
     return [*result]
 
 
+@flow
+def _paginate_flow(
+    is_async: bool,
+    engine: Union[SyncEngine, AIOEngine],
+    model: type[Model],
+    *queries: _Query,
+    # odmantic related
+    sort: Optional[Any] = None,
+    session: Optional[Union[SyncSessionType, AIOSessionType]] = None,
+    # fastapi-pagination related
+    params: Optional[AbstractParams] = None,
+    transformer: Optional[ItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
+) -> AnyFlow:
+    page = yield from generic_flow(
+        total_flow=flow_expr(
+            lambda: engine.count(
+                model,
+                *queries,
+                session=session,  # type: ignore[arg-type]
+            ),
+        ),
+        limit_offset_flow=partial(
+            _limit_offset_flow,
+            model,
+            queries,
+            sort,
+            engine,
+            session,
+        ),
+        params=params,
+        transformer=transformer,
+        additional_data=additional_data,
+        config=config,
+        async_=is_async,
+    )
+
+    return page
+
+
 @overload
+@deprecated("Use `apaginate` instead. This function will be removed in v0.14.0")
 async def paginate(
     engine: AIOEngine,
     model: type[Model],
@@ -50,6 +93,7 @@ async def paginate(
     params: Optional[AbstractParams] = None,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
     pass
 
@@ -66,6 +110,7 @@ def paginate(
     params: Optional[AbstractParams] = None,
     transformer: Optional[SyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
 ) -> Any:
     pass
 
@@ -83,30 +128,63 @@ def paginate(
     additional_data: Optional[AdditionalData] = None,
     config: Optional[Config] = None,
 ) -> Any:
-    is_async = isinstance(engine, AIOEngine)
-    run_flow = run_async_flow if is_async else run_sync_flow
+    if isinstance(engine, AIOEngine):
+        warnings.warn(
+            "Use `apaginate` instead. This function overload will be removed in v0.14.0",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return apaginate(
+            engine,
+            model,
+            *queries,
+            sort=sort,
+            session=session,  # type: ignore[arg-type]
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+        )
 
-    return run_flow(
-        generic_flow(
-            total_flow=flow_expr(
-                lambda: engine.count(
-                    model,
-                    *queries,
-                    session=session,  # type: ignore[arg-type]
-                ),
-            ),
-            limit_offset_flow=partial(
-                _limit_offset_flow,
-                model,
-                queries,
-                sort,
-                engine,
-                session,
-            ),
+    return run_sync_flow(
+        _paginate_flow(
+            False,
+            engine,
+            model,
+            *queries,
+            sort=sort,
+            session=session,
             params=params,
             transformer=transformer,
             additional_data=additional_data,
             config=config,
-            async_=is_async,
+        )
+    )
+
+
+async def apaginate(
+    engine: AIOEngine,
+    model: type[Model],
+    *queries: _Query,
+    # odmantic related
+    sort: Optional[Any] = None,
+    session: Optional[SyncSessionType] = None,
+    # fastapi-pagination related
+    params: Optional[AbstractParams] = None,
+    transformer: Optional[AsyncItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
+) -> Any:
+    return await run_async_flow(
+        _paginate_flow(
+            True,
+            engine,
+            model,
+            *queries,
+            sort=sort,
+            session=session,
+            params=params,
+            transformer=transformer,
+            additional_data=additional_data,
+            config=config,
         )
     )

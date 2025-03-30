@@ -2,7 +2,7 @@ import pytest
 from gino_starlette import Gino
 from sqlalchemy import Column, Integer, String
 
-from fastapi_pagination.ext.gino import paginate
+from fastapi_pagination.ext.gino import apaginate
 from tests.base import BasePaginationTestSuite
 
 
@@ -47,7 +47,7 @@ class TestGino(BasePaginationTestSuite):
 
         @builder.both.default
         async def route():
-            return await paginate(query)
+            return await apaginate(query)
 
         app = builder.build()
         db.init_app(app)

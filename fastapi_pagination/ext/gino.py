@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-__all__ = ["paginate"]
+__all__ = ["apaginate", "paginate"]
 
 from typing import Any, Optional, Union
 
 from gino.crud import CRUDModel
 from sqlalchemy import func, literal_column
 from sqlalchemy.sql import Select
+from typing_extensions import deprecated
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
@@ -17,7 +18,7 @@ from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 from .sqlalchemy import create_paginate_query
 
 
-async def paginate(
+async def apaginate(
     query: Union[Select[tuple[Any, ...]], CRUDModel],
     params: Optional[AbstractParams] = None,
     *,
@@ -47,4 +48,22 @@ async def paginate(
             config=config,
             async_=True,
         )
+    )
+
+
+@deprecated("Use `apaginate` instead. This function will be removed in v0.14.0")
+async def paginate(
+    query: Union[Select[tuple[Any, ...]], CRUDModel],
+    params: Optional[AbstractParams] = None,
+    *,
+    transformer: Optional[AsyncItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
+) -> Any:
+    return await apaginate(
+        query,
+        params=params,
+        transformer=transformer,
+        additional_data=additional_data,
+        config=config,
     )

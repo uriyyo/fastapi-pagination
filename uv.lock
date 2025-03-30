@@ -1,5 +1,4 @@
 version = 1
-revision = 1
 requires-python = ">=3.9, <4.0"
 resolution-markers = [
     "(python_full_version < '3.10' and platform_machine == 'AMD64' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'WIN32' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'aarch64' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'amd64' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'ppc64le' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'win32' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'x86_64' and sys_platform == 'win32')",
@@ -345,7 +344,7 @@ name = "click"
 version = "8.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "platform_system == 'Windows'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a", size = 226593 }
 wheels = [
@@ -700,7 +699,7 @@ requires-dist = [
     { name = "django", marker = "extra == 'django'", specifier = "<6.0.0" },
     { name = "elasticsearch-dsl", marker = "extra == 'all'", specifier = ">=8.13.0,<9" },
     { name = "elasticsearch-dsl", marker = "extra == 'elasticsearch'", specifier = ">=8.13.0,<9" },
-    { name = "fastapi", specifier = "==0.115.12" },
+    { name = "fastapi", specifier = ">=0.93.0" },
     { name = "google-cloud-firestore", marker = "extra == 'all'", specifier = ">=2.19.0,<3" },
     { name = "google-cloud-firestore", marker = "extra == 'firestore'", specifier = ">=2.19.0,<3" },
     { name = "mongoengine", marker = "extra == 'all'", specifier = ">=0.23.1,<0.30.0" },
@@ -714,7 +713,7 @@ requires-dist = [
     { name = "piccolo", marker = "extra == 'all'", specifier = ">=0.89,<1.25" },
     { name = "piccolo", marker = "extra == 'piccolo'", specifier = ">=0.89,<1.25" },
     { name = "pony", marker = "extra == 'all'", specifier = ">=0.7.16,<0.8" },
-    { name = "pydantic", specifier = "==2.10.6" },
+    { name = "pydantic", specifier = ">=1.9.1" },
     { name = "scylla-driver", marker = "extra == 'all'", specifier = ">=3.25.6,<4" },
     { name = "scylla-driver", marker = "extra == 'scylla-driver'", specifier = ">=3.25.6,<4" },
     { name = "sqlakeyset", marker = "extra == 'all'", specifier = ">=2.0.1680321678,<3" },
@@ -727,9 +726,8 @@ requires-dist = [
     { name = "sqlmodel", marker = "extra == 'sqlmodel'", specifier = ">=0.0.22" },
     { name = "tortoise-orm", marker = "extra == 'all'", specifier = ">=0.22.0" },
     { name = "tortoise-orm", marker = "extra == 'tortoise'", specifier = ">=0.22.0" },
-    { name = "typing-extensions", specifier = "==4.12.2" },
+    { name = "typing-extensions", specifier = ">=4.8.0,<5" },
 ]
-provides-extras = ["all", "asyncpg", "beanie", "bunnet", "databases", "django", "elasticsearch", "firestore", "mongoengine", "motor", "odmantic", "orm", "ormar", "piccolo", "scylla-driver", "sqlalchemy", "sqlmodel", "tortoise"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1227,7 +1225,7 @@ version = "1.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "platform_system == 'Windows'" },
     { name = "ghp-import" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10'" },
     { name = "jinja2" },

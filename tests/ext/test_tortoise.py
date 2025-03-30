@@ -12,7 +12,7 @@ from tortoise.fields import (
 )
 from tortoise.query_utils import Prefetch
 
-from fastapi_pagination.ext.tortoise import paginate
+from fastapi_pagination.ext.tortoise import apaginate
 from tests.base import BasePaginationTestSuite
 
 
@@ -89,7 +89,7 @@ class TestTortoiseDefault(BasePaginationTestSuite):
 
         @builder.both.default
         async def route():
-            return await paginate(query(), prefetch_related=False)
+            return await apaginate(query(), prefetch_related=False)
 
         return builder.build()
 
@@ -102,7 +102,7 @@ class TestTortoiseRelationship(BasePaginationTestSuite):
 
         @builder.both.relationship
         async def route():
-            return await paginate(query(), **pagination_params())
+            return await apaginate(query(), **pagination_params())
 
         return builder.build()
 

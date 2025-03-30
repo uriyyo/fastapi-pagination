@@ -1,7 +1,7 @@
 import pytest
 from asyncpg import create_pool
 
-from fastapi_pagination.ext.asyncpg import paginate
+from fastapi_pagination.ext.asyncpg import apaginate
 from tests.base import BasePaginationTestSuite
 
 
@@ -31,6 +31,6 @@ class TestAsyncpg(BasePaginationTestSuite):
         @builder.both.default
         async def route():
             async with pool.acquire() as conn:
-                return await paginate(conn, "SELECT id, name FROM users")
+                return await apaginate(conn, "SELECT id, name FROM users")
 
         return builder.build()

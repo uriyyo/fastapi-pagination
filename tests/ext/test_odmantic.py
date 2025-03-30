@@ -3,7 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from odmantic import AIOEngine, Model, SyncEngine
 from pymongo import MongoClient
 
-from fastapi_pagination.ext.odmantic import paginate
+from fastapi_pagination.ext.odmantic import apaginate, paginate
 from tests.base import BasePaginationTestSuite
 
 from .utils import mongodb_test
@@ -38,7 +38,7 @@ class TestOdmanticAsync(BasePaginationTestSuite):
     def app(self, builder, db_engine, db_model):
         @builder.both.default
         async def route():
-            return await paginate(db_engine, db_model)
+            return await apaginate(db_engine, db_model)
 
         return builder.build()
 

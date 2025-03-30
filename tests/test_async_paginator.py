@@ -1,6 +1,6 @@
 import pytest
 
-from fastapi_pagination.async_paginator import paginate
+from fastapi_pagination.async_paginator import apaginate
 
 from .base import BasePaginationTestSuite, SuiteBuilder
 
@@ -26,6 +26,6 @@ class TestAsyncPaginationParams(BasePaginationTestSuite):
     def app(self, builder, entities, len_function):
         @builder.both.default.optional
         async def route():
-            return await paginate(entities, length_function=len_function)
+            return await apaginate(entities, length_function=len_function)
 
         return builder.build()

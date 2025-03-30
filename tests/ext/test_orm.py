@@ -2,7 +2,7 @@ import pytest
 from databases import Database, __version__
 from orm import Integer, Model, ModelRegistry, String
 
-from fastapi_pagination.ext.orm import paginate
+from fastapi_pagination.ext.orm import apaginate
 from tests.base import BasePaginationTestSuite
 
 if tuple(map(int, __version__.split("."))) >= (0, 9, 0):  # noqa: RUF048
@@ -37,6 +37,6 @@ class TestORM(BasePaginationTestSuite):
 
         @builder.both.default
         async def route():
-            return await paginate(user.objects)
+            return await apaginate(user.objects)
 
         return builder.build()

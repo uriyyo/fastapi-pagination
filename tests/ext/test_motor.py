@@ -1,7 +1,7 @@
 import pytest
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from fastapi_pagination.ext.motor import paginate
+from fastapi_pagination.ext.motor import apaginate
 from tests.base import BasePaginationTestSuite
 
 from .utils import mongodb_test
@@ -25,6 +25,6 @@ class TestMotor(BasePaginationTestSuite):
     def app(self, builder, db_client):
         @builder.both.default
         async def route():
-            return await paginate(db_client.test.users, sort=[("name", 1)])
+            return await apaginate(db_client.test.users, sort=[("name", 1)])
 
         return builder.build()

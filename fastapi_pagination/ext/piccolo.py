@@ -1,4 +1,4 @@
-__all__ = ["paginate"]
+__all__ = ["apaginate", "paginate"]
 
 from contextlib import suppress
 from copy import copy
@@ -8,6 +8,7 @@ from typing import Any, Optional, TypeVar, Union, cast
 from piccolo.query import Select
 from piccolo.query.methods.select import Count
 from piccolo.table import Table
+from typing_extensions import deprecated
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
@@ -48,7 +49,7 @@ def _total_flow(query: Select[TTable_co]) -> TotalFlow:
     return None
 
 
-async def paginate(
+async def apaginate(
     query: Union[Select[TTable_co], type[TTable_co]],
     params: Optional[AbstractParams] = None,
     *,
@@ -69,4 +70,22 @@ async def paginate(
             additional_data=additional_data,
             config=config,
         )
+    )
+
+
+@deprecated("Use `apaginate` instead. This function will be removed in v0.14.0")
+async def paginate(
+    query: Union[Select[TTable_co], type[TTable_co]],
+    params: Optional[AbstractParams] = None,
+    *,
+    transformer: Optional[SyncItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
+) -> Any:
+    return await apaginate(
+        query,
+        params=params,
+        transformer=transformer,
+        additional_data=additional_data,
+        config=config,
     )

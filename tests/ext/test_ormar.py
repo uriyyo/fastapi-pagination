@@ -4,7 +4,7 @@ import sqlalchemy
 from ormar import Integer, Model, OrmarConfig, String
 from sqlalchemy.engine.create import create_engine
 
-from fastapi_pagination.ext.ormar import paginate
+from fastapi_pagination.ext.ormar import apaginate
 from tests.base import BasePaginationTestSuite
 
 
@@ -58,6 +58,6 @@ class TestOrmar(BasePaginationTestSuite):
 
         @builder.both.default
         async def route():
-            return await paginate(query)
+            return await apaginate(query)
 
         return builder.build()
