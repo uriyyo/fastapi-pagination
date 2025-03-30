@@ -1,7 +1,7 @@
 import pytest
 from databases import Database
 
-from fastapi_pagination.ext.databases import paginate
+from fastapi_pagination.ext.databases import apaginate
 from tests.base import BasePaginationTestSuite
 
 from .utils import sqlalchemy20
@@ -20,6 +20,6 @@ class TestDatabases(BasePaginationTestSuite):
 
         @builder.both.default
         async def route():
-            return await paginate(db, sa_user.__table__.select())
+            return await apaginate(db, sa_user.__table__.select())
 
         return builder.build()

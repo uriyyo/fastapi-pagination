@@ -1,7 +1,9 @@
 from collections.abc import Awaitable, Sequence
 from typing import Any, Callable, Optional, TypeVar, Union
 
-__all__ = ["paginate"]
+from typing_extensions import deprecated
+
+__all__ = ["apaginate", "paginate"]
 
 from .bases import AbstractParams
 from .config import Config
@@ -14,7 +16,7 @@ T = TypeVar("T")
 
 
 # same as default paginator, but allow to use async transformer
-async def paginate(
+async def apaginate(
     sequence: Sequence[T],
     params: Optional[AbstractParams] = None,
     length_function: Optional[Callable[[Sequence[T]], Union[int, Awaitable[int]]]] = None,
@@ -39,4 +41,26 @@ async def paginate(
             config=config,
             async_=True,
         )
+    )
+
+
+@deprecated("Use `apaginate` instead. This function will be removed in v0.14.0")
+async def paginate(
+    sequence: Sequence[T],
+    params: Optional[AbstractParams] = None,
+    length_function: Optional[Callable[[Sequence[T]], Union[int, Awaitable[int]]]] = None,
+    *,
+    safe: bool = False,
+    transformer: Optional[ItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    config: Optional[Config] = None,
+) -> Any:
+    return await apaginate(
+        sequence,
+        params=params,
+        length_function=length_function,
+        safe=safe,
+        transformer=transformer,
+        additional_data=additional_data,
+        config=config,
     )

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__all__ = ["paginate"]
+__all__ = ["apaginate", "paginate"]
 
 from copy import copy
 from typing import Any, Optional, TypeVar, Union
@@ -12,6 +12,7 @@ from beanie.odm.queries.aggregation import AggregationQuery
 from beanie.odm.queries.find import FindMany
 from bson.errors import InvalidId
 from motor.motor_asyncio import AsyncIOMotorClientSession
+from typing_extensions import deprecated
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams, is_cursor, is_limit_offset
@@ -28,7 +29,8 @@ def parse_cursor(cursor: str) -> PydanticObjectId:
         raise ValueError("Invalid cursor") from exc
 
 
-async def paginate(  # noqa: C901, PLR0912, PLR0915
+# TODO: simplify this function using flows
+async def apaginate(  # noqa: C901, PLR0912, PLR0915
     query: Union[TDocument, FindMany[TDocument], AggregationQuery[TDocument]],
     params: Optional[AbstractParams] = None,
     *,
@@ -160,4 +162,34 @@ async def paginate(  # noqa: C901, PLR0912, PLR0915
         total=total,
         params=params,
         **(additional_data or {}),
+    )
+
+
+@deprecated("Use `apaginate` instead. This function will be removed in v0.14.0")
+async def paginate(
+    query: Union[TDocument, FindMany[TDocument], AggregationQuery[TDocument]],
+    params: Optional[AbstractParams] = None,
+    *,
+    transformer: Optional[AsyncItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    projection_model: Optional[type[DocumentProjectionType]] = None,
+    sort: Union[None, str, list[tuple[str, SortDirection]]] = None,
+    session: Optional[AsyncIOMotorClientSession] = None,
+    ignore_cache: bool = False,
+    fetch_links: bool = False,
+    lazy_parse: bool = False,
+    **pymongo_kwargs: Any,
+) -> Any:
+    return await apaginate(
+        query,
+        params=params,
+        transformer=transformer,
+        additional_data=additional_data,
+        projection_model=projection_model,
+        sort=sort,
+        session=session,
+        ignore_cache=ignore_cache,
+        fetch_links=fetch_links,
+        lazy_parse=lazy_parse,
+        **pymongo_kwargs,
     )

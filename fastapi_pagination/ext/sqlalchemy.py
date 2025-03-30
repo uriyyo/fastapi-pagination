@@ -2,6 +2,7 @@ from __future__ import annotations
 
 __all__ = [
     "Selectable",
+    "apaginate",
     "create_count_query",
     "create_count_query_from_text",
     "create_paginate_query",
@@ -84,6 +85,27 @@ UnwrapMode: TypeAlias = Literal[
 TupleAny: TypeAlias = "tuple[Any, ...]"
 Selectable: TypeAlias = "Union[Select[TupleAny], TextClause, FromStatement[TupleAny], CompoundSelect[TupleAny]]"
 SelectableOrQuery: TypeAlias = "Union[Selectable, Query[Any]]"
+
+
+@overload
+def _prepare_query(query: Select[TupleAny]) -> Select[TupleAny]:
+    pass
+
+
+@overload
+def _prepare_query(query: Optional[Select[TupleAny]]) -> Optional[Select[TupleAny]]:
+    pass
+
+
+def _prepare_query(query: Optional[Select[TupleAny]]) -> Optional[Select[TupleAny]]:
+    if query is None:
+        return None
+
+    with suppress(AttributeError):
+        query = query._statement_20()  # type: ignore[attr-defined]
+
+    return query
+
 
 _selectable_classes = (Select, TextClause, FromStatement, CompoundSelect)
 
@@ -257,6 +279,7 @@ def _cursor_flow(query: Selectable, conn: AnyConn, is_async: bool, raw_params: C
 
     _call = paging.select_page
     if is_async:
+        conn = _get_sync_conn_from_async(conn)
         _call = partial(greenlet_spawn, _call)  # type: ignore[assignment]
 
     page = yield _call(
@@ -275,6 +298,36 @@ def _cursor_flow(query: Selectable, conn: AnyConn, is_async: bool, raw_params: C
     }
 
     return items, data
+
+
+@flow
+def _sqlalchemy_flow(
+    is_async: bool,
+    conn: Union[SyncConn, AsyncConn],
+    query: Select[TupleAny],
+    params: Optional[AbstractParams] = None,
+    *,
+    subquery_count: bool = True,
+    unwrap_mode: Optional[UnwrapMode] = None,
+    count_query: Optional[Selectable] = None,
+    transformer: Optional[ItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    unique: bool = True,
+    config: Optional[Config] = None,
+) -> Any:
+    page = yield from generic_flow(
+        async_=is_async,
+        total_flow=partial(_total_flow, query, conn, count_query, subquery_count),
+        limit_offset_flow=partial(_limit_offset_flow, query, conn),
+        cursor_flow=partial(_cursor_flow, query, conn, is_async),
+        params=params,
+        inner_transformer=partial(_inner_transformer, query=query, unwrap_mode=unwrap_mode, unique=unique),
+        transformer=transformer,
+        additional_data=additional_data,
+        config=config,
+    )
+
+    return page
 
 
 def _inner_transformer(
@@ -366,24 +419,41 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
         )
 
     try:
-        res_conn = _get_sync_conn_from_async(conn)
-        run_flow = run_async_flow
-        is_async = True
+        _get_sync_conn_from_async(conn)
     except TypeError:
-        res_conn = conn
-        run_flow = run_sync_flow  # type: ignore[assignment]
-        is_async = False
+        pass
+    else:
+        warnings.warn(
+            "Use `apaginate` instead. This function overload will be removed in v0.14.0",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
-    return run_flow(
-        generic_flow(
-            async_=is_async,
-            total_flow=partial(_total_flow, query, conn, count_query, subquery_count),
-            limit_offset_flow=partial(_limit_offset_flow, query, conn),
-            cursor_flow=partial(_cursor_flow, query, res_conn, is_async),
+        return apaginate(
+            conn=conn,  # type: ignore[arg-type]
+            query=query,
             params=params,
-            inner_transformer=partial(_inner_transformer, query=query, unwrap_mode=unwrap_mode, unique=unique),
+            count_query=count_query,
+            subquery_count=subquery_count,
+            unwrap_mode=unwrap_mode,
             transformer=transformer,
             additional_data=additional_data,
+            unique=unique,
+            config=config,
+        )
+
+    return run_sync_flow(
+        _sqlalchemy_flow(
+            is_async=False,
+            conn=conn,
+            query=query,
+            params=params,
+            subquery_count=subquery_count,
+            unwrap_mode=unwrap_mode,
+            count_query=count_query,
+            transformer=transformer,
+            additional_data=additional_data,
+            unique=unique,
             config=config,
         ),
     )
@@ -422,9 +492,7 @@ def _old_paginate_sign(
     )
 
     session = query.session
-
-    with suppress(AttributeError):
-        query = query._statement_20()  # type: ignore[assignment]
+    query = _prepare_query(query)  # type: ignore[call-overload]
 
     return query, None, session, params, transformer, additional_data, unique, subquery_count, unwrap_mode, config  # type: ignore[return-value]
 
@@ -453,7 +521,40 @@ def _new_paginate_sign(
     Optional[UnwrapMode],
     Optional[Config],
 ]:
-    with suppress(AttributeError):
-        query = query._statement_20()  # type: ignore[attr-defined]
+    query = _prepare_query(query)
+    count_query = _prepare_query(count_query)  # type: ignore[arg-type]
 
     return query, count_query, conn, params, transformer, additional_data, unique, subquery_count, unwrap_mode, config
+
+
+async def apaginate(
+    conn: AsyncConn,
+    query: Selectable,
+    params: Optional[AbstractParams] = None,
+    *,
+    count_query: Optional[Selectable] = None,
+    subquery_count: bool = True,
+    unwrap_mode: Optional[UnwrapMode] = None,
+    transformer: Optional[AsyncItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    unique: bool = True,
+    config: Optional[Config] = None,
+) -> Any:
+    query = _prepare_query(query)  # type: ignore[arg-type]
+    count_query = _prepare_query(count_query)  # type: ignore[arg-type]
+
+    return await run_async_flow(
+        _sqlalchemy_flow(
+            is_async=True,
+            conn=conn,
+            query=query,
+            params=params,
+            subquery_count=subquery_count,
+            unwrap_mode=unwrap_mode,
+            count_query=count_query,
+            transformer=transformer,
+            additional_data=additional_data,
+            unique=unique,
+            config=config,
+        ),
+    )

@@ -9,15 +9,24 @@ from sqlalchemy.orm import selectinload
 from fastapi_pagination import Page, Params, set_page, set_params
 from fastapi_pagination.cursor import CursorPage
 from fastapi_pagination.customization import CustomizedPage, UseQuotedCursor
-from fastapi_pagination.ext.sqlalchemy import paginate
+from fastapi_pagination.ext.sqlalchemy import apaginate, paginate
 from tests.base import BasePaginationTestSuite, SuiteBuilder, async_sync_testsuite, sync_testsuite
 from tests.ext.utils import is_sqlalchemy20
 from tests.schemas import UserOut, UserWithoutIDOut
 from tests.utils import maybe_async
 
 
+class _SQLAlchemyPaginateFuncMixin:
+    @pytest.fixture(scope="session")
+    def paginate_func(self, is_async_db):
+        if is_async_db:
+            return apaginate
+
+        return paginate
+
+
 @async_sync_testsuite
-class TestSQLAlchemyBaseSuite(BasePaginationTestSuite):
+class TestSQLAlchemyBaseSuite(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite):
     @pytest.fixture(
         scope="session",
         params=[True, False],
@@ -30,26 +39,26 @@ class TestSQLAlchemyBaseSuite(BasePaginationTestSuite):
         return request.param
 
     @pytest.fixture(scope="session")
-    def app(self, sa_session, sa_user, sa_session_ctx, builder, use_subquery_count):
+    def app(self, sa_session, sa_user, sa_session_ctx, paginate_func, builder, use_subquery_count):
         builder = builder.new()
         kwargs = {"subquery_count": use_subquery_count}
 
         @builder.both.default
         async def route_default(db: Any = Depends(sa_session_ctx)):
             return await maybe_async(
-                paginate(db, select(sa_user), **kwargs),
+                paginate_func(db, select(sa_user), **kwargs),
             )
 
         @builder.both.non_scalar
         async def route_non_scalar(db: Any = Depends(sa_session_ctx)):
             return await maybe_async(
-                paginate(db, select(sa_user.id, sa_user.name), **kwargs),
+                paginate_func(db, select(sa_user.id, sa_user.name), **kwargs),
             )
 
         @builder.both.relationship
         async def route_relationship(db: Any = Depends(sa_session_ctx)):
             return await maybe_async(
-                paginate(db, select(sa_user).options(selectinload(sa_user.orders)), **kwargs),
+                paginate_func(db, select(sa_user).options(selectinload(sa_user.orders)), **kwargs),
             )
 
         return builder.build()
@@ -167,20 +176,20 @@ class TestSQLAlchemyUnwrap:
 
 
 @sync_testsuite
-class TestSQLAlchemyOldStyle(BasePaginationTestSuite):
+class TestSQLAlchemyOldStyle(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite):
     @pytest.fixture(scope="session")
-    def app(self, sa_session, sa_user, sa_session_ctx, builder):
+    def app(self, sa_session, sa_user, sa_session_ctx, paginate_func, builder):
         builder = builder.new()
 
         @builder.both.default
         async def route(db: Any = Depends(sa_session_ctx)):
-            return await maybe_async(paginate(db.query(sa_user)))
+            return await maybe_async(paginate_func(db.query(sa_user)))
 
         return builder.build()
 
 
 @async_sync_testsuite
-class TestSQLAlchemyCursor(BasePaginationTestSuite):
+class TestSQLAlchemyCursor(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite):
     @pytest.fixture(
         scope="session",
         params=[True, False],
@@ -196,10 +205,12 @@ class TestSQLAlchemyCursor(BasePaginationTestSuite):
         )
 
     @pytest.fixture(scope="session")
-    def app(self, builder, sa_user, sa_order, sa_session, sa_session_ctx):
+    def app(self, builder, sa_user, sa_order, sa_session, sa_session_ctx, paginate_func):
+        builder = builder.new()
+
         @builder.cursor.default
         async def route(db: Any = Depends(sa_session_ctx)):
-            return await maybe_async(paginate(db, select(sa_user).order_by(sa_user.id)))
+            return await maybe_async(paginate_func(db, select(sa_user).order_by(sa_user.id)))
 
         return builder.build()
 
@@ -214,24 +225,28 @@ class TestSQLAlchemyCursor(BasePaginationTestSuite):
 
 
 @async_sync_testsuite
-class TestSQLAlchemyFromStatement(BasePaginationTestSuite):
+class TestSQLAlchemyFromStatement(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite):
     @pytest.fixture(scope="session")
-    def app(self, builder, sa_user, sa_session_ctx):
+    def app(self, builder, paginate_func, sa_user, sa_session_ctx):
+        builder = builder.new()
+
         @builder.both.default.optional
         async def route(db: Any = Depends(sa_session_ctx)):
             return await maybe_async(
-                paginate(db, select(sa_user).from_statement(text("SELECT * FROM users"))),
+                paginate_func(db, select(sa_user).from_statement(text("SELECT * FROM users"))),
             )
 
         return builder.build()
 
 
 @async_sync_testsuite
-class TestSQLAlchemyRaw(BasePaginationTestSuite):
+class TestSQLAlchemyRaw(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite):
     @pytest.fixture(scope="session")
-    def app(self, builder, sa_user, sa_session_ctx):
+    def app(self, builder, sa_user, sa_session_ctx, paginate_func):
+        builder = builder.new()
+
         @builder.both.default.optional
         async def route(db: Any = Depends(sa_session_ctx)):
-            return await maybe_async(paginate(db, text("SELECT * FROM users")))
+            return await maybe_async(paginate_func(db, text("SELECT * FROM users")))
 
         return builder.build()

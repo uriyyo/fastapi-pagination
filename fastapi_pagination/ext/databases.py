@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-__all__ = ["paginate"]
+__all__ = ["apaginate", "paginate"]
 
 from collections.abc import Sequence
 from typing import Any, Optional
 
 from databases import Database
 from sqlalchemy.sql import Select
+from typing_extensions import deprecated
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
@@ -21,7 +22,7 @@ def _to_mappins(items: Sequence[Any]) -> Sequence[Any]:
     return [{**item._mapping} for item in items]
 
 
-async def paginate(
+async def apaginate(
     db: Database,
     query: Select[tuple[Any, ...]],
     params: Optional[AbstractParams] = None,
@@ -47,4 +48,28 @@ async def paginate(
             additional_data=additional_data,
             config=config,
         )
+    )
+
+
+@deprecated("Use `apaginate` instead. This function will be removed in v0.14.0")
+async def paginate(
+    db: Database,
+    query: Select[tuple[Any, ...]],
+    params: Optional[AbstractParams] = None,
+    *,
+    transformer: Optional[AsyncItemsTransformer] = None,
+    additional_data: Optional[AdditionalData] = None,
+    convert_to_mapping: bool = True,
+    use_subquery: bool = True,
+    config: Optional[Config] = None,
+) -> Any:
+    return await apaginate(
+        db,
+        query,
+        params=params,
+        transformer=transformer,
+        additional_data=additional_data,
+        convert_to_mapping=convert_to_mapping,
+        use_subquery=use_subquery,
+        config=config,
     )
