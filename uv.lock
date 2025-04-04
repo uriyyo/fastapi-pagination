@@ -714,7 +714,7 @@ requires-dist = [
     { name = "piccolo", marker = "extra == 'all'", specifier = ">=0.89,<1.25" },
     { name = "piccolo", marker = "extra == 'piccolo'", specifier = ">=0.89,<1.25" },
     { name = "pony", marker = "extra == 'all'", specifier = ">=0.7.16,<0.8" },
-    { name = "pydantic", specifier = ">=1.9.1" },
+    { name = "pydantic", specifier = "==2.11.1" },
     { name = "scylla-driver", marker = "extra == 'all'", specifier = ">=3.25.6,<4" },
     { name = "scylla-driver", marker = "extra == 'scylla-driver'", specifier = ">=3.25.6,<4" },
     { name = "sqlakeyset", marker = "extra == 'all'", specifier = ">=2.0.1680321678,<3" },
@@ -1435,7 +1435,7 @@ wheels = [
 
 [[package]]
 name = "piccolo"
-version = "1.24.1"
+version = "1.24.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "black" },
@@ -1446,9 +1446,9 @@ dependencies = [
     { name = "targ" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/95/ce/9c45c64527b7868ab956ac62b53e356179c2243cb1e31cdf81c158c1325a/piccolo-1.24.1.tar.gz", hash = "sha256:e985c949b56171d50ee238192bce8d6149755876d9e3fbfcbf3dee7fe5a51c5a", size = 281954 }
+sdist = { url = "https://files.pythonhosted.org/packages/70/2f/b1e0bd6e074f05215e1624b7dc931810066738328b98f90fa97797d15c14/piccolo-1.24.2.tar.gz", hash = "sha256:764ec1ad37f419aecd9df10cd12c0b5d59a37c52dcf9c99fc72682d41f9ba1b8", size = 281958 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/86/f063e8725a76dccf9db692c31e68d3914b98e2b8e82ecf68097da800d0b7/piccolo-1.24.1-py3-none-any.whl", hash = "sha256:bdefb7109895977c7214a93aeba8ca862c7751a86bae0801fd4d8a8283e83e23", size = 402633 },
+    { url = "https://files.pythonhosted.org/packages/9b/f6/f28a4f4af2653a3e6d5bf78d546ce2085587ef30168c645f52d73934cbbb/piccolo-1.24.2-py3-none-any.whl", hash = "sha256:50118f760196bbff20fcc67d657a8adb99b6a929fa2a4928e46119d12945b63b", size = 402731 },
 ]
 
 [[package]]
