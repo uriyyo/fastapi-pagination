@@ -700,7 +700,7 @@ requires-dist = [
     { name = "django", marker = "extra == 'django'", specifier = "<6.0.0" },
     { name = "elasticsearch-dsl", marker = "extra == 'all'", specifier = ">=8.13.0,<9" },
     { name = "elasticsearch-dsl", marker = "extra == 'elasticsearch'", specifier = ">=8.13.0,<9" },
-    { name = "fastapi", specifier = "==0.115.12" },
+    { name = "fastapi", specifier = ">=0.93.0" },
     { name = "google-cloud-firestore", marker = "extra == 'all'", specifier = ">=2.19.0,<3" },
     { name = "google-cloud-firestore", marker = "extra == 'firestore'", specifier = ">=2.19.0,<3" },
     { name = "mongoengine", marker = "extra == 'all'", specifier = ">=0.23.1,<0.30.0" },
@@ -714,7 +714,7 @@ requires-dist = [
     { name = "piccolo", marker = "extra == 'all'", specifier = ">=0.89,<1.25" },
     { name = "piccolo", marker = "extra == 'piccolo'", specifier = ">=0.89,<1.25" },
     { name = "pony", marker = "extra == 'all'", specifier = ">=0.7.16,<0.8" },
-    { name = "pydantic", specifier = "==2.11.3" },
+    { name = "pydantic", specifier = ">=1.9.1" },
     { name = "scylla-driver", marker = "extra == 'all'", specifier = ">=3.25.6,<4" },
     { name = "scylla-driver", marker = "extra == 'scylla-driver'", specifier = ">=3.25.6,<4" },
     { name = "sqlakeyset", marker = "extra == 'all'", specifier = ">=2.0.1680321678,<3" },
@@ -729,7 +729,7 @@ requires-dist = [
     { name = "tortoise-orm", marker = "extra == 'tortoise'", specifier = ">=0.22.0" },
     { name = "typing-extensions", specifier = ">=4.8.0,<5" },
 ]
-provides-extras = ["all", "asyncpg", "beanie", "bunnet", "databases", "django", "elasticsearch", "firestore", "mongoengine", "motor", "odmantic", "orm", "ormar", "piccolo", "scylla-driver", "sqlalchemy", "sqlmodel", "tortoise"]
+provides-extras = ["sqlmodel", "sqlalchemy", "databases", "orm", "ormar", "tortoise", "asyncpg", "django", "piccolo", "motor", "bunnet", "mongoengine", "beanie", "scylla-driver", "odmantic", "elasticsearch", "firestore", "all"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2250,7 +2250,7 @@ wheels = [
 
 [[package]]
 name = "tortoise-orm"
-version = "0.24.2"
+version = "0.25.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiosqlite" },
@@ -2258,9 +2258,9 @@ dependencies = [
     { name = "pypika-tortoise" },
     { name = "pytz" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/49/e8/ac7cc41c297f20b3642351e5ff16f53beddea37be285f33f30308838d704/tortoise_orm-0.24.2.tar.gz", hash = "sha256:83d2373efafc1c5d668c3c5bd4e1e7f4a219526e850909ffe88f184da3808fdb", size = 126496 }
+sdist = { url = "https://files.pythonhosted.org/packages/d8/02/89777797d2c74386e21fca4a879d15eef6a0a789e4b9564355e94c367e6e/tortoise_orm-0.25.0.tar.gz", hash = "sha256:7d0aaf31c33a25a9efad8f94b44ee50febae15889f4da119cf184ffe98002673", size = 127955 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/48/66/6091aaad68c6e390e85a90cc2d9f9d12f43a577829c8b8dbfe51191a71db/tortoise_orm-0.24.2-py3-none-any.whl", hash = "sha256:d2381b26f48bd2f5c5d978ddf9bb40b2b81b2dbb78dab6a17882a156de8b5c62", size = 165737 },
+    { url = "https://files.pythonhosted.org/packages/47/da/1281ff9881de77f1e76508f4cede19f18552f40436af69ca83ed1d189173/tortoise_orm-0.25.0-py3-none-any.whl", hash = "sha256:b853acae52bc309800ec2954f3e261746cdac7e6b0e0a96ba20393dcb100a357", size = 167191 },
 ]
 
 [[package]]
