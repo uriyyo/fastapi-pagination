@@ -1,5 +1,4 @@
 version = 1
-revision = 1
 requires-python = ">=3.9, <4.0"
 resolution-markers = [
     "(python_full_version < '3.10' and platform_machine == 'AMD64' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'WIN32' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'aarch64' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'amd64' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'ppc64le' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'win32' and sys_platform == 'win32') or (python_full_version < '3.10' and platform_machine == 'x86_64' and sys_platform == 'win32')",
@@ -345,7 +344,7 @@ name = "click"
 version = "8.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "platform_system == 'Windows'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a", size = 226593 }
 wheels = [
@@ -579,7 +578,7 @@ wheels = [
 
 [[package]]
 name = "fastapi-pagination"
-version = "0.13.0a3"
+version = "0.13.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
@@ -729,7 +728,6 @@ requires-dist = [
     { name = "tortoise-orm", marker = "extra == 'tortoise'", specifier = ">=0.22.0" },
     { name = "typing-extensions", specifier = ">=4.8.0,<5" },
 ]
-provides-extras = ["sqlmodel", "sqlalchemy", "databases", "orm", "ormar", "tortoise", "asyncpg", "django", "piccolo", "motor", "bunnet", "mongoengine", "beanie", "scylla-driver", "odmantic", "elasticsearch", "firestore", "all"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1227,7 +1225,7 @@ version = "1.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "platform_system == 'Windows'" },
     { name = "ghp-import" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10'" },
     { name = "jinja2" },

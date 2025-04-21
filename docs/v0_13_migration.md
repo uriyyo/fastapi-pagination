@@ -2,6 +2,12 @@
 
 Now the minimum supported Python version is `3.9`.
 
+# Paginate function
+
+Starting from version `0.13.0`, the async `paginate` function has been renamed to `apaginate` to avoid confusion with the sync version
+and follow better naming conventions. Old code using `paginate` will still work, but it is recommended to update your code to use `apaginate` for async operations.
+Support for `async` calls for `paginate` will be removed in the next major version.
+
 # API Changes
 
 ## `create_page`
