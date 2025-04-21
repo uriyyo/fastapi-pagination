@@ -1,4 +1,4 @@
-`UseOptinalParams` is a customizer that allows to make your `Params` class fields optional.
+`UseOptionalParams` is a customizer that allows to make your `Params` class fields optional.
 It will allow you to be able to select all available items in case if some of input parameters are not provided.
 
 ```py
