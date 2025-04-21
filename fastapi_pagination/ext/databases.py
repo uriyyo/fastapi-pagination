@@ -18,7 +18,7 @@ from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 from .sqlalchemy import create_count_query, create_paginate_query
 
 
-def _to_mappins(items: Sequence[Any]) -> Sequence[Any]:
+def _to_mappings(items: Sequence[Any]) -> Sequence[Any]:
     return [{**item._mapping} for item in items]
 
 
@@ -35,7 +35,7 @@ async def apaginate(
 ) -> Any:
     inner_transformer = None
     if convert_to_mapping:
-        inner_transformer = _to_mappins
+        inner_transformer = _to_mappings
 
     return await run_async_flow(
         generic_flow(

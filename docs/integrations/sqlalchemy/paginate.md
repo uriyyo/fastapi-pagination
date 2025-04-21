@@ -1,7 +1,7 @@
 `fastapi_pagination.ext.sqlalchemy.paginate` allows you to paginate `sqlalchemy` queries easily.
 It can work for both `sync` and `async` SQLAlchemy engines.
 
-`paginate` accepts the following `sqlachemy` related arguments:
+`paginate` accepts the following `sqlalchemy` related arguments:
 
 * `conn` - can be either a `Connection` or `Session` object that allows you to execute the query.
 * `query` - is the query that you want to paginate, it can be either a default select query, raw text query, or a from statement construction.
@@ -116,7 +116,7 @@ and page creation.
 * `"auto"` - will unwrap only in case if you are selecting single model.
 * `"legacy"` - will use old behavior, where row will be unwrapped if it contains only one element.
 * `"unwrap"` - will always unwrap row, even if it contains multiple elements.
-* `"no-unwrap"` - will never unwrap row, even if it contains only one element. 
+* `"no-unwrap"` - will never unwrap row, even if it contains only one element.
 
 ```py
 from pydantic import BaseModel
@@ -139,7 +139,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(default=None, primary_key=True)
     name: Mapped[str] = mapped_column()
 
-    
+
 class UserName(BaseModel):
     name: str
 
