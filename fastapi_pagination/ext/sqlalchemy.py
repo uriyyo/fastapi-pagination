@@ -24,6 +24,7 @@ from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import TextClause
 from typing_extensions import Literal, TypeAlias
 
+from fastapi_pagination.api import create_page
 from fastapi_pagination.bases import AbstractParams, CursorRawParams, RawParams
 from fastapi_pagination.config import Config
 from fastapi_pagination.flow import flow, run_async_flow, run_sync_flow
@@ -315,6 +316,10 @@ def _sqlalchemy_flow(
     unique: bool = True,
     config: Optional[Config] = None,
 ) -> Any:
+    create_page_factory = create_page
+    if is_async:
+        create_page_factory = partial(greenlet_spawn, create_page_factory)  # type: ignore[assignment]
+
     page = yield from generic_flow(
         async_=is_async,
         total_flow=partial(_total_flow, query, conn, count_query, subquery_count),
@@ -325,6 +330,7 @@ def _sqlalchemy_flow(
         transformer=transformer,
         additional_data=additional_data,
         config=config,
+        create_page_factory=create_page_factory,
     )
 
     return page
