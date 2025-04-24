@@ -40,7 +40,7 @@ class CreatePageFactory(Protocol):
         total: Optional[int] = None,
         params: Optional[AbstractParams] = None,
         **kwargs: Any,
-    ) -> Any:
+    ) -> Any:  # pragma: no cover
         pass
 
 
