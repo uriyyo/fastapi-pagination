@@ -1,4 +1,5 @@
 __all__ = [
+    "CreatePageFactory",
     "CursorFlow",
     "CursorFlowFunc",
     "LimitOffsetFlow",
@@ -9,8 +10,9 @@ __all__ = [
     "generic_flow",
 ]
 
+from collections.abc import Sequence
 from contextlib import ExitStack
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Protocol
 
 from typing_extensions import TypeAlias
 
@@ -30,6 +32,18 @@ CursorFlowFunc: TypeAlias = Callable[[CursorRawParams], AnyFlow[tuple[Any, Optio
 TotalFlowFunc: TypeAlias = Callable[[], AnyFlow[Optional[int]]]
 
 
+class CreatePageFactory(Protocol):
+    def __call__(
+        self,
+        items: Sequence[Any],
+        /,
+        total: Optional[int] = None,
+        params: Optional[AbstractParams] = None,
+        **kwargs: Any,
+    ) -> Any:
+        pass
+
+
 @flow
 def create_page_flow(
     items: Any,
@@ -40,6 +54,7 @@ def create_page_flow(
     additional_data: Optional[dict[str, Any]] = None,
     config: Optional[Config] = None,
     async_: bool = False,
+    create_page_factory: Optional[CreatePageFactory] = None,
 ) -> Any:
     with ExitStack() as stack:
         if config and config.page_cls:
@@ -51,12 +66,17 @@ def create_page_flow(
             async_=async_,
         )
 
-        return create_page(
+        if create_page_factory is None:
+            create_page_factory = create_page
+
+        page = yield create_page_factory(
             t_items,
             total=total,
             params=params,
             **(additional_data or {}),
         )
+
+        return page
 
 
 @flow
@@ -71,6 +91,7 @@ def generic_flow(  # noqa: C901
     additional_data: Optional[AdditionalData] = None,
     config: Optional[Config] = None,
     async_: bool = False,
+    create_page_factory: Optional[CreatePageFactory] = None,
 ) -> Any:
     types: list[ParamsType] = []
     if limit_offset_flow is not None:
@@ -120,6 +141,7 @@ def generic_flow(  # noqa: C901
         additional_data=additional_data,
         config=config,
         async_=async_,
+        create_page_factory=create_page_factory,
     )
 
     return page
