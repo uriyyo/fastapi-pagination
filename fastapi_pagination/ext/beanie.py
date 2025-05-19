@@ -42,6 +42,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
     ignore_cache: bool = False,
     fetch_links: bool = False,
     lazy_parse: bool = False,
+    aggregation_filter_end: Optional[int] = None,
     **pymongo_kwargs: Any,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset", "cursor")
@@ -74,12 +75,19 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                         },
                     },
                 )
-
-        aggregation_query.aggregation_pipeline.extend(
-            [
-                {"$facet": {"metadata": [{"$count": "total"}], "data": paginate_data}},
-            ],
-        )
+        if aggregation_filter_end is not None:
+            filter_part = aggregation_query.aggregation_pipeline[aggregation_filter_end:]
+            transform_part = aggregation_query.aggregation_pipeline[:aggregation_filter_end]
+            aggregation_query.aggregation_pipeline = [
+                *filter_part,
+                {"$facet": {"metadata": [{"$count": "total"}], "data": [*paginate_data, *transform_part]}},
+            ]
+        else:
+            aggregation_query.aggregation_pipeline.extend(
+                [
+                    {"$facet": {"metadata": [{"$count": "total"}], "data": paginate_data}},
+                ],
+            )
         data = (await aggregation_query.to_list())[0]
         items = data["data"]
         try:
@@ -178,6 +186,7 @@ async def paginate(
     ignore_cache: bool = False,
     fetch_links: bool = False,
     lazy_parse: bool = False,
+    aggregation_filter_end: Optional[int] = None,
     **pymongo_kwargs: Any,
 ) -> Any:
     return await apaginate(
@@ -191,5 +200,6 @@ async def paginate(
         ignore_cache=ignore_cache,
         fetch_links=fetch_links,
         lazy_parse=lazy_parse,
+        aggregation_filter_end=aggregation_filter_end,
         **pymongo_kwargs,
     )

@@ -28,6 +28,7 @@ def paginate(
     ignore_cache: bool = False,
     fetch_links: bool = False,
     lazy_parse: bool = False,
+    aggregation_filter_end: Optional[int] = None,
     **pymongo_kwargs: Any,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
@@ -40,11 +41,20 @@ def paginate(
         if raw_params.offset is not None:
             paginate_data.append({"$skip": raw_params.offset})
 
-        aggregation_query.aggregation_pipeline.extend(
-            [
-                {"$facet": {"metadata": [{"$count": "total"}], "data": paginate_data}},
-            ],
-        )
+        if aggregation_filter_end is not None:
+            filter_part = aggregation_query.aggregation_pipeline[aggregation_filter_end:]
+            transform_part = aggregation_query.aggregation_pipeline[:aggregation_filter_end]
+            aggregation_query.aggregation_pipeline = [
+                *filter_part,
+                {"$facet": {"metadata": [{"$count": "total"}], "data": [*paginate_data, *transform_part]}},
+            ]
+        else:
+            aggregation_query.aggregation_pipeline.extend(
+                [
+                    {"$facet": {"metadata": [{"$count": "total"}], "data": paginate_data}},
+                ],
+            )
+
         data = aggregation_query.to_list()[0]
         items = data["data"]
         try:
