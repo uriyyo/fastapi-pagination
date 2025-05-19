@@ -76,8 +76,8 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                     },
                 )
         if aggregation_filter_end is not None:
-            filter_part = aggregation_query.aggregation_pipeline[aggregation_filter_end:]
-            transform_part = aggregation_query.aggregation_pipeline[:aggregation_filter_end]
+            filter_part = aggregation_query.aggregation_pipeline[:aggregation_filter_end]
+            transform_part = aggregation_query.aggregation_pipeline[aggregation_filter_end:]
             aggregation_query.aggregation_pipeline = [
                 *filter_part,
                 {"$facet": {"metadata": [{"$count": "total"}], "data": [*paginate_data, *transform_part]}},

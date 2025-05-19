@@ -70,8 +70,8 @@ async def apaginate_aggregate(
         paginate_data.append({"$skip": raw_params.offset})
 
     if aggregation_filter_end is not None:
-        transform_part = aggregate_pipeline[aggregation_filter_end:]
-        aggregate_pipeline = aggregate_pipeline[:aggregation_filter_end]
+        transform_part = aggregate_pipeline[:aggregation_filter_end]
+        aggregate_pipeline = aggregate_pipeline[aggregation_filter_end:]
         paginate_data.extend(transform_part)
 
     cursor = collection.aggregate(
