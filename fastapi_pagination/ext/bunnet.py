@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Optional, TypeVar, Union
+from typing import Any, Literal, Optional, TypeVar, Union
 
 from bunnet import Document
 from bunnet.odm.enums import SortDirection
@@ -10,6 +10,7 @@ from bunnet.odm.queries.find import FindMany
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
 from fastapi_pagination.utils import verify_params
 
@@ -28,7 +29,7 @@ def paginate(
     ignore_cache: bool = False,
     fetch_links: bool = False,
     lazy_parse: bool = False,
-    aggregation_filter_end: Optional[int] = None,
+    aggregation_filter_end: Optional[Union[int, Literal["auto"]]] = None,
     **pymongo_kwargs: Any,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
@@ -42,6 +43,8 @@ def paginate(
             paginate_data.append({"$skip": raw_params.offset})
 
         if aggregation_filter_end is not None:
+            if aggregation_filter_end == "auto":
+                aggregation_filter_end = get_mongo_pipeline_filter_end(aggregation_query.aggregation_pipeline)
             filter_part = aggregation_query.aggregation_pipeline[:aggregation_filter_end]
             transform_part = aggregation_query.aggregation_pipeline[aggregation_filter_end:]
             aggregation_query.aggregation_pipeline = [
