@@ -1,5 +1,6 @@
 __all__ = [
     "generic_query_apply_params",
+    "get_mongo_pipeline_filter_end",
     "len_or_none",
     "unwrap_scalars",
     "wrap_scalars",
@@ -55,3 +56,29 @@ def generic_query_apply_params(q: TAbstractQuery, params: RawParams) -> TAbstrac
         q = q.offset(params.offset)
 
     return q
+
+
+def get_mongo_pipeline_filter_end(
+    aggregate_pipeline: list[dict[str, Any]],
+) -> int:
+    """
+    Get the index of the stage in the aggregation pipeline where the number or order
+    of documents in the pipeline no longer changes.
+    """
+
+    # MongoDB aggregation pipeline stages that do not change the number or order
+    # of documents in the pipeline output.
+    transform_stages = [
+        "$addFields",
+        "$graphLookup",
+        "$lookup",
+        "$project",
+        "$replaceRoot",
+        "$replaceWith",
+        "$set",
+        "$unset",
+    ]
+    for i, stage in enumerate(reversed(aggregate_pipeline)):
+        if any(stage_name not in transform_stages for stage_name in stage):
+            return len(aggregate_pipeline) - i
+    return 0
