@@ -5,13 +5,14 @@ __all__ = [
     "paginate_aggregate",
 ]
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from motor.core import AgnosticCollection
 from typing_extensions import TypeAlias, deprecated
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 from fastapi_pagination.utils import verify_params
 
@@ -58,6 +59,7 @@ async def apaginate_aggregate(
     *,
     transformer: Optional[AsyncItemsTransformer] = None,
     additional_data: Optional[AdditionalData] = None,
+    aggregation_filter_end: Optional[Union[int, Literal["auto"]]] = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []
@@ -67,6 +69,13 @@ async def apaginate_aggregate(
         paginate_data.append({"$limit": raw_params.limit + (raw_params.offset or 0)})
     if raw_params.offset is not None:
         paginate_data.append({"$skip": raw_params.offset})
+
+    if aggregation_filter_end is not None:
+        if aggregation_filter_end == "auto":
+            aggregation_filter_end = get_mongo_pipeline_filter_end(aggregate_pipeline)
+        transform_part = aggregate_pipeline[:aggregation_filter_end]
+        aggregate_pipeline = aggregate_pipeline[aggregation_filter_end:]
+        paginate_data.extend(transform_part)
 
     cursor = collection.aggregate(
         [
