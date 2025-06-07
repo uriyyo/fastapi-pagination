@@ -31,3 +31,24 @@ PageWithTotal = CustomizedPage[
 async def get_nums() -> Any:
     return paginate(range(1_000))
 ```
+
+
+By default `UseIncludeTotal` will update type annotation of `total` field to be optional in case if `include_total` is set to `False`,
+or it will be required if `include_total` is set to `True`. You can override this behavior by passing `update_annotations` argument to `UseIncludeTotal`.
+
+```py
+from typing import TypeVar
+
+from fastapi_pagination import Page
+from fastapi_pagination.customization import CustomizedPage, UseIncludeTotal
+
+T = TypeVar("T")
+
+PageWithTotal = CustomizedPage[
+    Page[T],
+    UseIncludeTotal(
+        True,
+        update_annotations=False,
+    ),
+]
+```
