@@ -170,7 +170,7 @@ def _setup_cassandra(_cassandra_address, raw_data):
         connection.unregister_connection("setup")
 
 
-@async_fixture(scope="session", autouse=True)
+@async_fixture(scope="session")
 async def _setup_postgres(_postgres_url: str, raw_data: RawData):
     async with asyncpg.create_pool(_postgres_url) as pool:
         await pool.fetch("DROP TABLE IF EXISTS users CASCADE;")
@@ -209,7 +209,7 @@ async def _setup_postgres(_postgres_url: str, raw_data: RawData):
         await pool.fetch("COMMIT")
 
 
-@async_fixture(scope="session", autouse=True)
+@async_fixture(scope="session")
 async def _setup_sqlite(_sqlite_file: str, raw_data: RawData):
     async with aiosqlite.connect(_sqlite_file) as pool:
         await pool.execute("DROP TABLE IF EXISTS orders;")
@@ -248,7 +248,7 @@ async def _setup_sqlite(_sqlite_file: str, raw_data: RawData):
         await pool.commit()
 
 
-@async_fixture(scope="session", autouse=True)
+@async_fixture(scope="session")
 async def _setup_mongodb(_mongodb_url: str, raw_data: RawData):
     motor = AsyncIOMotorClient(_mongodb_url)
 
