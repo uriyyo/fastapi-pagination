@@ -32,9 +32,9 @@ class Params(BaseModel, AbstractParams):
 
 
 class Page(BasePage[TAny], Generic[TAny]):
-    page: Optional[GreaterEqualOne]
-    size: Optional[GreaterEqualOne]
-    pages: Optional[GreaterEqualZero] = None
+    page: GreaterEqualOne
+    size: GreaterEqualOne
+    pages: GreaterEqualZero
 
     __params_type__ = Params
 

@@ -15,6 +15,7 @@ def test_cursor_page_invalid_params_type():
     with pytest.raises(TypeError, match="^CursorPage should be used with CursorParams$"):
         CursorPage[int].create(
             items=[1, 2, 3],
+            total=3,
             params=Params(),
         )
 
@@ -35,7 +36,7 @@ def test_invalid_cursor(cursor):
         params = resolve_params()
         params.to_raw_params()
 
-        return CursorPage(items=[])
+        return CursorPage(items=[], total=0)
 
     add_pagination(app)
 

@@ -294,7 +294,7 @@ def test_cursor_encoding(kwargs):
         UseCursorEncoding(**kwargs),
     ]
 
-    page = CustomPage.create([], CustomPage.__params_type__(), current="current")
+    page = CustomPage.create([], CustomPage.__params_type__(), total=0, current="current")
 
     if "encoder" in kwargs:
         assert page.current_page == "encoded"
