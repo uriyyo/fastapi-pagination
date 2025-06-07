@@ -3,13 +3,14 @@ from cassandra.cluster import Cluster
 from cassandra.cqlengine import columns, connection, models
 
 from fastapi_pagination.cursor import CursorPage as BaseCursorPage
-from fastapi_pagination.customization import CustomizedPage, UseParamsFields
+from fastapi_pagination.customization import CustomizedPage, UseIncludeTotal, UseParamsFields
 from fastapi_pagination.ext.cassandra import paginate
 from tests.base import BasePaginationTestSuite, SuiteBuilder
 
 CursorPage = CustomizedPage[
     BaseCursorPage,
     UseParamsFields(str_cursor=False),
+    UseIncludeTotal(False),
 ]
 
 
@@ -31,6 +32,8 @@ def cassandra_session(cassandra_address):
 
 @pytest.mark.usefixtures("cassandra_session")
 class TestCasandra(BasePaginationTestSuite):
+    include_total = False
+
     @pytest.fixture(scope="session")
     def builder(self) -> SuiteBuilder:
         return SuiteBuilder.with_classes(cursor=CursorPage)

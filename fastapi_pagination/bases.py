@@ -91,7 +91,7 @@ class RawParams(BaseRawParams):
 class CursorRawParams(BaseRawParams):
     cursor: Optional[Cursor]
     size: int
-    include_total: bool = False
+    include_total: bool = True
 
     type: ClassVar[ParamsType] = "cursor"
 
@@ -178,4 +178,4 @@ class AbstractPage(GenericModel, Generic[TAny], ABC):
 
 class BasePage(AbstractPage[TAny], Generic[TAny], ABC):
     items: Sequence[TAny]
-    total: Optional[GreaterEqualZero] = None
+    total: GreaterEqualZero

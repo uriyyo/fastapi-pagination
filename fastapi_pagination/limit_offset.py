@@ -31,8 +31,8 @@ class LimitOffsetParams(BaseModel, AbstractParams):
 
 
 class LimitOffsetPage(BasePage[TAny], Generic[TAny]):
-    limit: Optional[GreaterEqualOne]
-    offset: Optional[GreaterEqualZero]
+    limit: GreaterEqualOne
+    offset: GreaterEqualZero
 
     __params_type__ = LimitOffsetParams
 

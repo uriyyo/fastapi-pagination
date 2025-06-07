@@ -61,6 +61,7 @@ SuiteDecl: TypeAlias = tuple[
 class BasePaginationTestSuite:
     pagination_types: ClassVar[set[PaginationType]] = {}
     case_types: ClassVar[set[PaginationCaseType]] = {}
+    include_total: ClassVar[bool] = True
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -213,7 +214,13 @@ class BasePaginationTestSuite:
             assert len(page.items) == min(len(entities), size)
 
             with set_page(cls):
-                expected = self._normalize_expected(cls.create(entities[: len(page.items)], params))
+                expected = self._normalize_expected(
+                    cls.create(
+                        entities[: len(page.items)],
+                        params,
+                        total=len(entities) if self.include_total else None,
+                    ),
+                )
 
             assert page.items == expected.items
 

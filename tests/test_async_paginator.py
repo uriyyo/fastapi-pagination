@@ -2,7 +2,7 @@ import pytest
 
 from fastapi_pagination.async_paginator import apaginate
 
-from .base import BasePaginationTestSuite, SuiteBuilder
+from .base import BasePaginationTestSuite
 
 
 async def _len_func(seq):
@@ -19,11 +19,9 @@ class TestAsyncPaginationParams(BasePaginationTestSuite):
         return request.param
 
     @pytest.fixture(scope="session")
-    def builder(self, len_function) -> SuiteBuilder:
-        return self.create_builder()
-
-    @pytest.fixture(scope="session")
     def app(self, builder, entities, len_function):
+        builder = builder.new()
+
         @builder.both.default.optional
         async def route():
             return await apaginate(entities, length_function=len_function)
