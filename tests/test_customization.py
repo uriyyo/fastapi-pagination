@@ -1,7 +1,7 @@
 from typing import ClassVar, Generic, TypeVar
 
 import pytest
-from fastapi import Query
+from fastapi import FastAPI, Query
 
 from fastapi_pagination import Page, Params
 from fastapi_pagination.bases import AbstractPage, AbstractParams
@@ -173,6 +173,25 @@ def test_use_include_total(include_total):
     raw_params = CustomPage.__params_type__().to_raw_params()
 
     assert raw_params.include_total == include_total
+
+
+@pytest.mark.skipif(not IS_PYDANTIC_V2, reason="Only for Pydantic v2")
+@pytest.mark.parametrize("include_total", [True, False])
+def test_use_include_total_update_tp_json_schema(include_total):
+    app = FastAPI()
+
+    CustomPage = CustomizedPage[Page, UseIncludeTotal(include_total)]
+
+    @app.get("/", response_model=CustomPage)
+    def root():
+        return None
+
+    total_schema = app.openapi()["components"]["schemas"]["PageCustomized"]["properties"]["total"]
+
+    if include_total:
+        assert total_schema == {"minimum": 0.0, "title": "Total", "type": "integer"}
+    else:
+        assert total_schema == {"anyOf": [{"minimum": 0.0, "type": "integer"}, {"type": "null"}], "title": "Total"}
 
 
 @pytest.mark.parametrize("quoted_cursor", [True, False])
