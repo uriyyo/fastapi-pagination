@@ -34,10 +34,10 @@ jobs:
         run: |
           uv sync --all-extras --dev
 
-      - name: Cache Docker images
-        uses: ScribeMD/docker-cache@0.5.0
-        with:
-          key: docker-${{ runner.os }}-ci
+      # - name: Cache Docker images
+      #   uses: ScribeMD/docker-cache@0.5.0
+      #   with:
+      #     key: docker-${{ runner.os }}-ci
 
       - name: Prepare DBs
         shell: bash
