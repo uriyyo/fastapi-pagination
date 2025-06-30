@@ -23,6 +23,7 @@ else:
 
 
 # TODO: refactor this function using flows
+@deprecated("Motor will be deprecated on May 14, 2026. Migration to the PyMongo Async driver is recommended.")
 async def apaginate(
     collection: _AgnosticCollection,
     query_filter: Optional[dict[Any, Any]] = None,
@@ -52,6 +53,7 @@ async def apaginate(
     )
 
 
+@deprecated("Motor will be deprecated on May 14, 2026. Migration to the PyMongo Async driver is recommended.")
 async def apaginate_aggregate(
     collection: _AgnosticCollection,
     aggregate_pipeline: Optional[list[dict[Any, Any]]] = None,
