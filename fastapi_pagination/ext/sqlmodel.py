@@ -96,7 +96,7 @@ def paginate(
 ) -> Any:
     query = _prepare_query(query)
 
-    if count_query:
+    if count_query is not None:
         count_query = _prepare_query(count_query)
 
     if isinstance(session, (AsyncSession, AsyncConnection)):
@@ -145,7 +145,7 @@ async def apaginate(
 ) -> Any:
     query = _prepare_query(query)
 
-    if count_query:
+    if count_query is not None:
         count_query = _prepare_query(count_query)  # type: ignore[assignment]
 
     return await _apaginate(
