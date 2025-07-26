@@ -447,6 +447,15 @@ wheels = [
 ]
 
 [[package]]
+name = "dirty-equals"
+version = "0.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b0/99/133892f401ced5a27e641a473c547d5fbdb39af8f85dac8a9d633ea3e7a7/dirty_equals-0.9.0.tar.gz", hash = "sha256:17f515970b04ed7900b733c95fd8091f4f85e52f1fb5f268757f25c858eb1f7b", size = 50412, upload-time = "2025-01-11T23:23:40.491Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/0c/03cc99bf3b6328604b10829de3460f2b2ad3373200c45665c38508e550c6/dirty_equals-0.9.0-py3-none-any.whl", hash = "sha256:ff4d027f5cfa1b69573af00f7ba9043ea652dbdce3fe5cbe828e478c7346db9c", size = 28226, upload-time = "2025-01-11T23:23:37.489Z" },
+]
+
+[[package]]
 name = "distlib"
 version = "0.3.9"
 source = { registry = "https://pypi.org/simple" }
@@ -663,6 +672,7 @@ tortoise = [
 [package.dev-dependencies]
 dev = [
     { name = "asgi-lifespan" },
+    { name = "dirty-equals" },
     { name = "faker" },
     { name = "flaky" },
     { name = "fontawesome-markdown" },
@@ -732,6 +742,7 @@ provides-extras = ["sqlmodel", "sqlalchemy", "databases", "orm", "ormar", "torto
 [package.metadata.requires-dev]
 dev = [
     { name = "asgi-lifespan", specifier = ">=2.1.0,<3" },
+    { name = "dirty-equals", specifier = ">=0.9.0" },
     { name = "faker", specifier = ">=35.2,<38.0" },
     { name = "flaky", specifier = ">=3.8.1,<4" },
     { name = "fontawesome-markdown", specifier = ">=0.2.6,<0.3" },

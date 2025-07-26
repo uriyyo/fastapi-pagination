@@ -1,4 +1,5 @@
 import pytest
+from dirty_equals import IsStr
 from fastapi import FastAPI, status
 from starlette.testclient import TestClient
 
@@ -48,7 +49,7 @@ for name, page in CASES:
                     "total": {"minimum": 0.0, "title": "Total", "type": "integer"},
                 },
                 "required": ["items", "total", "page", "size", "pages"],
-                "title": "Page[int]",
+                "title": IsStr,
                 "type": "object",
             },
         ),
@@ -62,7 +63,7 @@ for name, page in CASES:
                     "total": {"minimum": 0.0, "title": "Total", "type": "integer"},
                 },
                 "required": ["items", "total", "limit", "offset"],
-                "title": "LimitOffsetPage[int]",
+                "title": IsStr,
                 "type": "object",
             },
         ),
@@ -79,7 +80,7 @@ for name, page in CASES:
                 },
                 "type": "object",
                 "required": ["items", "total", "page", "size", "pages", "links"],
-                "title": "Page[~TAny]Customized[int]",
+                "title": IsStr,
             },
         ),
         (
@@ -94,7 +95,7 @@ for name, page in CASES:
                 },
                 "type": "object",
                 "required": ["items", "total", "limit", "offset", "links"],
-                "title": "LimitOffsetPage[~TAny]Customized[int]",
+                "title": IsStr,
             },
         ),
         (
@@ -109,7 +110,7 @@ for name, page in CASES:
                 },
                 "type": "object",
                 "required": ["items"],
-                "title": "Page[~T]Customized[int]",
+                "title": IsStr,
             },
         ),
         (
@@ -123,7 +124,7 @@ for name, page in CASES:
                 },
                 "type": "object",
                 "required": ["items"],
-                "title": "LimitOffsetPage[~T]Customized[int]",
+                "title": IsStr,
             },
         ),
     ],

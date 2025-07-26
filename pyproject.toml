@@ -102,6 +102,7 @@ dev = [
     "Jinja2>=3.1.5,<4",
     "mypy>=1.14.1,<2",
     "ruff>=0.9.4,<0.12.0",
+    "dirty-equals>=0.9.0",
 ]
 
 [build-system]
