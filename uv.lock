@@ -169,19 +169,18 @@ wheels = [
 
 [[package]]
 name = "beanie"
-version = "1.30.0"
+version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "lazy-model" },
-    { name = "motor" },
     { name = "pydantic" },
-    { name = "tomli", marker = "python_full_version < '3.11'" },
+    { name = "pymongo" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/46/1c/feee03924a8f255d76236a8f71fde310da52ab4e03abd1254cd9309d73e1/beanie-1.30.0.tar.gz", hash = "sha256:33ead17ff2742144c510b4b24e188f6b316dd1b614d86b57a3cfe20bc7b768c9", size = 176743, upload-time = "2025-06-10T19:48:01.119Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ff/c3/21152df5974f6b690a74a990a1b706102ad694b56bd2a59f7903b6424696/beanie-2.0.0.tar.gz", hash = "sha256:07982e42618cea01722f62d2b4028514a508a2c2c2c71ff85f07f6009112ffb3", size = 169854, upload-time = "2025-07-20T06:55:27.515Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cb/f2/adfea21c19d73ad2e90f5346c166523dadc33493a0b398d543eeb9b67e7a/beanie-1.30.0-py3-none-any.whl", hash = "sha256:385f1b850b36a19dd221aeb83e838c83ec6b47bbf6aeac4e5bf8b8d40bfcfe51", size = 87140, upload-time = "2025-06-10T19:47:59.066Z" },
+    { url = "https://files.pythonhosted.org/packages/47/36/c40577bc8e3564639b89db32aff1e9e8af14c990e3a7ed85a79b74ec4b78/beanie-2.0.0-py3-none-any.whl", hash = "sha256:0d5c0e0de09f2a316c74d17bbba1ceb68ebcbfd3046ae5be69038b2023682372", size = 87051, upload-time = "2025-07-20T06:55:25.944Z" },
 ]
 
 [[package]]
@@ -224,7 +223,7 @@ wheels = [
 
 [[package]]
 name = "bunnet"
-version = "1.3.0"
+version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -232,11 +231,10 @@ dependencies = [
     { name = "pydantic" },
     { name = "pymongo" },
     { name = "toml" },
-    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/08/1d/e80a90d024e9f340d253cbffbff2cd98821045fe8a1ddc6c404bd6b6c9d7/bunnet-1.3.0.tar.gz", hash = "sha256:5e4aeee9c30ac7fe3968ad057398349d8c3fb886c5b568980266fc4e061c3a8f", size = 1649116, upload-time = "2024-02-28T15:06:39.557Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e7/6a/c2d2f63c0260f0bad47168e0427bdb46e1134266d0d49854c7106a6597ac/bunnet-1.1.0.tar.gz", hash = "sha256:e8e4aa61129c164f774a6549937f85507999cccef1a6591ac0ad175e695fe8c5", size = 47159, upload-time = "2023-01-19T17:22:31.431Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c9/19/40ff7d514d09429909b26034c001d4e315f13dc42826a40e9d5796a30e7b/bunnet-1.3.0-py3-none-any.whl", hash = "sha256:feaf0e3a061e98411110bcc02a5f4fbf7e7483f575dddda748888e293fb3c1a1", size = 80219, upload-time = "2024-02-28T15:06:37.516Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/88/d3c15abab54d4fea31a8df0d631f9d57e271b842b1d8bf53d1d2f7d3f82b/bunnet-1.1.0-py3-none-any.whl", hash = "sha256:860d79bed3f97c0e45e631a725e6da22598712dad2a599240d62c5ee581dde1a", size = 71809, upload-time = "2023-01-19T17:22:30.073Z" },
 ]
 
 [[package]]
@@ -1122,14 +1120,14 @@ wheels = [
 
 [[package]]
 name = "lazy-model"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/47/9e/c60681be72f03845c209a86d5ce0404540c8d1818fc29bc64fc95220de5c/lazy-model-0.2.0.tar.gz", hash = "sha256:57c0e91e171530c4fca7aebc3ac05a163a85cddd941bf7527cc46c0ddafca47c", size = 8152, upload-time = "2023-09-10T02:29:57.974Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/15/fa/158a07f8c25c76568534328bf3ab8d16dba92abcb27cc9cfd84bbc652815/lazy-model-0.3.0.tar.gz", hash = "sha256:e425a189897dc926cc79af196a7cb385d1fd3ac7a7bccb4436fc93661f63b811", size = 8172, upload-time = "2025-04-22T17:03:33.923Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0a/13/e37962a20f7051b2d6d286c3feb85754f9ea8c4cac302927971e910cc9f6/lazy_model-0.2.0-py3-none-any.whl", hash = "sha256:5a3241775c253e36d9069d236be8378288a93d4fc53805211fd152e04cc9c342", size = 13719, upload-time = "2023-09-10T02:29:59.067Z" },
+    { url = "https://files.pythonhosted.org/packages/74/a4/55bb305df9fe0d343ff8f0dd4da25b2cc33ba65f8596238aa7a4ecbe9777/lazy_model-0.3.0-py3-none-any.whl", hash = "sha256:67c112cad3fbc1816d32c070bf3b3ac1f48aefeb4e46e9eb70e12acc92c6859d", size = 13719, upload-time = "2025-04-22T17:03:34.764Z" },
 ]
 
 [[package]]
