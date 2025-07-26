@@ -352,7 +352,7 @@ if IS_PYDANTIC_V2:
 
         field = copy(field)
 
-        field.annotation = Optional[field.annotation]  # type: ignore[assignment]
+        field.annotation = Optional[field.annotation]
         field.default = None
         field.default_factory = None
 
@@ -389,7 +389,7 @@ else:
         assert isinstance(field, _PydanticField)
 
         field = copy(field)
-        field.required = True  # type: ignore[attr-defined]
+        field.required = True
         field.default = ...
         field.default_factory = None
 

@@ -1,6 +1,6 @@
 [project]
 name = "fastapi-pagination"
-version = "0.13.2"
+version = "0.14.0b1"
 description = "FastAPI pagination"
 authors = [
     { name = "Yurii Karabas", email = "1998uriyyo@gmail.com" },
@@ -53,31 +53,11 @@ piccolo = ["piccolo>=0.89,<1.25"]
 motor = ["motor>=3.6.0,<4.0.0"]
 bunnet = ["bunnet>=1.1.0,<2"]
 mongoengine = ["mongoengine>=0.23.1,<0.30.0"]
-beanie = ["beanie>=1.25.0"]
+beanie = ["beanie>=2.0.0"]
 scylla-driver = ["scylla-driver>=3.25.6,<4"]
 odmantic = ["odmantic>=1.0.2,<2"]
 elasticsearch = ["elasticsearch-dsl>=8.13.0,<9"]
 firestore = ["google-cloud-firestore>=2.19.0,<3"]
-all = [
-    "sqlmodel>=0.0.22",
-    "SQLAlchemy>=1.3.20",
-    "databases>=0.6.0",
-    "orm>=0.3.1",
-    "odmantic>=1.0.2,<2",
-    "tortoise-orm>=0.22.0",
-    "asyncpg>=0.24.0",
-    "django<6.0.0",
-    "piccolo>=0.89,<1.25",
-    "motor>=3.6.0,<4.0.0",
-    "mongoengine>=0.23.1,<0.30.0",
-    "pony>=0.7.16,<0.8",
-    "beanie>=1.25.0",
-    "sqlakeyset>=2.0.1680321678,<3",
-    "scylla-driver>=3.25.6,<4",
-    "bunnet>=1.1.0,<2",
-    "elasticsearch-dsl>=8.13.0,<9",
-    "google-cloud-firestore>=2.19.0,<3",
-]
 
 [project.urls]
 Repository = "https://github.com/uriyyo/fastapi-pagination"

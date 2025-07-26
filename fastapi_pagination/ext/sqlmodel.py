@@ -110,7 +110,7 @@ def paginate(
             session,
             query,
             params,
-            count_query=count_query,
+            count_query=count_query,  # type: ignore[arg-type]
             subquery_count=subquery_count,
             transformer=transformer,
             additional_data=additional_data,
@@ -122,7 +122,7 @@ def paginate(
         session,
         query,
         params,
-        count_query=count_query,
+        count_query=count_query,  # type: ignore[arg-type]
         subquery_count=subquery_count,
         transformer=transformer,  # type: ignore[arg-type]
         additional_data=additional_data,
