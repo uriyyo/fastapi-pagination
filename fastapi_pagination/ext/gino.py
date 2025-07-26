@@ -51,7 +51,7 @@ async def apaginate(
     )
 
 
-@deprecated("Use `apaginate` instead. This function will be removed in v0.14.0")
+@deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
 async def paginate(
     query: Union[Select[tuple[Any, ...]], CRUDModel],
     params: Optional[AbstractParams] = None,

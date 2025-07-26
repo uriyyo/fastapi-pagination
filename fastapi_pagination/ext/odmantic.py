@@ -81,7 +81,7 @@ def _paginate_flow(
 
 
 @overload
-@deprecated("Use `apaginate` instead. This function will be removed in v0.14.0")
+@deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
 async def paginate(
     engine: AIOEngine,
     model: type[Model],
@@ -130,7 +130,7 @@ def paginate(
 ) -> Any:
     if isinstance(engine, AIOEngine):
         warnings.warn(
-            "Use `apaginate` instead. This function overload will be removed in v0.14.0",
+            "Use `apaginate` instead. This function overload will be removed in v0.15.0",
             DeprecationWarning,
             stacklevel=2,
         )

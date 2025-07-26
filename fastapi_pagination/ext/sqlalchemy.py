@@ -430,7 +430,7 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
         pass
     else:
         warnings.warn(
-            "Use `apaginate` instead. This function overload will be removed in v0.14.0",
+            "Use `apaginate` instead. This function overload will be removed in v0.15.0",
             DeprecationWarning,
             stacklevel=2,
         )
