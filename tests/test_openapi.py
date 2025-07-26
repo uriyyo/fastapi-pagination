@@ -6,6 +6,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.links import LimitOffsetPage as LinksLimitOffsetPage
 from fastapi_pagination.links import Page as LinksPage
 from fastapi_pagination.optional import OptionalLimitOffsetPage, OptionalPage
+from fastapi_pagination.utils import IS_PYDANTIC_V2
 
 app = FastAPI()
 add_pagination(app)
@@ -29,6 +30,10 @@ for name, page in CASES:
         pass
 
 
+@pytest.mark.skipif(
+    not IS_PYDANTIC_V2,
+    reason="We don't check OpenAPI schema for Pydantic v1, as support for it will be dropped in the future.",
+)
 @pytest.mark.parametrize(
     ("endpoint", "schema"),
     [
