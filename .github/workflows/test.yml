@@ -21,7 +21,7 @@ jobs:
         fastapi_pre_0_112_4: [ "true", "false" ]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
@@ -54,7 +54,7 @@ jobs:
           bash scripts/ci-test.sh
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5.4.3
+        uses: codecov/codecov-action@v5.5.0
         with:
           files: ./coverage.xml
         env:
