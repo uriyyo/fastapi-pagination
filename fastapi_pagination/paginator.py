@@ -16,7 +16,7 @@ T = TypeVar("T")
 def paginate(
     sequence: Sequence[T],
     params: Optional[AbstractParams] = None,
-    length_function: Callable[[Sequence[T]], int] = len,
+    length_function: Optional[Callable[[Sequence[T]], int]] = None,
     *,
     safe: bool = False,
     transformer: Optional[SyncItemsTransformer] = None,
@@ -25,6 +25,9 @@ def paginate(
 ) -> Any:
     if not safe:
         check_installed_extensions()
+
+    if length_function is None:
+        length_function = len
 
     return run_sync_flow(
         generic_flow(

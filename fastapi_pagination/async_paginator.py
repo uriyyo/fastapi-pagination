@@ -29,7 +29,8 @@ async def apaginate(
     if not safe:
         check_installed_extensions()
 
-    length_function = length_function or len
+    if length_function is None:
+        length_function = len
 
     return await run_async_flow(
         generic_flow(
