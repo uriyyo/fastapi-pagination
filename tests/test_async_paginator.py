@@ -12,8 +12,8 @@ async def _len_func(seq):
 class TestAsyncPaginationParams(BasePaginationTestSuite):
     @pytest.fixture(
         scope="session",
-        params=[len, _len_func],
-        ids=["sync", "async"],
+        params=[len, _len_func, None],
+        ids=["sync", "async", "default"],
     )
     def len_function(self, request):
         return request.param
