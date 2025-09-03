@@ -1,6 +1,6 @@
 [project]
 name = "fastapi-pagination"
-version = "0.14.0"
+version = "0.14.1"
 description = "FastAPI pagination"
 authors = [
     { name = "Yurii Karabas", email = "1998uriyyo@gmail.com" },
