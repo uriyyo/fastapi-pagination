@@ -36,7 +36,11 @@ from fastapi.dependencies.utils import (
 )
 from fastapi.routing import APIRoute, APIRouter
 from pydantic import BaseModel
-from starlette.routing import request_response
+
+try:
+    from fastapi.routing import request_response
+except ImportError:  # pragma: no cover
+    from starlette.routing import request_response
 
 from .bases import AbstractPage, AbstractParams
 from .errors import UninitializedConfigurationError
