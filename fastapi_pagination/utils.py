@@ -15,7 +15,6 @@ __all__ = [
     "verify_params",
 ]
 
-import asyncio
 import functools
 import inspect
 import warnings
@@ -67,7 +66,7 @@ def is_async_callable(obj: Any) -> bool:  # pragma: no cover
     while isinstance(obj, functools.partial):
         obj = obj.func
 
-    return asyncio.iscoroutinefunction(obj) or (callable(obj) and asyncio.iscoroutinefunction(obj.__call__))
+    return inspect.iscoroutinefunction(obj) or (callable(obj) and inspect.iscoroutinefunction(obj.__call__))
 
 
 P = ParamSpec("P")
