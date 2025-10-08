@@ -31,9 +31,6 @@ for name, page in CASES:
         pass
 
 
-@pytest.mark.skip(
-    reason="Flaky for optional pages, need to investigate later.",
-)
 @pytest.mark.skipif(
     not IS_PYDANTIC_V2,
     reason="We don't check OpenAPI schema for Pydantic v1, as support for it will be dropped in the future.",
