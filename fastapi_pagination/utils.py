@@ -32,7 +32,6 @@ if TYPE_CHECKING:
     TModel = TypeVar("TModel", bound=BaseModel)
 
 IS_PYDANTIC_V2 = VERSION.startswith("2.")
-IS_PYDANTIC_V2_12 = IS_PYDANTIC_V2 and VERSION >= "2.12"
 
 
 @overload
