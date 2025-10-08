@@ -201,7 +201,9 @@ class _UseOptionalRequiredFields(PageCustomizer):
         else:  # noqa: PLR5501
             if IS_PYDANTIC_V2:
                 fields_to_update = {k: _make_field_optional(v) or v for k, v in fields_to_update.items()}
-                customizer = UseAdditionalFields(**{k: (_get_field_tp(v), v) for k, v in fields_to_update.items()})
+                customizer = UseAdditionalFields(
+                    **{k: (Annotated[_get_field_tp(v), v], None) for k, v in fields_to_update.items()}
+                )
             else:
                 customizer = UseAdditionalFields(
                     **{k: (Optional[_get_field_tp(v)], None) for k, v in fields_to_update.items()},
