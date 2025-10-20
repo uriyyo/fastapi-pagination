@@ -9,20 +9,20 @@ __all__ = [
 
 import binascii
 from base64 import b64decode, b64encode
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import (
     Any,
-    Callable,
     ClassVar,
     Generic,
-    Optional,
+    Literal,
+    TypeAlias,
     overload,
 )
 from urllib.parse import quote, unquote
 
 from fastapi import HTTPException, Query, status
 from pydantic import BaseModel, Field
-from typing_extensions import Literal, TypeAlias, TypeVar
+from typing_extensions import TypeVar
 
 from .bases import AbstractParams, BasePage, CursorRawParams
 from .types import Cursor
@@ -30,26 +30,26 @@ from .utils import create_pydantic_model
 
 TAny = TypeVar("TAny", default=Any)
 
-CursorEncoder: TypeAlias = "Callable[[CursorParams, Optional[Cursor]], Optional[str]]"
-CursorDecoder: TypeAlias = "Callable[[CursorParams, Optional[str]], Optional[Cursor]]"
+CursorEncoder: TypeAlias = "Callable[[CursorParams, Cursor | None], str | None]"
+CursorDecoder: TypeAlias = "Callable[[CursorParams, str | None], Cursor | None]"
 
 
 @overload
-def decode_cursor(cursor: Optional[str], *, to_str: Literal[True] = True, quoted: bool = True) -> Optional[str]:
+def decode_cursor(cursor: str | None, *, to_str: Literal[True] = True, quoted: bool = True) -> str | None:
     pass
 
 
 @overload
-def decode_cursor(cursor: Optional[str], *, to_str: Literal[False], quoted: bool = True) -> Optional[bytes]:
+def decode_cursor(cursor: str | None, *, to_str: Literal[False], quoted: bool = True) -> bytes | None:
     pass
 
 
 @overload
-def decode_cursor(cursor: Optional[str], *, to_str: bool, quoted: bool = True) -> Optional[Cursor]:
+def decode_cursor(cursor: str | None, *, to_str: bool, quoted: bool = True) -> Cursor | None:
     pass
 
 
-def decode_cursor(cursor: Optional[str], *, to_str: bool = True, quoted: bool = True) -> Optional[Cursor]:
+def decode_cursor(cursor: str | None, *, to_str: bool = True, quoted: bool = True) -> Cursor | None:
     if cursor:
         try:
             cursor = unquote(cursor) if quoted else cursor
@@ -69,11 +69,11 @@ def default_encoder(cursor: bytes) -> str:
 
 
 def encode_cursor(
-    cursor: Optional[Cursor],
+    cursor: Cursor | None,
     *,
     quoted: bool = True,
     encoder: Callable[[bytes], str] = default_encoder,
-) -> Optional[str]:
+) -> str | None:
     if cursor:
         cursor = cursor.encode() if isinstance(cursor, str) else cursor
         encoded = encoder(cursor)
@@ -87,7 +87,7 @@ def encode_cursor(
 
 
 class CursorParams(BaseModel, AbstractParams):
-    cursor: Optional[str] = Query(None, description="Cursor for the next page")
+    cursor: str | None = Query(None, description="Cursor for the next page")
     size: int = Query(50, ge=0, le=100, description="Page size")
 
     str_cursor: ClassVar[bool] = True
@@ -99,21 +99,21 @@ class CursorParams(BaseModel, AbstractParams):
             size=self.size,
         )
 
-    def encode_cursor(self, cursor: Optional[Cursor]) -> Optional[str]:
+    def encode_cursor(self, cursor: Cursor | None) -> str | None:
         return encode_cursor(cursor, quoted=self.quoted_cursor)
 
-    def decode_cursor(self, cursor: Optional[str]) -> Optional[Cursor]:
+    def decode_cursor(self, cursor: str | None) -> Cursor | None:
         return decode_cursor(cursor, to_str=self.str_cursor, quoted=self.quoted_cursor)
 
 
 class CursorPage(BasePage[TAny], Generic[TAny]):
-    current_page: Optional[str] = Field(None, description="Cursor to refetch the current page")
-    current_page_backwards: Optional[str] = Field(
+    current_page: str | None = Field(None, description="Cursor to refetch the current page")
+    current_page_backwards: str | None = Field(
         None,
         description="Cursor to refetch the current page starting from the last item",
     )
-    previous_page: Optional[str] = Field(None, description="Cursor for the previous page")
-    next_page: Optional[str] = Field(None, description="Cursor for the next page")
+    previous_page: str | None = Field(None, description="Cursor for the previous page")
+    next_page: str | None = Field(None, description="Cursor for the next page")
 
     __params_type__ = CursorParams
 
@@ -123,10 +123,10 @@ class CursorPage(BasePage[TAny], Generic[TAny]):
         items: Sequence[TAny],
         params: AbstractParams,
         *,
-        current: Optional[Cursor] = None,
-        current_backwards: Optional[Cursor] = None,
-        next_: Optional[Cursor] = None,
-        previous: Optional[Cursor] = None,
+        current: Cursor | None = None,
+        current_backwards: Cursor | None = None,
+        next_: Cursor | None = None,
+        previous: Cursor | None = None,
         **kwargs: Any,
     ) -> CursorPage[TAny]:
         if not isinstance(params, CursorParams):

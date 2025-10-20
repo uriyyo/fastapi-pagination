@@ -1,7 +1,7 @@
 __all__ = ["paginate"]
 
 from functools import partial
-from typing import Any, Optional, TypeVar, Union, cast
+from typing import Any, TypeVar, cast
 
 from mongoengine import QuerySet
 from mongoengine.base.metaclasses import TopLevelDocumentMetaclass
@@ -23,12 +23,12 @@ def _limit_offset_flow(query: QuerySet, raw_params: RawParams) -> LimitOffsetFlo
 
 
 def paginate(
-    query: Union[type[T], QuerySet],
-    params: Optional[AbstractParams] = None,
+    query: type[T] | QuerySet,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     if isinstance(query, TopLevelDocumentMetaclass):
         query = cast(type[T], query).objects().all()

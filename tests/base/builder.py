@@ -8,7 +8,7 @@ __all__ = [
 from collections.abc import Callable, Iterable
 from contextlib import AsyncExitStack, asynccontextmanager
 from dataclasses import dataclass, field, replace
-from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -86,11 +86,11 @@ class BuilderClasses(Generic[TSuiteBuilder_co]):
 
         def update(
             self,
-            page_size: Optional[type[AbstractPage[Any]]] = None,
-            limit_offset: Optional[type[AbstractPage[Any]]] = None,
-            cursor: Optional[type[AbstractPage[Any]]] = None,
-            model: Optional[type[BaseModel]] = None,
-            model_with_rel: Optional[type[BaseModel]] = None,
+            page_size: type[AbstractPage[Any]] | None = None,
+            limit_offset: type[AbstractPage[Any]] | None = None,
+            cursor: type[AbstractPage[Any]] | None = None,
+            model: type[BaseModel] | None = None,
+            model_with_rel: type[BaseModel] | None = None,
         ) -> TSuiteBuilder_co:
             pass
     else:
@@ -132,11 +132,11 @@ class SuiteBuilder:
         @classmethod
         def with_classes(
             cls,
-            page_size: Optional[type[AbstractPage[Any]]] = None,
-            limit_offset: Optional[type[AbstractPage[Any]]] = None,
-            cursor: Optional[type[AbstractPage[Any]]] = None,
-            model: Optional[type[BaseModel]] = None,
-            model_with_rel: Optional[type[BaseModel]] = None,
+            page_size: type[AbstractPage[Any]] | None = None,
+            limit_offset: type[AbstractPage[Any]] | None = None,
+            cursor: type[AbstractPage[Any]] | None = None,
+            model: type[BaseModel] | None = None,
+            model_with_rel: type[BaseModel] | None = None,
         ) -> Self:
             pass
     else:

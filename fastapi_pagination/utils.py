@@ -18,11 +18,11 @@ __all__ = [
 import functools
 import inspect
 import warnings
-from collections.abc import Awaitable
-from typing import TYPE_CHECKING, Annotated, Any, Callable, Optional, TypeVar, Union, cast, overload
+from collections.abc import Awaitable, Callable
+from typing import TYPE_CHECKING, Annotated, Any, Literal, TypeVar, cast, get_origin, overload
 
 from pydantic import VERSION, BaseModel
-from typing_extensions import Literal, ParamSpec, get_origin
+from typing_extensions import ParamSpec
 
 if TYPE_CHECKING:
     from .bases import AbstractParams, BaseRawParams, CursorRawParams, RawParams
@@ -35,21 +35,21 @@ IS_PYDANTIC_V2 = VERSION.startswith("2.")
 
 
 @overload
-def verify_params(params: Optional[TParams], *params_types: Literal["limit-offset"]) -> tuple[TParams, RawParams]:
+def verify_params(params: TParams | None, *params_types: Literal["limit-offset"]) -> tuple[TParams, RawParams]:
     pass
 
 
 @overload
-def verify_params(params: Optional[TParams], *params_types: Literal["cursor"]) -> tuple[TParams, CursorRawParams]:
+def verify_params(params: TParams | None, *params_types: Literal["cursor"]) -> tuple[TParams, CursorRawParams]:
     pass
 
 
 @overload
-def verify_params(params: Optional[TParams], *params_types: ParamsType) -> tuple[TParams, BaseRawParams]:
+def verify_params(params: TParams | None, *params_types: ParamsType) -> tuple[TParams, BaseRawParams]:
     pass
 
 
-def verify_params(params: Optional[TParams], *params_types: ParamsType) -> tuple[TParams, BaseRawParams]:
+def verify_params(params: TParams | None, *params_types: ParamsType) -> tuple[TParams, BaseRawParams]:
     from .api import resolve_params
 
     params = resolve_params(params)
@@ -94,7 +94,7 @@ def is_coro(obj: Any) -> bool:
     return isinstance(obj, Awaitable)
 
 
-async def await_if_coro(coro: Union[Awaitable[R], R], /) -> R:
+async def await_if_coro(coro: Awaitable[R] | R, /) -> R:
     if isinstance(coro, Awaitable):
         return cast(R, await coro)
 
@@ -167,7 +167,7 @@ def check_installed_extensions() -> None:
             break
 
 
-def get_caller(depth: int = 1) -> Optional[str]:
+def get_caller(depth: int = 1) -> str | None:
     frame = inspect.currentframe()
 
     for _ in range(depth + 1):
@@ -176,7 +176,7 @@ def get_caller(depth: int = 1) -> Optional[str]:
 
         frame = frame.f_back
 
-    return cast(Optional[str], frame and frame.f_globals.get("__name__"))
+    return cast(str | None, frame and frame.f_globals.get("__name__"))
 
 
 def create_pydantic_model(model_cls: type[TModel], /, **kwargs: Any) -> TModel:

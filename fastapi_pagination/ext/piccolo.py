@@ -3,7 +3,7 @@ __all__ = ["apaginate", "paginate"]
 from contextlib import suppress
 from copy import copy
 from functools import partial
-from typing import Any, Optional, TypeVar, Union, cast
+from typing import Any, TypeVar, cast
 
 from piccolo.query import Select
 from piccolo.query.methods.select import Count
@@ -50,12 +50,12 @@ def _total_flow(query: Select[TTable_co]) -> TotalFlow:
 
 
 async def apaginate(
-    query: Union[Select[TTable_co], type[TTable_co]],
-    params: Optional[AbstractParams] = None,
+    query: Select[TTable_co] | type[TTable_co],
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     if not isinstance(query, Select):
         query = query.select()
@@ -75,12 +75,12 @@ async def apaginate(
 
 @deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
 async def paginate(
-    query: Union[Select[TTable_co], type[TTable_co]],
-    params: Optional[AbstractParams] = None,
+    query: Select[TTable_co] | type[TTable_co],
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return await apaginate(
         query,

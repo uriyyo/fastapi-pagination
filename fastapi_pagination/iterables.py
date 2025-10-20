@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from itertools import islice
-from typing import Any, Optional
+from typing import Any
 
 __all__ = [
     "LimitOffsetPage",
@@ -23,12 +23,12 @@ from .types import AdditionalData, SyncItemsTransformer
 
 def paginate(
     iterable: Iterable[Any],
-    params: Optional[AbstractParams] = None,
-    total: Optional[int] = None,
+    params: AbstractParams | None = None,
+    total: int | None = None,
     *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return run_sync_flow(
         generic_flow(

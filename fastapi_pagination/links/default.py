@@ -8,9 +8,9 @@ __all__ = [
 
 from abc import ABC
 from math import ceil
-from typing import Any, Optional
+from typing import Any, TypeAlias
 
-from typing_extensions import TypeAlias, TypeVar
+from typing_extensions import TypeVar
 
 from fastapi_pagination.customization import CustomizedPage
 from fastapi_pagination.default import Page as BasePage
@@ -20,7 +20,7 @@ from .bases import BaseLinksCustomizer, BaseUseHeaderLinks, BaseUseLinks, Links,
 TAny = TypeVar("TAny", default=Any)
 
 
-def resolve_default_links(_page: BasePage, /, only_path: Optional[bool] = None) -> Links:
+def resolve_default_links(_page: BasePage, /, only_path: bool | None = None) -> Links:
     page, size, total = _page.page, _page.size, _page.total
 
     return create_links(

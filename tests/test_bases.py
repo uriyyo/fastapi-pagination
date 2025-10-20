@@ -1,4 +1,4 @@
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 import pytest
 from fastapi import Query
@@ -13,10 +13,10 @@ C = TypeVar("C")
 
 def test_zero_size():
     class CustomParams(Params):
-        size: Optional[int] = Query(0)
+        size: int | None = Query(0)
 
     class CustomPage(Page[T], Generic[T]):
-        size: Optional[int] = None
+        size: int | None = None
 
         __params_type__ = CustomParams
 

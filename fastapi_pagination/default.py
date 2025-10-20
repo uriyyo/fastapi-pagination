@@ -7,7 +7,7 @@ __all__ = [
 
 from collections.abc import Sequence
 from math import ceil
-from typing import Any, Generic, Optional
+from typing import Any, Generic
 
 from fastapi import Query
 from pydantic import BaseModel
@@ -44,7 +44,7 @@ class Page(BasePage[TAny], Generic[TAny]):
         items: Sequence[TAny],
         params: AbstractParams,
         *,
-        total: Optional[int] = None,
+        total: int | None = None,
         **kwargs: Any,
     ) -> Page[TAny]:
         if not isinstance(params, Params):

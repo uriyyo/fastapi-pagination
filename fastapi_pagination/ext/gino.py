@@ -2,7 +2,7 @@ from __future__ import annotations
 
 __all__ = ["apaginate", "paginate"]
 
-from typing import Any, Optional, Union
+from typing import Any
 
 from gino.crud import CRUDModel
 from sqlalchemy import func, literal_column
@@ -19,12 +19,12 @@ from .sqlalchemy import create_paginate_query
 
 
 async def apaginate(
-    query: Union[Select[tuple[Any, ...]], CRUDModel],
-    params: Optional[AbstractParams] = None,
+    query: Select[tuple[Any, ...]] | CRUDModel,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     if isinstance(query, type) and issubclass(query, CRUDModel):
         query = query.query  # type: ignore[attr-defined]
@@ -53,12 +53,12 @@ async def apaginate(
 
 @deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
 async def paginate(
-    query: Union[Select[tuple[Any, ...]], CRUDModel],
-    params: Optional[AbstractParams] = None,
+    query: Select[tuple[Any, ...]] | CRUDModel,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return await apaginate(
         query,

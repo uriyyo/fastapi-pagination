@@ -1,5 +1,5 @@
-from collections.abc import Sequence
-from typing import Any, Callable, Optional, TypeVar
+from collections.abc import Callable, Sequence
+from typing import Any, TypeVar
 
 __all__ = ["paginate"]
 
@@ -15,13 +15,13 @@ T = TypeVar("T")
 
 def paginate(
     sequence: Sequence[T],
-    params: Optional[AbstractParams] = None,
-    length_function: Optional[Callable[[Sequence[T]], int]] = None,
+    params: AbstractParams | None = None,
+    length_function: Callable[[Sequence[T]], int] | None = None,
     *,
     safe: bool = False,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     if not safe:
         check_installed_extensions()

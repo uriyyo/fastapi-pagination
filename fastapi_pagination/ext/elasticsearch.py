@@ -3,7 +3,7 @@ __all__ = [
 ]
 
 from functools import partial
-from typing import Any, Optional
+from typing import Any
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
@@ -37,11 +37,11 @@ def _cursor_flow(
 def paginate(
     conn: Elasticsearch,
     query: Search,
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return run_sync_flow(
         generic_flow(

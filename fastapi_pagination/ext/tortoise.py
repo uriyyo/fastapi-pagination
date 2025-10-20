@@ -1,6 +1,6 @@
 __all__ = ["apaginate", "paginate"]
 
-from typing import Any, Optional, TypeVar, Union
+from typing import Any, TypeVar
 
 from tortoise.models import Model
 from tortoise.query_utils import Prefetch
@@ -20,7 +20,7 @@ TModel = TypeVar("TModel", bound=Model)
 
 def _generate_query(
     query: QuerySet[TModel],
-    prefetch_related: Union[bool, list[Union[str, Prefetch]]],
+    prefetch_related: bool | list[str | Prefetch],
 ) -> QuerySet[TModel]:
     if prefetch_related:
         if prefetch_related is True:
@@ -32,14 +32,14 @@ def _generate_query(
 
 
 async def apaginate(
-    query: Union[QuerySet[TModel], type[TModel]],
-    params: Optional[AbstractParams] = None,
-    prefetch_related: Union[bool, list[Union[str, Prefetch]]] = False,
+    query: QuerySet[TModel] | type[TModel],
+    params: AbstractParams | None = None,
+    prefetch_related: bool | list[str | Prefetch] = False,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    total: Optional[int] = None,
-    config: Optional[Config] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    total: int | None = None,
+    config: Config | None = None,
 ) -> Any:
     if not isinstance(query, QuerySet):
         query = query.all()
@@ -64,14 +64,14 @@ async def apaginate(
 
 @deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
 async def paginate(
-    query: Union[QuerySet[TModel], type[TModel]],
-    params: Optional[AbstractParams] = None,
-    prefetch_related: Union[bool, list[Union[str, Prefetch]]] = False,
+    query: QuerySet[TModel] | type[TModel],
+    params: AbstractParams | None = None,
+    prefetch_related: bool | list[str | Prefetch] = False,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    total: Optional[int] = None,
-    config: Optional[Config] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    total: int | None = None,
+    config: Config | None = None,
 ) -> Any:
     return await apaginate(
         query,

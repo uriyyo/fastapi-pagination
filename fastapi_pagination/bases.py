@@ -19,7 +19,6 @@ from typing import (
     Any,
     ClassVar,
     Generic,
-    Optional,
 )
 
 from .utils import IS_PYDANTIC_V2
@@ -74,8 +73,8 @@ def is_cursor(params: BaseRawParams) -> TypeIs[CursorRawParams]:
 
 @dataclass
 class RawParams(BaseRawParams):
-    limit: Optional[int] = None
-    offset: Optional[int] = None
+    limit: int | None = None
+    offset: int | None = None
     include_total: bool = True
 
     type: ClassVar[ParamsType] = "limit-offset"
@@ -89,7 +88,7 @@ class RawParams(BaseRawParams):
 
 @dataclass
 class CursorRawParams(BaseRawParams):
-    cursor: Optional[Cursor]
+    cursor: Cursor | None
     size: int
     include_total: bool = True
 
@@ -102,7 +101,7 @@ def connect_page_and_params(page_cls: type[AbstractPage[Any]], params_cls: type[
 
 
 class AbstractParams(ABC):
-    __page_type__: ClassVar[Optional[type[AbstractPage[Any]]]] = None
+    __page_type__: ClassVar[type[AbstractPage[Any]] | None] = None
 
     @abstractmethod
     def to_raw_params(self) -> BaseRawParams:

@@ -10,11 +10,9 @@ __all__ = [
     "generic_flow",
 ]
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from contextlib import ExitStack
-from typing import Any, Callable, Optional, Protocol
-
-from typing_extensions import TypeAlias
+from typing import Any, Protocol, TypeAlias
 
 from .api import apply_items_transformer, create_page, set_page
 from .bases import AbstractParams, CursorRawParams, RawParams, is_cursor, is_limit_offset
@@ -24,12 +22,12 @@ from .types import AdditionalData, ItemsTransformer, ParamsType
 from .utils import verify_params
 
 LimitOffsetFlow: TypeAlias = AnyFlow
-CursorFlow: TypeAlias = AnyFlow[tuple[Any, Optional[AdditionalData]]]
-TotalFlow: TypeAlias = AnyFlow[Optional[int]]
+CursorFlow: TypeAlias = AnyFlow[tuple[Any, AdditionalData | None]]
+TotalFlow: TypeAlias = AnyFlow[int | None]
 
 LimitOffsetFlowFunc: TypeAlias = Callable[[RawParams], AnyFlow]
-CursorFlowFunc: TypeAlias = Callable[[CursorRawParams], AnyFlow[tuple[Any, Optional[AdditionalData]]]]
-TotalFlowFunc: TypeAlias = Callable[[], AnyFlow[Optional[int]]]
+CursorFlowFunc: TypeAlias = Callable[[CursorRawParams], AnyFlow[tuple[Any, AdditionalData | None]]]
+TotalFlowFunc: TypeAlias = Callable[[], AnyFlow[int | None]]
 
 
 class CreatePageFactory(Protocol):
@@ -37,8 +35,8 @@ class CreatePageFactory(Protocol):
         self,
         items: Sequence[Any],
         /,
-        total: Optional[int] = None,
-        params: Optional[AbstractParams] = None,
+        total: int | None = None,
+        params: AbstractParams | None = None,
         **kwargs: Any,
     ) -> Any:  # pragma: no cover
         pass
@@ -49,12 +47,12 @@ def create_page_flow(
     items: Any,
     params: AbstractParams,
     /,
-    total: Optional[int] = None,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[dict[str, Any]] = None,
-    config: Optional[Config] = None,
+    total: int | None = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: dict[str, Any] | None = None,
+    config: Config | None = None,
     async_: bool = False,
-    create_page_factory: Optional[CreatePageFactory] = None,
+    create_page_factory: CreatePageFactory | None = None,
 ) -> Any:
     with ExitStack() as stack:
         if config and config.page_cls:
@@ -82,16 +80,16 @@ def create_page_flow(
 @flow
 def generic_flow(  # noqa: C901
     *,
-    limit_offset_flow: Optional[LimitOffsetFlowFunc] = None,
-    cursor_flow: Optional[CursorFlowFunc] = None,
-    total_flow: Optional[TotalFlowFunc] = None,
-    params: Optional[AbstractParams] = None,
-    inner_transformer: Optional[ItemsTransformer] = None,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    limit_offset_flow: LimitOffsetFlowFunc | None = None,
+    cursor_flow: CursorFlowFunc | None = None,
+    total_flow: TotalFlowFunc | None = None,
+    params: AbstractParams | None = None,
+    inner_transformer: ItemsTransformer | None = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
     async_: bool = False,
-    create_page_factory: Optional[CreatePageFactory] = None,
+    create_page_factory: CreatePageFactory | None = None,
 ) -> Any:
     types: list[ParamsType] = []
     if limit_offset_flow is not None:

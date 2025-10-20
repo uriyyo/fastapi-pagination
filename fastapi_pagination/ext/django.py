@@ -1,4 +1,4 @@
-from typing import Any, Optional, TypeVar, Union, cast
+from typing import Any, TypeVar, cast
 
 __all__ = ["paginate"]
 
@@ -15,12 +15,12 @@ T = TypeVar("T", bound=Model)
 
 
 def paginate(
-    query: Union[type[T], QuerySet[T]],
-    params: Optional[AbstractParams] = None,
+    query: type[T] | QuerySet[T],
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     if isinstance(query, ModelBase):
         query = cast(type[T], query).objects.all()

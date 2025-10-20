@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import Any, Generic, Optional
+from typing import Any, Generic
 
 from pydantic import BaseModel, Field, root_validator
 from starlette.requests import URL
@@ -29,17 +29,17 @@ _link_field = (
 
 
 class Links(BaseModel):
-    first: Optional[str] = _link_field
-    last: Optional[str] = _link_field
-    self: Optional[str] = _link_field
-    next: Optional[str] = _link_field
-    prev: Optional[str] = _link_field
+    first: str | None = _link_field
+    last: str | None = _link_field
+    self: str | None = _link_field
+    next: str | None = _link_field
+    prev: str | None = _link_field
 
 
 def _resolve_path(
     url: URL,
     *,
-    only_path: Optional[bool] = None,
+    only_path: bool | None = None,
 ) -> str:
     if only_path is None:
         only_path = True
@@ -55,10 +55,10 @@ def _resolve_path(
 
 def _update_path(
     url: URL,
-    to_update: Optional[Mapping[str, Any]],
+    to_update: Mapping[str, Any] | None,
     *,
-    only_path: Optional[bool] = None,
-) -> Optional[str]:
+    only_path: bool | None = None,
+) -> str | None:
     if to_update is None:
         return None
 
@@ -68,10 +68,10 @@ def _update_path(
 def create_links(
     first: Mapping[str, Any],
     last: Mapping[str, Any],
-    next: Optional[Mapping[str, Any]],  # noqa: A002
-    prev: Optional[Mapping[str, Any]],
+    next: Mapping[str, Any] | None,  # noqa: A002
+    prev: Mapping[str, Any] | None,
     *,
-    only_path: Optional[bool] = None,
+    only_path: bool | None = None,
 ) -> Links:
     req = request()
     url = req.url

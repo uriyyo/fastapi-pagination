@@ -5,7 +5,7 @@ __all__ = [
 
 from collections.abc import Sequence
 from functools import partial
-from typing import Any, Optional, TypeVar, Union, cast
+from typing import Any, TypeAlias, TypeVar, cast
 
 from google.cloud.firestore_v1 import (
     AsyncCollectionReference,
@@ -18,7 +18,6 @@ from google.cloud.firestore_v1 import (
 )
 from google.cloud.firestore_v1.aggregation import AggregationQuery
 from google.cloud.firestore_v1.async_aggregation import AsyncAggregationQuery
-from typing_extensions import TypeAlias
 
 from fastapi_pagination.bases import AbstractParams, CursorRawParams, RawParams
 from fastapi_pagination.config import Config
@@ -29,14 +28,14 @@ from fastapi_pagination.types import AdditionalData, ItemsTransformer, SyncItems
 
 TQuery = TypeVar("TQuery", Query, AsyncQuery)
 
-AnyQuery: TypeAlias = Union[Query, AsyncQuery]
-AnyTransaction: TypeAlias = Union[Transaction, AsyncTransaction]
+AnyQuery: TypeAlias = Query | AsyncQuery
+AnyTransaction: TypeAlias = Transaction | AsyncTransaction
 
 
 def _apply_cursor(
     query: TQuery,
     params: CursorRawParams,
-    snapshot: Optional[DocumentSnapshot],
+    snapshot: DocumentSnapshot | None,
 ) -> TQuery:
     if snapshot is not None:
         query = query.start_after(snapshot)
@@ -53,7 +52,7 @@ def _convert_raw_items(items: Sequence[DocumentSnapshot], /) -> Sequence[dict[st
 def _get_total(
     async_: bool,
     query: AnyQuery,
-    transaction: Optional[AnyTransaction],
+    transaction: AnyTransaction | None,
 ) -> Flow[Any, int]:
     aggr_query = AsyncAggregationQuery if async_ else AggregationQuery
     total_res = yield aggr_query(query).count("total").get(transaction=transaction)
@@ -65,7 +64,7 @@ def _get_total(
 def _total_flow(
     async_: bool,
     query: AnyQuery,
-    transaction: Optional[AnyTransaction],
+    transaction: AnyTransaction | None,
 ) -> TotalFlow:
     aggr_query = AsyncAggregationQuery if async_ else AggregationQuery
     total_res = yield aggr_query(query).count("total").get(transaction=transaction)
@@ -76,7 +75,7 @@ def _total_flow(
 @flow
 def _limit_offset_flow(
     query: AnyQuery,
-    transaction: Optional[AnyTransaction],
+    transaction: AnyTransaction | None,
     raw_params: RawParams,
 ) -> LimitOffsetFlow:
     query = generic_query_apply_params(query, raw_params)
@@ -89,8 +88,8 @@ def _limit_offset_flow(
 def _fetch_cursor(
     query: AnyQuery,
     params: CursorRawParams,
-    transaction: Optional[AnyTransaction],
-) -> Flow[Any, Optional[DocumentSnapshot]]:
+    transaction: AnyTransaction | None,
+) -> Flow[Any, DocumentSnapshot | None]:
     if cursor := params.cursor:
         raw_doc = yield query._parent.document(cursor).get(transaction=transaction)
         return cast(DocumentSnapshot, raw_doc)
@@ -101,7 +100,7 @@ def _fetch_cursor(
 @flow
 def _cursor_flow(
     query: AnyQuery,
-    transaction: Optional[AnyTransaction],
+    transaction: AnyTransaction | None,
     raw_params: CursorRawParams,
 ) -> CursorFlow:
     snapshot = yield from _fetch_cursor(query, raw_params, transaction)
@@ -116,20 +115,15 @@ def _cursor_flow(
 
 @flow
 def _firebase_flow(
-    src: Union[
-        CollectionReference,
-        Query,
-        AsyncCollectionReference,
-        AsyncQuery,
-    ],
+    src: CollectionReference | Query | AsyncCollectionReference | AsyncQuery,
     /,
-    params: Optional[AbstractParams],
+    params: AbstractParams | None,
     *,
     raw: bool,
-    transaction: Optional[AnyTransaction],
-    transformer: Optional[ItemsTransformer],
-    additional_data: Optional[AdditionalData],
-    config: Optional[Config],
+    transaction: AnyTransaction | None,
+    transformer: ItemsTransformer | None,
+    additional_data: AdditionalData | None,
+    config: Config | None,
     async_: bool,
 ) -> AnyFlow:
     query: AnyQuery
@@ -140,7 +134,7 @@ def _firebase_flow(
     else:
         query = src
 
-    inner_transformer: Optional[ItemsTransformer] = None
+    inner_transformer: ItemsTransformer | None = None
     if not raw:
         inner_transformer = _convert_raw_items
 
@@ -160,15 +154,15 @@ def _firebase_flow(
 
 
 def paginate(
-    src: Union[CollectionReference, Query],
+    src: CollectionReference | Query,
     /,
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
     raw: bool = False,
-    transaction: Optional[Transaction] = None,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transaction: Transaction | None = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return run_sync_flow(
         _firebase_flow(
@@ -185,15 +179,15 @@ def paginate(
 
 
 async def apaginate(
-    src: Union[AsyncCollectionReference, AsyncQuery],
+    src: AsyncCollectionReference | AsyncQuery,
     /,
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
     raw: bool = False,
-    transaction: Optional[AsyncTransaction] = None,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transaction: AsyncTransaction | None = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return await run_async_flow(
         _firebase_flow(

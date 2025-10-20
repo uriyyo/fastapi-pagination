@@ -15,14 +15,12 @@ __all__ = [
 ]
 
 import inspect
-from collections.abc import AsyncIterator, Iterator, Sequence
+from collections.abc import AsyncIterator, Callable, Iterator, Sequence
 from contextlib import AbstractContextManager, ExitStack, asynccontextmanager, contextmanager, suppress
 from contextvars import ContextVar
 from typing import (
     Any,
-    Callable,
     Literal,
-    Optional,
     TypeVar,
     cast,
     overload,
@@ -57,10 +55,10 @@ _rsp_val: ContextVar[Response] = ContextVar("_rsp_val")
 _req_val: ContextVar[Request] = ContextVar("_req_val")
 
 _items_val: ContextVar[Sequence[Any]] = ContextVar("_items_val")
-_items_transformer_val: ContextVar[Optional[ItemsTransformer]] = ContextVar("_items_transformer_val", default=None)
+_items_transformer_val: ContextVar[ItemsTransformer | None] = ContextVar("_items_transformer_val", default=None)
 
 
-def resolve_params(params: Optional[TAbstractParams_co] = None) -> TAbstractParams_co:
+def resolve_params(params: TAbstractParams_co | None = None) -> TAbstractParams_co:
     if params is None:
         try:
             return cast(TAbstractParams_co, _params_val.get())
@@ -70,7 +68,7 @@ def resolve_params(params: Optional[TAbstractParams_co] = None) -> TAbstractPara
     return params
 
 
-def resolve_items_transformer(transformer: Optional[ItemsTransformer] = None) -> Optional[ItemsTransformer]:
+def resolve_items_transformer(transformer: ItemsTransformer | None = None) -> ItemsTransformer | None:
     if transformer is None:
         return _items_transformer_val.get()
 
@@ -87,8 +85,8 @@ def pagination_items() -> Sequence[Any]:
 def create_page(
     items: Sequence[T],
     /,
-    total: Optional[int] = None,
-    params: Optional[AbstractParams] = None,
+    total: int | None = None,
+    params: AbstractParams | None = None,
     **kwargs: Any,
 ) -> AbstractPage[T]:
     """
@@ -141,7 +139,7 @@ def set_page(page: type[AbstractPage[Any]]) -> AbstractContextManager[None]:
     return _ctx_var_with_reset(_page_val, page)
 
 
-def resolve_page(params: Optional[AbstractParams] = None, /) -> type[AbstractPage[Any]]:
+def resolve_page(params: AbstractParams | None = None, /) -> type[AbstractPage[Any]]:
     try:
         return _page_val.get()
     except LookupError:
@@ -166,7 +164,7 @@ async def async_wrapped(obj: T) -> T:
 def apply_items_transformer(
     items: Sequence[Any],
     /,
-    transformer: Optional[SyncItemsTransformer] = None,
+    transformer: SyncItemsTransformer | None = None,
     *,
     async_: Literal[False] = False,
 ) -> Sequence[Any]:
@@ -177,7 +175,7 @@ def apply_items_transformer(
 async def apply_items_transformer(
     items: Sequence[Any],
     /,
-    transformer: Optional[AsyncItemsTransformer] = None,
+    transformer: AsyncItemsTransformer | None = None,
     *,
     async_: Literal[True],
 ) -> Sequence[Any]:
@@ -187,7 +185,7 @@ async def apply_items_transformer(
 def apply_items_transformer(
     items: Sequence[Any],
     /,
-    transformer: Optional[ItemsTransformer] = None,
+    transformer: ItemsTransformer | None = None,
     *,
     async_: bool = False,
 ) -> Any:
@@ -243,9 +241,9 @@ async def _noop_dep() -> None:
 
 
 def pagination_ctx(
-    page: Optional[type[AbstractPage[Any]]] = None,
-    params: Optional[type[AbstractParams]] = None,
-    transformer: Optional[ItemsTransformer] = None,
+    page: type[AbstractPage[Any]] | None = None,
+    params: type[AbstractParams] | None = None,
+    transformer: ItemsTransformer | None = None,
     __page_ctx_dep__: bool = False,
 ) -> Callable[..., AsyncIterator[AbstractParams]]:
     if page is not None and params is None:
@@ -275,7 +273,7 @@ def pagination_ctx(
     return _page_ctx_dependency
 
 
-def _bet_body_field(route: APIRoute) -> Optional[Any]:
+def _bet_body_field(route: APIRoute) -> Any | None:
     try:
         # starting from fastapi 0.113.0 get_body_field changed its signature
         return get_body_field(

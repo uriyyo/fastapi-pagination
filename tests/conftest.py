@@ -6,7 +6,7 @@ from asyncio import new_event_loop
 from itertools import count
 from pathlib import Path
 from random import randint
-from typing import Any
+from typing import Any, TypeAlias
 
 import aiosqlite
 import asyncpg
@@ -18,7 +18,6 @@ from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from motor.motor_asyncio import AsyncIOMotorClient
 from pytest_asyncio import fixture as async_fixture
-from typing_extensions import TypeAlias
 
 from .schemas import UserWithOrderOut
 from .utils import faker

@@ -5,9 +5,7 @@ __all__ = [
 ]
 
 from functools import cache
-from typing import TYPE_CHECKING, Annotated, Any, TypeVar
-
-from typing_extensions import Literal, TypeAlias
+from typing import TYPE_CHECKING, Annotated, Any, Literal, TypeAlias, TypeVar
 
 from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.customization import CustomizedPage, UseOptionalParams
