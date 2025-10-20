@@ -14,7 +14,7 @@ The documentation is built using [mkdocs](https://www.mkdocs.org/). All document
 `fastapi-pagination` uses [uv](https://docs.astral.sh/uv/) for dependency management.
 Please, install uv before continuing.
 
-Minimum supported python version is `3.9`.
+Minimum supported python version is `3.10`.
 
 
 ### Step 2: clone the repo
