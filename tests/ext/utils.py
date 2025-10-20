@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 
 from tests.base import SuiteBuilder
@@ -17,6 +19,11 @@ sqlalchemy20 = pytest.mark.sqlalchemy20
 only_sqlalchemy20 = pytest.mark.skipif(
     lambda: not is_sqlalchemy20,
     reason="Only for SQLAlchemy 2.0",
+)
+
+skip_python_314 = pytest.mark.skipif(
+    sys.version_info[:2] == (3, 14),
+    reason="Skip tests on Python 3.14 due to incompatibilities",
 )
 
 

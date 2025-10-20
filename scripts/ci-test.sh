@@ -34,16 +34,16 @@ fi
 if [[ "$PYDANTIC_V2" == true ]]; then
     _pip install -U "pydantic>2.0.0"
 else
-    _pip install "pydantic<2"
+  if [[ "$PY_VERSION" == "3.14" ]]; then
+    echo "Skipping tests with Pydantic v1 on Python 3.14 due to incompatibilities"
+    exit 0
+  fi
+
+  _pip install "pydantic<2"
 fi
 
 echo "Running unit-tests"
 _pytest tests --ignore=tests/ext
-
-# install greenlet for python 3.13 separately
-if [[ "$PY_VERSION" == "3.13" ]]; then
-  _pip install greenlet
-fi
 
 echo "Running integration tests"
 _pytest tests/ext
@@ -51,6 +51,11 @@ _pytest tests/ext
 echo "Running tests with SQLAlchemy<2"
 _pip install -U "sqlalchemy<2"
 _pytest tests/ext -m "not sqlalchemy20"
+
+if [[ "$PY_VERSION" == "3.14" ]]; then
+  echo "Skipping rest of tests on Python 3.14 due to incompatibilities"
+  exit 0
+fi
 
 if [[ "$PYDANTIC_V2" == true ]]; then
     echo "Running ormar tests"
