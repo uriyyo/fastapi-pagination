@@ -1,6 +1,6 @@
 from collections.abc import Callable, Coroutine
 from contextlib import AbstractAsyncContextManager, AbstractContextManager
-from typing import Any, TypeVar, Union
+from typing import Any, TypeVar
 
 from faker import Faker
 from pydantic import BaseModel
@@ -41,7 +41,7 @@ async def maybe_async(obj: Any) -> Any:
 
 
 def create_ctx(
-    ctx: Callable[[], Union[AbstractContextManager[Any], AbstractAsyncContextManager[Any]]],
+    ctx: Callable[[], AbstractContextManager[Any] | AbstractAsyncContextManager[Any]],
     is_async: bool,
 ) -> Any:
     async def ctx_func():

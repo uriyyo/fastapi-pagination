@@ -3,12 +3,12 @@ from __future__ import annotations
 __all__ = ["apaginate", "paginate"]
 
 import warnings
-from typing import Any, Generic, Optional, TypeVar, Union, overload
+from typing import Any, Generic, TypeAlias, TypeVar, overload
 
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlmodel import Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
-from typing_extensions import TypeAlias, deprecated
+from typing_extensions import deprecated
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
@@ -30,16 +30,8 @@ T = TypeVar("T")
 TSQLModel = TypeVar("TSQLModel", bound=SQLModel)
 
 
-_InputQuery: TypeAlias = Union[
-    Select[TSQLModel],
-    type[TSQLModel],
-    SelectBase[TSQLModel],
-    SelectOfScalar[T],
-]
-_InputCountQuery: TypeAlias = Union[
-    Select[TSQLModel],
-    SelectOfScalar[T],
-]
+_InputQuery: TypeAlias = Select[TSQLModel] | type[TSQLModel] | SelectBase[TSQLModel] | SelectOfScalar[T]
+_InputCountQuery: TypeAlias = Select[TSQLModel] | SelectOfScalar[T]
 
 
 def _prepare_query(query: _InputQuery[TSQLModel, T], /) -> _InputQuery[TSQLModel, T]:
@@ -53,14 +45,14 @@ def _prepare_query(query: _InputQuery[TSQLModel, T], /) -> _InputQuery[TSQLModel
 def paginate(
     session: Session,
     query: _InputQuery[TSQLModel, T],
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    count_query: Optional[_InputCountQuery[TSQLModel, T]] = None,
+    count_query: _InputCountQuery[TSQLModel, T] | None = None,
     subquery_count: bool = True,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     pass
 
@@ -68,31 +60,31 @@ def paginate(
 @overload
 @deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
 async def paginate(
-    session: Union[AsyncSession, AsyncConnection],
+    session: AsyncSession | AsyncConnection,
     query: _InputQuery[TSQLModel, T],
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    count_query: Optional[_InputCountQuery[TSQLModel, T]] = None,
+    count_query: _InputCountQuery[TSQLModel, T] | None = None,
     subquery_count: bool = True,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     pass
 
 
 def paginate(
-    session: Union[AsyncSession, AsyncConnection, Session],
+    session: AsyncSession | AsyncConnection | Session,
     query: Any,
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    count_query: Optional[Any] = None,
+    count_query: Any | None = None,
     subquery_count: bool = True,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     query = _prepare_query(query)
 
@@ -132,16 +124,16 @@ def paginate(
 
 
 async def apaginate(
-    session: Union[AsyncSession, AsyncConnection],
+    session: AsyncSession | AsyncConnection,
     query: _InputQuery[TSQLModel, T],
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    count_query: Optional[_InputCountQuery[TSQLModel, T]] = None,
+    count_query: _InputCountQuery[TSQLModel, T] | None = None,
     subquery_count: bool = True,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     query = _prepare_query(query)
 

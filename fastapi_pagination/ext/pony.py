@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Optional
+from typing import Any
 
 from pony.orm.core import Query
 
@@ -13,11 +13,11 @@ from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
 
 def paginate(
     query: Query,
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return run_sync_flow(
         generic_flow(

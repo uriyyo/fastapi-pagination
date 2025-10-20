@@ -7,7 +7,7 @@ __all__ = [
 ]
 
 from collections.abc import Sequence
-from typing import Any, Optional, Protocol, TypeVar, Union, cast
+from typing import Any, Protocol, TypeVar, cast
 
 from typing_extensions import Self
 
@@ -16,7 +16,7 @@ from fastapi_pagination.bases import RawParams
 T = TypeVar("T")
 
 
-def len_or_none(obj: Any) -> Optional[int]:
+def len_or_none(obj: Any) -> int | None:
     try:
         return len(obj)
     except TypeError:
@@ -27,9 +27,9 @@ def unwrap_scalars(
     items: Sequence[Sequence[T]],
     *,
     force_unwrap: bool = False,
-) -> Union[Sequence[T], Sequence[Sequence[T]]]:
+) -> Sequence[T] | Sequence[Sequence[T]]:
     return cast(
-        Union[Sequence[T], Sequence[Sequence[T]]],
+        Sequence[T] | Sequence[Sequence[T]],
         [item[0] if force_unwrap or len_or_none(item) == 1 else item for item in items],
     )
 

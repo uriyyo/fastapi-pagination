@@ -9,9 +9,9 @@ __all__ = [
 
 from abc import ABC
 from math import floor, inf
-from typing import Any, cast
+from typing import Any, TypeAlias, cast
 
-from typing_extensions import TypeAlias, TypeVar
+from typing_extensions import TypeVar
 
 from fastapi_pagination.customization import CustomizedPage
 from fastapi_pagination.limit_offset import LimitOffsetPage as BasePage

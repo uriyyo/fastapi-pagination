@@ -36,10 +36,9 @@ from typing import (
     Any,
     ClassVar,
     Generic,
-    Optional,
     Protocol,
+    TypeAlias,
     TypeVar,
-    Union,
     cast,
     get_type_hints,
     runtime_checkable,
@@ -48,7 +47,7 @@ from typing import (
 from fastapi import Query
 from fastapi.params import Param
 from pydantic import BaseModel, ConfigDict, create_model
-from typing_extensions import TypeAlias, Unpack
+from typing_extensions import Unpack
 
 from .bases import AbstractPage, AbstractParams, BaseRawParams
 from .cursor import CursorDecoder, CursorEncoder
@@ -206,7 +205,7 @@ class _UseOptionalRequiredFields(PageCustomizer):
                 )
             else:
                 customizer = UseAdditionalFields(
-                    **{k: (Optional[_get_field_tp(v)], None) for k, v in fields_to_update.items()},
+                    **{k: (_get_field_tp(v) | None, None) for k, v in fields_to_update.items()},
                 )
 
         customizer.customize_page_ns(page_cls, ns)
@@ -263,8 +262,8 @@ class UseIncludeTotal(PageCustomizer):
 
 @dataclass
 class UseCursorEncoding(PageCustomizer):
-    encoder: Optional[CursorEncoder] = None
-    decoder: Optional[CursorDecoder] = None
+    encoder: CursorEncoder | None = None
+    decoder: CursorDecoder | None = None
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         if not (self.encoder or self.decoder):
@@ -278,13 +277,13 @@ class UseCursorEncoding(PageCustomizer):
         src = self
 
         class CustomizedParams(CursorParams):
-            def encode_cursor(self, cursor: Optional[Cursor]) -> Optional[str]:
+            def encode_cursor(self, cursor: Cursor | None) -> str | None:
                 if src.encoder:
                     return src.encoder(self, cursor)
 
                 return super().encode_cursor(cursor)
 
-            def decode_cursor(self, cursor: Optional[str]) -> Optional[Cursor]:
+            def decode_cursor(self, cursor: str | None) -> Cursor | None:
                 if src.decoder:
                     return src.decoder(self, cursor)
 
@@ -354,7 +353,7 @@ if IS_PYDANTIC_V2:
 
         field = copy(field)
 
-        field.annotation = Optional[field.annotation]
+        field.annotation = field.annotation | None
         field.default = None
         field.default_factory = None
 
@@ -512,7 +511,7 @@ class UseFieldsAliases(PageCustomizer):
                 fields_config[name]["alias"] = alias
 
 
-_RawFieldDef: TypeAlias = Union[Any, tuple[Any, Any]]
+_RawFieldDef: TypeAlias = Any | tuple[Any, Any]
 
 
 class UseAdditionalFields(PageCustomizer):

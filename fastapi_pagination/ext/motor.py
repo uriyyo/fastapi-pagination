@@ -5,10 +5,10 @@ __all__ = [
     "paginate_aggregate",
 ]
 
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, TypeAlias
 
 from motor.core import AgnosticCollection
-from typing_extensions import TypeAlias, deprecated
+from typing_extensions import deprecated
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
@@ -26,12 +26,12 @@ else:
 @deprecated("Motor will be deprecated on May 14, 2026. Migration to the PyMongo Async driver is recommended.")
 async def apaginate(
     collection: _AgnosticCollection,
-    query_filter: Optional[dict[Any, Any]] = None,
-    params: Optional[AbstractParams] = None,
-    sort: Optional[Any] = None,
+    query_filter: dict[Any, Any] | None = None,
+    params: AbstractParams | None = None,
+    sort: Any | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     **kwargs: Any,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
@@ -56,12 +56,12 @@ async def apaginate(
 @deprecated("Motor will be deprecated on May 14, 2026. Migration to the PyMongo Async driver is recommended.")
 async def apaginate_aggregate(
     collection: _AgnosticCollection,
-    aggregate_pipeline: Optional[list[dict[Any, Any]]] = None,
-    params: Optional[AbstractParams] = None,
+    aggregate_pipeline: list[dict[Any, Any]] | None = None,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    aggregation_filter_end: Optional[Union[int, Literal["auto"]]] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    aggregation_filter_end: int | Literal["auto"] | None = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []
@@ -112,12 +112,12 @@ async def apaginate_aggregate(
 @deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
 async def paginate(
     collection: _AgnosticCollection,
-    query_filter: Optional[dict[Any, Any]] = None,
-    params: Optional[AbstractParams] = None,
-    sort: Optional[Any] = None,
+    query_filter: dict[Any, Any] | None = None,
+    params: AbstractParams | None = None,
+    sort: Any | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     **kwargs: Any,
 ) -> Any:
     return await apaginate(
@@ -134,11 +134,11 @@ async def paginate(
 @deprecated("Use `apaginate_aggregate` instead. This function will be removed in v0.15.0")
 async def paginate_aggregate(
     collection: _AgnosticCollection,
-    aggregate_pipeline: Optional[list[dict[Any, Any]]] = None,
-    params: Optional[AbstractParams] = None,
+    aggregate_pipeline: list[dict[Any, Any]] | None = None,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
 ) -> Any:
     return await apaginate_aggregate(
         collection=collection,

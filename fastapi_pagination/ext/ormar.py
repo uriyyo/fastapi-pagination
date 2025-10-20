@@ -1,6 +1,6 @@
 __all__ = ["apaginate", "paginate"]
 
-from typing import Any, Optional, TypeVar, Union
+from typing import Any, TypeVar
 
 from ormar import Model, QuerySet
 from typing_extensions import deprecated
@@ -17,12 +17,12 @@ TModel = TypeVar("TModel", bound=Model)
 
 
 async def apaginate(
-    query: Union[QuerySet[TModel], type[TModel]],
-    params: Optional[AbstractParams] = None,
+    query: QuerySet[TModel] | type[TModel],
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     if not isinstance(query, QuerySet):
         query = query.objects
@@ -42,12 +42,12 @@ async def apaginate(
 
 @deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
 async def paginate(
-    query: Union[QuerySet[TModel], type[TModel]],
-    params: Optional[AbstractParams] = None,
+    query: QuerySet[TModel] | type[TModel],
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return await apaginate(
         query,

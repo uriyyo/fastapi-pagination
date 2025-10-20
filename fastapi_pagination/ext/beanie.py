@@ -3,7 +3,7 @@ from __future__ import annotations
 __all__ = ["apaginate", "paginate"]
 
 from copy import copy
-from typing import Any, Literal, Optional, TypeVar, Union
+from typing import Any, Literal, TypeVar
 
 from beanie import Document, PydanticObjectId
 from beanie.odm.enums import SortDirection
@@ -32,18 +32,18 @@ def parse_cursor(cursor: str) -> PydanticObjectId:
 
 # TODO: simplify this function using flows
 async def apaginate(  # noqa: C901, PLR0912, PLR0915
-    query: Union[TDocument, FindMany[TDocument], AggregationQuery[TDocument]],
-    params: Optional[AbstractParams] = None,
+    query: TDocument | FindMany[TDocument] | AggregationQuery[TDocument],
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    projection_model: Optional[type[DocumentProjectionType]] = None,
-    sort: Union[None, str, list[tuple[str, SortDirection]]] = None,
-    session: Optional[AsyncClientSession] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    projection_model: type[DocumentProjectionType] | None = None,
+    sort: None | str | list[tuple[str, SortDirection]] = None,
+    session: AsyncClientSession | None = None,
     ignore_cache: bool = False,
     fetch_links: bool = False,
     lazy_parse: bool = False,
-    aggregation_filter_end: Optional[Union[int, Literal["auto"]]] = None,
+    aggregation_filter_end: int | Literal["auto"] | None = None,
     **pymongo_kwargs: Any,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset", "cursor")
@@ -178,18 +178,18 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
 
 @deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
 async def paginate(
-    query: Union[TDocument, FindMany[TDocument], AggregationQuery[TDocument]],
-    params: Optional[AbstractParams] = None,
+    query: TDocument | FindMany[TDocument] | AggregationQuery[TDocument],
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    projection_model: Optional[type[DocumentProjectionType]] = None,
-    sort: Union[None, str, list[tuple[str, SortDirection]]] = None,
-    session: Optional[AsyncClientSession] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    projection_model: type[DocumentProjectionType] | None = None,
+    sort: None | str | list[tuple[str, SortDirection]] = None,
+    session: AsyncClientSession | None = None,
     ignore_cache: bool = False,
     fetch_links: bool = False,
     lazy_parse: bool = False,
-    aggregation_filter_end: Optional[int] = None,
+    aggregation_filter_end: int | None = None,
     **pymongo_kwargs: Any,
 ) -> Any:
     return await apaginate(

@@ -6,7 +6,7 @@ __all__ = [
 ]
 
 from collections.abc import Sequence
-from typing import Any, Generic, Optional
+from typing import Any, Generic
 
 from fastapi import Query
 from pydantic import BaseModel
@@ -42,7 +42,7 @@ class LimitOffsetPage(BasePage[TAny], Generic[TAny]):
         items: Sequence[TAny],
         params: AbstractParams,
         *,
-        total: Optional[int] = None,
+        total: int | None = None,
         **kwargs: Any,
     ) -> LimitOffsetPage[TAny]:
         raw_params = params.to_raw_params().as_limit_offset()

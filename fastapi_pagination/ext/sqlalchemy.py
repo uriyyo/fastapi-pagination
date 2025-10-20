@@ -14,7 +14,7 @@ import warnings
 from collections.abc import Sequence
 from contextlib import suppress
 from functools import partial
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, cast, overload
+from typing import TYPE_CHECKING, Any, Literal, TypeAlias, TypeVar, cast, overload
 
 from sqlalchemy import func, select, text
 from sqlalchemy.engine import Connection
@@ -22,7 +22,6 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query, Session, noload, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import TextClause
-from typing_extensions import Literal, TypeAlias
 
 from fastapi_pagination.api import create_page
 from fastapi_pagination.bases import AbstractParams, CursorRawParams, RawParams
@@ -72,9 +71,9 @@ except ImportError:  # pragma: no cover
     paging = None  # type: ignore[assignment]
 
 
-AsyncConn: TypeAlias = "Union[AsyncSession, AsyncConnection, async_scoped_session[Any]]"
-SyncConn: TypeAlias = "Union[Session, Connection, scoped_session[Any]]"
-AnyConn: TypeAlias = "Union[AsyncConn, SyncConn]"
+AsyncConn: TypeAlias = "AsyncSession | AsyncConnection | async_scoped_session[Any]"
+SyncConn: TypeAlias = "Session | Connection | scoped_session[Any]"
+AnyConn: TypeAlias = "AsyncConn | SyncConn"
 
 UnwrapMode: TypeAlias = Literal[
     "auto",  # default, unwrap only if select is select(model)
@@ -84,8 +83,8 @@ UnwrapMode: TypeAlias = Literal[
 ]
 
 TupleAny: TypeAlias = "tuple[Any, ...]"
-Selectable: TypeAlias = "Union[Select[TupleAny], TextClause, FromStatement[TupleAny], CompoundSelect[TupleAny]]"
-SelectableOrQuery: TypeAlias = "Union[Selectable, Query[Any]]"
+Selectable: TypeAlias = "Select[TupleAny] | TextClause | FromStatement[TupleAny] | CompoundSelect[TupleAny]"
+SelectableOrQuery: TypeAlias = "Selectable | Query[Any]"
 
 
 @overload
@@ -94,11 +93,11 @@ def _prepare_query(query: Select[TupleAny]) -> Select[TupleAny]:
 
 
 @overload
-def _prepare_query(query: Optional[Select[TupleAny]]) -> Optional[Select[TupleAny]]:
+def _prepare_query(query: Select[TupleAny] | None) -> Select[TupleAny] | None:
     pass
 
 
-def _prepare_query(query: Optional[Select[TupleAny]]) -> Optional[Select[TupleAny]]:
+def _prepare_query(query: Select[TupleAny] | None) -> Select[TupleAny] | None:
     if query is None:
         return None
 
@@ -148,7 +147,7 @@ def _should_unwrap_scalars(query: Selectable) -> bool:
     return False
 
 
-AnyParams: TypeAlias = Union[AbstractParams, RawParams]
+AnyParams: TypeAlias = AbstractParams | RawParams
 
 
 def _unwrap_params(params: AnyParams) -> RawParams:
@@ -226,7 +225,7 @@ _TSeq = TypeVar("_TSeq", bound=Sequence[Any])
 def _unwrap_items(
     items: _TSeq,
     query: Selectable,
-    unwrap_mode: Optional[UnwrapMode] = None,
+    unwrap_mode: UnwrapMode | None = None,
 ) -> _TSeq:
     # for raw queries we will use legacy mode by default
     # because we can't determine if we should unwrap or not
@@ -251,14 +250,14 @@ def _unwrap_items(
 def _total_flow(
     query: Selectable,
     conn: AnyConn,
-    count_query: Optional[Selectable],
+    count_query: Selectable | None,
     subquery_count: bool,
 ) -> TotalFlow:
     if count_query is None:
         count_query = create_count_query(query, use_subquery=subquery_count)
 
     total = yield conn.scalar(count_query)
-    return cast(Optional[int], total)
+    return cast(int | None, total)
 
 
 @flow
@@ -304,17 +303,17 @@ def _cursor_flow(query: Selectable, conn: AnyConn, is_async: bool, raw_params: C
 @flow
 def _sqlalchemy_flow(
     is_async: bool,
-    conn: Union[SyncConn, AsyncConn],
+    conn: SyncConn | AsyncConn,
     query: Select[TupleAny],
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
-    unwrap_mode: Optional[UnwrapMode] = None,
-    count_query: Optional[Selectable] = None,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    unwrap_mode: UnwrapMode | None = None,
+    count_query: Selectable | None = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     create_page_factory = create_page
     if is_async:
@@ -340,7 +339,7 @@ def _inner_transformer(
     items: Sequence[Any],
     /,
     query: Selectable,
-    unwrap_mode: Optional[UnwrapMode],
+    unwrap_mode: UnwrapMode | None,
     unique: bool,
 ) -> Sequence[Any]:
     with suppress(AttributeError):
@@ -366,14 +365,14 @@ def _get_sync_conn_from_async(conn: Any) -> SyncConn:  # pragma: no cover
 @overload
 def paginate(
     query: Query[Any],
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
-    unwrap_mode: Optional[UnwrapMode] = None,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    unwrap_mode: UnwrapMode | None = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     pass
 
@@ -382,15 +381,15 @@ def paginate(
 def paginate(
     conn: SyncConn,
     query: SelectableOrQuery,
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    count_query: Optional[SelectableOrQuery] = None,
+    count_query: SelectableOrQuery | None = None,
     subquery_count: bool = True,
-    unwrap_mode: Optional[UnwrapMode] = None,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    unwrap_mode: UnwrapMode | None = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     pass
 
@@ -399,15 +398,15 @@ def paginate(
 async def paginate(
     conn: AsyncConn,
     query: Selectable,
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    count_query: Optional[Selectable] = None,
+    count_query: Selectable | None = None,
     subquery_count: bool = True,
-    unwrap_mode: Optional[UnwrapMode] = None,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    unwrap_mode: UnwrapMode | None = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     pass
 
@@ -467,25 +466,25 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
 
 def _old_paginate_sign(
     query: Query[Any],
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
-    unwrap_mode: Optional[UnwrapMode] = None,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    unwrap_mode: UnwrapMode | None = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> tuple[
     Select[TupleAny],
-    Optional[Selectable],
+    Selectable | None,
     SyncConn,
-    Optional[AbstractParams],
-    Optional[ItemsTransformer],
-    Optional[AdditionalData],
+    AbstractParams | None,
+    ItemsTransformer | None,
+    AdditionalData | None,
     bool,
     bool,
-    Optional[UnwrapMode],
-    Optional[Config],
+    UnwrapMode | None,
+    Config | None,
 ]:
     if query.session is None:
         raise ValueError("query.session is None")
@@ -506,26 +505,26 @@ def _old_paginate_sign(
 def _new_paginate_sign(
     conn: SyncConn,
     query: Select[TupleAny],
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
-    unwrap_mode: Optional[UnwrapMode] = None,
-    count_query: Optional[Selectable] = None,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    unwrap_mode: UnwrapMode | None = None,
+    count_query: Selectable | None = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> tuple[
     Select[TupleAny],
-    Optional[Selectable],
+    Selectable | None,
     SyncConn,
-    Optional[AbstractParams],
-    Optional[ItemsTransformer],
-    Optional[AdditionalData],
+    AbstractParams | None,
+    ItemsTransformer | None,
+    AdditionalData | None,
     bool,
     bool,
-    Optional[UnwrapMode],
-    Optional[Config],
+    UnwrapMode | None,
+    Config | None,
 ]:
     query = _prepare_query(query)
     count_query = _prepare_query(count_query)  # type: ignore[arg-type]
@@ -536,15 +535,15 @@ def _new_paginate_sign(
 async def apaginate(
     conn: AsyncConn,
     query: Selectable,
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    count_query: Optional[Selectable] = None,
+    count_query: Selectable | None = None,
     subquery_count: bool = True,
-    unwrap_mode: Optional[UnwrapMode] = None,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    unwrap_mode: UnwrapMode | None = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     unique: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     query = _prepare_query(query)  # type: ignore[arg-type]
     count_query = _prepare_query(count_query)  # type: ignore[arg-type]

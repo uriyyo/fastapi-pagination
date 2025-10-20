@@ -9,7 +9,7 @@ __all__ = [
 
 
 from collections.abc import Mapping, Sequence
-from typing import Any, Literal, Optional, TypeVar, Union
+from typing import Any, Literal, TypeVar
 
 from pymongo.asynchronous.collection import AsyncCollection
 from pymongo.collection import Collection
@@ -27,14 +27,14 @@ T = TypeVar("T", bound=Mapping[str, Any])
 
 def paginate(
     collection: Collection[T],
-    query_filter: Optional[dict[Any, Any]] = None,
-    filter_fields: Optional[dict[Any, Any]] = None,
-    params: Optional[AbstractParams] = None,
-    sort: Optional[Sequence[Any]] = None,
+    query_filter: dict[Any, Any] | None = None,
+    filter_fields: dict[Any, Any] | None = None,
+    params: AbstractParams | None = None,
+    sort: Sequence[Any] | None = None,
     *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
     **kwargs: Any,
 ) -> Any:
     query_filter = query_filter or {}
@@ -62,14 +62,14 @@ def paginate(
 
 async def apaginate(
     collection: AsyncCollection[T],
-    query_filter: Optional[dict[Any, Any]] = None,
-    filter_fields: Optional[dict[Any, Any]] = None,
-    params: Optional[AbstractParams] = None,
-    sort: Optional[Sequence[Any]] = None,
+    query_filter: dict[Any, Any] | None = None,
+    filter_fields: dict[Any, Any] | None = None,
+    params: AbstractParams | None = None,
+    sort: Sequence[Any] | None = None,
     *,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
     **kwargs: Any,
 ) -> Any:
     query_filter = query_filter or {}
@@ -98,14 +98,14 @@ async def apaginate(
 @flow
 def _aggregate_flow(
     is_async: bool,
-    collection: Union[Collection[T], AsyncCollection[T]],
-    aggregate_pipeline: Optional[list[dict[Any, Any]]] = None,
-    params: Optional[AbstractParams] = None,
+    collection: Collection[T] | AsyncCollection[T],
+    aggregate_pipeline: list[dict[Any, Any]] | None = None,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    aggregation_filter_end: Optional[Union[int, Literal["auto"]]] = None,
-    config: Optional[Config] = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    aggregation_filter_end: int | Literal["auto"] | None = None,
+    config: Config | None = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []
@@ -158,13 +158,13 @@ def _aggregate_flow(
 
 async def apaginate_aggregate(
     collection: AsyncCollection[T],
-    aggregate_pipeline: Optional[list[dict[Any, Any]]] = None,
-    params: Optional[AbstractParams] = None,
+    aggregate_pipeline: list[dict[Any, Any]] | None = None,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    aggregation_filter_end: Optional[Union[int, Literal["auto"]]] = None,
-    config: Optional[Config] = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    aggregation_filter_end: int | Literal["auto"] | None = None,
+    config: Config | None = None,
 ) -> Any:
     return await run_async_flow(
         _aggregate_flow(
@@ -182,13 +182,13 @@ async def apaginate_aggregate(
 
 def paginate_aggregate(
     collection: Collection[T],
-    aggregate_pipeline: Optional[list[dict[Any, Any]]] = None,
-    params: Optional[AbstractParams] = None,
+    aggregate_pipeline: list[dict[Any, Any]] | None = None,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    aggregation_filter_end: Optional[Union[int, Literal["auto"]]] = None,
-    config: Optional[Config] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    aggregation_filter_end: int | Literal["auto"] | None = None,
+    config: Config | None = None,
 ) -> Any:
     return run_sync_flow(
         _aggregate_flow(

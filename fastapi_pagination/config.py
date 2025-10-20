@@ -3,7 +3,7 @@ __all__ = [
 ]
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from .bases import AbstractPage
 
@@ -17,4 +17,4 @@ class Config:
     But in the future, more options might be added.
     """
 
-    page_cls: Optional[type[AbstractPage[Any]]] = None
+    page_cls: type[AbstractPage[Any]] | None = None

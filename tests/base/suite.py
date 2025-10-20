@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import ClassVar
+from typing import ClassVar, TypeAlias
 
 import pytest
-from typing_extensions import TypeAlias
 
 from fastapi_pagination import LimitOffsetPage, LimitOffsetParams, Page, Params, paginate, set_page
 from fastapi_pagination.bases import AbstractParams
@@ -144,7 +143,7 @@ class BasePaginationTestSuite:
     def generate_suites(cls) -> Iterable[SuiteDecl]:
         if "page-size" in cls.pagination_types:
             for case in {*cls.case_types} - {"optional"}:
-                for param, name in zip(_default_params, _params_desc):
+                for param, name in zip(_default_params, _params_desc, strict=False):
                     yield param, "page-size", case, f"page-size-{case}-{name}"
 
             if "optional" in cls.case_types:
@@ -157,7 +156,7 @@ class BasePaginationTestSuite:
 
         if "limit-offset" in cls.pagination_types:
             for case in {*cls.case_types} - {"optional"}:
-                for param, name in zip(_limit_offset_params, _params_desc):
+                for param, name in zip(_limit_offset_params, _params_desc, strict=False):
                     yield param, "limit-offset", case, f"limit-offset-{case}-{name}"
 
             if "optional" in cls.case_types:

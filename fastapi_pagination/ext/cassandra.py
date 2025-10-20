@@ -1,7 +1,7 @@
 __all__ = ["paginate"]
 
 from collections.abc import Mapping
-from typing import Any, Optional, TypeVar
+from typing import Any, TypeVar
 
 from cassandra.cluster import SimpleStatement
 from cassandra.cqlengine import connection
@@ -17,11 +17,11 @@ T = TypeVar("T", bound=Mapping[str, Any])
 
 def paginate(
     model: type[Model],
-    query_filter: Optional[dict[Any, Any]] = None,
-    params: Optional[AbstractParams] = None,
+    query_filter: dict[Any, Any] | None = None,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
 ) -> Any:
     params, raw_params = verify_params(params, "cursor")
     assert not raw_params.include_total, "Cassandra does not support total count"

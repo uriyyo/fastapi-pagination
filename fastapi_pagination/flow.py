@@ -9,11 +9,11 @@ __all__ = [
     "sync_flow",
 ]
 
-from collections.abc import Awaitable, Generator
+from collections.abc import Awaitable, Callable, Generator
 from functools import wraps
-from typing import Any, Callable, Union, cast
+from typing import Any, TypeAlias, cast
 
-from typing_extensions import ParamSpec, TypeAlias, TypeVar
+from typing_extensions import ParamSpec, TypeVar
 
 from fastapi_pagination.utils import await_if_coro, is_coro
 
@@ -23,7 +23,7 @@ TArg = TypeVar("TArg")
 R = TypeVar("R", default=Any)
 
 Flow: TypeAlias = Generator[
-    Union[Awaitable[TArg], TArg],
+    Awaitable[TArg] | TArg,
     TArg,
     R,
 ]
@@ -90,7 +90,7 @@ def async_flow(func: Callable[P, Flow[Any, R]]) -> Callable[P, Awaitable[R]]:
     return wrapper
 
 
-def flow_expr(expr: Callable[P, Union[Awaitable[R], R]]) -> Callable[P, Flow[Any, R]]:
+def flow_expr(expr: Callable[P, Awaitable[R] | R]) -> Callable[P, Flow[Any, R]]:
     @wraps(expr)
     def flow_wrapper(*args: P.args, **kwargs: P.kwargs) -> Flow[Any, R]:
         res = yield expr(*args, **kwargs)

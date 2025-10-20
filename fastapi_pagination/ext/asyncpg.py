@@ -1,7 +1,7 @@
 __all__ = ["apaginate", "paginate"]
 
 from functools import partial
-from typing import Any, Optional
+from typing import Any
 
 from asyncpg import Connection
 from typing_extensions import deprecated
@@ -32,10 +32,10 @@ async def apaginate(
     conn: Connection,
     query: str,
     *args: Any,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    params: Optional[AbstractParams] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    params: AbstractParams | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return await run_async_flow(
         generic_flow(
@@ -55,10 +55,10 @@ async def paginate(
     conn: Connection,
     query: str,
     *args: Any,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    params: Optional[AbstractParams] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    params: AbstractParams | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return await paginate(
         conn,

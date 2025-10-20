@@ -2,12 +2,12 @@ __all__ = ["apaginate", "paginate"]
 
 import warnings
 from functools import partial
-from typing import Any, Optional, Union, overload
+from typing import Any, TypeAlias, overload
 
 from odmantic import AIOEngine, Model, SyncEngine
 from odmantic.engine import AIOSessionType, SyncSessionType
 from odmantic.query import QueryExpression
-from typing_extensions import TypeAlias, deprecated
+from typing_extensions import deprecated
 
 from fastapi_pagination.bases import AbstractParams, RawParams
 from fastapi_pagination.config import Config
@@ -15,16 +15,16 @@ from fastapi_pagination.flow import AnyFlow, flow, flow_expr, run_async_flow, ru
 from fastapi_pagination.flows import LimitOffsetFlow, generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 
-_Query: TypeAlias = Union[QueryExpression, dict[Any, Any], bool]
+_Query: TypeAlias = QueryExpression | dict[Any, Any] | bool
 
 
 @flow
 def _limit_offset_flow(
     model: type[Model],
     queries: tuple[_Query, ...],
-    sort: Optional[Any],
-    engine: Union[SyncEngine, AIOEngine],
-    session: Optional[Union[SyncSessionType, AIOSessionType]],
+    sort: Any | None,
+    engine: SyncEngine | AIOEngine,
+    session: SyncSessionType | AIOSessionType | None,
     raw_params: RawParams,
 ) -> LimitOffsetFlow:
     result = yield engine.find(
@@ -42,17 +42,17 @@ def _limit_offset_flow(
 @flow
 def _paginate_flow(
     is_async: bool,
-    engine: Union[SyncEngine, AIOEngine],
+    engine: SyncEngine | AIOEngine,
     model: type[Model],
     *queries: _Query,
     # odmantic related
-    sort: Optional[Any] = None,
-    session: Optional[Union[SyncSessionType, AIOSessionType]] = None,
+    sort: Any | None = None,
+    session: SyncSessionType | AIOSessionType | None = None,
     # fastapi-pagination related
-    params: Optional[AbstractParams] = None,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    params: AbstractParams | None = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> AnyFlow:
     page = yield from generic_flow(
         total_flow=flow_expr(
@@ -87,13 +87,13 @@ async def paginate(
     model: type[Model],
     *queries: _Query,
     # odmantic related
-    sort: Optional[Any] = None,
-    session: Optional[SyncSessionType] = None,
+    sort: Any | None = None,
+    session: SyncSessionType | None = None,
     # fastapi-pagination related
-    params: Optional[AbstractParams] = None,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    params: AbstractParams | None = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     pass
 
@@ -104,29 +104,29 @@ def paginate(
     model: type[Model],
     *queries: _Query,
     # odmantic related
-    sort: Optional[Any] = None,
-    session: Optional[AIOSessionType] = None,
+    sort: Any | None = None,
+    session: AIOSessionType | None = None,
     # fastapi-pagination related
-    params: Optional[AbstractParams] = None,
-    transformer: Optional[SyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    params: AbstractParams | None = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     pass
 
 
 def paginate(
-    engine: Union[SyncEngine, AIOEngine],
+    engine: SyncEngine | AIOEngine,
     model: type[Model],
     *queries: _Query,
     # odmantic related
-    sort: Optional[Any] = None,
-    session: Optional[Union[SyncSessionType, AIOSessionType]] = None,
+    sort: Any | None = None,
+    session: SyncSessionType | AIOSessionType | None = None,
     # fastapi-pagination related
-    params: Optional[AbstractParams] = None,
-    transformer: Optional[ItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    params: AbstractParams | None = None,
+    transformer: ItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     if isinstance(engine, AIOEngine):
         warnings.warn(
@@ -166,13 +166,13 @@ async def apaginate(
     model: type[Model],
     *queries: _Query,
     # odmantic related
-    sort: Optional[Any] = None,
-    session: Optional[SyncSessionType] = None,
+    sort: Any | None = None,
+    session: SyncSessionType | None = None,
     # fastapi-pagination related
-    params: Optional[AbstractParams] = None,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
-    config: Optional[Config] = None,
+    params: AbstractParams | None = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    config: Config | None = None,
 ) -> Any:
     return await run_async_flow(
         _paginate_flow(

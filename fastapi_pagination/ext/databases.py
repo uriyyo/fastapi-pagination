@@ -3,7 +3,7 @@ from __future__ import annotations
 __all__ = ["apaginate", "paginate"]
 
 from collections.abc import Sequence
-from typing import Any, Optional
+from typing import Any
 
 from databases import Database
 from sqlalchemy.sql import Select
@@ -25,13 +25,13 @@ def _to_mappings(items: Sequence[Any]) -> Sequence[Any]:
 async def apaginate(
     db: Database,
     query: Select[tuple[Any, ...]],
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     convert_to_mapping: bool = True,
     use_subquery: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     inner_transformer = None
     if convert_to_mapping:
@@ -55,13 +55,13 @@ async def apaginate(
 async def paginate(
     db: Database,
     query: Select[tuple[Any, ...]],
-    params: Optional[AbstractParams] = None,
+    params: AbstractParams | None = None,
     *,
-    transformer: Optional[AsyncItemsTransformer] = None,
-    additional_data: Optional[AdditionalData] = None,
+    transformer: AsyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
     convert_to_mapping: bool = True,
     use_subquery: bool = True,
-    config: Optional[Config] = None,
+    config: Config | None = None,
 ) -> Any:
     return await apaginate(
         db,
