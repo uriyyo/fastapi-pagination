@@ -546,11 +546,11 @@ class UseResponseHeaders(PageCustomizer):
     resolver: Callable[[AbstractPage[Any]], dict[str, str | Sequence[str]]]
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
-        if not IS_PYDANTIC_V2:
+        if not IS_PYDANTIC_V2:  # pragma: no cover
             raise UnsupportedFeatureError("UseResponseHeaders is only supported in Pydantic v2")
 
         def model_post_init(_self: AbstractPage[Any], context: Any, /) -> None:
-            super(page_cls, _self).model_post_init(context)
+            page_cls.model_post_init(_self, context)
 
             rsp = response()
 
