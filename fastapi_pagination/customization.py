@@ -20,13 +20,15 @@ __all__ = [
     "UseParamsFields",
     "UseQuotedCursor",
     "UseRequiredFields",
+    "UseResponseHeaders",
     "UseStrCursor",
     "get_page_bases",
     "new_page_cls",
 ]
 
 from abc import abstractmethod
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
+from contextlib import suppress
 from copy import copy
 from dataclasses import dataclass
 from types import new_class
@@ -49,8 +51,10 @@ from fastapi.params import Param
 from pydantic import BaseModel, ConfigDict, create_model
 from typing_extensions import Unpack
 
+from .api import response
 from .bases import AbstractPage, AbstractParams, BaseRawParams
 from .cursor import CursorDecoder, CursorEncoder
+from .errors import UnsupportedFeatureError
 from .types import Cursor
 from .typing_utils import remove_optional_from_tp
 from .utils import IS_PYDANTIC_V2, get_caller
@@ -535,3 +539,32 @@ class UseFieldTypeAnnotations(PageCustomizer):
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         anns = ns.setdefault("__annotations__", {})
         anns.update(self.anns)
+
+
+@dataclass
+class UseResponseHeaders(PageCustomizer):
+    resolver: Callable[[AbstractPage[Any]], dict[str, str | Sequence[str]]]
+
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        if not IS_PYDANTIC_V2:
+            raise UnsupportedFeatureError("UseResponseHeaders is only supported in Pydantic v2")
+
+        def model_post_init(_self: AbstractPage[Any], context: Any, /) -> None:
+            super(page_cls, _self).model_post_init(context)
+
+            rsp = response()
+
+            for k, v in self.resolver(_self).items():
+                match v:
+                    case str():
+                        rsp.headers[k] = v
+                    case Sequence() as items:
+                        with suppress(KeyError):
+                            del rsp.headers[k]
+
+                        for item in items:
+                            rsp.headers.append(k, item)
+                    case _:
+                        raise TypeError(f"Header value must be str or list[str], got {v!r}")
+
+        ns["model_post_init"] = model_post_init
