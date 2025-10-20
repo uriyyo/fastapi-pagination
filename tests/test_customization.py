@@ -1,9 +1,9 @@
 from typing import ClassVar, Generic, TypeVar
 
 import pytest
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, status
 
-from fastapi_pagination import Page, Params
+from fastapi_pagination import Page, Params, add_pagination, paginate
 from fastapi_pagination.bases import AbstractPage, AbstractParams
 from fastapi_pagination.cursor import CursorPage, encode_cursor
 from fastapi_pagination.customization import (
@@ -22,6 +22,7 @@ from fastapi_pagination.customization import (
     UseParams,
     UseParamsFields,
     UseQuotedCursor,
+    UseResponseHeaders,
     UseStrCursor,
 )
 from fastapi_pagination.utils import IS_PYDANTIC_V2
@@ -317,3 +318,41 @@ def test_str_cursor(str_cursor):
     ]
 
     assert CustomPage.__params_type__.str_cursor == str_cursor
+
+
+@pytest.mark.skipif(
+    not IS_PYDANTIC_V2,
+    reason="UseResponseHeaders is only supported in Pydantic v2",
+)
+class TestUseResponseHeaders:
+    @pytest.fixture(scope="session")
+    def app(self):
+        _app = FastAPI()
+        add_pagination(_app)
+
+        CustomPage = CustomizedPage[
+            Page,
+            UseResponseHeaders(
+                lambda page: {
+                    "X-Total-Count": str(page.total or 0),
+                    "X-Params": [
+                        f"page={page.page}",
+                        f"size={page.size}",
+                    ],
+                }
+            ),
+        ]
+
+        @_app.get("/items")
+        def _items() -> CustomPage[int]:
+            return paginate([*range(100)])
+
+        return _app
+
+    @pytest.mark.asyncio
+    async def test_response_headers(self, client):
+        response = await client.get("/items", params={"page": 2, "size": 20})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers["X-Total-Count"] == "100"
+        assert response.headers.get_list("X-Params") == ["page=2", "size=20"]

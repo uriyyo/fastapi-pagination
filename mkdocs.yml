@@ -81,6 +81,7 @@ nav:
           - "UseFieldsAliases": customization/customizers/use_fields_aliases.md
           - "UseAdditionalFields": customization/customizers/use_additional_fields.md
           - "UseFieldTypeAnnotations": customization/customizers/use_field_type_annotations.md
+          - "UseResponseHeaders": customization/customizers/use_response_headers.md
       - "Customizers Combinations": customization/customizer_combinations.md
   - "Integrations":
       - "Available": integrations/available.md
