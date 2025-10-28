@@ -23,7 +23,7 @@ CustomPage = CustomizedPage[
 ]
 
 
-# req: GET /nums?page=2&size=5
+# req(+headers): GET /nums?page=2&size=5
 @app.get("/nums")
 async def get_nums() -> CustomPage[int]:
     return paginate(range(1_000))
