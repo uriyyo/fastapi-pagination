@@ -176,7 +176,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
     )
 
 
-@deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
+@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
 async def paginate(
     query: TDocument | FindMany[TDocument] | AggregationQuery[TDocument],
     params: AbstractParams | None = None,

@@ -58,7 +58,7 @@ def paginate(
 
 
 @overload
-@deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
+@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
 async def paginate(
     session: AsyncSession | AsyncConnection,
     query: _InputQuery[TSQLModel, T],
@@ -93,7 +93,7 @@ def paginate(
 
     if isinstance(session, (AsyncSession, AsyncConnection)):
         warnings.warn(
-            "Use `apaginate` instead. This function overload will be removed in v0.15.0",
+            "Use `apaginate` instead. This function overload will be removed in v0.16.0",
             DeprecationWarning,
             stacklevel=2,
         )

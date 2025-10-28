@@ -429,7 +429,7 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
         pass
     else:
         warnings.warn(
-            "Use `apaginate` instead. This function overload will be removed in v0.15.0",
+            "Use `apaginate` instead. This function overload will be removed in v0.16.0",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -491,7 +491,7 @@ def _old_paginate_sign(
 
     warnings.warn(
         "sqlalchemy.orm.Query is deprecated, use sqlalchemy.sql.Select instead "
-        "sqlalchemy.orm.Query support will be removed in the next major release (0.13.0).",
+        "sqlalchemy.orm.Query support will be removed in the next major release (0.16.0).",
         DeprecationWarning,
         stacklevel=3,
     )

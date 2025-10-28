@@ -109,7 +109,7 @@ async def apaginate_aggregate(
     )
 
 
-@deprecated("Use `apaginate` instead. This function will be removed in v0.15.0")
+@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
 async def paginate(
     collection: _AgnosticCollection,
     query_filter: dict[Any, Any] | None = None,
@@ -131,7 +131,7 @@ async def paginate(
     )
 
 
-@deprecated("Use `apaginate_aggregate` instead. This function will be removed in v0.15.0")
+@deprecated("Use `apaginate_aggregate` instead. This function will be removed in v0.16.0")
 async def paginate_aggregate(
     collection: _AgnosticCollection,
     aggregate_pipeline: list[dict[Any, Any]] | None = None,
