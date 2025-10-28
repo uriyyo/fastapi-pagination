@@ -489,13 +489,6 @@ def _old_paginate_sign(
     if query.session is None:
         raise ValueError("query.session is None")
 
-    warnings.warn(
-        "sqlalchemy.orm.Query is deprecated, use sqlalchemy.sql.Select instead "
-        "sqlalchemy.orm.Query support will be removed in the next major release (0.16.0).",
-        DeprecationWarning,
-        stacklevel=3,
-    )
-
     session = query.session
     query = _prepare_query(query)  # type: ignore[call-overload]
 
