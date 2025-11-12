@@ -2111,7 +2111,7 @@ wheels = [
 
 [[package]]
 name = "sqlakeyset"
-version = "2.0.1762823545"
+version = "2.0.1762907931"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "packaging" },
@@ -2119,9 +2119,9 @@ dependencies = [
     { name = "sqlalchemy" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f8/bd/9845a3641a9354c11c98912e6386a3ace0761a1888a33601634f858a7814/sqlakeyset-2.0.1762823545.tar.gz", hash = "sha256:e994d122b5ef0aba0e3773c59177137b12a960cf3015139a75b5c5bb9fdf25e1", size = 113702, upload-time = "2025-11-11T01:12:27.305Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3e/42/53e772e4194da1eb3f3857769a6f556d9386ea3e8b3e8ccc27499f408e75/sqlakeyset-2.0.1762907931.tar.gz", hash = "sha256:80b1ab1d8813b7c91fd7b45de4448978be2cedb3c75fff3fd192b0f9cf91508d", size = 113872, upload-time = "2025-11-12T00:38:53.396Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/29/84/61da7d4cf10a12578dd809ed5514dca13a4955b05a722fefb3cd3516083e/sqlakeyset-2.0.1762823545-py3-none-any.whl", hash = "sha256:b7f36dfd021d2e55c1b9dda6ee414154753ec670d50ca4977792df628fbb643b", size = 26877, upload-time = "2025-11-11T01:12:26.361Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/06/ee0374e12f225142fa843bf5963a32b377773b13184637bf8a7b6792d1ca/sqlakeyset-2.0.1762907931-py3-none-any.whl", hash = "sha256:3fda94510bfc63eded6dc064eb007343d9582c1605517d28651128381dbbb9ae", size = 27154, upload-time = "2025-11-12T00:38:52.416Z" },
 ]
 
 [[package]]
