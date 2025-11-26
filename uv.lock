@@ -736,7 +736,7 @@ requires-dist = [
     { name = "motor", marker = "extra == 'motor'", specifier = ">=3.6.0,<4.0.0" },
     { name = "odmantic", marker = "extra == 'odmantic'", specifier = ">=1.0.2,<2" },
     { name = "orm", marker = "extra == 'orm'", specifier = ">=0.3.1" },
-    { name = "piccolo", marker = "extra == 'piccolo'", specifier = ">=0.89,<1.25" },
+    { name = "piccolo", marker = "extra == 'piccolo'", specifier = ">=0.89,<1.31" },
     { name = "pydantic", specifier = ">=1.9.1" },
     { name = "scylla-driver", marker = "extra == 'scylla-driver'", specifier = ">=3.25.6,<4" },
     { name = "sqlakeyset", marker = "extra == 'sqlalchemy'", specifier = ">=2.0.1680321678,<3" },
@@ -1458,7 +1458,7 @@ wheels = [
 
 [[package]]
 name = "piccolo"
-version = "1.24.2"
+version = "1.30.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "black" },
@@ -1469,9 +1469,9 @@ dependencies = [
     { name = "targ" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/70/2f/b1e0bd6e074f05215e1624b7dc931810066738328b98f90fa97797d15c14/piccolo-1.24.2.tar.gz", hash = "sha256:764ec1ad37f419aecd9df10cd12c0b5d59a37c52dcf9c99fc72682d41f9ba1b8", size = 281958, upload-time = "2025-04-03T22:06:45.84Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/7d/1445af6858a41c2d5b008ebfee3b6e37e57d424d0d0fa69635e9805fee73/piccolo-1.30.0.tar.gz", hash = "sha256:3f41d01bc0c5a36e74ef8ef3b4a52cf899c4f874ec2e916b51cbac5ffe47dd89", size = 288980, upload-time = "2025-10-21T23:05:02.034Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9b/f6/f28a4f4af2653a3e6d5bf78d546ce2085587ef30168c645f52d73934cbbb/piccolo-1.24.2-py3-none-any.whl", hash = "sha256:50118f760196bbff20fcc67d657a8adb99b6a929fa2a4928e46119d12945b63b", size = 402731, upload-time = "2025-04-03T22:06:43.643Z" },
+    { url = "https://files.pythonhosted.org/packages/9f/69/a490f885cd34ceb9c984ad39d0ea60d6d896c31c40bf1aa5ba7c90f90ba0/piccolo-1.30.0-py3-none-any.whl", hash = "sha256:664bed38cc09db1421acf23adb6d33e404edd6498a2a3beab134476b80019d4f", size = 411255, upload-time = "2025-10-21T23:05:00.398Z" },
 ]
 
 [[package]]
