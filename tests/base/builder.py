@@ -18,7 +18,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.cursor import CursorPage
 from fastapi_pagination.pydantic.v1 import BaseModelV1
-from tests.schemas import UserOut, UserOutV1, UserWithOrderOut
+from tests.schemas import UserOut, UserOutV1, UserWithOrderOut, UserWithOrderOutV1
 
 from .types import MakeOptionalPage, MakePydanticV1Page, PaginationCaseType, PaginationType
 
@@ -129,7 +129,7 @@ class SuiteBuilder:
     _model_with_rel_cls: type[BaseModel] = UserWithOrderOut
 
     _model_cls_v1: type[BaseModelV1] = UserOutV1
-    _model_with_rel_cls_v1: type[BaseModelV1] = UserWithOrderOut
+    _model_with_rel_cls_v1: type[BaseModelV1] = UserWithOrderOutV1
 
     if TYPE_CHECKING:
 
