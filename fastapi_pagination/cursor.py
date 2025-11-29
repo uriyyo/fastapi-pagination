@@ -25,8 +25,8 @@ from pydantic import BaseModel, Field
 from typing_extensions import TypeVar
 
 from .bases import AbstractParams, BasePage, CursorRawParams
+from .pydantic import create_pydantic_model
 from .types import Cursor
-from .utils import create_pydantic_model
 
 TAny = TypeVar("TAny", default=Any)
 

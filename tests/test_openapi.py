@@ -7,7 +7,7 @@ from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.links import LimitOffsetPage as LinksLimitOffsetPage
 from fastapi_pagination.links import Page as LinksPage
 from fastapi_pagination.optional import OptionalLimitOffsetPage, OptionalPage
-from fastapi_pagination.utils import IS_PYDANTIC_V2
+from fastapi_pagination.pydantic import IS_PYDANTIC_V2
 
 app = FastAPI()
 add_pagination(app)

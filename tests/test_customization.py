@@ -21,11 +21,13 @@ from fastapi_pagination.customization import (
     UseOptionalParams,
     UseParams,
     UseParamsFields,
+    UsePydanticV1,
     UseQuotedCursor,
     UseResponseHeaders,
     UseStrCursor,
 )
-from fastapi_pagination.utils import IS_PYDANTIC_V2
+from fastapi_pagination.pydantic import IS_PYDANTIC_V2
+from fastapi_pagination.pydantic.v1 import BaseModelV1
 
 
 class _NoopCustomizer(PageCustomizer):
@@ -69,7 +71,7 @@ def test_customization_no_args():
 
 
 def test_customization_incorrect_customizer():
-    with pytest.raises(TypeError, match=r"^Expected PageCustomizer, got .*$"):
+    with pytest.raises(TypeError, match=r"^Expected PageCustomizer or PageTransformer, got .*$"):
         _ = CustomizedPage[Page, object()]
 
 
@@ -356,3 +358,12 @@ class TestUseResponseHeaders:
         assert response.status_code == status.HTTP_200_OK
         assert response.headers["X-Total-Count"] == "100"
         assert response.headers.get_list("X-Params") == ["page=2", "size=20"]
+
+
+def test_use_pydantic_v1():
+    CustomPage = CustomizedPage[
+        Page,
+        UsePydanticV1(),
+    ]
+
+    assert issubclass(CustomPage, BaseModelV1)
