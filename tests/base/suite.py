@@ -58,19 +58,12 @@ SuiteDecl: TypeAlias = tuple[
 ]
 
 
-def _add_pydantic_v1_suites(suites: Iterable[SuiteDecl]) -> Iterable[SuiteDecl]:
-    for param, pagination_type, pagination_case_type, _, id_ in suites:
-        yield param, pagination_type, pagination_case_type, False, id_
-
-        if IS_PYDANTIC_V2:
-            yield param, pagination_type, pagination_case_type, True, f"{id_}-pydantic-v1-compatible"
-
-
 @pytest.mark.usefixtures("db_type")
 class BasePaginationTestSuite:
     pagination_types: ClassVar[set[PaginationType]] = {}
     case_types: ClassVar[set[PaginationCaseType]] = {}
     include_total: ClassVar[bool] = True
+    add_pydantic_v1_suites: ClassVar[bool] = False
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -83,7 +76,7 @@ class BasePaginationTestSuite:
         if not cls.pagination_types:
             cls.pagination_types = collect_pagination_types(cls)
 
-        suites = [pytest.param(*values, id=id_) for *values, id_ in _add_pydantic_v1_suites(cls.generate_suites())]
+        suites = [pytest.param(*values, id=id_) for *values, id_ in cls._add_pydantic_v1_suites(cls.generate_suites())]
 
         if suites:
             marker = pytest.mark.parametrize(
@@ -116,7 +109,7 @@ class BasePaginationTestSuite:
             cls.test_pagination = _run_pagination
 
         cursor_suites = [
-            pytest.param(*values, id=id_) for *values, id_ in _add_pydantic_v1_suites(cls.generate_cursor_suites())
+            pytest.param(*values, id=id_) for *values, id_ in cls._add_pydantic_v1_suites(cls.generate_cursor_suites())
         ]
 
         if cursor_suites:
@@ -148,6 +141,14 @@ class BasePaginationTestSuite:
                 )
 
             cls.test_cursor_pagination = _run_cursor_pagination
+
+    @classmethod
+    def _add_pydantic_v1_suites(cls, suites: Iterable[SuiteDecl]) -> Iterable[SuiteDecl]:
+        for param, pagination_type, pagination_case_type, _, id_ in suites:
+            yield param, pagination_type, pagination_case_type, False, id_
+
+            if IS_PYDANTIC_V2 and cls.add_pydantic_v1_suites:
+                yield param, pagination_type, pagination_case_type, True, f"{id_}-pydantic-v1-compatible"
 
     @classmethod
     def generate_suites(cls) -> Iterable[SuiteDecl]:

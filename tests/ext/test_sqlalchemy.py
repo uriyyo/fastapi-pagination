@@ -17,6 +17,8 @@ from tests.utils import maybe_async
 
 
 class _SQLAlchemyPaginateFuncMixin:
+    add_pydantic_v1_suites = True
+
     @pytest.fixture(scope="session")
     def paginate_func(self, is_async_db):
         if is_async_db:
