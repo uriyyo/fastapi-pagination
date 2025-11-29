@@ -4,6 +4,7 @@ __all__ = [
     "FieldV2",
     "GenericModelV2",
     "PydanticUndefinedAnnotationV2",
+    "UndefinedV2",
     "is_pydantic_v2_model",
 ]
 
@@ -19,6 +20,7 @@ if IS_PYDANTIC_V2:
     from pydantic import BaseModel as GenericModelV2
     from pydantic import PydanticUndefinedAnnotation as PydanticUndefinedAnnotationV2
     from pydantic.fields import FieldInfo as FieldV2
+    from pydantic.fields import PydanticUndefined as UndefinedV2
 else:
 
     class _DummyCls:
@@ -27,6 +29,7 @@ else:
     BaseModelV2 = _DummyCls  # type: ignore[misc,assignment]
     GenericModelV2 = _DummyCls  # type: ignore[misc,assignment]
     FieldV2 = _DummyCls  # type: ignore[misc,assignment]
+    UndefinedV2 = _DummyCls  # type: ignore[assignment]
 
     class PydanticUndefinedAnnotationV2(Exception):  # type: ignore[no-redef]
         pass

@@ -5,6 +5,7 @@ __all__ = [
     "CustomizedPage",
     "PageCls",
     "PageCustomizer",
+    "PageTransformer",
     "UseAdditionalFields",
     "UseCursorEncoding",
     "UseExcludedFields",
@@ -18,6 +19,7 @@ __all__ = [
     "UseOptionalParams",
     "UseParams",
     "UseParamsFields",
+    "UsePydanticV1",
     "UseQuotedCursor",
     "UseRequiredFields",
     "UseResponseHeaders",
@@ -25,7 +27,6 @@ __all__ = [
     "get_page_bases",
     "new_page_cls",
 ]
-
 from abc import abstractmethod
 from collections.abc import Callable, Sequence
 from contextlib import suppress
@@ -42,6 +43,7 @@ from typing import (
     TypeAlias,
     TypeVar,
     cast,
+    get_origin,
     get_type_hints,
     runtime_checkable,
 )
@@ -49,14 +51,21 @@ from typing import (
 from fastapi import Query
 from fastapi.params import Param
 from pydantic import BaseModel, ConfigDict, create_model
-from typing_extensions import Unpack
+from typing_extensions import Self, Unpack
 
 from .api import response
-from .bases import AbstractPage, AbstractParams, BaseRawParams
+from .bases import AbstractPage, AbstractParams, BaseAbstractPage, BaseRawParams
 from .cursor import CursorDecoder, CursorEncoder
 from .errors import UnsupportedFeatureError
-from .pydantic import get_field_tp, get_model_fields, is_pydantic_field, make_field_optional, make_field_required
-from .pydantic.v2 import is_pydantic_v2_model
+from .pydantic import (
+    get_field_tp,
+    get_model_fields,
+    is_pydantic_field,
+    make_field_optional,
+    make_field_required,
+)
+from .pydantic.v1 import BaseModelV1, ConfiguredBaseModelV1, FieldInfoV1, GenericModelV1, UndefinedV1, create_model_v1
+from .pydantic.v2 import FieldV2, UndefinedV2, is_pydantic_v2_model
 from .types import Cursor
 from .utils import get_caller
 
@@ -121,6 +130,14 @@ else:
             original_name = page_cls.__name__.removesuffix("Customized")
             cls_name = f"{original_name}Customized"
 
+            for customizer in customizers:
+                if not isinstance(customizer, (PageCustomizer, PageTransformer)):
+                    raise TypeError(f"Expected PageCustomizer or PageTransformer, got {customizer!r}")
+
+            for customizer in customizers:
+                if isinstance(customizer, PageTransformer):
+                    page_cls = customizer.transform_page_cls(page_cls)
+
             new_ns = {
                 "__name__": cls_name,
                 "__qualname__": cls_name,
@@ -142,8 +159,6 @@ else:
             for customizer in customizers:
                 if isinstance(customizer, PageCustomizer):
                     customizer.customize_page_ns(page_cls, new_ns)
-                else:
-                    raise TypeError(f"Expected PageCustomizer, got {customizer!r}")
 
             new_ns["__params_type__"] = new_params_cls(new_ns["__params_type__"], {"__page_type__": None})
             return new_page_cls(page_cls, new_ns)
@@ -153,6 +168,13 @@ else:
 class PageCustomizer(Protocol):
     @abstractmethod
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        pass
+
+
+@runtime_checkable
+class PageTransformer(Protocol):
+    @abstractmethod
+    def transform_page_cls(self, page_cls: PageCls) -> PageCls:
         pass
 
 
@@ -505,3 +527,74 @@ class UseResponseHeaders(PageCustomizer):
                         raise TypeError(f"Header value must be str or list[str], got {v!r}")
 
         ns["model_post_init"] = model_post_init
+
+
+def _convert_v2_field_to_v1(field_v2: FieldV2) -> tuple[Any, Any]:
+    default = field_v2.default
+    if default is UndefinedV2:
+        default = UndefinedV1
+
+    type_ = get_field_tp(field_v2)
+
+    if get_origin(type_) is Annotated:
+        type_, *_ = type_.__args__
+
+    return type_, FieldInfoV1(
+        default=default,
+        default_factory=field_v2.default_factory,
+        alias=field_v2.alias or field_v2.validation_alias,
+        title=field_v2.title,
+        description=field_v2.description,
+    )
+
+
+def _convert_v2_page_cls_to_v1(page_cls: type[AbstractPage], /) -> BaseModelV1:
+    assert issubclass(page_cls, AbstractPage)
+
+    _create = page_cls.create.__func__  # type: ignore[attr-defined]
+    *_, generic_base = get_page_bases(page_cls)
+    tp_params = generic_base.__parameters__
+
+    class _PydanticV2ToV1(
+        BaseAbstractPage,
+        GenericModelV1,
+        ConfiguredBaseModelV1,
+        generic_base,  # type: ignore[valid-type,misc]
+    ):
+        __params_type__ = copy(page_cls.__params_type__)
+        __model_aliases__ = copy(page_cls.__model_aliases__)
+        __model_exclude__ = copy(page_cls.__model_exclude__)
+
+        @classmethod
+        def create(
+            cls,
+            items: Sequence[Any],
+            params: AbstractParams,
+            **kwargs: Any,
+        ) -> Self:
+            return cast(
+                Self,
+                _create(
+                    cls,
+                    items=items,
+                    params=params,
+                    **kwargs,
+                ),
+            )
+
+    new_cls = create_model_v1(  # type: ignore[call-overload]
+        page_cls.__name__,
+        __base__=(_PydanticV2ToV1[tp_params], Generic[tp_params]),  # type: ignore[misc,index]
+        **{k: _convert_v2_field_to_v1(cast(FieldV2, v)) for k, v in get_model_fields(page_cls).items()},
+    )
+
+    return cast(BaseModelV1, new_cls)
+
+
+@dataclass
+class UsePydanticV1(PageTransformer):
+    def transform_page_cls(self, page_cls: PageCls) -> PageCls:
+        if not is_pydantic_v2_model(page_cls):
+            return page_cls
+
+        return cast(PageCls, _convert_v2_page_cls_to_v1(page_cls))

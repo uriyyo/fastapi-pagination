@@ -17,6 +17,7 @@ from .types import AnyBaseModel, AnyField
 from .v1 import FieldV1
 from .v2 import FieldV2, is_pydantic_v2_model
 
+TAny = TypeVar("TAny")
 TModel = TypeVar("TModel", bound=AnyBaseModel)
 
 
