@@ -109,9 +109,8 @@ def _prepare_query(query: Select[TupleAny] | None) -> Select[TupleAny] | None:
 
 def _prepare_query_for_cursor(query: Selectable) -> Selectable:
     if isinstance(query, CompoundSelect):
-        query = query._clone()
         ordering = query._order_by_clauses or ()
-        query = query.order_by(None)
+        query = query.order_by(None)  # reset ordering, it will be applied later
 
         subquery = query.subquery("__cursor_subquery__")
         return select(subquery).order_by(*ordering)
