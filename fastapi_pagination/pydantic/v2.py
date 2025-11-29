@@ -22,7 +22,7 @@ else:
         pass
 
     BaseModelV2 = _DummyCls  # type: ignore[misc,assignment]
-    GenericBaseModelV2 = _DummyCls
+    GenericModelV2 = _DummyCls  # type: ignore[misc,assignment]
     FieldV2 = _DummyCls  # type: ignore[misc,assignment]
 
 

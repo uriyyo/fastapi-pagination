@@ -40,6 +40,7 @@ def __getattr__(name: str) -> Any:
         warnings.warn(
             "Importing 'IS_PYDANTIC_V2' from 'fastapi_pagination.utils' is deprecated. "
             "Please import it from 'fastapi_pagination.pydantic' instead.",
+            DeprecationWarning,
             stacklevel=2,
         )
 
@@ -51,6 +52,7 @@ def __getattr__(name: str) -> Any:
         warnings.warn(
             "Importing 'create_pydantic_model' from 'fastapi_pagination.utils' is deprecated. "
             "Please import it from 'fastapi_pagination.pydantic' instead.",
+            DeprecationWarning,
             stacklevel=2,
         )
 
