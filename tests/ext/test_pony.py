@@ -2,11 +2,11 @@ import sys
 from contextlib import suppress
 
 import pytest
-from fastapi_pagination.pydantici import IS_PYDANTIC_V2
 from pony.orm import Database, Required, Set, db_session, select
 from sqlalchemy.engine.url import make_url
 
 from fastapi_pagination.ext.pony import paginate
+from fastapi_pagination.pydantic import IS_PYDANTIC_V2
 from tests.base import BasePaginationTestSuite
 
 
