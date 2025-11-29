@@ -17,9 +17,10 @@ from typing_extensions import Self
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.cursor import CursorPage
-from tests.schemas import UserOut, UserWithOrderOut
+from fastapi_pagination.pydantic.v1 import BaseModelV1
+from tests.schemas import UserOut, UserOutV1, UserWithOrderOut
 
-from .types import MakeOptionalPage, PaginationCaseType, PaginationType
+from .types import MakeOptionalPage, MakePydanticV1Page, PaginationCaseType, PaginationType
 
 TRoute = TypeVar("TRoute", bound=Callable[..., Any])
 
@@ -127,6 +128,9 @@ class SuiteBuilder:
     _model_cls: type[BaseModel] = UserOut
     _model_with_rel_cls: type[BaseModel] = UserWithOrderOut
 
+    _model_cls_v1: type[BaseModelV1] = UserOutV1
+    _model_with_rel_cls_v1: type[BaseModelV1] = UserWithOrderOut
+
     if TYPE_CHECKING:
 
         @classmethod
@@ -182,6 +186,7 @@ class SuiteBuilder:
         self,
         pagination_type: PaginationType,
         case_type: PaginationCaseType,
+        pydantic_v1: bool = False,
     ) -> type[AbstractPage[Any]]:
         if pagination_type == "page-size":
             page_cls = self._page_size_cls
@@ -192,6 +197,9 @@ class SuiteBuilder:
         else:
             raise ValueError(f"Unknown pagination type {pagination_type}")
 
+        if pydantic_v1:
+            page_cls = MakePydanticV1Page[page_cls]
+
         if case_type == "optional":
             page_cls = MakeOptionalPage[page_cls]
 
@@ -200,7 +208,14 @@ class SuiteBuilder:
     def get_model_cls_for(
         self,
         case_type: PaginationCaseType,
+        pydantic_v1: bool = False,
     ) -> type[BaseModel]:
+        if pydantic_v1:
+            if case_type == "relationship":
+                return self._model_with_rel_cls_v1
+
+            return self._model_cls_v1
+
         if case_type == "relationship":
             return self._model_with_rel_cls
 
@@ -210,9 +225,10 @@ class SuiteBuilder:
         self,
         pagination_type: PaginationType,
         case_type: PaginationCaseType,
+        pydantic_v1: bool = False,
     ) -> Any:
-        page_cls = self.get_page_cls_for(pagination_type, case_type)
-        model_cls = self.get_model_cls_for(case_type)
+        page_cls = self.get_page_cls_for(pagination_type, case_type, pydantic_v1)
+        model_cls = self.get_model_cls_for(case_type, pydantic_v1)
 
         return page_cls[model_cls]
 

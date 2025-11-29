@@ -122,7 +122,7 @@ else:
             page_cls, *customizers = item
 
             assert isinstance(page_cls, type), f"Expected type, got {page_cls!r}"
-            assert issubclass(page_cls, AbstractPage), f"Expected subclass of AbstractPage, got {page_cls!r}"
+            assert issubclass(page_cls, BaseAbstractPage), f"Expected subclass of AbstractPage, got {page_cls!r}"
 
             if not customizers:
                 return page_cls
