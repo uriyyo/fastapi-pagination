@@ -1,6 +1,6 @@
 __all__ = [
-    "AbstractPagePydanticConfigV1",
     "BaseModelV1",
+    "ConfiguredBaseModelV1",
     "FieldV1",
     "GenericModelV1",
     "is_pydantic_v1_model",
@@ -25,7 +25,8 @@ def is_pydantic_v1_model(model_cls: type[Any]) -> TypeIs[type[BaseModelV1]]:
     return lenient_issubclass(model_cls, BaseModelV1)
 
 
-class AbstractPagePydanticConfigV1:
-    orm_mode = True
-    arbitrary_types_allowed = True
-    allow_population_by_field_name = True
+class ConfiguredBaseModelV1(BaseModelV1):
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True
+        allow_population_by_field_name = True

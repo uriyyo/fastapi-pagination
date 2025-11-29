@@ -13,6 +13,7 @@ __all__ = [
 ]
 
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from contextlib import suppress
 from dataclasses import dataclass
 from typing import (
@@ -22,22 +23,11 @@ from typing import (
     Generic,
 )
 
-from .pydantic import IS_PYDANTIC_V2
-from .pydantic.types import LatestGenericModel
-from .pydantic.v1 import AbstractPagePydanticConfigV1
-
-try:
-    from pydantic import PydanticUndefinedAnnotation
-except ImportError:
-
-    class PydanticUndefinedAnnotation(Exception):  # type: ignore[no-redef]
-        pass
-
-
-from collections.abc import Sequence
-
 from typing_extensions import Self, TypeIs, TypeVar
 
+from .pydantic import IS_PYDANTIC_V2
+from .pydantic.types import LatestConfiguredBaseModel, LatestGenericModel
+from .pydantic.v2 import PydanticUndefinedAnnotationV2
 from .types import Cursor, GreaterEqualZero, ParamsType
 
 TAny = TypeVar("TAny", default=Any)
@@ -129,7 +119,7 @@ class BaseAbstractPage(ABC, Generic[TAny]):
         pass
 
 
-class AbstractPage(BaseAbstractPage[TAny], LatestGenericModel, ABC, Generic[TAny]):
+class AbstractPage(BaseAbstractPage[TAny], LatestConfiguredBaseModel, LatestGenericModel, ABC, Generic[TAny]):
     # used by pydantic v2
     __model_aliases__: ClassVar[dict[str, str]] = {}
     __model_exclude__: ClassVar[set[str]] = set()
@@ -163,17 +153,8 @@ class AbstractPage(BaseAbstractPage[TAny], LatestGenericModel, ABC, Generic[TAny
 
             # rebuild model only in case if customizations is present
             if cls.__model_exclude__ or cls.__model_aliases__:
-                with suppress(PydanticUndefinedAnnotation):
+                with suppress(PydanticUndefinedAnnotationV2):
                     cls.model_rebuild(force=True)
-
-    if IS_PYDANTIC_V2:
-        model_config = {
-            "arbitrary_types_allowed": True,
-            "from_attributes": True,
-            "populate_by_name": True,
-        }
-    else:
-        Config = AbstractPagePydanticConfigV1
 
 
 class BasePage(AbstractPage[TAny], ABC, Generic[TAny]):

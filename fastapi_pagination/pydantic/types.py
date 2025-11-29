@@ -1,6 +1,7 @@
 __all__ = [
     "AnyBaseModel",
     "AnyField",
+    "LatestConfiguredBaseModel",
     "LatestGenericModel",
 ]
 
@@ -14,6 +15,8 @@ AnyBaseModel: TypeAlias = BaseModelV1 | BaseModelV2
 AnyField: TypeAlias = FieldV1 | FieldV2
 
 if IS_PYDANTIC_V2:
+    from .v2 import ConfiguredBaseModelV2 as LatestConfiguredBaseModel
     from .v2 import GenericModelV2 as LatestGenericModel
 else:
+    from .v1 import ConfiguredBaseModelV1 as LatestConfiguredBaseModel  # type: ignore[assignment]
     from .v1 import GenericModelV1 as LatestGenericModel  # type: ignore[assignment]

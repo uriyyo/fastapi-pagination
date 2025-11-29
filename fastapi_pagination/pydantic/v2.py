@@ -1,7 +1,9 @@
 __all__ = [
     "BaseModelV2",
+    "ConfiguredBaseModelV2",
     "FieldV2",
     "GenericModelV2",
+    "PydanticUndefinedAnnotationV2",
     "is_pydantic_v2_model",
 ]
 
@@ -15,6 +17,7 @@ from .consts import IS_PYDANTIC_V2
 if IS_PYDANTIC_V2:
     from pydantic import BaseModel as BaseModelV2
     from pydantic import BaseModel as GenericModelV2
+    from pydantic import PydanticUndefinedAnnotation as PydanticUndefinedAnnotationV2
     from pydantic.fields import FieldInfo as FieldV2
 else:
 
@@ -25,6 +28,9 @@ else:
     GenericModelV2 = _DummyCls  # type: ignore[misc,assignment]
     FieldV2 = _DummyCls  # type: ignore[misc,assignment]
 
+    class PydanticUndefinedAnnotationV2(Exception):  # type: ignore[no-redef]
+        pass
+
 
 def is_pydantic_v2_model(model_cls: type[Any]) -> TypeIs[type[BaseModelV2]]:
     if not IS_PYDANTIC_V2:
@@ -33,3 +39,11 @@ def is_pydantic_v2_model(model_cls: type[Any]) -> TypeIs[type[BaseModelV2]]:
     from .v1 import BaseModelV1
 
     return not lenient_issubclass(model_cls, BaseModelV1)
+
+
+class ConfiguredBaseModelV2(BaseModelV2):
+    model_config = {
+        "arbitrary_types_allowed": True,
+        "from_attributes": True,
+        "populate_by_name": True,
+    }
