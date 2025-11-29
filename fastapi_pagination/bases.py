@@ -22,9 +22,9 @@ from typing import (
     Generic,
 )
 
+from .pydantic import IS_PYDANTIC_V2
 from .pydantic.types import LatestGenericModel
 from .pydantic.v1 import AbstractPagePydanticConfigV1
-from .utils import IS_PYDANTIC_V2
 
 try:
     from pydantic import PydanticUndefinedAnnotation

@@ -42,8 +42,9 @@ except ImportError:  # pragma: no cover
 
 from .bases import AbstractPage, AbstractParams, BaseAbstractPage
 from .errors import UninitializedConfigurationError
+from .pydantic import IS_PYDANTIC_V2
 from .types import AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
-from .utils import IS_PYDANTIC_V2, is_async_callable, unwrap_annotated
+from .utils import is_async_callable, unwrap_annotated
 
 T = TypeVar("T")
 TAbstractParams_co = TypeVar("TAbstractParams_co", covariant=True, bound=AbstractParams)

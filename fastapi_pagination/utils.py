@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 
 def __getattr__(name: str) -> Any:
-    if name == "IS_PYDANTIC_V2":
+    if name == "IS_PYDANTIC_V2":  # pragma: no cover
         from .pydantic import IS_PYDANTIC_V2
 
         warnings.warn(
@@ -45,7 +45,7 @@ def __getattr__(name: str) -> Any:
 
         return IS_PYDANTIC_V2
 
-    if name == "create_pydantic_model":
+    if name == "create_pydantic_model":  # pragma: no cover
         from .pydantic import create_pydantic_model
 
         warnings.warn(

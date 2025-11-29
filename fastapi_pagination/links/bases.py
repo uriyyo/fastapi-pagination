@@ -19,7 +19,7 @@ from typing_extensions import TypeVar
 from fastapi_pagination.api import request, response
 from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.customization import ClsNamespace, PageCls, PageCustomizer, UseAdditionalFields
-from fastapi_pagination.utils import IS_PYDANTIC_V2
+from fastapi_pagination.pydantic import IS_PYDANTIC_V2
 
 _link_field = (
     Field(default=None, examples=["/api/v1/users?limit=1&offset1"])
