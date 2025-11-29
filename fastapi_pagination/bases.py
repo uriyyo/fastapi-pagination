@@ -3,6 +3,7 @@ from __future__ import annotations
 __all__ = [
     "AbstractPage",
     "AbstractParams",
+    "BaseAbstractPage",
     "BasePage",
     "BaseRawParams",
     "CursorRawParams",
@@ -21,13 +22,9 @@ from typing import (
     Generic,
 )
 
+from .pydantic.types import LatestGenericModel
+from .pydantic.v1 import AbstractPagePydanticConfigV1
 from .utils import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from pydantic import BaseModel as GenericModel
-else:
-    from pydantic.generics import GenericModel  # type: ignore[no-redef]
-
 
 try:
     from pydantic import PydanticUndefinedAnnotation
@@ -112,9 +109,27 @@ class AbstractParams(ABC):
         connect_page_and_params(page_cls, cls)
 
 
-class AbstractPage(GenericModel, ABC, Generic[TAny]):
+class BaseAbstractPage(ABC, Generic[TAny]):
+    """
+    Marker class for page classes.
+
+    Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+    """
+
     __params_type__: ClassVar[type[AbstractParams]]
 
+    @classmethod
+    @abstractmethod
+    def create(
+        cls,
+        items: Sequence[TAny],
+        params: AbstractParams,
+        **kwargs: Any,
+    ) -> Self:
+        pass
+
+
+class AbstractPage(BaseAbstractPage[TAny], LatestGenericModel, ABC, Generic[TAny]):
     # used by pydantic v2
     __model_aliases__: ClassVar[dict[str, str]] = {}
     __model_exclude__: ClassVar[set[str]] = set()
@@ -151,16 +166,6 @@ class AbstractPage(GenericModel, ABC, Generic[TAny]):
                 with suppress(PydanticUndefinedAnnotation):
                     cls.model_rebuild(force=True)
 
-    @classmethod
-    @abstractmethod
-    def create(
-        cls,
-        items: Sequence[TAny],
-        params: AbstractParams,
-        **kwargs: Any,
-    ) -> Self:
-        pass
-
     if IS_PYDANTIC_V2:
         model_config = {
             "arbitrary_types_allowed": True,
@@ -168,11 +173,7 @@ class AbstractPage(GenericModel, ABC, Generic[TAny]):
             "populate_by_name": True,
         }
     else:
-
-        class Config:
-            orm_mode = True
-            arbitrary_types_allowed = True
-            allow_population_by_field_name = True
+        Config = AbstractPagePydanticConfigV1
 
 
 class BasePage(AbstractPage[TAny], ABC, Generic[TAny]):

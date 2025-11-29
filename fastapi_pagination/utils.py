@@ -21,17 +21,42 @@ import warnings
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Annotated, Any, Literal, TypeVar, cast, get_origin, overload
 
-from pydantic import VERSION, BaseModel
 from typing_extensions import ParamSpec
 
 if TYPE_CHECKING:
     from .bases import AbstractParams, BaseRawParams, CursorRawParams, RawParams
+    from .pydantic import create_pydantic_model
     from .types import ParamsType
 
     TParams = TypeVar("TParams", bound=AbstractParams)
-    TModel = TypeVar("TModel", bound=BaseModel)
 
-IS_PYDANTIC_V2 = VERSION.startswith("2.")
+    from .pydantic import IS_PYDANTIC_V2
+
+
+def __getattr__(name: str) -> Any:
+    if name == "IS_PYDANTIC_V2":
+        from .pydantic import IS_PYDANTIC_V2
+
+        warnings.warn(
+            "Importing 'IS_PYDANTIC_V2' from 'fastapi_pagination.utils' is deprecated. "
+            "Please import it from 'fastapi_pagination.pydantic' instead.",
+            stacklevel=2,
+        )
+
+        return IS_PYDANTIC_V2
+
+    if name == "create_pydantic_model":
+        from .pydantic import create_pydantic_model
+
+        warnings.warn(
+            "Importing 'create_pydantic_model' from 'fastapi_pagination.utils' is deprecated. "
+            "Please import it from 'fastapi_pagination.pydantic' instead.",
+            stacklevel=2,
+        )
+
+        return create_pydantic_model
+
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 @overload
@@ -177,13 +202,6 @@ def get_caller(depth: int = 1) -> str | None:
         frame = frame.f_back
 
     return cast(str | None, frame and frame.f_globals.get("__name__"))
-
-
-def create_pydantic_model(model_cls: type[TModel], /, **kwargs: Any) -> TModel:
-    if IS_PYDANTIC_V2:
-        return model_cls.model_validate(kwargs, from_attributes=True)
-
-    return model_cls(**kwargs)
 
 
 def unwrap_annotated(ann: Any) -> Any:
