@@ -14,7 +14,7 @@ def test_params_not_set():
     def route():
         return paginate([])
 
-    with pytest.raises(RuntimeError, match="Use params, add_pagination or pagination_ctx"):
+    with pytest.raises(RuntimeError, match=r"Use params, add_pagination or pagination_ctx"):
         client.get("/")
 
 
@@ -27,5 +27,5 @@ def test_default_page_with_limit_offset():
         return paginate([], params)
 
     add_pagination(app)
-    with pytest.raises(TypeError, match="Page should be used with Params"):
+    with pytest.raises(TypeError, match=r"Page should be used with Params"):
         client.get("/")

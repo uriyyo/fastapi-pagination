@@ -7,12 +7,12 @@ from fastapi_pagination.cursor import CursorPage, CursorParams
 
 
 def test_unsupported_params():
-    with pytest.raises(ValueError, match="^'cursor' params not supported$"):
+    with pytest.raises(ValueError, match=r"^'cursor' params not supported$"):
         paginate([1, 2, 3], CursorParams())
 
 
 def test_cursor_page_invalid_params_type():
-    with pytest.raises(TypeError, match="^CursorPage should be used with CursorParams$"):
+    with pytest.raises(TypeError, match=r"^CursorPage should be used with CursorParams$"):
         CursorPage[int].create(
             items=[1, 2, 3],
             total=3,

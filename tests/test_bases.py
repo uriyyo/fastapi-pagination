@@ -36,10 +36,10 @@ def test_zero_size():
 
 
 def test_invalid_params_cast():
-    with pytest.raises(ValueError, match="^Not a 'limit-offset' params$"):
+    with pytest.raises(ValueError, match=r"^Not a 'limit-offset' params$"):
         CursorParams().to_raw_params().as_limit_offset()
 
-    with pytest.raises(ValueError, match="^Not a 'cursor' params$"):
+    with pytest.raises(ValueError, match=r"^Not a 'cursor' params$"):
         Params().to_raw_params().as_cursor()
 
 

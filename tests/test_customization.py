@@ -69,7 +69,7 @@ def test_customization_no_args():
 
 
 def test_customization_incorrect_customizer():
-    with pytest.raises(TypeError, match="^Expected PageCustomizer, got .*$"):
+    with pytest.raises(TypeError, match=r"^Expected PageCustomizer, got .*$"):
         _ = CustomizedPage[Page, object()]
 
 
@@ -119,10 +119,10 @@ def test_customization_use_params_fields():
 
 
 def test_customization_use_unknown_field():
-    with pytest.raises(ValueError, match="^Unknown field unknown_field$"):
+    with pytest.raises(ValueError, match=r"^Unknown field unknown_field$"):
         _ = CustomizedPage[Page, UseParamsFields(unknown_field=10)]
 
-    with pytest.raises(ValueError, match="^Unknown fields a, b$"):
+    with pytest.raises(ValueError, match=r"^Unknown fields a, b$"):
         _ = CustomizedPage[Page, UseParamsFields(a=10, b=1)]
 
 
@@ -155,7 +155,7 @@ def test_customization_use_params_fields_non_pydantic_params():
     class CustomPage(Page[T]):
         __params_type__ = object
 
-    with pytest.raises(TypeError, match="^.* must be subclass of BaseModel$"):
+    with pytest.raises(TypeError, match=r"^.* must be subclass of BaseModel$"):
         _ = CustomizedPage[CustomPage, UseParamsFields(page=10, size=20)]
 
 

@@ -5,7 +5,7 @@ description = "FastAPI pagination"
 authors = [
     { name = "Yurii Karabas", email = "1998uriyyo@gmail.com" },
 ]
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.10"
 readme = "README.md"
 license = "MIT"
 classifiers = [
@@ -22,17 +22,17 @@ classifiers = [
 dependencies = [
     "fastapi>=0.93.0",
     "pydantic>=1.9.1",
-    "typing-extensions>=4.8.0,<5",
+    "typing-extensions>=4.8.0",
 ]
 
 [project.optional-dependencies]
 sqlmodel = [
     "sqlmodel>=0.0.22",
-    "sqlakeyset>=2.0.1680321678,<3",
+    "sqlakeyset>=2.0.1680321678",
 ]
 sqlalchemy = [
     "SQLAlchemy>=1.3.20",
-    "sqlakeyset>=2.0.1680321678,<3",
+    "sqlakeyset>=2.0.1680321678",
 ]
 databases = ["databases>=0.6.0"]
 orm = [
@@ -49,39 +49,39 @@ django = [
     "django<6.0.0",
     "databases>=0.6.0",
 ]
-piccolo = ["piccolo>=0.89,<1.31"]
-motor = ["motor>=3.6.0,<4.0.0"]
-bunnet = ["bunnet>=1.1.0,<2"]
-mongoengine = ["mongoengine>=0.23.1,<0.30.0"]
+piccolo = ["piccolo>=0.89"]
+motor = ["motor>=3.6.0"]
+bunnet = ["bunnet>=1.1.0"]
+mongoengine = ["mongoengine>=0.23.1"]
 beanie = ["beanie>=2.0.0"]
-scylla-driver = ["scylla-driver>=3.25.6,<4"]
-odmantic = ["odmantic>=1.0.2,<2"]
-elasticsearch = ["elasticsearch-dsl>=8.13.0,<9"]
-firestore = ["google-cloud-firestore>=2.19.0,<3"]
+scylla-driver = ["scylla-driver>=3.25.6"]
+odmantic = ["odmantic>=1.0.2"]
+elasticsearch = ["elasticsearch-dsl>=8.13.0"]
+firestore = ["google-cloud-firestore>=2.19.0"]
 
 [project.urls]
 Repository = "https://github.com/uriyyo/fastapi-pagination"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.4,<10",
-    "pytest-cov>=6.0.0,<8",
-    "pytest-asyncio>=0.25.3,<1.4",
-    "flaky>=3.8.1,<4",
-    "pre-commit>=4.1.0,<5",
-    "Faker>=35.2,<38.0",
-    "psycopg2-binary>=2.9.10,<3",
-    "mkdocs>=1.6.1,<2",
-    "mkdocs-material>=9.5.50,<10",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "pytest-asyncio>=0.25.3",
+    "flaky>=3.8.1",
+    "pre-commit>=4.1.0",
+    "Faker>=35.2",
+    "psycopg2-binary>=2.9.10",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.5.50",
     "pymdown-extensions~=10.14",
-    "fontawesome-markdown>=0.2.6,<0.3",
-    "httpx>=0.28.1,<0.29",
-    "asgi-lifespan>=2.1.0,<3",
-    "requests>=2.32.2,<3",
-    "uvicorn>=0.34.0,<0.39",
-    "Jinja2>=3.1.5,<4",
-    "mypy>=1.14.1,<2",
-    "ruff>=0.9.4,<0.12.0",
+    "fontawesome-markdown>=0.2.6",
+    "httpx>=0.28.1",
+    "asgi-lifespan>=2.1.0",
+    "requests>=2.32.2",
+    "uvicorn>=0.34.0",
+    "Jinja2>=3.1.5",
+    "mypy>=1.14.1",
+    "ruff>=0.14.0",
     "dirty-equals>=0.9.0",
 ]
 
@@ -112,13 +112,14 @@ ignore = [
     "N805",    # ignore first argument name check
     "N818",    # ignore exception name should ends with Error suffix
     "FAST002", # allow to use non-annotated dependencies
-    "PLR0913",  # allow more than 5 arguments
+    "PLR0913", # allow more than 5 arguments
     "PLR2004", # allow to compare with "magic numbers"
     "TC001",   # ignore moving things to if TYPE_CHECKING block
     "TC002",   # ignore moving things to if TYPE_CHECKING block
     "TC003",   # ignore moving things to if TYPE_CHECKING block
     "A005",    # allow module name to shadow a Python standard-library module
     "TC006",   # ignore quotes in typing.cast calls
+    "PLC0415", # allow to have local imports
 
     # full rule exclude
     "D",    # ignore docstrings

@@ -89,7 +89,7 @@ TPage_contra = TypeVar("TPage_contra", bound=AbstractPage, contravariant=True, d
 
 
 @dataclass
-class BaseLinksCustomizer(PageCustomizer, Generic[TPage_contra], ABC):
+class BaseLinksCustomizer(PageCustomizer, ABC, Generic[TPage_contra]):
     only_path: bool = True
 
     @abstractmethod

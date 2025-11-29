@@ -112,7 +112,7 @@ class AbstractParams(ABC):
         connect_page_and_params(page_cls, cls)
 
 
-class AbstractPage(GenericModel, Generic[TAny], ABC):
+class AbstractPage(GenericModel, ABC, Generic[TAny]):
     __params_type__: ClassVar[type[AbstractParams]]
 
     # used by pydantic v2
@@ -175,6 +175,6 @@ class AbstractPage(GenericModel, Generic[TAny], ABC):
             allow_population_by_field_name = True
 
 
-class BasePage(AbstractPage[TAny], Generic[TAny], ABC):
+class BasePage(AbstractPage[TAny], ABC, Generic[TAny]):
     items: Sequence[TAny]
     total: GreaterEqualZero
