@@ -40,7 +40,7 @@ def is_pydantic_field(field: Any, /) -> bool:
 
 
 @singledispatch
-def make_field_optional(field: Any) -> Any:
+def make_field_optional(field: Any) -> Any:  # pragma: no cover
     raise ValueError(f"Invalid field type {field!r}")
 
 
@@ -61,7 +61,7 @@ def _(field: FieldV2, /) -> Any:
 
 
 @singledispatch
-def make_field_required(field: Any, /) -> Any:
+def make_field_required(field: Any, /) -> Any:  # pragma: no cover
     raise ValueError(f"Invalid field type {field!r}")
 
 
@@ -87,7 +87,7 @@ def _(field: FieldV2, /) -> Any:
 
 
 @singledispatch
-def get_field_tp(field: Any, /) -> Any:
+def get_field_tp(field: Any, /) -> Any:  # pragma: no cover
     raise ValueError(f"Invalid field type {field!r}")
 
 
