@@ -40,10 +40,11 @@ try:
 except ImportError:  # pragma: no cover
     from starlette.routing import request_response
 
-from .bases import AbstractPage, AbstractParams
+from .bases import AbstractPage, AbstractParams, BaseAbstractPage
 from .errors import UninitializedConfigurationError
+from .pydantic import IS_PYDANTIC_V2
 from .types import AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
-from .utils import IS_PYDANTIC_V2, is_async_callable, unwrap_annotated
+from .utils import is_async_callable, unwrap_annotated
 
 T = TypeVar("T")
 TAbstractParams_co = TypeVar("TAbstractParams_co", covariant=True, bound=AbstractParams)
@@ -297,7 +298,7 @@ def _update_route(route: APIRoute) -> None:
 
     page_cls = unwrap_annotated(route.response_model)
 
-    if not lenient_issubclass(page_cls, AbstractPage):
+    if not lenient_issubclass(page_cls, BaseAbstractPage):
         return
 
     cls = cast(type[AbstractPage[Any]], page_cls)

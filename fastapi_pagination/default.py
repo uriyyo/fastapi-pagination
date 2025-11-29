@@ -14,8 +14,8 @@ from pydantic import BaseModel
 from typing_extensions import TypeVar
 
 from .bases import AbstractParams, BasePage, RawParams
+from .pydantic import create_pydantic_model
 from .types import GreaterEqualOne, GreaterEqualZero
-from .utils import create_pydantic_model
 
 TAny = TypeVar("TAny", default=Any)
 

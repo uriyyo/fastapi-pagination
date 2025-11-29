@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from fastapi_pagination.utils import IS_PYDANTIC_V2
+from fastapi_pagination.pydantic import IS_PYDANTIC_V2
 
 
 class BaseSchema(BaseModel):

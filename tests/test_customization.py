@@ -25,7 +25,7 @@ from fastapi_pagination.customization import (
     UseResponseHeaders,
     UseStrCursor,
 )
-from fastapi_pagination.utils import IS_PYDANTIC_V2
+from fastapi_pagination.pydantic import IS_PYDANTIC_V2
 
 
 class _NoopCustomizer(PageCustomizer):
