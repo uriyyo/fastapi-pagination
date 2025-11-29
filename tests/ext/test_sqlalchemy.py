@@ -227,6 +227,24 @@ class TestSQLAlchemyCursor(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite
 
 
 @async_sync_testsuite
+class TestCompoundSelectSQLAlchemyCursor(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def app(self, builder, sa_user, sa_session_ctx, paginate_func):
+        builder = builder.new()
+
+        @builder.cursor.default
+        async def route(db: Any = Depends(sa_session_ctx)):
+            stmt = select(sa_user).union_all(select(sa_user)).order_by("id")
+            return await maybe_async(paginate_func(db, stmt))
+
+        return builder.build()
+
+    @pytest.fixture(scope="session")
+    def entities(self, entities):
+        return entities + entities
+
+
+@async_sync_testsuite
 class TestSQLAlchemyFromStatement(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite):
     @pytest.fixture(scope="session")
     def app(self, builder, paginate_func, sa_user, sa_session_ctx):

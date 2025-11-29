@@ -107,6 +107,17 @@ def _prepare_query(query: Select[TupleAny] | None) -> Select[TupleAny] | None:
     return query
 
 
+def _prepare_query_for_cursor(query: Selectable) -> Selectable:
+    if isinstance(query, CompoundSelect):
+        ordering = query._order_by_clauses or ()
+        query = query.order_by(None)  # reset ordering, it will be applied later
+
+        subquery = query.subquery("__cursor_subquery__")
+        return select(subquery).order_by(*ordering)
+
+    return query
+
+
 _selectable_classes = (Select, TextClause, FromStatement, CompoundSelect)
 
 
@@ -270,8 +281,12 @@ def _limit_offset_flow(query: Selectable, conn: AnyConn, raw_params: RawParams) 
 
 @flow
 def _cursor_flow(query: Selectable, conn: AnyConn, is_async: bool, raw_params: CursorRawParams) -> CursorFlow:
+    query = _prepare_query_for_cursor(query)
+
     if isinstance(query, TextClause):
         raise ValueError("Cursor pagination cannot be used with raw SQL queries")  # noqa: TRY004
+    if isinstance(query, FromStatement):
+        raise ValueError("Cursor pagination cannot be used with FromStatement queries")  # noqa: TRY004
     if paging is None:  # pragma: no cover
         raise ImportError("sqlakeyset is not installed")
     if not getattr(query, "_order_by_clauses", True):
