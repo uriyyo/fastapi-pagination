@@ -14,7 +14,7 @@ from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
 from fastapi_pagination.flow import flow, flow_expr, run_async_flow
 from fastapi_pagination.flows import TotalFlow, generic_flow
-from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 
 from .utils import generic_query_apply_params
 
@@ -53,7 +53,7 @@ async def apaginate(
     query: Select[TTable_co] | type[TTable_co],
     params: AbstractParams | None = None,
     *,
-    transformer: SyncItemsTransformer | None = None,
+    transformer: AsyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
@@ -78,7 +78,7 @@ async def paginate(
     query: Select[TTable_co] | type[TTable_co],
     params: AbstractParams | None = None,
     *,
-    transformer: SyncItemsTransformer | None = None,
+    transformer: AsyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
