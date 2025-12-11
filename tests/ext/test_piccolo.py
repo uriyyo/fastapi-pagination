@@ -10,7 +10,7 @@ from piccolo.engine import SQLiteEngine, engine_finder
 from piccolo.table import Table
 from pytest_asyncio import fixture as async_fixture
 
-from fastapi_pagination.ext.piccolo import paginate
+from fastapi_pagination.ext.piccolo import apaginate
 from tests.base import BasePaginationTestSuite
 from tests.utils import faker
 
@@ -33,7 +33,7 @@ def query(request):
     if request.param:
         return User
 
-    return User.select()
+    return User.select().order_by(User.id)
 
 
 DB = SQLiteEngine()
@@ -74,6 +74,6 @@ class TestPiccolo(BasePaginationTestSuite):
     def app(self, builder, query, engine):
         @builder.both.default
         async def route():
-            return await paginate(query)
+            return await apaginate(query)
 
         return builder.build()
