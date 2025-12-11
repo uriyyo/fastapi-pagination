@@ -52,7 +52,7 @@ def is_pydantic_v1_field(field: Any, /) -> bool:
     if not IS_PYDANTIC_V2:
         names.add("pydantic.fields.ModelField")
 
-    return any(f"{cls.__module__}.{cls.__qualname__}" in names for cls in inspect.getmro(cls))
+    return any(f"{mro_cls.__module__}.{mro_cls.__qualname__}" in names for mro_cls in inspect.getmro(cls))
 
 
 @singledispatch

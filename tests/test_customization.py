@@ -367,3 +367,12 @@ def test_use_pydantic_v1():
     ]
 
     assert issubclass(CustomPage, BaseModelV1)
+
+    page = CustomPage[int].create(
+        items=["1", "2", "3"],
+        params=CustomPage.__params_type__(),
+        total=3,
+    )
+
+    assert page.items == [1, 2, 3]
+    assert page.total == 3
