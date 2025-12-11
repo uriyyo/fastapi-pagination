@@ -1,7 +1,7 @@
 __all__ = ["apaginate", "paginate"]
 
 from contextlib import suppress
-from copy import copy
+from copy import deepcopy
 from functools import partial
 from typing import Any, TypeVar, cast
 
@@ -28,7 +28,7 @@ def _copy_query(query: Select[TTable_co]) -> Select[TTable_co]:
 
     for s in select_cls.__slots__:
         with suppress(AttributeError):
-            setattr(q, s, copy(getattr(query, s)))
+            setattr(q, s, deepcopy(getattr(query, s)))
 
     return q
 
