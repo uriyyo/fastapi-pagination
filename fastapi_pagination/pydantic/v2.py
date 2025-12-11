@@ -39,9 +39,7 @@ def is_pydantic_v2_model(model_cls: type[Any]) -> TypeIs[type[BaseModelV2]]:
     if not IS_PYDANTIC_V2:
         return False
 
-    from .v1 import BaseModelV1
-
-    return not lenient_issubclass(model_cls, BaseModelV1)
+    return lenient_issubclass(model_cls, BaseModelV2)
 
 
 class ConfiguredBaseModelV2(BaseModelV2):
