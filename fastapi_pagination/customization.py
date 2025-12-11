@@ -64,10 +64,13 @@ from .pydantic import (
     make_field_optional,
     make_field_required,
 )
-from .pydantic.v1 import BaseModelV1, ConfiguredBaseModelV1, FieldInfoV1, GenericModelV1, UndefinedV1, create_model_v1
 from .pydantic.v2 import FieldV2, UndefinedV2, is_pydantic_v2_model
 from .types import Cursor
 from .utils import get_caller
+
+if TYPE_CHECKING:
+    from .pydantic.v1 import BaseModelV1
+
 
 ClsNamespace: TypeAlias = dict[str, Any]
 PageCls: TypeAlias = "type[AbstractPage[Any]]"
@@ -530,6 +533,11 @@ class UseResponseHeaders(PageCustomizer):
 
 
 def _convert_v2_field_to_v1(field_v2: FieldV2) -> tuple[Any, Any]:
+    from .pydantic.v1 import (
+        FieldInfoV1,
+        UndefinedV1,
+    )
+
     default = field_v2.default
     if default is UndefinedV2:
         default = UndefinedV1
@@ -549,6 +557,13 @@ def _convert_v2_field_to_v1(field_v2: FieldV2) -> tuple[Any, Any]:
 
 
 def _convert_v2_page_cls_to_v1(page_cls: type[AbstractPage], /) -> BaseModelV1:
+    from .pydantic.v1 import (
+        BaseModelV1,
+        ConfiguredBaseModelV1,
+        GenericModelV1,
+        create_model_v1,
+    )
+
     assert issubclass(page_cls, AbstractPage)
 
     _create = page_cls.create.__func__  # type: ignore[attr-defined]

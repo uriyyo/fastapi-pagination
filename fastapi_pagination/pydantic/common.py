@@ -7,14 +7,15 @@ __all__ = [
     "make_field_required",
 ]
 
+import inspect
 from copy import copy
 from functools import singledispatch
 from typing import Annotated, Any, TypeVar, cast
 
 from fastapi_pagination.typing_utils import remove_optional_from_tp
 
+from .consts import IS_PYDANTIC_V2
 from .types import AnyBaseModel, AnyField
-from .v1 import FieldV1
 from .v2 import FieldV2, is_pydantic_v2_model
 
 TAny = TypeVar("TAny")
@@ -37,16 +38,25 @@ def get_model_fields(model: type[AnyBaseModel], /) -> dict[str, AnyField]:
 
 
 def is_pydantic_field(field: Any, /) -> bool:
-    return isinstance(field, (FieldV1, FieldV2))
+    return is_pydantic_v2_field(field) or is_pydantic_v1_field(field)
+
+
+def is_pydantic_v2_field(field: Any, /) -> bool:
+    return isinstance(field, FieldV2)
+
+
+def is_pydantic_v1_field(field: Any, /) -> bool:
+    cls = type(field)
+
+    names = {"pydantic.v1.fields.ModelField"}
+    if not IS_PYDANTIC_V2:
+        names.add("pydantic.fields.ModelField")
+
+    return any(f"{mro_cls.__module__}.{mro_cls.__qualname__}" in names for mro_cls in inspect.getmro(cls))
 
 
 @singledispatch
 def make_field_optional(field: Any) -> Any:  # pragma: no cover
-    raise ValueError(f"Invalid field type {field!r}")
-
-
-@make_field_optional.register
-def _(field: FieldV1, /) -> Any:
     return None
 
 
@@ -63,11 +73,6 @@ def _(field: FieldV2, /) -> Any:
 
 @singledispatch
 def make_field_required(field: Any, /) -> Any:  # pragma: no cover
-    raise ValueError(f"Invalid field type {field!r}")
-
-
-@make_field_required.register
-def _(field: FieldV1, /) -> Any:
     field = copy(field)
     field.required = True
     field.default = ...
@@ -89,11 +94,6 @@ def _(field: FieldV2, /) -> Any:
 
 @singledispatch
 def get_field_tp(field: Any, /) -> Any:  # pragma: no cover
-    raise ValueError(f"Invalid field type {field!r}")
-
-
-@get_field_tp.register
-def _(field: FieldV1, /) -> Any:
     return field.type_
 
 
