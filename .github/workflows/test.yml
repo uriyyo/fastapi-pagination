@@ -12,13 +12,17 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: "py${{ matrix.python-version }}; pydantic-${{ matrix.pydantic_v2 == 'true' && 'v2' || 'v1' }}; fastapi${{ matrix.fastapi_pre_0_112_4 == 'true' && '<0.12.4' || '>=0.12.4' }}"
+    name: "py${{ matrix.python-version }}; pydantic${{ matrix.pydantic_v2 == 'false' && '-v1' || (matrix.pydantic_pre_v2_12_5 == 'true' && '<v2.12.5' || '>=v2.12.5') }}; fastapi${{ matrix.fastapi_pre_0_112_4 == 'true' && '<0.112.4' || '>=0.112.4' }}"
     strategy:
       fail-fast: false
       matrix:
         python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14" ]
         pydantic_v2: [ "true", "false" ]
+        pydantic_pre_v2_12_5: [ "true", "false" ]
         fastapi_pre_0_112_4: [ "true", "false" ]
+        exclude:
+          - pydantic_v2: "false"
+            pydantic_pre_v2_12_5: "true"
 
     steps:
       - uses: actions/checkout@v6
@@ -49,6 +53,7 @@ jobs:
         env:
           PY_VERSION: ${{ matrix.python-version }}
           PYDANTIC_V2: ${{ matrix.pydantic_v2 }}
+          PYDANTIC_PRE_V2_12_5: ${{ matrix.pydantic_pre_v2_12_5 }}
           FASTAPI_PRE_0_112_4: ${{ matrix.fastapi_pre_0_112_4 }}
         run: |
           bash scripts/ci-test.sh
