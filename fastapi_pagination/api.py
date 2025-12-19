@@ -35,7 +35,7 @@ from fastapi.dependencies.utils import (
 from fastapi.routing import APIRoute, APIRouter
 from pydantic import BaseModel
 
-from .pydantic.consts import IS_PYDANTIC_V2_12_OR_HIGHER
+from .pydantic.consts import IS_PYDANTIC_V2_12_5_OR_HIGHER
 
 try:
     from fastapi.routing import request_response
@@ -219,7 +219,7 @@ def _create_params_dependency(
 
     sign = inspect.signature(params)
 
-    if IS_PYDANTIC_V2 and not IS_PYDANTIC_V2_12_OR_HIGHER:
+    if IS_PYDANTIC_V2 and not IS_PYDANTIC_V2_12_5_OR_HIGHER:
         with suppress(ValueError, TypeError):
             if issubclass(params, BaseModel):
                 sign_params = [
