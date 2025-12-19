@@ -12,7 +12,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: "py${{ matrix.python-version }}; pydantic-${{ matrix.pydantic_v2 == 'false' && 'v1' || (matrix.pydantic_pre_v2_12_5 == 'true' && '<v2.12.5' || '>=v2.12.5') }}; fastapi${{ matrix.fastapi_pre_0_112_4 == 'true' && '<0.12.4' || '>=0.12.4' }}"
+    name: "py${{ matrix.python-version }}; pydantic${{ matrix.pydantic_v2 == 'false' && '-v1' || (matrix.pydantic_pre_v2_12_5 == 'true' && '<v2.12.5' || '>=v2.12.5') }}; fastapi${{ matrix.fastapi_pre_0_112_4 == 'true' && '<0.12.4' || '>=0.12.4' }}"
     strategy:
       fail-fast: false
       matrix:
