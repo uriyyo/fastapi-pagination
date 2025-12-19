@@ -32,7 +32,7 @@ else
     _pip install -U "fastapi>=0.112.4"
 fi
 
-if [[ "$PYDANTIC_PRE_V2_12_5" == true ]]; then
+if [[ "$PYDANTIC_V2" == true && "$PYDANTIC_PRE_V2_12_5" == true ]]; then
     _pip install "pydantic>=2.0.0,<2.12.5"
 elif [[ "$PYDANTIC_V2" == true ]]; then
     _pip install -U "pydantic>2.0.0"
