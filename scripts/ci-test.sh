@@ -3,7 +3,7 @@
 set -ex
 
 PYDANTIC_V2="${PYDANTIC_V2:-true}"
-PYDANTIC_PRE_V2_12_5="${PYDANTIC_V2_12_5:-false}"
+PYDANTIC_PRE_V2_12_5="${PYDANTIC_PRE_V2_12_5:-false}"
 FASTAPI_PRE_0_112_4="${FASTAPI_PRE_0_112_4:-false}"
 
 function _pip() {
