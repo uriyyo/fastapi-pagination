@@ -58,7 +58,7 @@ scylla-driver = ["scylla-driver>=3.25.6"]
 odmantic = ["odmantic>=1.0.2"]
 elasticsearch = ["elasticsearch-dsl>=8.13.0"]
 firestore = ["google-cloud-firestore>=2.19.0"]
-aiosqlite = ["aiosqlite>=0.19.0,!=0.22.0"]
+aiosqlite = ["aiosqlite>=0.19.0,!=0.22.0,!=0.22.1"]
 
 [project.urls]
 Repository = "https://github.com/uriyyo/fastapi-pagination"
