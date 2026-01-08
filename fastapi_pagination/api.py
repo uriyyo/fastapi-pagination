@@ -18,7 +18,9 @@ import inspect
 from collections.abc import AsyncIterator, Callable, Iterator, Sequence
 from contextlib import AbstractContextManager, ExitStack, asynccontextmanager, contextmanager, suppress
 from contextvars import ContextVar
+from copy import copy
 from typing import (
+    Annotated,
     Any,
     Literal,
     TypeVar,
@@ -36,6 +38,7 @@ from fastapi.routing import APIRoute, APIRouter
 from pydantic import BaseModel
 
 from .pydantic.consts import IS_PYDANTIC_V2_12_5_OR_HIGHER
+from .pydantic.v2 import FieldV2, UndefinedV2
 
 try:
     from fastapi.routing import request_response
@@ -219,19 +222,35 @@ def _create_params_dependency(
 
     sign = inspect.signature(params)
 
-    if IS_PYDANTIC_V2 and not IS_PYDANTIC_V2_12_5_OR_HIGHER:
+    if IS_PYDANTIC_V2:
         with suppress(ValueError, TypeError):
-            if issubclass(params, BaseModel):
-                sign_params = [
-                    inspect.Parameter(
+            if IS_PYDANTIC_V2_12_5_OR_HIGHER:
+
+                def _get_param(name: str, field: FieldV2) -> inspect.Parameter:
+                    default = field.default
+
+                    field = copy(field)
+                    field.default = UndefinedV2
+                    field.default_factory = None
+
+                    return inspect.Parameter(
+                        name=name,
+                        kind=inspect.Parameter.KEYWORD_ONLY,
+                        annotation=Annotated[field.annotation, field],
+                        default=default if default is not UndefinedV2 else inspect.Parameter.empty,
+                    )
+            else:
+
+                def _get_param(name: str, field: FieldV2) -> inspect.Parameter:
+                    return inspect.Parameter(
                         name=name,
                         kind=inspect.Parameter.KEYWORD_ONLY,
                         annotation=field.annotation,
                         default=field,
                     )
-                    for name, field in params.model_fields.items()
-                ]
 
+            if issubclass(params, BaseModel):
+                sign_params = [_get_param(name, field) for name, field in params.model_fields.items()]
                 sign = sign.replace(parameters=sign_params)
 
     _pagination_params.__signature__ = sign  # type: ignore[attr-defined]
