@@ -3,6 +3,7 @@ from contextlib import AbstractAsyncContextManager, AbstractContextManager
 from typing import Any, TypeVar
 
 from faker import Faker
+from fastapi import __version__
 from pydantic import BaseModel
 
 from fastapi_pagination.pydantic.v2 import is_pydantic_v2_model
@@ -45,7 +46,11 @@ def create_ctx(
     return ctx_func
 
 
+IS_FASTAPI_V_0_112_4_OR_NEWER = tuple(int(part) for part in __version__.split(".") if part.isdigit()) >= (0, 112, 4)
+
+
 __all__ = [
+    "IS_FASTAPI_V_0_112_4_OR_NEWER",
     "create_ctx",
     "faker",
     "maybe_async",

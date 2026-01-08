@@ -227,17 +227,21 @@ def _create_params_dependency(
             if IS_PYDANTIC_V2_12_5_OR_HIGHER:
 
                 def _get_param(name: str, field: FieldV2) -> inspect.Parameter:
-                    default = field.default
-
                     field = copy(field)
-                    field.default = UndefinedV2
-                    field.default_factory = None
+
+                    param_default: Any
+                    if field.default is not UndefinedV2:
+                        # for pydantic v2.12.5+ we need to move default value to be as parameter default
+                        param_default = field.default
+                        field.default = UndefinedV2
+                    else:
+                        param_default = inspect.Parameter.empty
 
                     return inspect.Parameter(
                         name=name,
                         kind=inspect.Parameter.KEYWORD_ONLY,
                         annotation=Annotated[field.annotation, field],
-                        default=default if default is not UndefinedV2 else inspect.Parameter.empty,
+                        default=param_default,
                     )
             else:
 
