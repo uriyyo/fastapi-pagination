@@ -28,6 +28,7 @@ from fastapi_pagination.customization import (
 )
 from fastapi_pagination.pydantic import IS_PYDANTIC_V2
 from fastapi_pagination.pydantic.v1 import BaseModelV1
+from tests.utils import IS_FASTAPI_V_0_112_4_OR_NEWER
 
 
 class _NoopCustomizer(PageCustomizer):
@@ -121,7 +122,7 @@ def test_customization_use_params_fields():
 
 
 @pytest.mark.skipif(
-    not IS_PYDANTIC_V2,
+    not (IS_PYDANTIC_V2 and IS_FASTAPI_V_0_112_4_OR_NEWER),
     reason="default_factory is only supported in Pydantic v2",
 )
 class TestUseParamsFields:
