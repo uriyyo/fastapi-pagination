@@ -120,6 +120,62 @@ def test_customization_use_params_fields():
     assert params.size == 20
 
 
+@pytest.mark.skipif(
+    not IS_PYDANTIC_V2,
+    reason="default_factory is only supported in Pydantic v2",
+)
+class TestUseParamsFields:
+    @pytest.fixture(scope="session")
+    def app(self):
+        _app = FastAPI()
+        add_pagination(_app)
+
+        CustomPage = CustomizedPage[
+            Page,
+            UseParamsFields(
+                page=Query(default_factory=lambda: 5),
+                size=Query(...),
+            ),
+        ]
+
+        @_app.get("/items", response_model=CustomPage)
+        def items(params: CustomPage.__params_type__ = Query(...)):
+            return paginate([*range(100)], params=params)
+
+        return _app
+
+    @pytest.mark.asyncio
+    async def test_default_factory(self, client):
+        response = await client.get("/items", params={"size": 10})
+
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+
+        assert data["page"] == 5
+        assert data["size"] == 10
+
+    @pytest.mark.asyncio
+    async def test_missing_required_field(self, client):
+        response = await client.get("/items", params={})
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        match response.json():
+            case {
+                "detail": [
+                    {
+                        "loc": ["query", "size"],
+                        "msg": "Field required",
+                    },
+                    *_,
+                ]
+            }:
+                pass
+            case _:
+                pytest.fail(f"Unexpected response JSON: {response.json()}")
+
+
 def test_customization_use_unknown_field():
     with pytest.raises(ValueError, match=r"^Unknown field unknown_field$"):
         _ = CustomizedPage[Page, UseParamsFields(unknown_field=10)]
