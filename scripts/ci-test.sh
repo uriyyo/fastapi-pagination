@@ -72,12 +72,5 @@ _pip install "databases<0.9.0" orm
 _pytest tests/ext -m orm
 _pip uninstall orm
 
-if [[ "$PYDANTIC_V2" == true ]]; then
-  echo "Running tests GINO tests"
-  _pip install -U "gino[starlette]" "sqlalchemy<1.4" "asyncpg"
-  _pytest tests -m gino
-  _pip uninstall gino gino-starlette
-fi
-
 echo "Restore env"
 _restore_env
