@@ -12,6 +12,7 @@ from typing_extensions import deprecated
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.ext.mongo import AggrPipelineTransformer
 from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 from fastapi_pagination.utils import verify_params
@@ -62,6 +63,7 @@ async def apaginate_aggregate(
     transformer: AsyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     aggregation_filter_end: int | Literal["auto"] | None = None,
+    aggregation_pipeline_transformer: AggrPipelineTransformer | None = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
     aggregate_pipeline = aggregate_pipeline or []
@@ -79,17 +81,20 @@ async def apaginate_aggregate(
         aggregate_pipeline = aggregate_pipeline[aggregation_filter_end:]
         paginate_data.extend(transform_part)
 
-    cursor = collection.aggregate(
-        [
-            *aggregate_pipeline,
-            {
-                "$facet": {
-                    "metadata": [{"$count": "total"}],
-                    "data": paginate_data,
-                },
+    pipeline = [
+        *aggregate_pipeline,
+        {
+            "$facet": {
+                "metadata": [{"$count": "total"}],
+                "data": paginate_data,
             },
-        ],
-    )
+        },
+    ]
+
+    if aggregation_pipeline_transformer is not None:
+        pipeline = aggregation_pipeline_transformer(pipeline)
+
+    cursor = collection.aggregate(pipeline)
 
     data, *_ = await cursor.to_list(length=None)
 

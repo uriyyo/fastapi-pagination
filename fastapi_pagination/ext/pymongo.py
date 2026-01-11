@@ -16,6 +16,7 @@ from pymongo.collection import Collection
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
+from fastapi_pagination.ext.mongo import AggrPipelineTransformer
 from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.flow import flow, flow_expr, run_async_flow, run_sync_flow
 from fastapi_pagination.flows import create_page_flow, generic_flow
@@ -105,6 +106,7 @@ def _aggregate_flow(
     transformer: ItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     aggregation_filter_end: int | Literal["auto"] | None = None,
+    aggregation_pipeline_transformer: AggrPipelineTransformer | None = None,
     config: Config | None = None,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
@@ -123,17 +125,20 @@ def _aggregate_flow(
         aggregate_pipeline = aggregate_pipeline[aggregation_filter_end:]
         paginate_data.extend(transform_part)
 
-    cursor = yield collection.aggregate(
-        [
-            *aggregate_pipeline,
-            {
-                "$facet": {
-                    "metadata": [{"$count": "total"}],
-                    "data": paginate_data,
-                },
+    pipeline = [
+        *aggregate_pipeline,
+        {
+            "$facet": {
+                "metadata": [{"$count": "total"}],
+                "data": paginate_data,
             },
-        ],
-    )
+        },
+    ]
+
+    if aggregation_pipeline_transformer is not None:
+        pipeline = aggregation_pipeline_transformer(pipeline)
+
+    cursor = yield collection.aggregate(pipeline)
 
     data, *_ = yield cursor.to_list(length=None)
 
@@ -164,6 +169,7 @@ async def apaginate_aggregate(
     transformer: ItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     aggregation_filter_end: int | Literal["auto"] | None = None,
+    aggregation_pipeline_transformer: AggrPipelineTransformer | None = None,
     config: Config | None = None,
 ) -> Any:
     return await run_async_flow(
@@ -175,6 +181,7 @@ async def apaginate_aggregate(
             transformer=transformer,
             additional_data=additional_data,
             aggregation_filter_end=aggregation_filter_end,
+            aggregation_pipeline_transformer=aggregation_pipeline_transformer,
             config=config,
         )
     )
@@ -188,6 +195,7 @@ def paginate_aggregate(
     transformer: SyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     aggregation_filter_end: int | Literal["auto"] | None = None,
+    aggregation_pipeline_transformer: AggrPipelineTransformer | None = None,
     config: Config | None = None,
 ) -> Any:
     return run_sync_flow(
@@ -199,6 +207,7 @@ def paginate_aggregate(
             transformer=transformer,
             additional_data=additional_data,
             aggregation_filter_end=aggregation_filter_end,
+            aggregation_pipeline_transformer=aggregation_pipeline_transformer,
             config=config,
         )
     )
