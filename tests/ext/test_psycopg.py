@@ -61,6 +61,8 @@ class TestPsycopg(BasePaginationTestSuite):
 
     @pytest.fixture(scope="session")
     def app(self, builder, conn_ctx, paginate_func, query_factory):
+        builder = builder.new()
+
         @builder.both.default
         async def route():
             async with conn_ctx() as conn:

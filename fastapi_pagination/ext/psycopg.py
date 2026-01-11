@@ -63,6 +63,7 @@ def _psycopg_total_flow(
     args: tuple[Any, ...],
 ) -> Any:
     query = _compile_query(query, conn)
+
     with _switch_factory(conn, tuple_row):
         cursor = yield conn.execute(cast(LiteralString, create_count_query_from_text(query)), args)
         row = yield cursor.fetchone()
@@ -71,7 +72,7 @@ def _psycopg_total_flow(
             (value,) = row
             return value
 
-        return None
+        return None  # pragma: no cover
 
 
 async def apaginate(
