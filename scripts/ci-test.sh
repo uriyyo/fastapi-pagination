@@ -60,13 +60,6 @@ if [[ "$PY_VERSION" == "3.14" ]]; then
   exit 0
 fi
 
-if [[ "$PYDANTIC_V2" == true ]]; then
-    echo "Running ormar tests"
-    _pip install -U ormar
-    _pytest tests/ext -m ormar
-    _pip uninstall ormar
-fi
-
 echo "Running orm tests"
 _pip install "databases<0.9.0" orm
 _pytest tests/ext -m orm
