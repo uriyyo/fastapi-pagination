@@ -119,6 +119,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
         mongo_cursor = aggregation_query.document_model.get_pymongo_collection().aggregate(
             pipeline,
             session=aggregation_query.session,
+            **aggregation_query.pymongo_kwargs,
         )
         data = (await mongo_cursor.to_list(length=None))[0]
         items = data["data"]
