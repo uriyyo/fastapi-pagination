@@ -10,6 +10,7 @@ from beanie.odm.enums import SortDirection
 from beanie.odm.interfaces.aggregate import DocumentProjectionType
 from beanie.odm.queries.aggregation import AggregationQuery
 from beanie.odm.queries.find import FindMany
+from beanie.odm.utils.projection import get_projection
 from bson.errors import InvalidId
 from pymongo.asynchronous.client_session import AsyncClientSession
 from typing_extensions import deprecated
@@ -53,7 +54,21 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
     cursor = getattr(raw_params, "cursor", None)
     if isinstance(query, AggregationQuery):
         aggregation_query = query.clone()
-        paginate_data = []
+
+        # Get the projection from the query's projection_model if it exists.
+        # We need to include it inside the $facet's data pipeline because Beanie
+        # appends $project at the end of the pipeline (after $facet), which breaks
+        # the aggregation since $facet changes the document structure.
+        # See: https://github.com/uriyyo/fastapi-pagination/issues/1514
+        projection_pipeline: list[dict[str, Any]] = []
+        if aggregation_query.projection_model is not None:
+            projection = get_projection(aggregation_query.projection_model)
+            if projection is not None:
+                projection_pipeline = [{"$project": projection}]
+            # Clear the projection_model so Beanie doesn't append $project after $facet
+            aggregation_query.projection_model = None
+
+        paginate_data: list[dict[str, Any]] = []
         if is_limit_offset(raw_params):
             if raw_params.limit is not None:
                 paginate_data.append({"$limit": raw_params.limit + (raw_params.offset or 0)})
@@ -83,15 +98,30 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
             transform_part = aggregation_query.aggregation_pipeline[aggregation_filter_end:]
             aggregation_query.aggregation_pipeline = [
                 *filter_part,
-                {"$facet": {"metadata": [{"$count": "total"}], "data": [*paginate_data, *transform_part]}},
+                {
+                    "$facet": {
+                        "metadata": [{"$count": "total"}],
+                        "data": [*paginate_data, *transform_part, *projection_pipeline],
+                    }
+                },
             ]
         else:
             aggregation_query.aggregation_pipeline.extend(
                 [
-                    {"$facet": {"metadata": [{"$count": "total"}], "data": paginate_data}},
+                    {"$facet": {"metadata": [{"$count": "total"}], "data": [*paginate_data, *projection_pipeline]}},
                 ],
             )
-        data = (await aggregation_query.to_list())[0]
+
+        # Execute the aggregation pipeline directly using the underlying collection.
+        # We bypass Beanie's to_list() because we've already handled the projection
+        # and need to avoid Beanie appending $project after our $facet stage.
+        pipeline = aggregation_query.get_aggregation_pipeline()
+        mongo_cursor = aggregation_query.document_model.get_pymongo_collection().aggregate(
+            pipeline,
+            session=aggregation_query.session,
+            **aggregation_query.pymongo_kwargs,
+        )
+        data = (await mongo_cursor.to_list(length=None))[0]
         items = data["data"]
         try:
             total = data["metadata"][0]["total"]

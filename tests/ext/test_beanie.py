@@ -1,7 +1,7 @@
 import pytest
 from beanie import Document, init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination.ext.beanie import apaginate
@@ -62,5 +62,78 @@ class TestBeanie(BasePaginationTestSuite):
         @builder.both.default.with_kwargs(response_model_by_alias=False)
         async def route():
             return await apaginate(query)
+
+        return builder.build()
+
+
+class _UserProjection(BaseModel):
+    name: str
+
+
+@pytest.mark.usefixtures("db_client")
+@mongodb_test
+class TestBeanieAggregate(BasePaginationTestSuite):
+    @pytest.fixture(
+        scope="session",
+        params=[True, False],
+        ids=["with-projection", "without-projection"],
+    )
+    def aggr_projection(self, request):
+        if request.param:
+            return _UserProjection
+
+        return None
+
+    @pytest.fixture(
+        scope="session",
+        params=[True, False],
+        ids=["with-match", "without-match"],
+    )
+    def match_stage(self, request):
+        if not request.param:
+            return None
+
+        return {"$match": {"name": {"$exists": True}}}
+
+    @pytest.fixture(
+        scope="session",
+        params=[True, False],
+        ids=["with-sort", "without-sort"],
+    )
+    def sort_stage(self, request):
+        if not request.param:
+            return None
+
+        return {"$sort": {"name": 1}}
+
+    @pytest.fixture(scope="session")
+    def aggr_query(self, be_user, match_stage, sort_stage, aggr_projection):
+        pipeline = []
+        if match_stage:
+            pipeline.append(match_stage)
+        if sort_stage:
+            pipeline.append(sort_stage)
+
+        return be_user.aggregate(pipeline, projection_model=aggr_projection)
+
+    @pytest.fixture(scope="session")
+    def entities(self, entities, sort_stage):
+        if sort_stage:
+            return sorted(entities, key=lambda x: x.name)
+
+        return entities
+
+    @pytest.fixture(scope="session")
+    def app(self, builder, be_user, aggr_query):
+        builder = builder.new()
+
+        class Model(builder.classes.model):
+            name: str
+
+        builder = builder.classes.update(model=Model)
+
+        @builder.both.default
+        async def route():
+            return await apaginate(aggr_query)
 
         return builder.build()
