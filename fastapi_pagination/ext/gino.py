@@ -18,6 +18,7 @@ from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 from .sqlalchemy import create_paginate_query
 
 
+@deprecated("`gino` project is not longer maintained and this extension will be removed in v0.16.0")
 async def apaginate(
     query: Select[tuple[Any, ...]] | CRUDModel,
     params: AbstractParams | None = None,
@@ -51,7 +52,7 @@ async def apaginate(
     )
 
 
-@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
+@deprecated("`gino` project is not longer maintained and this extension will be removed in v0.16.0")
 async def paginate(
     query: Select[tuple[Any, ...]] | CRUDModel,
     params: AbstractParams | None = None,

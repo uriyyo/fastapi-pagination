@@ -7,6 +7,7 @@ from bunnet.odm.enums import SortDirection
 from bunnet.odm.interfaces.aggregate import ClientSession, DocumentProjectionType
 from bunnet.odm.queries.aggregation import AggregationQuery
 from bunnet.odm.queries.find import FindMany
+from typing_extensions import deprecated
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
@@ -18,6 +19,7 @@ from fastapi_pagination.utils import verify_params
 TDocument = TypeVar("TDocument", bound=Document)
 
 
+@deprecated("`bunnet` project is not longer maintained and this extension will be removed in v0.16.0")
 def paginate(
     query: TDocument | FindMany[TDocument] | AggregationQuery[TDocument],
     params: AbstractParams | None = None,

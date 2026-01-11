@@ -22,6 +22,7 @@ def _to_mappings(items: Sequence[Any]) -> Sequence[Any]:
     return [{**item._mapping} for item in items]
 
 
+@deprecated("`databases` project is not longer maintained and this extension will be removed in v0.16.0")
 async def apaginate(
     db: Database,
     query: Select[tuple[Any, ...]],
@@ -51,7 +52,7 @@ async def apaginate(
     )
 
 
-@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
+@deprecated("`databases` project is not longer maintained and this extension will be removed in v0.16.0")
 async def paginate(
     db: Database,
     query: Select[tuple[Any, ...]],
@@ -63,7 +64,7 @@ async def paginate(
     use_subquery: bool = True,
     config: Config | None = None,
 ) -> Any:
-    return await apaginate(
+    return await apaginate(  # type: ignore[deprecated]
         db,
         query,
         params=params,

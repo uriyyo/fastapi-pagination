@@ -13,6 +13,7 @@ from fastapi_pagination.flows import generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 
 
+@deprecated("`orm` project is not longer maintained and this extension will be removed in v0.16.0")
 async def apaginate(
     query: QuerySet,
     params: AbstractParams | None = None,
@@ -34,7 +35,7 @@ async def apaginate(
     )
 
 
-@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
+@deprecated("`orm` project is not longer maintained and this extension will be removed in v0.16.0")
 async def paginate(
     query: QuerySet,
     params: AbstractParams | None = None,
@@ -43,7 +44,7 @@ async def paginate(
     additional_data: AdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
-    return await apaginate(
+    return await apaginate(  # type: ignore[deprecated]
         query,
         params=params,
         transformer=transformer,

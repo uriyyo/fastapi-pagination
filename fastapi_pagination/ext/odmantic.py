@@ -115,6 +115,7 @@ def paginate(
     pass
 
 
+@deprecated("`odmantic` project is not longer maintained and this extension will be removed in v0.16.0")
 def paginate(
     engine: SyncEngine | AIOEngine,
     model: type[Model],
