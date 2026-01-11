@@ -71,7 +71,7 @@ def _psycopg_total_flow(
             (value,) = row
             return value
 
-        return None
+        return None  # pragma: no cover
 
 
 async def apaginate(
