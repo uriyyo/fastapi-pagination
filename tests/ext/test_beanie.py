@@ -66,6 +66,30 @@ class TestBeanie(BasePaginationTestSuite):
         return builder.build()
 
 
+@pytest.mark.usefixtures("db_client")
+@mongodb_test
+class TestBeanieAggregateTransformer(BasePaginationTestSuite):
+    @pytest.fixture(scope="session")
+    def entities(self, entities):
+        entities = sorted(entities, key=lambda x: x.name)
+        return entities[:20]
+
+    @pytest.fixture(scope="session")
+    def app(self, builder, be_user):
+        @builder.both.default
+        async def route():
+            return await apaginate(
+                be_user.aggregate([]),
+                aggregation_pipeline_transformer=lambda pipeline: [
+                    {"$sort": {"name": 1}},
+                    {"$limit": 20},
+                    *pipeline,
+                ],
+            )
+
+        return builder.build()
+
+
 class _UserProjection(BaseModel):
     name: str
 
