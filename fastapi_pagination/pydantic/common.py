@@ -10,9 +10,9 @@ __all__ = [
 import inspect
 from copy import copy
 from functools import singledispatch
-from typing import Annotated, Any, TypeVar, cast
+from typing import Any, TypeVar, cast
 
-from fastapi_pagination.typing_utils import remove_optional_from_tp
+from fastapi_pagination.typing_utils import create_annotated_tp, remove_optional_from_tp
 
 from .consts import IS_PYDANTIC_V2
 from .types import AnyBaseModel, AnyField
@@ -100,6 +100,6 @@ def get_field_tp(field: Any, /) -> Any:  # pragma: no cover
 @get_field_tp.register
 def _(field: FieldV2, /) -> Any:
     if field.metadata:
-        return Annotated[(field.annotation, *field.metadata)]
+        return create_annotated_tp(field.annotation, *field.metadata)
 
     return field.annotation

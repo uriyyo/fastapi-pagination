@@ -19,8 +19,8 @@ repos:
 
   - repo: local
     hooks:
-      - id: mypy
+      - id: ty
         language: python
-        name: mypy
+        name: ty
         pass_filenames: false
-        entry: uv run mypy fastapi_pagination --show-error-codes
+        entry: uv run ty check fastapi_pagination --error-on-warning

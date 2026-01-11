@@ -35,7 +35,7 @@ def paginate(
     params, raw_params = verify_params(params, "limit-offset")
 
     if isinstance(query, AggregationQuery):
-        aggregation_query = query.clone()  # type: ignore[no-untyped-call]
+        aggregation_query = query.clone()
         paginate_data = []
         if raw_params.limit is not None:
             paginate_data.append({"$limit": raw_params.limit + (raw_params.offset or 0)})

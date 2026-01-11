@@ -26,12 +26,12 @@ else:
     class _DummyCls:
         pass
 
-    BaseModelV2 = _DummyCls  # type: ignore[misc,assignment]
-    GenericModelV2 = _DummyCls  # type: ignore[misc,assignment]
-    FieldV2 = _DummyCls  # type: ignore[misc,assignment]
-    UndefinedV2 = _DummyCls  # type: ignore[assignment]
+    BaseModelV2 = _DummyCls
+    GenericModelV2 = _DummyCls
+    FieldV2 = _DummyCls
+    UndefinedV2 = _DummyCls
 
-    class PydanticUndefinedAnnotationV2(Exception):  # type: ignore[no-redef]
+    class PydanticUndefinedAnnotationV2(Exception):
         pass
 
 

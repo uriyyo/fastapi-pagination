@@ -52,7 +52,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
 
     cursor = getattr(raw_params, "cursor", None)
     if isinstance(query, AggregationQuery):
-        aggregation_query = query.clone()  # type: ignore[no-untyped-call]
+        aggregation_query = query.clone()
         paginate_data = []
         if is_limit_offset(raw_params):
             if raw_params.limit is not None:
@@ -63,7 +63,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
             if cursor.startswith("prev_"):
                 paginate_data.append(
                     {
-                        "_id": {  # type: ignore[dict-item]
+                        "_id": {
                             "$lt": parse_cursor(cursor),
                         },
                     },
@@ -71,7 +71,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
             else:
                 paginate_data.append(
                     {
-                        "_id": {  # type: ignore[dict-item]
+                        "_id": {
                             "$gt": parse_cursor(cursor),
                         },
                     },
@@ -132,7 +132,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
             ).to_list()
         else:
             query = query.find_many(
-                projection_model=projection_model,  # type: ignore[arg-type]
+                projection_model=projection_model,
                 sort=sort,
                 session=session,
                 ignore_cache=ignore_cache,

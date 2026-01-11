@@ -60,7 +60,7 @@ async def paginate(
     additional_data: AdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
-    return await paginate(
+    return await apaginate(
         conn,
         query,
         *args,

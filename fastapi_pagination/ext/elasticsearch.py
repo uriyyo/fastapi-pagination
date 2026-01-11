@@ -6,7 +6,7 @@ from functools import partial
 from typing import Any
 
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search
+from elasticsearch.dsl import Search
 
 from fastapi_pagination.bases import AbstractParams, CursorRawParams
 from fastapi_pagination.config import Config
@@ -27,7 +27,7 @@ def _cursor_flow(
         items = response.hits
         next_ = response._scroll_id
     else:
-        response = yield conn.scroll(scroll_id=raw_params.cursor, scroll="1m")  # type: ignore[arg-type]
+        response = yield conn.scroll(scroll_id=raw_params.cursor, scroll="1m")
         next_ = response.get("_scroll_id")
         items = [item.get("_source") for item in response["hits"]["hits"]]
 

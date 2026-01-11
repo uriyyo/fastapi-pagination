@@ -66,6 +66,7 @@ from .pydantic import (
 )
 from .pydantic.v2 import FieldV2, UndefinedV2, is_pydantic_v2_model
 from .types import Cursor
+from .typing_utils import create_annotated_tp
 from .utils import get_caller
 
 if TYPE_CHECKING:
@@ -163,7 +164,8 @@ else:
                 if isinstance(customizer, PageCustomizer):
                     customizer.customize_page_ns(page_cls, new_ns)
 
-            new_ns["__params_type__"] = new_params_cls(new_ns["__params_type__"], {"__page_type__": None})
+            params_type = new_params_cls(cast(type[AbstractParams], new_ns["__params_type__"]), {"__page_type__": None})
+            new_ns["__params_type__"] = params_type
             return new_page_cls(page_cls, new_ns)
 
 
@@ -231,7 +233,7 @@ class _UseOptionalRequiredFields(PageCustomizer):
             if is_pydantic_v2_model(page_cls):
                 fields_to_update = {k: make_field_optional(v) or v for k, v in fields_to_update.items()}
                 customizer = UseAdditionalFields(
-                    **{k: (Annotated[get_field_tp(v), v], None) for k, v in fields_to_update.items()}
+                    **{k: (create_annotated_tp(get_field_tp(v), v), None) for k, v in fields_to_update.items()}
                 )
             else:
                 customizer = UseAdditionalFields(
@@ -275,7 +277,7 @@ class UseIncludeTotal(PageCustomizer):
 
         class CustomizedParams(ParamsCls):
             def to_raw_params(self) -> BaseRawParams:
-                raw_params = super().to_raw_params()  # type: ignore[safe-super]
+                raw_params = super().to_raw_params()
                 raw_params.include_total = include_total
 
                 return raw_params
@@ -445,7 +447,7 @@ def _pydantic_v1_get_inited_fields(cls: Any, /, *fields: str) -> ClsNamespace:
     for f in fields:
         cls.fields.setdefault(f, {})
 
-    return cls.fields  # type: ignore[no-any-return]
+    return cls.fields
 
 
 class UseExcludedFields(PageCustomizer):
@@ -566,7 +568,7 @@ def _convert_v2_page_cls_to_v1(page_cls: type[AbstractPage], /) -> BaseModelV1:
 
     assert issubclass(page_cls, AbstractPage)
 
-    _create = page_cls.create.__func__  # type: ignore[attr-defined]
+    _create = page_cls.create.__func__
     *_, generic_base = get_page_bases(page_cls)
     tp_params = generic_base.__parameters__
 
@@ -574,7 +576,7 @@ def _convert_v2_page_cls_to_v1(page_cls: type[AbstractPage], /) -> BaseModelV1:
         BaseAbstractPage,
         GenericModelV1,
         ConfiguredBaseModelV1,
-        generic_base,  # type: ignore[valid-type,misc]
+        generic_base,
     ):
         __params_type__ = copy(page_cls.__params_type__)
         __model_aliases__ = copy(page_cls.__model_aliases__)
@@ -587,14 +589,11 @@ def _convert_v2_page_cls_to_v1(page_cls: type[AbstractPage], /) -> BaseModelV1:
             params: AbstractParams,
             **kwargs: Any,
         ) -> Self:
-            return cast(
-                Self,
-                _create(
-                    cls,
-                    items=items,
-                    params=params,
-                    **kwargs,
-                ),
+            return _create(
+                cls,
+                items=items,
+                params=params,
+                **kwargs,
             )
 
     new_cls = create_model_v1(  # type: ignore[call-overload]

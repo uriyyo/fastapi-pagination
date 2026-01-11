@@ -1,4 +1,5 @@
 __all__ = [
+    "create_annotated_tp",
     "remove_optional_from_tp",
 ]
 
@@ -17,11 +18,16 @@ def remove_optional_from_tp(tp: Any, /) -> Any:
 
         return reduce(operator.or_, args)
     if get_origin(tp) is Annotated:
-        return Annotated[
-            (
-                remove_optional_from_tp(get_args(tp)[0]),
-                *tp.__metadata__,
-            )
-        ]
+        return create_annotated_tp(
+            remove_optional_from_tp(get_args(tp)[0]),
+            *tp.__metadata__,
+        )
+
+    return tp
+
+
+def create_annotated_tp(tp: Any, /, *annotations: Any) -> Any:
+    if annotations:
+        return Annotated[(tp, *annotations)]
 
     return tp
