@@ -59,6 +59,7 @@ odmantic = ["odmantic>=1.0.2"]
 elasticsearch = ["elasticsearch-dsl>=8.13.0"]
 firestore = ["google-cloud-firestore>=2.19.0"]
 aiosqlite = ["aiosqlite>=0.19.0,!=0.22.0,!=0.22.1"]
+psycopg = ["psycopg[binary]>=3.3.2"]
 
 [project.urls]
 Repository = "https://github.com/uriyyo/fastapi-pagination"
@@ -167,7 +168,6 @@ exclude = [
     "fastapi_pagination/ext/ormar.py",
     "fastapi_pagination/ext/motor.py",
 ]
-
 
 [tool.coverage.paths]
 source = ["fastapi_pagination"]
