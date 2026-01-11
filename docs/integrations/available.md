@@ -20,3 +20,4 @@ Currently, `fastapi-pagination` supports:
 | [Motor](https://motor.readthedocs.io/en/stable/)                       | `fastapi_pagination.ext.motor.paginate`       |
 | [Cassandra](https://python-driver.docs.scylladb.com/stable/)           | `fastapi_pagination.ext.cassandra.paginate`   |
 | [ODMantic](https://art049.github.io/odmantic/)                         | `fastapi_pagination.ext.odmantic.paginate`    |
+| [Psycopg](https://www.psycopg.org/psycopg3/docs/)                      | `fastapi_pagination.ext.psycopg.paginate`     |
