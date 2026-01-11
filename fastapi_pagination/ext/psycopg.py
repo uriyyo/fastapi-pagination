@@ -1,10 +1,13 @@
 __all__ = ["apaginate", "paginate"]
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from functools import partial
 from typing import Any, TypeAlias, cast
 
 from psycopg import AsyncConnection, AsyncCursor, Connection, Cursor
-from psycopg.sql import SQL
+from psycopg.rows import AsyncRowFactory, RowFactory, tuple_row
+from psycopg.sql import SQL, Composed
 from typing_extensions import LiteralString
 
 from fastapi_pagination.bases import AbstractParams, RawParams
@@ -19,11 +22,21 @@ _SyncConn: TypeAlias = Connection[Any] | Cursor[Any]
 _AsyncConn: TypeAlias = AsyncConnection[Any] | AsyncCursor[Any]
 _AnyConn: TypeAlias = _SyncConn | _AsyncConn
 
-_InputQuery: TypeAlias = str | SQL
+_InputQuery: TypeAlias = str | LiteralString | SQL | Composed
+_AnyFactory: TypeAlias = RowFactory[Any] | AsyncRowFactory[Any]
+
+
+@contextmanager
+def _switch_factory(conn: _AnyConn, factory: _AnyFactory) -> Iterator[None]:
+    original_factory, conn.row_factory = conn.row_factory, factory  # type: ignore[invalid-assignment]
+    try:
+        yield
+    finally:
+        conn.row_factory = original_factory  # type: ignore[invalid-assignment]
 
 
 def _compile_query(query: _InputQuery, conn: _AnyConn) -> LiteralString:
-    if isinstance(query, SQL):
+    if isinstance(query, SQL | Composed):
         query = query.as_string(conn)
 
     return cast(LiteralString, query)
@@ -50,14 +63,15 @@ def _psycopg_total_flow(
     args: tuple[Any, ...],
 ) -> Any:
     query = _compile_query(query, conn)
-    cursor = yield conn.execute(cast(LiteralString, create_count_query_from_text(query)), args)
-    row = yield cursor.fetchone()
+    with _switch_factory(conn, tuple_row):
+        cursor = yield conn.execute(cast(LiteralString, create_count_query_from_text(query)), args)
+        row = yield cursor.fetchone()
 
-    if row:
-        (value,) = row.values()
-        return value
+        if row:
+            (value,) = row
+            return value
 
-    return None
+        return None
 
 
 async def apaginate(
