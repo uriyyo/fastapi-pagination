@@ -17,6 +17,7 @@ from typing_extensions import deprecated
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams, is_cursor, is_limit_offset
+from fastapi_pagination.ext.mongo import AggrPipelineTransformer
 from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 from fastapi_pagination.utils import verify_params
@@ -32,6 +33,7 @@ def parse_cursor(cursor: str) -> PydanticObjectId:
 
 
 # TODO: simplify this function using flows
+# TODO: refactor it before 0.16.0 release
 async def apaginate(  # noqa: C901, PLR0912, PLR0915
     query: TDocument | FindMany[TDocument] | AggregationQuery[TDocument],
     params: AbstractParams | None = None,
@@ -45,6 +47,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
     fetch_links: bool = False,
     lazy_parse: bool = False,
     aggregation_filter_end: int | Literal["auto"] | None = None,
+    aggregation_pipeline_transformer: AggrPipelineTransformer | None = None,
     **pymongo_kwargs: Any,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset", "cursor")
@@ -116,6 +119,10 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
         # We bypass Beanie's to_list() because we've already handled the projection
         # and need to avoid Beanie appending $project after our $facet stage.
         pipeline = aggregation_query.get_aggregation_pipeline()
+
+        if aggregation_pipeline_transformer is not None:
+            pipeline = aggregation_pipeline_transformer(pipeline)
+
         mongo_cursor = aggregation_query.document_model.get_pymongo_collection().aggregate(
             pipeline,
             session=aggregation_query.session,

@@ -10,6 +10,7 @@ from bunnet.odm.queries.find import FindMany
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
+from fastapi_pagination.ext.mongo import AggrPipelineTransformer
 from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
 from fastapi_pagination.utils import verify_params
@@ -30,6 +31,7 @@ def paginate(
     fetch_links: bool = False,
     lazy_parse: bool = False,
     aggregation_filter_end: int | Literal["auto"] | None = None,
+    aggregation_pipeline_transformer: AggrPipelineTransformer | None = None,
     **pymongo_kwargs: Any,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset")
@@ -56,6 +58,11 @@ def paginate(
                 [
                     {"$facet": {"metadata": [{"$count": "total"}], "data": paginate_data}},
                 ],
+            )
+
+        if aggregation_pipeline_transformer is not None:
+            aggregation_query.aggregation_pipeline = aggregation_pipeline_transformer(
+                aggregation_query.aggregation_pipeline
             )
 
         data = aggregation_query.to_list()[0]
