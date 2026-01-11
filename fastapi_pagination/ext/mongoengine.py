@@ -1,7 +1,7 @@
 __all__ = ["paginate"]
 
 from functools import partial
-from typing import Any, TypeVar, cast
+from typing import Any, TypeVar
 
 from mongoengine import QuerySet
 from mongoengine.base.metaclasses import TopLevelDocumentMetaclass
@@ -31,7 +31,7 @@ def paginate(
     config: Config | None = None,
 ) -> Any:
     if isinstance(query, TopLevelDocumentMetaclass):
-        query = cast(type[T], query).objects().all()
+        query = query.objects().all()  # type: ignore[unresolved-attribute]
 
     return run_sync_flow(
         generic_flow(

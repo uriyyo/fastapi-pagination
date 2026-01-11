@@ -40,7 +40,9 @@ try:
     from sqlalchemy.orm import FromStatement
 except ImportError:  # pragma: no cover
 
-    class FromStatement:  # type: ignore[no-redef]
+    class FromStatement:
+        element: Any
+
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             raise ImportError("sqlalchemy.orm.FromStatement is not available")
 
@@ -49,10 +51,10 @@ try:
     from sqlalchemy.util import await_only, greenlet_spawn
 except ImportError:  # pragma: no cover
 
-    async def greenlet_spawn(*_: Any, **__: Any) -> Any:  # type: ignore[misc]
+    async def greenlet_spawn(*_: Any, **__: Any) -> Any:
         raise ImportError("sqlalchemy.util.greenlet_spawn is not available")
 
-    def await_only(*_: Any, **__: Any) -> Any:  # type: ignore[misc]
+    def await_only(*_: Any, **__: Any) -> Any:
         raise ImportError("sqlalchemy.util.await_only is not available")
 
 
@@ -60,7 +62,7 @@ try:
     from sqlalchemy.ext.asyncio import async_scoped_session
 except ImportError:  # pragma: no cover
 
-    class async_scoped_session:  # type: ignore[no-redef]  # noqa: N801
+    class async_scoped_session:  # noqa: N801
         def __init__(self, *_: Any, **__: Any) -> None:
             raise ImportError("sqlalchemy.ext.asyncio is not available")
 
@@ -186,7 +188,7 @@ def create_count_query_from_text(query: str) -> str:
 
 def _paginate_from_statement(query: FromStatement[TupleAny], params: AnyParams) -> FromStatement[TupleAny]:
     query = query._generate()
-    query.element = create_paginate_query(query.element, params)  # type: ignore[arg-type]
+    query.element = create_paginate_query(query.element, params)
     return query
 
 
@@ -203,7 +205,7 @@ def create_count_query(query: Selectable, *, use_subquery: bool = True) -> Selec
     if isinstance(query, TextClause):
         return text(create_count_query_from_text(query.text))
     if isinstance(query, FromStatement):
-        return create_count_query(query.element)  # type: ignore[arg-type]
+        return create_count_query(query.element)
 
     query = query.order_by(None).options(noload("*"))
 
@@ -295,7 +297,7 @@ def _cursor_flow(query: Selectable, conn: AnyConn, is_async: bool, raw_params: C
     _call = paging.select_page
     if is_async:
         conn = _get_sync_conn_from_async(conn)
-        _call = partial(greenlet_spawn, _call)  # type: ignore[assignment]
+        _call = partial(greenlet_spawn, _call)
 
     page = yield _call(
         conn,  # type: ignore[arg-type]
@@ -332,7 +334,7 @@ def _sqlalchemy_flow(
 ) -> Any:
     create_page_factory = create_page
     if is_async:
-        create_page_factory = partial(greenlet_spawn, create_page_factory)  # type: ignore[assignment]
+        create_page_factory = partial(greenlet_spawn, create_page_factory)
 
     page = yield from generic_flow(
         async_=is_async,
@@ -450,7 +452,7 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
         )
 
         return apaginate(
-            conn=conn,  # type: ignore[arg-type]
+            conn=conn,
             query=query,
             params=params,
             count_query=count_query,
@@ -507,7 +509,7 @@ def _old_paginate_sign(
     session = query.session
     query = _prepare_query(query)  # type: ignore[call-overload]
 
-    return query, None, session, params, transformer, additional_data, unique, subquery_count, unwrap_mode, config  # type: ignore[return-value]
+    return query, None, session, params, transformer, additional_data, unique, subquery_count, unwrap_mode, config
 
 
 def _new_paginate_sign(

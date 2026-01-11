@@ -1,6 +1,6 @@
-from typing import Any, TypeVar, cast
-
 __all__ = ["paginate"]
+
+from typing import Any, TypeVar, cast
 
 from django.db.models import Model, QuerySet
 from django.db.models.base import ModelBase
@@ -23,12 +23,14 @@ def paginate(
     config: Config | None = None,
 ) -> Any:
     if isinstance(query, ModelBase):
-        query = cast(type[T], query).objects.all()
+        query = query.objects.all()  # type: ignore[possibly-missing-attribute]
+
+    query_set = cast(QuerySet[T], query)
 
     return run_sync_flow(
         generic_flow(
-            total_flow=flow_expr(lambda: query.count()),
-            limit_offset_flow=flow_expr(lambda raw_params: [*query[raw_params.as_slice()]]),
+            total_flow=flow_expr(lambda: query_set.count()),
+            limit_offset_flow=flow_expr(lambda raw_params: [*query_set[raw_params.as_slice()]]),
             params=params,
             transformer=transformer,
             additional_data=additional_data,

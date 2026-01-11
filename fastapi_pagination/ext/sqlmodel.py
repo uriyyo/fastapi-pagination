@@ -22,7 +22,7 @@ try:
 except ImportError:  # pragma: no cover
     _T = TypeVar("_T")
 
-    class SelectBase(Generic[_T]):  # type: ignore[no-redef]
+    class SelectBase(Generic[_T]):
         pass
 
 
@@ -36,7 +36,7 @@ _InputCountQuery: TypeAlias = Select[TSQLModel] | SelectOfScalar[T]
 
 def _prepare_query(query: _InputQuery[TSQLModel, T], /) -> _InputQuery[TSQLModel, T]:
     if not isinstance(query, (Select, SelectOfScalar)):
-        query = select(query)  # type: ignore[arg-type]
+        query = select(query)  # type: ignore[no-matching-overload]
 
     return query
 
@@ -102,7 +102,7 @@ def paginate(
             session,
             query,
             params,
-            count_query=count_query,  # type: ignore[arg-type]
+            count_query=count_query,  # type: ignore[invalid-argument-type]
             subquery_count=subquery_count,
             transformer=transformer,
             additional_data=additional_data,
@@ -110,13 +110,13 @@ def paginate(
             config=config,
         )
 
-    return _paginate(  # type: ignore[misc]
+    return _paginate(
         session,
         query,
         params,
-        count_query=count_query,  # type: ignore[arg-type]
+        count_query=count_query,
         subquery_count=subquery_count,
-        transformer=transformer,  # type: ignore[arg-type]
+        transformer=transformer,
         additional_data=additional_data,
         unique=unique,
         config=config,
@@ -138,11 +138,11 @@ async def apaginate(
     query = _prepare_query(query)
 
     if count_query is not None:
-        count_query = _prepare_query(count_query)  # type: ignore[assignment]
+        count_query = _prepare_query(count_query)  # type: ignore[invalid-assignment]
 
     return await _apaginate(
         session,
-        query,  # type: ignore[arg-type]
+        query,
         params,
         count_query=count_query,
         subquery_count=subquery_count,
