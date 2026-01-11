@@ -690,6 +690,9 @@ orm = [
     { name = "databases" },
     { name = "orm" },
 ]
+ormar = [
+    { name = "ormar" },
+]
 piccolo = [
     { name = "piccolo" },
 ]
@@ -751,6 +754,7 @@ requires-dist = [
     { name = "motor", marker = "extra == 'motor'", specifier = ">=3.6.0" },
     { name = "odmantic", marker = "extra == 'odmantic'", specifier = ">=1.0.2" },
     { name = "orm", marker = "extra == 'orm'", specifier = ">=0.3.1" },
+    { name = "ormar", marker = "extra == 'ormar'", specifier = ">=0.21.0" },
     { name = "piccolo", marker = "extra == 'piccolo'", specifier = ">=0.89" },
     { name = "psycopg", extras = ["binary"], marker = "extra == 'psycopg'", specifier = ">=3.3.2" },
     { name = "pydantic", specifier = ">=1.9.1" },
@@ -1391,6 +1395,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e3/19/be5a59955678c6e553b59e64accd81ebeb1082d377fbf253bc0ce8b6a75e/orm-0.3.1.tar.gz", hash = "sha256:5b41cccdd55d50f90d207f9cb66a379e6d0fefbae434af7992fddea9aa74572a", size = 10893, upload-time = "2021-11-29T09:21:27.689Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0c/d8/68932570e09b99e0e8e28f0ffa79294a80127704d635cb500462f7e6ab9e/orm-0.3.1-py3-none-any.whl", hash = "sha256:c29342006ecea111b7d3f4b77a96d5b658e495466050f4e98a5efc623aaada25", size = 11325, upload-time = "2021-11-29T09:21:26.768Z" },
+]
+
+[[package]]
+name = "ormar"
+version = "0.21.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "databases" },
+    { name = "pydantic" },
+    { name = "sqlalchemy", extra = ["asyncio"] },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8a/5e/49b3c36eec3014002ed4f6f667e6c2d577a17b7dc8537ba08aa57b1d000e/ormar-0.21.0.tar.gz", hash = "sha256:be051a894c3ede0f08586936d9acd2b1cc4ebe54389a953da10cf306df5a1a95", size = 129345, upload-time = "2026-01-09T13:34:51.08Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ab/da/69f350dda0736e3aa6592f62c5318b4e3c52fc15dc8214623057fb903074/ormar-0.21.0-py3-none-any.whl", hash = "sha256:92b8d025360760bb349b5fb53f075698342d8cf66ab3d9f3067dc147339780cc", size = 157556, upload-time = "2026-01-09T13:34:49.915Z" },
 ]
 
 [[package]]
@@ -2234,6 +2252,11 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/42/39/f05f0ed54d451156bbed0e23eb0516bcad7cbb9f18b3bf219c786371b3f0/sqlalchemy-2.0.45-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:cd337d3526ec5298f67d6a30bbbe4ed7e5e68862f0bf6dd21d289f8d37b7d60b", size = 3522029, upload-time = "2025-12-09T22:13:32.09Z" },
     { url = "https://files.pythonhosted.org/packages/54/0f/d15398b98b65c2bce288d5ee3f7d0a81f77ab89d9456994d5c7cc8b2a9db/sqlalchemy-2.0.45-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:9a62b446b7d86a3909abbcd1cd3cc550a832f99c2bc37c5b22e1925438b9367b", size = 3475142, upload-time = "2025-12-09T22:13:33.739Z" },
     { url = "https://files.pythonhosted.org/packages/bf/e1/3ccb13c643399d22289c6a9786c1a91e3dcbb68bce4beb44926ac2c557bf/sqlalchemy-2.0.45-py3-none-any.whl", hash = "sha256:5225a288e4c8cc2308dbdd874edad6e7d0fd38eac1e9e5f23503425c8eee20d0", size = 1936672, upload-time = "2025-12-09T21:54:52.608Z" },
+]
+
+[package.optional-dependencies]
+asyncio = [
+    { name = "greenlet" },
 ]
 
 [[package]]
