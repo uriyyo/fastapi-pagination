@@ -84,7 +84,7 @@ def get_page_bases(cls: TPage) -> tuple[type[Any], ...]:
 
     if is_pydantic_v2_model(cls):
         params = cls.__pydantic_generic_metadata__["parameters"]
-        bases = (cls,) if not params else (cls[params], Generic[params])  # type: ignore[index]
+        bases = (cls,) if not params else (cls[params], Generic[params])
     elif cls.__concrete__:
         bases = (cls,)
     else:
