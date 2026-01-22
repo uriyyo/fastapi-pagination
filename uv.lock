@@ -1371,7 +1371,7 @@ wheels = [
 
 [[package]]
 name = "odmantic"
-version = "1.0.2"
+version = "1.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "motor" },
@@ -1379,9 +1379,9 @@ dependencies = [
     { name = "pymongo" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d6/cf/77a4fccc2810bd5cbab5df36edb209e0e91b4bab390f0e969d67c17741bb/odmantic-1.0.2.tar.gz", hash = "sha256:bbd0d46bc920e0e6d966d9f3add7396bc92377d2c73860d071d5ca8102f57235", size = 140263, upload-time = "2024-04-26T23:29:19.746Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/96/14/c40bad655c1cc59cb2fadb9cbee84143970f204a070a9a0a6e29b3f27eee/odmantic-1.0.3.tar.gz", hash = "sha256:f21616f73783ae1236034ddcb9eb96cca822043d8caf4f35bf6985f1eb983027", size = 36876, upload-time = "2026-01-21T21:07:39.198Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bf/2d/c8ccdb60ccd873bff3dcabfd46fc7cf24fe09150a31446f6b3b947322fe2/odmantic-1.0.2-py3-none-any.whl", hash = "sha256:0475c763687624b70ba4d52266a7d0bdfb74dda7ec40162669334e9d41c06049", size = 36891, upload-time = "2024-04-26T23:29:17.843Z" },
+    { url = "https://files.pythonhosted.org/packages/99/ef/0b837b48da87cb231ec0d4c83b4f5a2a1740a90bac5f678489fcc7886f69/odmantic-1.0.3-py3-none-any.whl", hash = "sha256:2971f36cef337de8a6e8279d3c6b7019322d2473de490f4e3bc6f26f6c0f0497", size = 37058, upload-time = "2026-01-21T21:07:37.583Z" },
 ]
 
 [[package]]
