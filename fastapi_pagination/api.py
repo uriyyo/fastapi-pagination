@@ -253,8 +253,17 @@ def _create_params_dependency(
                         default=field,
                     )
 
+            def _apply_alias(field: FieldV2, param: inspect.Parameter) -> inspect.Parameter:
+                match field:
+                    case FieldV2(alias=str() as alias) | FieldV2(validation_alias=str() as alias):
+                        return param.replace(name=alias)
+                    case _:
+                        return param
+
             if issubclass(params, BaseModel):
-                sign_params = [_get_param(name, field) for name, field in params.model_fields.items()]
+                sign_params = [
+                    _apply_alias(field, _get_param(name, field)) for name, field in params.model_fields.items()
+                ]
                 sign = sign.replace(parameters=sign_params)
 
     _pagination_params.__signature__ = sign  # type: ignore[attr-defined]

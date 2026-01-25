@@ -140,8 +140,8 @@ class TestUseParamsFields:
         ]
 
         @_app.get("/items", response_model=CustomPage)
-        def items(params: CustomPage.__params_type__ = Query(...)):
-            return paginate([*range(100)], params=params)
+        def items():
+            return paginate([*range(100)])
 
         return _app
 
@@ -175,6 +175,43 @@ class TestUseParamsFields:
                 pass
             case _:
                 pytest.fail(f"Unexpected response JSON: {response.json()}")
+
+
+@pytest.mark.skipif(
+    not (IS_PYDANTIC_V2 and IS_FASTAPI_V_0_112_4_OR_NEWER),
+    reason="alias and validation_alias are only supported in Pydantic v2",
+)
+class TestUseParamsFieldsAlias:
+    @pytest.fixture(scope="session")
+    def app(self):
+        _app = FastAPI()
+        add_pagination(_app)
+
+        class CustomParams(Page.__params_type__):
+            page: int = Query(alias="p")
+            size: int = Query(..., validation_alias="s")
+
+        CustomPage = CustomizedPage[
+            Page,
+            UseParams(CustomParams),
+        ]
+
+        @_app.get("/items", response_model=CustomPage)
+        def items():
+            return paginate([*range(100)])
+
+        return _app
+
+    @pytest.mark.asyncio
+    async def test_aliases(self, client):
+        response = await client.get("/items", params={"p": 3, "s": 15})
+
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+
+        assert data["page"] == 3
+        assert data["size"] == 15
 
 
 def test_customization_use_unknown_field():
