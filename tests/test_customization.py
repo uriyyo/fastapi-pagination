@@ -188,7 +188,7 @@ class TestUseParamsFieldsAlias:
         add_pagination(_app)
 
         class CustomParams(Page.__params_type__):
-            page: int = Query(alias="p")
+            page: int = Query(alias="from")
             size: int = Query(..., validation_alias="s")
 
         CustomPage = CustomizedPage[
@@ -204,7 +204,7 @@ class TestUseParamsFieldsAlias:
 
     @pytest.mark.asyncio
     async def test_aliases(self, client):
-        response = await client.get("/items", params={"p": 3, "s": 15})
+        response = await client.get("/items", params={"from": 3, "s": 15})
 
         assert response.status_code == status.HTTP_200_OK
 
