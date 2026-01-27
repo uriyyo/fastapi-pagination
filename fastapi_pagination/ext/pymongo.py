@@ -175,7 +175,7 @@ async def apaginate_aggregate(
     return await run_async_flow(
         _aggregate_flow(
             is_async=True,
-            collection=collection,  # type: ignore[arg-type]
+            collection=collection,
             aggregate_pipeline=aggregate_pipeline or [],
             params=params,
             transformer=transformer,
@@ -201,7 +201,7 @@ def paginate_aggregate(
     return run_sync_flow(
         _aggregate_flow(
             is_async=False,
-            collection=collection,  # type: ignore[arg-type]
+            collection=collection,
             aggregate_pipeline=aggregate_pipeline or [],
             params=params,
             transformer=transformer,
