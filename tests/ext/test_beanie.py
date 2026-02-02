@@ -2,6 +2,7 @@ import pytest
 from beanie import Document, init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field
+from pymongo import AsyncMongoClient
 from pytest_asyncio import fixture as async_fixture
 
 from fastapi_pagination.ext.beanie import apaginate
@@ -22,9 +23,24 @@ def be_user():
     return User
 
 
+@pytest.fixture(
+    scope="session",
+    params=[
+        AsyncIOMotorClient,
+        AsyncMongoClient,
+    ],
+    ids=[
+        "motor",
+        "pymongo",
+    ],
+)
+def beanie_client(request):
+    return request.param
+
+
 @async_fixture(scope="session")
-async def db_client(database_url, be_user):
-    client = AsyncIOMotorClient(database_url)
+async def db_client(database_url, be_user, beanie_client):
+    client = beanie_client(database_url)
     await init_beanie(database=client.test, document_models=[be_user])
     yield
     client.close()

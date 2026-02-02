@@ -2,6 +2,7 @@ from __future__ import annotations
 
 __all__ = ["apaginate", "paginate"]
 
+import inspect
 from copy import copy
 from typing import Any, Literal, TypeVar
 
@@ -128,6 +129,11 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
             session=aggregation_query.session,
             **aggregation_query.pymongo_kwargs,
         )
+
+        # in case of pymongo engine we need to await the cursor
+        if inspect.iscoroutine(mongo_cursor):
+            mongo_cursor = await mongo_cursor
+
         data = (await mongo_cursor.to_list(length=None))[0]
         items = data["data"]
         try:
