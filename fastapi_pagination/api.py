@@ -1,8 +1,3 @@
-from copy import copy
-
-from fastapi_pagination.pydantic.consts import IS_PYDANTIC_V2_12_5_OR_HIGHER
-from fastapi_pagination.typing_utils import create_annotated_tp
-
 __all__ = [
     "add_pagination",
     "apply_items_transformer",
@@ -23,6 +18,7 @@ import inspect
 from collections.abc import AsyncIterator, Callable, Iterator, Sequence
 from contextlib import AbstractContextManager, ExitStack, asynccontextmanager, contextmanager, suppress
 from contextvars import ContextVar
+from copy import copy
 from typing import (
     Annotated,
     Any,
@@ -40,6 +36,9 @@ from fastapi.dependencies.utils import (
 )
 from fastapi.routing import APIRoute, APIRouter
 from pydantic import BaseModel
+
+from fastapi_pagination.pydantic.consts import IS_PYDANTIC_V2_12_5_OR_HIGHER
+from fastapi_pagination.typing_utils import create_annotated_tp
 
 from .pydantic.v2 import FieldV2, UndefinedV2
 
