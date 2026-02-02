@@ -1,3 +1,8 @@
+from copy import copy
+
+from fastapi_pagination.pydantic.consts import IS_PYDANTIC_V2_12_5_OR_HIGHER
+from fastapi_pagination.typing_utils import create_annotated_tp
+
 __all__ = [
     "add_pagination",
     "apply_items_transformer",
@@ -36,7 +41,7 @@ from fastapi.dependencies.utils import (
 from fastapi.routing import APIRoute, APIRouter
 from pydantic import BaseModel
 
-from .pydantic.v2 import FieldV2
+from .pydantic.v2 import FieldV2, UndefinedV2
 
 try:
     from fastapi.routing import request_response
@@ -210,7 +215,7 @@ def apply_items_transformer(
     return async_wrapped(items) if async_ else items
 
 
-def _create_params_dependency(
+def _create_params_dependency(  # noqa: C901
     params: type[TAbstractParams_co],
 ) -> Callable[[TAbstractParams_co], AsyncIterator[TAbstractParams_co]]:
     is_pydantic_v2_model = False
@@ -221,11 +226,15 @@ def _create_params_dependency(
             if args:  # pragma: no cover
                 raise ValueError("Positional arguments are not supported for Pydantic v2 models")
 
-            # populate model by_name to avoid issues with alias fields
-            # otherwise we might just lose those fields cause model will expect them to be passed by their alias
+            extra_kwargs = {}
+            if IS_PYDANTIC_V2_12_5_OR_HIGHER:
+                # populate model by_name to avoid issues with alias fields
+                # otherwise we might just lose those fields cause model will expect them to be passed by their alias
+                extra_kwargs["by_name"] = True
+
             val = cast(
                 AbstractParams,
-                cast(type[BaseModel], params).model_validate(kwargs, by_name=True),
+                cast(type[BaseModel], params).model_validate(kwargs, **extra_kwargs),
             )
         else:
             val = params(*args, **kwargs)
@@ -236,14 +245,34 @@ def _create_params_dependency(
     sign = inspect.signature(params)
 
     if IS_PYDANTIC_V2:
+        if IS_PYDANTIC_V2_12_5_OR_HIGHER:
 
-        def _get_param(name: str, field: FieldV2) -> inspect.Parameter:
-            return inspect.Parameter(
-                name=name,
-                kind=inspect.Parameter.KEYWORD_ONLY,
-                annotation=field.annotation,
-                default=field,
-            )
+            def _get_param(name: str, field: FieldV2) -> inspect.Parameter:
+                field = copy(field)
+
+                param_default: Any
+                if field.default is not UndefinedV2:
+                    # for pydantic v2.12.5+ we need to move default value to be as parameter default
+                    param_default = field.default
+                    field.default = UndefinedV2
+                else:
+                    param_default = inspect.Parameter.empty
+
+                return inspect.Parameter(
+                    name=name,
+                    kind=inspect.Parameter.KEYWORD_ONLY,
+                    annotation=create_annotated_tp(field.annotation, field),
+                    default=param_default,
+                )
+        else:
+
+            def _get_param(name: str, field: FieldV2) -> inspect.Parameter:
+                return inspect.Parameter(
+                    name=name,
+                    kind=inspect.Parameter.KEYWORD_ONLY,
+                    annotation=field.annotation,
+                    default=field,
+                )
 
         with suppress(ValueError, TypeError):
             is_pydantic_v2_model = issubclass(params, BaseModel)
