@@ -123,7 +123,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
         if aggregation_pipeline_transformer is not None:
             pipeline = aggregation_pipeline_transformer(pipeline)
 
-        mongo_cursor = aggregation_query.document_model.get_pymongo_collection().aggregate(
+        mongo_cursor = await aggregation_query.document_model.get_pymongo_collection().aggregate(
             pipeline,
             session=aggregation_query.session,
             **aggregation_query.pymongo_kwargs,
