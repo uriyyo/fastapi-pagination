@@ -1,3 +1,5 @@
+from functools import cache
+
 __all__ = [
     "add_pagination",
     "apply_items_transformer",
@@ -214,26 +216,26 @@ def apply_items_transformer(
     return async_wrapped(items) if async_ else items
 
 
+@cache
+def _model_validate_has_by_name_param() -> bool:
+    sign = inspect.signature(BaseModel.model_validate)
+    return "by_name" in sign.parameters
+
+
 def _create_params_dependency(  # noqa: C901
     params: type[TAbstractParams_co],
 ) -> Callable[[TAbstractParams_co], AsyncIterator[TAbstractParams_co]]:
     is_pydantic_v2_model = False
 
     async def _pagination_params(*args: Any, **kwargs: Any) -> AsyncIterator[TAbstractParams_co]:
-        if is_pydantic_v2_model:
+        if is_pydantic_v2_model and _model_validate_has_by_name_param():
             # should not happen cause all , but let's be safe
             if args:  # pragma: no cover
                 raise ValueError("Positional arguments are not supported for Pydantic v2 models")
 
-            extra_kwargs = {}
-            if IS_PYDANTIC_V2_12_5_OR_HIGHER:
-                # populate model by_name to avoid issues with alias fields
-                # otherwise we might just lose those fields cause model will expect them to be passed by their alias
-                extra_kwargs["by_name"] = True
-
             val = cast(
                 AbstractParams,
-                cast(type[BaseModel], params).model_validate(kwargs, **extra_kwargs),
+                cast(type[BaseModel], params).model_validate(kwargs, by_name=True),
             )
         else:
             val = params(*args, **kwargs)
