@@ -25,7 +25,7 @@ async def apaginate(
     return await run_async_flow(
         generic_flow(
             async_=True,
-            total_flow=flow_expr(query.count),
+            total_flow=flow_expr(lambda: query.count()),
             limit_offset_flow=flow_expr(lambda raw_params: generic_query_apply_params(query, raw_params).all()),
             params=params,
             transformer=transformer,
