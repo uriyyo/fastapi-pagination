@@ -83,7 +83,7 @@ class TestSQLAlchemyUnwrap:
         ("query", "validate"),
         [
             (
-                lambda sa_user: select(sa_user),
+                select,
                 lambda sa_user, item: isinstance(item, sa_user),
             ),
             (
@@ -116,10 +116,10 @@ class TestSQLAlchemyUnwrap:
     @pytest.mark.parametrize(
         ("unwrap_mode", "validate"),
         [
-            (None, lambda item, sa_user: isinstance(item, sa_user)),
-            ("auto", lambda item, sa_user: isinstance(item, sa_user)),
-            ("legacy", lambda item, sa_user: isinstance(item, sa_user)),
-            ("unwrap", lambda item, sa_user: isinstance(item, sa_user)),
+            (None, isinstance),
+            ("auto", isinstance),
+            ("legacy", isinstance),
+            ("unwrap", isinstance),
             ("no-unwrap", lambda item, sa_user: len(item) == 1 and isinstance(item[0], sa_user)),
         ],
     )
@@ -161,7 +161,7 @@ class TestSQLAlchemyUnwrap:
             (None, lambda item, sa_user: len(item) == 2),
             ("auto", lambda item, sa_user: len(item) == 2),
             ("legacy", lambda item, sa_user: len(item) == 2),
-            ("unwrap", lambda item, sa_user: isinstance(item, sa_user)),
+            ("unwrap", isinstance),
             ("no-unwrap", lambda item, sa_user: len(item) == 2),
         ],
     )

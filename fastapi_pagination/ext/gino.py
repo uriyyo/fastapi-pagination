@@ -33,14 +33,12 @@ async def apaginate(
     return await run_async_flow(
         generic_flow(
             total_flow=flow_expr(
-                lambda: (
-                    func.count(literal_column("*"))
+                func.count(literal_column("*"))
                     .select()
                     .select_from(
                         query.order_by(None).alias(),
                     )
-                    .gino.scalar()
-                )  # type: ignore[attr-defined]
+                    .gino.scalar  # type: ignore[attr-defined]
             ),
             limit_offset_flow=flow_expr(
                 lambda raw_params: create_paginate_query(query, raw_params).gino.all()  # type: ignore[union-attr]

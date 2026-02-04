@@ -55,7 +55,7 @@ def query(request):
     if request.param:
         return lambda: User
 
-    return lambda: User.all()
+    return User.all
 
 
 @pytest.fixture(scope="session")

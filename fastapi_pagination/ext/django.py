@@ -29,7 +29,7 @@ def paginate(
 
     return run_sync_flow(
         generic_flow(
-            total_flow=flow_expr(lambda: query_set.count()),
+            total_flow=flow_expr(query_set.count),
             limit_offset_flow=flow_expr(lambda raw_params: [*query_set[raw_params.as_slice()]]),
             params=params,
             transformer=transformer,

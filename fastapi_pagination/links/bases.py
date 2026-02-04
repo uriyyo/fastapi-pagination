@@ -105,7 +105,7 @@ class BaseUseLinks(BaseLinksCustomizer[TPage_contra], ABC):
         if IS_PYDANTIC_V2:
             from pydantic import computed_field
 
-            ns[self.field] = computed_field(return_type=Links)(lambda _self: self.resolve_links(_self))
+            ns[self.field] = computed_field(return_type=Links)(self.resolve_links)
             return
 
         add_field = UseAdditionalFields(**{self.field: (Links, Field(default_factory=Links))})

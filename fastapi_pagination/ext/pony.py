@@ -21,7 +21,7 @@ def paginate(
 ) -> Any:
     return run_sync_flow(
         generic_flow(
-            total_flow=flow_expr(lambda: query.count()),
+            total_flow=flow_expr(query.count),
             limit_offset_flow=flow_expr(lambda raw_params: query.fetch(raw_params.limit, raw_params.offset).to_list()),
             params=params,
             transformer=transformer,
