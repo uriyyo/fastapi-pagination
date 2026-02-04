@@ -101,6 +101,7 @@ select = [
 ]
 ignore = [
     # single rule exclude
+    "ASYNC240", # allow async functions to use pathlib.Path methods
     "B008",    # do not perform function calls in argument defaults
     "S101",    # use of assert detected
     "SIM114",  # allow have multiple ifs with same body
@@ -116,6 +117,7 @@ ignore = [
     "FAST002", # allow to use non-annotated dependencies
     "PLR0913", # allow more than 5 arguments
     "PLR2004", # allow to compare with "magic numbers"
+    "PLW0108", # allow lambda with unnecessary function call
     "TC001",   # ignore moving things to if TYPE_CHECKING block
     "TC002",   # ignore moving things to if TYPE_CHECKING block
     "TC003",   # ignore moving things to if TYPE_CHECKING block
