@@ -101,6 +101,7 @@ select = [
 ]
 ignore = [
     # single rule exclude
+    "ASYNC240", # allow async functions to use pathlib.Path methods
     "B008",    # do not perform function calls in argument defaults
     "S101",    # use of assert detected
     "SIM114",  # allow have multiple ifs with same body
