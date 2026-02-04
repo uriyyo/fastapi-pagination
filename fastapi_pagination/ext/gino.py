@@ -34,11 +34,11 @@ async def apaginate(
         generic_flow(
             total_flow=flow_expr(
                 func.count(literal_column("*"))
-                    .select()
-                    .select_from(
-                        query.order_by(None).alias(),
-                    )
-                    .gino.scalar  # type: ignore[attr-defined]
+                .select()
+                .select_from(
+                    query.order_by(None).alias(),
+                )
+                .gino.scalar  # type: ignore[attr-defined]
             ),
             limit_offset_flow=flow_expr(
                 lambda raw_params: create_paginate_query(query, raw_params).gino.all()  # type: ignore[union-attr]
