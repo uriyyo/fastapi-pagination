@@ -171,6 +171,14 @@ def _unwrap_params(params: AnyParams) -> RawParams:
 
 
 def create_paginate_query_from_text(query: str, params: AnyParams) -> str:
+    """
+    .. deprecated:: 1.2.0
+        This function is deprecated and will be removed.
+        It has been moved to the :mod:`raw_sql` module.
+        Please update your imports to use
+        :func:`fastapi_pagination.raw_sql.create_paginate_query_from_text`.
+    """
+
     raw_params = _unwrap_params(params)
 
     suffix = ""
@@ -183,6 +191,13 @@ def create_paginate_query_from_text(query: str, params: AnyParams) -> str:
 
 
 def create_count_query_from_text(query: str) -> str:
+    """
+    .. deprecated:: 1.2.0
+        This function is deprecated and will be removed.
+        It has been moved to the :mod:`raw_sql` module.
+        Please update your imports to use
+        :func:`fastapi_pagination.raw_sql.create_count_query_from_text`.
+    """
     return f"SELECT count(*) FROM ({query}) AS __count_query__"  # noqa: S608
 
 
