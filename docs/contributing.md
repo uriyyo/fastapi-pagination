@@ -33,7 +33,7 @@ uv sync --dev --all-extras
 
 To install only basic dependencies, run:
 ```sh
-uv install --dev
+uv sync --dev
 ```
 
 To install docs requirements, run:
