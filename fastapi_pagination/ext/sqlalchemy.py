@@ -173,20 +173,12 @@ def _unwrap_params(params: AnyParams) -> RawParams:
 
 @deprecated("Use fastapi_pagination.ext.raw_sql.create_paginate_query_from_text instead.")
 def create_paginate_query_from_text(query: str, params: AnyParams) -> str:
-    raw_params = _unwrap_params(params)
-
-    suffix = ""
-    if raw_params.limit is not None:
-        suffix += f" LIMIT {raw_params.limit}"
-    if raw_params.offset is not None:
-        suffix += f" OFFSET {raw_params.offset}"
-
-    return f"{query} {suffix}".strip()
+    return _create_paginate_query_from_text(query, _unwrap_params(params))
 
 
 @deprecated("Use fastapi_pagination.ext.raw_sql.create_count_query_from_text instead.")
 def create_count_query_from_text(query: str) -> str:
-    return f"SELECT count(*) FROM ({query}) AS __count_query__"  # noqa: S608
+    return _create_count_query_from_text(query)
 
 
 def _paginate_from_statement(query: FromStatement[TupleAny], params: AnyParams) -> FromStatement[TupleAny]:
