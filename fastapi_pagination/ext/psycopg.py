@@ -1,6 +1,6 @@
 __all__ = ["apaginate", "paginate"]
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from functools import partial
 from typing import Any, TypeAlias, cast
@@ -24,6 +24,7 @@ _AnyConn: TypeAlias = _SyncConn | _AsyncConn
 
 _InputQuery: TypeAlias = str | LiteralString | SQL | Composed
 _AnyFactory: TypeAlias = RowFactory[Any] | AsyncRowFactory[Any]
+_QueryParams: TypeAlias = Mapping[str, Any] | Sequence[Any]
 
 
 @contextmanager
@@ -46,7 +47,7 @@ def _compile_query(query: _InputQuery, conn: _AnyConn) -> LiteralString:
 def _psycopg_limit_offset_flow(
     conn: _AnyConn,
     query: _InputQuery,
-    args: tuple[Any, ...],
+    args: _QueryParams | None,
     raw_params: RawParams,
 ) -> Any:
     query = _compile_query(query, conn)
@@ -60,7 +61,7 @@ def _psycopg_limit_offset_flow(
 def _psycopg_total_flow(
     conn: _AnyConn,
     query: _InputQuery,
-    args: tuple[Any, ...],
+    args: _QueryParams | None,
 ) -> Any:
     query = _compile_query(query, conn)
 
@@ -75,20 +76,30 @@ def _psycopg_total_flow(
         return None  # pragma: no cover
 
 
+def _resolve_query_args(args: tuple[Any, ...], query_params: _QueryParams | None) -> _QueryParams | None:
+    if args and query_params is not None:
+        raise ValueError("Cannot use both positional query arguments and 'query_params' keyword argument")
+
+    return args or query_params
+
+
 async def apaginate(
     conn: _AsyncConn,
     query: _InputQuery,
     *args: Any,
+    query_params: _QueryParams | None = None,
     transformer: AsyncItemsTransformer | None = None,
     params: AbstractParams | None = None,
     additional_data: AdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
+    resolved = _resolve_query_args(args, query_params)
+
     return await run_async_flow(
         generic_flow(
             async_=True,
-            limit_offset_flow=partial(_psycopg_limit_offset_flow, conn, query, args),
-            total_flow=partial(_psycopg_total_flow, conn, query, args),
+            limit_offset_flow=partial(_psycopg_limit_offset_flow, conn, query, resolved),
+            total_flow=partial(_psycopg_total_flow, conn, query, resolved),
             params=params,
             transformer=transformer,
             additional_data=additional_data,
@@ -101,16 +112,19 @@ def paginate(
     conn: _SyncConn,
     query: _InputQuery,
     *args: Any,
+    query_params: _QueryParams | None = None,
     transformer: ItemsTransformer | None = None,
     params: AbstractParams | None = None,
     additional_data: AdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
+    resolved = _resolve_query_args(args, query_params)
+
     return run_sync_flow(
         generic_flow(
             async_=False,
-            limit_offset_flow=partial(_psycopg_limit_offset_flow, conn, query, args),
-            total_flow=partial(_psycopg_total_flow, conn, query, args),
+            limit_offset_flow=partial(_psycopg_limit_offset_flow, conn, query, resolved),
+            total_flow=partial(_psycopg_total_flow, conn, query, resolved),
             params=params,
             transformer=transformer,
             additional_data=additional_data,

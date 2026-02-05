@@ -22,13 +22,22 @@ def database_url(postgres_url):
 
 @async_sync_testsuite
 class TestPsycopg(BasePaginationTestSuite):
-    @pytest.fixture(scope="session", params=["raw", "sql-stmt"])
-    def query_factory(self, request):
-        def _factory():
-            if request.param == "raw":
-                return "SELECT id, name FROM users"
+    @pytest.fixture(scope="session", params=["args", "kwargs"])
+    def query_params(self, request):
+        if request.param == "args":
+            return (1,)
 
-            return SQL("SELECT id, name FROM {}").format(Identifier("users"))
+        return {"arg": 1}
+
+    @pytest.fixture(scope="session", params=["raw", "sql-stmt"])
+    def query_factory(self, request, query_params):
+        def _factory():
+            arg_format = "%s" if isinstance(query_params, tuple) else "%(arg)s"
+
+            if request.param == "raw":
+                return f"SELECT id, name FROM users WHERE 1 = {arg_format}"  # noqa: S608
+
+            return SQL(f"SELECT id, name FROM {{}} WHERE 1 = {arg_format}").format(Identifier("users"))  # type: ignore[arg-type]  # noqa: S608
 
         return _factory
 
@@ -60,12 +69,12 @@ class TestPsycopg(BasePaginationTestSuite):
         return apaginate if is_async_db else paginate
 
     @pytest.fixture(scope="session")
-    def app(self, builder, conn_ctx, paginate_func, query_factory):
+    def app(self, builder, conn_ctx, paginate_func, query_factory, query_params):
         builder = builder.new()
 
         @builder.both.default
         async def route():
             async with conn_ctx() as conn:
-                return await maybe_async(paginate_func(conn, query_factory()))
+                return await maybe_async(paginate_func(conn, query_factory(), query_params=query_params))
 
         return builder.build()
