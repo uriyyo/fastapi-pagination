@@ -12,7 +12,7 @@ from fastapi_pagination.flow import flow, flow_expr, run_async_flow
 from fastapi_pagination.flows import generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 
-from .sqlalchemy import create_count_query_from_text, create_paginate_query_from_text
+from .raw_sql import create_count_query_from_text, create_paginate_query_from_text
 
 
 @flow

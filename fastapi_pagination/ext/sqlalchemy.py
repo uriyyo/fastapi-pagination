@@ -22,6 +22,7 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query, Session, noload, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import TextClause
+from typing_extensions import deprecated
 
 from fastapi_pagination.api import create_page
 from fastapi_pagination.bases import AbstractParams, CursorRawParams, RawParams
@@ -30,11 +31,12 @@ from fastapi_pagination.flow import flow, run_async_flow, run_sync_flow
 from fastapi_pagination.flows import CursorFlow, LimitOffsetFlow, TotalFlow, generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 
+from .raw_sql import create_count_query_from_text as _create_count_query_from_text
+from .raw_sql import create_paginate_query_from_text as _create_paginate_query_from_text
 from .utils import generic_query_apply_params, unwrap_scalars
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
-
 
 try:
     from sqlalchemy.orm import FromStatement
@@ -71,7 +73,6 @@ try:
     from sqlakeyset import paging
 except ImportError:  # pragma: no cover
     paging = None  # type: ignore[assignment]
-
 
 AsyncConn: TypeAlias = "AsyncSession | AsyncConnection | async_scoped_session[Any]"
 SyncConn: TypeAlias = "Session | Connection | scoped_session[Any]"
@@ -170,15 +171,8 @@ def _unwrap_params(params: AnyParams) -> RawParams:
     return params.to_raw_params().as_limit_offset()
 
 
+@deprecated("Use fastapi_pagination.ext.raw_sql.create_paginate_query_from_text instead.")
 def create_paginate_query_from_text(query: str, params: AnyParams) -> str:
-    """
-    .. deprecated:: 1.2.0
-        This function is deprecated and will be removed.
-        It has been moved to the :mod:`raw_sql` module.
-        Please update your imports to use
-        :func:`fastapi_pagination.raw_sql.create_paginate_query_from_text`.
-    """
-
     raw_params = _unwrap_params(params)
 
     suffix = ""
@@ -190,14 +184,8 @@ def create_paginate_query_from_text(query: str, params: AnyParams) -> str:
     return f"{query} {suffix}".strip()
 
 
+@deprecated("Use fastapi_pagination.ext.raw_sql.create_count_query_from_text instead.")
 def create_count_query_from_text(query: str) -> str:
-    """
-    .. deprecated:: 1.2.0
-        This function is deprecated and will be removed.
-        It has been moved to the :mod:`raw_sql` module.
-        Please update your imports to use
-        :func:`fastapi_pagination.raw_sql.create_count_query_from_text`.
-    """
     return f"SELECT count(*) FROM ({query}) AS __count_query__"  # noqa: S608
 
 
@@ -209,7 +197,7 @@ def _paginate_from_statement(query: FromStatement[TupleAny], params: AnyParams) 
 
 def create_paginate_query(query: Selectable, params: AnyParams) -> Selectable:
     if isinstance(query, TextClause):
-        return text(create_paginate_query_from_text(query.text, params))
+        return text(_create_paginate_query_from_text(query.text, params))
     if isinstance(query, FromStatement):
         return _paginate_from_statement(query, params)
 
@@ -218,7 +206,7 @@ def create_paginate_query(query: Selectable, params: AnyParams) -> Selectable:
 
 def create_count_query(query: Selectable, *, use_subquery: bool = True) -> Selectable:
     if isinstance(query, TextClause):
-        return text(create_count_query_from_text(query.text))
+        return text(_create_count_query_from_text(query.text))
     if isinstance(query, FromStatement):
         return create_count_query(query.element)
 
