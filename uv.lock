@@ -643,7 +643,7 @@ wheels = [
 
 [[package]]
 name = "fastapi-pagination"
-version = "0.15.9"
+version = "0.15.10"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
@@ -1441,7 +1441,7 @@ wheels = [
 
 [[package]]
 name = "piccolo"
-version = "1.30.0"
+version = "1.31.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "black" },
@@ -1452,9 +1452,9 @@ dependencies = [
     { name = "targ" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/19/7d/1445af6858a41c2d5b008ebfee3b6e37e57d424d0d0fa69635e9805fee73/piccolo-1.30.0.tar.gz", hash = "sha256:3f41d01bc0c5a36e74ef8ef3b4a52cf899c4f874ec2e916b51cbac5ffe47dd89", size = 288980, upload-time = "2025-10-21T23:05:02.034Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/71/21a5e071b3adcc72618f0a56abb259fa38f4f111e24e70549741d00b8abf/piccolo-1.31.0.tar.gz", hash = "sha256:6dbf2b47f5a42132cd92d4c896f150b9b0b77833a1076832469960651a20061b", size = 289514, upload-time = "2026-02-06T22:16:02.644Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9f/69/a490f885cd34ceb9c984ad39d0ea60d6d896c31c40bf1aa5ba7c90f90ba0/piccolo-1.30.0-py3-none-any.whl", hash = "sha256:664bed38cc09db1421acf23adb6d33e404edd6498a2a3beab134476b80019d4f", size = 411255, upload-time = "2025-10-21T23:05:00.398Z" },
+    { url = "https://files.pythonhosted.org/packages/62/da/642443a8e5db6bf809f4b8a69505286b4c5bcc1ed90521b20cfbaab27ed0/piccolo-1.31.0-py3-none-any.whl", hash = "sha256:c45d70424acff2e19faeb7152937fc06f3e0313eae9e9db8221c0da44b3a7618", size = 411117, upload-time = "2026-02-06T22:16:00.639Z" },
 ]
 
 [[package]]
