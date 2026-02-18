@@ -18,7 +18,8 @@ def db(database_url):
 
 @pytest.fixture(scope="session")
 def meta(db_type):
-    # Create separate metadata for each database type to avoid conflicts
+    # Create separate metadata for each database type (postgres/sqlite)
+    # The db_type parameter ensures pytest creates a distinct fixture instance per database
     return sqlalchemy.MetaData()
 
 
