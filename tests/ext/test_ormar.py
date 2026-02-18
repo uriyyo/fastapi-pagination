@@ -1,35 +1,35 @@
-import databases
 import pytest
 import sqlalchemy
-from ormar import Integer, Model, OrmarConfig, String
-from sqlalchemy.engine.create import create_engine
+from ormar import DatabaseConnection, Integer, Model, OrmarConfig, String
 
 from fastapi_pagination.ext.ormar import apaginate
 from tests.base import BasePaginationTestSuite
 
 
 @pytest.fixture(scope="session")
-def db(database_url):
-    return databases.Database(database_url)
+def is_async_db():
+    return True
 
 
 @pytest.fixture(scope="session")
-def meta(database_url):
+def db(database_url):
+    return DatabaseConnection(database_url)
+
+
+@pytest.fixture(scope="session")
+def meta(db_type):
+    # Create separate metadata for each database type (postgres/sqlite)
+    # The db_type parameter ensures pytest creates a distinct fixture instance per database
     return sqlalchemy.MetaData()
 
 
 @pytest.fixture(scope="session")
-def engine(database_url):
-    return create_engine(database_url)
-
-
-@pytest.fixture(scope="session")
-def user_cls(meta, db, engine):
+def user_cls(meta, db):
     class User(Model):
         ormar_config = OrmarConfig(
             metadata=meta,
             database=db,
-            engine=engine,
+            tablename="users",
         )
 
         id: int = Integer(primary_key=True)
