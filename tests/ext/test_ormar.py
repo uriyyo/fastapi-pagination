@@ -17,7 +17,8 @@ def db(database_url):
 
 
 @pytest.fixture(scope="session")
-def meta():
+def meta(db_type):
+    # Create separate metadata for each database type to avoid conflicts
     return sqlalchemy.MetaData()
 
 
