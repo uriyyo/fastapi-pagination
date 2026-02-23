@@ -26,7 +26,7 @@ def create_pydantic_model(model_cls: type[TModel], /, **kwargs: Any) -> TModel:
     if is_pydantic_v2_model(model_cls):
         return model_cls.model_validate(kwargs, from_attributes=True)
 
-    return cast(TModel, model_cls(**kwargs))
+    return model_cls(**kwargs)
 
 
 @singledispatch
