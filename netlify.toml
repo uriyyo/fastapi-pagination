@@ -1,6 +1,7 @@
 [build]
 publish = "site"
 command = """
-pip3 install -U -r docs_requirements.txt &&
-mkdocs build -d site
+pip3 install uv &&
+uv sync --group docs &&
+uv run mkdocs build -d site
 """

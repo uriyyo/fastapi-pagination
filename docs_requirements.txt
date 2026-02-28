@@ -1,5 +1,0 @@
-mkdocs
-mkdocs-material
-pymdown-extensions
-fontawesome-markdown
-mdx_include
