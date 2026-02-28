@@ -123,7 +123,7 @@ def is_coro(obj: Any) -> bool:
 
 async def await_if_coro(coro: Awaitable[R] | R, /) -> R:
     if isinstance(coro, Awaitable):
-        return await coro
+        return await coro  # type: ignore[invalid-return-type]
 
     return coro
 
