@@ -38,7 +38,7 @@ uv sync --dev
 
 To install docs requirements, run:
 ```sh
-uv pip install -r docs_requirements.txt
+uv sync --group docs
 ```
 
 ### Step 4: do your changes
