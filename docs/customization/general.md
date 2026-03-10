@@ -1,11 +1,10 @@
 `fastapi-pagination` provides a way to customize your input and output models.
 
-In most cases you will find needed customizer is `fastapi_pagination.customization` module.
+In most cases, you will find the customizer you need in the `fastapi_pagination.customization` module.
 
-`CustomizedPage` works similar to how `typing.Annotated` works, but as arguments it accepts instances of 
-`PageCustomizer` protocol.
+`CustomizedPage` works similar to how `typing.Annotated` works, but as arguments it accepts instances of the `PageCustomizer` protocol.
 
-Here is an examples of how to increase default size of params:
+Here is an example of how to increase the default size of params:
 ```py
 from typing import TypeVar
 
