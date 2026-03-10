@@ -78,7 +78,7 @@ async def paginate(
     )
 ```
 
-If you want to add/updated docs, then you will need to edit `./docs/` directory.
+If you want to add/update docs, then you will need to edit `./docs/` directory.
 You can run `mkdocs serve` to see your changes locally.
 
 ### Step 5: run pre-commit hooks
