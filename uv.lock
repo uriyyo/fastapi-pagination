@@ -1074,7 +1074,7 @@ wheels = [
 
 [[package]]
 name = "google-cloud-firestore"
-version = "2.24.0"
+version = "2.25.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "google-api-core", extra = ["grpc"] },
@@ -1084,9 +1084,9 @@ dependencies = [
     { name = "proto-plus" },
     { name = "protobuf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c4/5e/9a0f2378623a21d46800815e6ff4c3119af3914e3b8405b1f33f12b4f1b1/google_cloud_firestore-2.24.0.tar.gz", hash = "sha256:e7f831f150e787c46ac3a96407f58d9edccd5455dbc9dae472f4cadb6daf6dc9", size = 620822, upload-time = "2026-03-06T21:53:04.143Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fd/84/4acfdc4d29de4eae4dd6ac1267611421c2a36975c473b2a86fd2e9752e75/google_cloud_firestore-2.25.0.tar.gz", hash = "sha256:9bca3b504f5473048eeab603b9bec69bbeffcdddc4e5fc65cdcc01b449628fc0", size = 621860, upload-time = "2026-03-12T19:31:06.062Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/69/d0/2ac7ff231eb380c88ddac21551156b7d03e25b1699b55641cf694def7c60/google_cloud_firestore-2.24.0-py3-none-any.whl", hash = "sha256:8b778fe766dacc54ef19b4f1b64adc751fca51b59ce569f1ec38c2ebd985dda1", size = 416388, upload-time = "2026-03-06T21:52:50.144Z" },
+    { url = "https://files.pythonhosted.org/packages/30/f2/29abde0fcd98f32ce61fc2064a1a3e39b4e64746537409f8ea5521f79afb/google_cloud_firestore-2.25.0-py3-none-any.whl", hash = "sha256:c933a7696b7dd160953d60413ab9481387f6dd8367e77dd750d841689773104a", size = 416714, upload-time = "2026-03-12T19:30:36.674Z" },
 ]
 
 [[package]]
