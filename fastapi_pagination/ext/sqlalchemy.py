@@ -70,9 +70,12 @@ except ImportError:  # pragma: no cover
 
 
 try:
+    from sqlakeyset import asyncio as apaging
     from sqlakeyset import paging
 except ImportError:  # pragma: no cover
     paging = None  # type: ignore[assignment]
+    apaging = None  # type: ignore[assignment]
+
 
 AsyncConn: TypeAlias = "AsyncSession | AsyncConnection | async_scoped_session[Any]"
 SyncConn: TypeAlias = "Session | Connection | scoped_session[Any]"
@@ -289,12 +292,9 @@ def _cursor_flow(query: Selectable, conn: AnyConn, is_async: bool, raw_params: C
     if not getattr(query, "_order_by_clauses", True):
         raise ValueError("Cursor pagination requires ordering")
 
-    _call = paging.select_page
-    if is_async:
-        conn = _get_sync_conn_from_async(conn)
-        _call = partial(greenlet_spawn, _call)
+    _select_page = apaging.select_page if is_async else paging.select_page
 
-    page = yield _call(
+    page = yield _select_page(
         conn,  # type: ignore[arg-type]
         selectable=query,  # type: ignore[arg-type]
         per_page=raw_params.size,
