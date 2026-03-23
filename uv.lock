@@ -787,7 +787,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -824,7 +824,7 @@ wheels = [
 
 [[package]]
 name = "fastapi-pagination"
-version = "0.15.10"
+version = "0.15.11"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
@@ -2646,7 +2646,7 @@ wheels = [
 
 [[package]]
 name = "tortoise-orm"
-version = "1.1.6"
+version = "1.1.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiosqlite" },
@@ -2656,9 +2656,9 @@ dependencies = [
     { name = "tomlkit", marker = "python_full_version < '3.11'" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/40/76/629a5d69c170605dbdc10f3f3416d124fae05836860686ccd9e06726810c/tortoise_orm-1.1.6.tar.gz", hash = "sha256:30095a77aa7c3eb3ede1baf4b390a66b994dc7c4d0d06a609d23a16c50e55d0c", size = 377565, upload-time = "2026-03-05T07:24:26.561Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/55/e75d3ae0dd2c96cf961bf068f465fb62ec481d802beb65f406620bfd40a0/tortoise_orm-1.1.7.tar.gz", hash = "sha256:a0f0f27f9c92547739f0a3f0862c257ab64d8baadbc0e548cbcfa2d70bcbe275", size = 387489, upload-time = "2026-03-21T20:03:29.087Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/41/8e/e7e237dbdee717c8eac602fa9682df8ad9b43012a1b7760f59bb57eeddb1/tortoise_orm-1.1.6-py3-none-any.whl", hash = "sha256:70bd10d28dff9df889161e190c460c2339169ef47986765647ec53cb554031b2", size = 267314, upload-time = "2026-03-05T07:20:11.807Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/9b/e7e5b4f4e9433b9d9c389afc62ea0ed2597626842dc0f76dd7b54eb32cdd/tortoise_orm-1.1.7-py3-none-any.whl", hash = "sha256:b640b786905891cc120aa16d1a7af18cd54b111a812f9b1c1d1c7b294d62949d", size = 272437, upload-time = "2026-03-21T20:03:27.539Z" },
 ]
 
 [[package]]
