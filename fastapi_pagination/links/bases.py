@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import Any, Generic
 
-from pydantic import BaseModel, Field, root_validator  # type: ignore[deprecated]
+from pydantic import BaseModel, Field, root_validator  # type: ignore[ty:deprecated]
 from starlette.requests import URL
 from typing_extensions import TypeVar
 
@@ -137,9 +137,9 @@ class BaseUseHeaderLinks(BaseLinksCustomizer[TPage_contra], ABC):
             rsp.headers["Link"] = ", ".join(parts)
 
     def _customize_page_ns_pydantic_v1(self, page_cls: PageCls, ns: ClsNamespace, /) -> None:
-        @root_validator(skip_on_failure=True, allow_reuse=True)  # type: ignore[deprecated]
+        @root_validator(skip_on_failure=True, allow_reuse=True)  # type: ignore[ty:deprecated]
         def __add_links_to_header__(cls: Any, values: dict[str, Any]) -> dict[str, Any]:  # noqa: N807
-            links = self.resolve_links(SimpleNamespace(**values))  # type: ignore[arg-type]
+            links = self.resolve_links(SimpleNamespace(**values))  # type: ignore[ty:invalid-argument-type]
             self._add_links_to_header(links)
 
             return values

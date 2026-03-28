@@ -84,7 +84,7 @@ def get_page_bases(cls: TPage) -> tuple[type[Any], ...]:
 
     if is_pydantic_v2_model(cls):
         params = cls.__pydantic_generic_metadata__["parameters"]
-        bases = (cls,) if not params else (cls[params], Generic[params])  # type: ignore[invalid-argument-type]
+        bases = (cls,) if not params else (cls[params], Generic[params])  # type: ignore[ty:invalid-argument-type]
     elif cls.__concrete__:
         bases = (cls,)
     else:
@@ -596,9 +596,9 @@ def _convert_v2_page_cls_to_v1(page_cls: type[AbstractPage], /) -> BaseModelV1:
                 **kwargs,
             )
 
-    new_cls = create_model_v1(  # type: ignore[call-overload]
+    new_cls = create_model_v1(  # type: ignore[ty:no-matching-overload]
         page_cls.__name__,
-        __base__=(_PydanticV2ToV1[tp_params], Generic[tp_params]),  # type: ignore[misc,index]
+        __base__=(_PydanticV2ToV1[tp_params], Generic[tp_params]),  # type: ignore[ty:invalid-argument-type]
         **{k: _convert_v2_field_to_v1(cast(FieldV2, v)) for k, v in get_model_fields(page_cls).items()},
     )
 

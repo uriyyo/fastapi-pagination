@@ -44,7 +44,7 @@ async def paginate(
     additional_data: AdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
-    return await apaginate(  # type: ignore[deprecated]
+    return await apaginate(  # type: ignore[ty:deprecated]
         query,
         params=params,
         transformer=transformer,

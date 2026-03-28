@@ -212,7 +212,7 @@ def apply_items_transformer(
     if is_coro:
         return transformer(items)
 
-    items = transformer(items)  # type: ignore[assignment]
+    items = transformer(items)  # type: ignore[ty:invalid-assignment]
     return async_wrapped(items) if async_ else items
 
 
@@ -241,7 +241,7 @@ def _create_params_dependency(  # noqa: C901
             val = params(*args, **kwargs)
 
         with set_params(val):
-            yield val
+            yield val  # type: ignore[ty:invalid-yield]
 
     sign = inspect.signature(params)
 
@@ -282,7 +282,7 @@ def _create_params_dependency(  # noqa: C901
             sign_params = [_get_param(name, field) for name, field in cast(BaseModel, params).model_fields.items()]
             sign = sign.replace(parameters=sign_params)
 
-    _pagination_params.__signature__ = sign  # type: ignore[attr-defined]
+    _pagination_params.__signature__ = sign  # type: ignore[ty:unresolved-attribute]
 
     return _pagination_params
 
@@ -319,7 +319,7 @@ def pagination_ctx(
             yield cast(AbstractParams, _params)
 
     if __page_ctx_dep__:
-        _page_ctx_dependency.__page_ctx_dep__ = True  # type: ignore[attr-defined]
+        _page_ctx_dependency.__page_ctx_dep__ = True  # type: ignore[ty:unresolved-attribute]
 
     return _page_ctx_dependency
 
@@ -333,8 +333,8 @@ def _bet_body_field(route: APIRoute) -> Any | None:
             embed_body_fields=route._embed_body_fields,
         )
     except (TypeError, AttributeError):
-        return get_body_field(  # type: ignore[missing-argument]
-            dependant=route.dependant,  # type: ignore[call-arg]
+        return get_body_field(  # type: ignore[ty:missing-argument]
+            dependant=route.dependant,  # type: ignore[ty:unknown-argument]
             name=route.unique_id,
         )
 
