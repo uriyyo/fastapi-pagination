@@ -280,7 +280,13 @@ def _limit_offset_flow(query: Selectable, conn: AnyConn, raw_params: RawParams) 
 
 
 @flow
-def _cursor_flow(query: Selectable, conn: AnyConn, is_async: bool, raw_params: CursorRawParams) -> CursorFlow:
+def _cursor_flow(
+    query: Selectable,
+    conn: AnyConn,
+    unique: bool,
+    is_async: bool,
+    raw_params: CursorRawParams,
+) -> CursorFlow:
     query = _prepare_query_for_cursor(query)
 
     if isinstance(query, TextClause):
@@ -297,6 +303,7 @@ def _cursor_flow(query: Selectable, conn: AnyConn, is_async: bool, raw_params: C
     page = yield _select_page(
         conn,  # type: ignore[arg-type]
         selectable=query,  # type: ignore[arg-type]
+        unique=unique,
         per_page=raw_params.size,
         page=raw_params.cursor,  # type: ignore[arg-type]
     )
@@ -335,7 +342,7 @@ def _sqlalchemy_flow(
         async_=is_async,
         total_flow=partial(_total_flow, query, conn, count_query, subquery_count),
         limit_offset_flow=partial(_limit_offset_flow, query, conn),
-        cursor_flow=partial(_cursor_flow, query, conn, is_async),
+        cursor_flow=partial(_cursor_flow, query, conn, unique, is_async),
         params=params,
         inner_transformer=partial(_inner_transformer, query=query, unwrap_mode=unwrap_mode, unique=unique),
         transformer=transformer,
