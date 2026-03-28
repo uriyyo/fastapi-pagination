@@ -189,6 +189,9 @@ class BasePaginationTestSuite:
 
         yield CursorParams(size=22), "cursor", "default", False, "cursor-default"
 
+        if "relationship" in cls.case_types:
+            yield CursorParams(size=22), "cursor", "relationship", False, "cursor-relationship"
+
     @classmethod
     def create_builder(cls) -> SuiteBuilder:
         return SuiteBuilder()
