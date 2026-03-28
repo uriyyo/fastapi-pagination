@@ -5,8 +5,8 @@ import uvicorn
 from beanie import Document, init_beanie
 from faker import Faker
 from fastapi import FastAPI
-from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import Field
+from pymongo import AsyncMongoClient
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
 from fastapi_pagination.ext.beanie import paginate
@@ -29,7 +29,7 @@ class UserOut(UserIn):
 @asynccontextmanager
 async def lifespan(_: Any) -> None:
     global client
-    client = AsyncIOMotorClient("mongodb://localhost:27017")
+    client = AsyncMongoClient("mongodb://localhost:27017")
     await init_beanie(client.test, document_models=[UserIn])
 
     users = [UserIn(name=faker.name(), email=faker.email()) for _ in range(100)]
@@ -38,7 +38,7 @@ async def lifespan(_: Any) -> None:
 
 
 app = FastAPI(lifespan=lifespan)
-client: AsyncIOMotorClient
+client: AsyncMongoClient
 
 
 @app.post("/users", response_model=UserOut)
