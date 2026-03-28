@@ -23,7 +23,7 @@ def paginate(
     config: Config | None = None,
 ) -> Any:
     if isinstance(query, ModelBase):
-        query = query.objects.all()  # type: ignore[possibly-missing-attribute]
+        query = query.objects.all()  # type: ignore[ty:unresolved-attribute]
 
     query_set = cast(QuerySet[T], query)
 

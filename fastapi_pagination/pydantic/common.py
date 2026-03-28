@@ -64,7 +64,7 @@ def make_field_optional(field: Any) -> Any:  # pragma: no cover
 def _(field: FieldV2, /) -> Any:
     field = copy(field)
 
-    field.annotation = field.annotation | None  # type: ignore[operator, assignment]
+    field.annotation = field.annotation | None  # type: ignore[ty:unsupported-operator]
     field.default = None
     field.default_factory = None
 

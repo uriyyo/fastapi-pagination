@@ -31,7 +31,7 @@ def paginate(
     config: Config | None = None,
 ) -> Any:
     if isinstance(query, TopLevelDocumentMetaclass):
-        query = query.objects().all()  # type: ignore[unresolved-attribute]
+        query = query.objects().all()  # type: ignore[ty:unresolved-attribute]
 
     return run_sync_flow(
         generic_flow(

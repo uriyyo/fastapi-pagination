@@ -201,9 +201,9 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                         },
                     )
 
-            items = await query.limit(raw_params.size + 1).to_list()  # type: ignore[attr-defined]
-            next_link_available = items and len(items) >= raw_params.size  # type: ignore[attr-defined]
-            items = items[: raw_params.size]  # type: ignore[attr-defined]
+            items = await query.limit(raw_params.size + 1).to_list()  # type: ignore[ty:unresolved-attribute]
+            next_link_available = items and len(items) >= raw_params.size  # type: ignore[ty:unresolved-attribute]
+            items = items[: raw_params.size]  # type: ignore[ty:unresolved-attribute]
             if cursor and cursor.startswith("prev_"):
                 items = list(reversed(items))
             additional_data["next_"] = str(items[-1].id) if next_link_available else None

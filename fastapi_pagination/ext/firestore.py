@@ -79,7 +79,7 @@ def _limit_offset_flow(
     raw_params: RawParams,
 ) -> LimitOffsetFlow:
     query = generic_query_apply_params(query, raw_params)
-    items = yield query.get(transaction=transaction)  # type: ignore[arg-type]
+    items = yield query.get(transaction=transaction)  # type: ignore[ty:invalid-argument-type]
 
     return items
 
@@ -104,7 +104,7 @@ def _cursor_flow(
     raw_params: CursorRawParams,
 ) -> CursorFlow:
     snapshot = yield from _fetch_cursor(query, raw_params, transaction)
-    query = _apply_cursor(query, raw_params, snapshot)  # type: ignore[type-var]
+    query = _apply_cursor(query, raw_params, snapshot)  # type: ignore[ty:invalid-argument-type]
     items = yield query.get(transaction=transaction)
 
     if items:
