@@ -214,6 +214,12 @@ class TestSQLAlchemyCursor(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite
         async def route(db: Any = Depends(sa_session_ctx)):
             return await maybe_async(paginate_func(db, select(sa_user).order_by(sa_user.id)))
 
+        @builder.cursor.relationship
+        async def route_relationship(db: Any = Depends(sa_session_ctx)):
+            return await maybe_async(
+                paginate_func(db, select(sa_user).options(selectinload(sa_user.orders)).order_by(sa_user.id)),
+            )
+
         return builder.build()
 
     @pytest.mark.asyncio(scope="session")
@@ -235,7 +241,7 @@ class TestCompoundSelectSQLAlchemyCursor(_SQLAlchemyPaginateFuncMixin, BasePagin
         @builder.cursor.default
         async def route(db: Any = Depends(sa_session_ctx)):
             stmt = select(sa_user).union_all(select(sa_user)).order_by("id")
-            return await maybe_async(paginate_func(db, stmt))
+            return await maybe_async(paginate_func(db, stmt, unique=False))
 
         return builder.build()
 
