@@ -29,11 +29,11 @@ _QueryParams: TypeAlias = Mapping[str, Any] | Sequence[Any]
 
 @contextmanager
 def _switch_factory(conn: _AnyConn, factory: _AnyFactory) -> Iterator[None]:
-    original_factory, conn.row_factory = conn.row_factory, factory  # type: ignore[invalid-assignment]
+    original_factory, conn.row_factory = conn.row_factory, factory  # type: ignore[ty:invalid-assignment]
     try:
         yield
     finally:
-        conn.row_factory = original_factory  # type: ignore[invalid-assignment]
+        conn.row_factory = original_factory  # type: ignore[ty:invalid-assignment]
 
 
 def _compile_query(query: _InputQuery, conn: _AnyConn) -> LiteralString:

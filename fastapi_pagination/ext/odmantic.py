@@ -31,7 +31,7 @@ def _limit_offset_flow(
         model,
         *queries,
         sort=sort,
-        session=session,  # type: ignore[arg-type]
+        session=session,  # type: ignore[ty:invalid-argument-type]
         limit=raw_params.limit,
         skip=raw_params.offset or 0,
     )
@@ -59,7 +59,7 @@ def _paginate_flow(
             lambda: engine.count(
                 model,
                 *queries,
-                session=session,  # type: ignore[arg-type]
+                session=session,  # type: ignore[ty:invalid-argument-type]
             ),
         ),
         limit_offset_flow=partial(
@@ -140,7 +140,7 @@ def paginate(
             model,
             *queries,
             sort=sort,
-            session=session,  # type: ignore[arg-type]
+            session=session,  # type: ignore[ty:invalid-argument-type]
             params=params,
             transformer=transformer,
             additional_data=additional_data,

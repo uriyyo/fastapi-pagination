@@ -58,7 +58,7 @@ def create_page_flow(
         if config and config.page_cls:
             stack.enter_context(set_page(config.page_cls))
 
-        t_items = yield apply_items_transformer(  # type: ignore[call-overload]
+        t_items = yield apply_items_transformer(  # type: ignore[ty:no-matching-overload]
             items,
             transformer,
             async_=async_,
@@ -125,7 +125,7 @@ def generic_flow(  # noqa: C901
         raise ValueError("Invalid params type")
 
     if inner_transformer:
-        items = yield apply_items_transformer(  # type: ignore[call-overload]
+        items = yield apply_items_transformer(  # type: ignore[ty:no-matching-overload]
             items,
             inner_transformer,
             async_=async_,

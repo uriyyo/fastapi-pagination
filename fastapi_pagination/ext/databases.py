@@ -64,7 +64,7 @@ async def paginate(
     use_subquery: bool = True,
     config: Config | None = None,
 ) -> Any:
-    return await apaginate(  # type: ignore[deprecated]
+    return await apaginate(  # type: ignore[ty:deprecated]
         db,
         query,
         params=params,
