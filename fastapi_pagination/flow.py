@@ -11,7 +11,7 @@ __all__ = [
 
 from collections.abc import Awaitable, Callable, Generator
 from functools import wraps
-from typing import Any, TypeAlias, cast
+from typing import Any, TypeAlias, cast, overload
 
 from typing_extensions import ParamSpec, TypeVar
 
@@ -88,6 +88,12 @@ def async_flow(func: Callable[P, Flow[Any, R]]) -> Callable[P, Awaitable[R]]:
         return await run_async_flow(func(*args, **kwargs))
 
     return wrapper
+
+
+@overload
+def flow_expr(expr: Callable[P, Awaitable[R]]) -> Callable[P, Flow[Any, R]]: ...
+@overload
+def flow_expr(expr: Callable[P, R]) -> Callable[P, Flow[Any, R]]: ...
 
 
 def flow_expr(expr: Callable[P, Awaitable[R] | R]) -> Callable[P, Flow[Any, R]]:

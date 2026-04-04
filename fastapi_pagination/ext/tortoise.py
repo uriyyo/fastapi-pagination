@@ -47,7 +47,7 @@ async def apaginate(
     return await run_async_flow(
         generic_flow(
             async_=True,
-            total_flow=flow_expr(lambda: query.count() if total is None else total),
+            total_flow=flow_expr(lambda: query.count() if total is None else total),  # type: ignore[ty:invalid-argument-type]
             limit_offset_flow=flow_expr(
                 lambda raw_params: generic_query_apply_params(
                     _generate_query(query, prefetch_related),

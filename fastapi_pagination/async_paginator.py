@@ -35,7 +35,7 @@ async def apaginate(
     return await run_async_flow(
         generic_flow(
             limit_offset_flow=flow_expr(lambda r: sequence[r.as_slice()]),
-            total_flow=flow_expr(lambda: length_function(sequence)),
+            total_flow=flow_expr(lambda: length_function(sequence)),  # type: ignore[ty:invalid-argument-type]
             params=params,
             transformer=transformer,
             additional_data=additional_data,
