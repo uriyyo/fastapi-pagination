@@ -55,7 +55,7 @@ def _paginate_flow(
     config: Config | None = None,
 ) -> AnyFlow:
     page = yield from generic_flow(
-        total_flow=flow_expr(
+        total_flow=flow_expr(  # type: ignore[ty:invalid-argument-type]
             lambda: engine.count(
                 model,
                 *queries,

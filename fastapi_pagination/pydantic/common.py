@@ -24,7 +24,7 @@ TModel = TypeVar("TModel", bound=AnyBaseModel)
 
 def create_pydantic_model(model_cls: type[TModel], /, **kwargs: Any) -> TModel:
     if is_pydantic_v2_model(model_cls):
-        return model_cls.model_validate(kwargs, from_attributes=True)
+        return model_cls.model_validate(kwargs, from_attributes=True)  # type: ignore[ty:invalid-return-type]
 
     return model_cls(**kwargs)
 
