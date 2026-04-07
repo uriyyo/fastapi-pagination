@@ -4,6 +4,7 @@ Currently, `fastapi-pagination` supports:
 |------------------------------------------------------------------------|-----------------------------------------------|
 | [SQLAlchemy](https://docs.sqlalchemy.org/en/14/orm/quickstart.html)    | `fastapi_pagination.ext.sqlalchemy.paginate`  |
 | [SQLModel](https://sqlmodel.tiangolo.com/)                             | `fastapi_pagination.ext.sqlmodel.paginate`    |
+| [Peewee](https://docs.peewee-orm.com/)                                 | `fastapi_pagination.ext.peewee.paginate`      |
 | [AsyncPG](https://magicstack.github.io/asyncpg/current/)               | `fastapi_pagination.ext.asyncpg.paginate`     |
 | [Databases](https://www.encode.io/databases/)                          | `fastapi_pagination.ext.databases.paginate`   |
 | [Django ORM](https://docs.djangoproject.com/en/3.2/topics/db/queries/) | `fastapi_pagination.ext.django.paginate`      |
