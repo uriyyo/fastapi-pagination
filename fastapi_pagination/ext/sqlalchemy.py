@@ -39,6 +39,11 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 try:
+    from typing import TypeVarTuple, Unpack  # ty:ignore[unresolved-import]
+except ImportError:
+    from typing_extensions import TypeVarTuple, Unpack
+
+try:
     from sqlalchemy.orm import FromStatement
 except ImportError:  # pragma: no cover
 
@@ -88,22 +93,24 @@ UnwrapMode: TypeAlias = Literal[
     "unwrap",  # always unwrap
 ]
 
-TupleAny: TypeAlias = "tuple[Any, ...]"
-Selectable: TypeAlias = "Select[TupleAny] | TextClause | FromStatement[TupleAny] | CompoundSelect[TupleAny]"
+TupleAny = TypeVarTuple("TupleAny")
+Selectable: TypeAlias = (
+    "Select[Unpack[TupleAny]] | TextClause | FromStatement[Unpack[TupleAny]] | CompoundSelect[Unpack[TupleAny]]"
+)
 SelectableOrQuery: TypeAlias = "Selectable | Query[Any]"
 
 
 @overload
-def _prepare_query(query: Select[TupleAny]) -> Select[TupleAny]:
+def _prepare_query(query: Select[Unpack[TupleAny]]) -> Select[Unpack[TupleAny]]:
     pass
 
 
 @overload
-def _prepare_query(query: Select[TupleAny] | None) -> Select[TupleAny] | None:
+def _prepare_query(query: Select[Unpack[TupleAny]] | None) -> Select[Unpack[TupleAny]] | None:
     pass
 
 
-def _prepare_query(query: Select[TupleAny] | None) -> Select[TupleAny] | None:
+def _prepare_query(query: Select[Unpack[TupleAny]] | None) -> Select[Unpack[TupleAny]] | None:
     if query is None:
         return None
 
@@ -184,7 +191,9 @@ def create_count_query_from_text(query: str) -> str:
     return _create_count_query_from_text(query)
 
 
-def _paginate_from_statement(query: FromStatement[TupleAny], params: AnyParams) -> FromStatement[TupleAny]:
+def _paginate_from_statement(
+    query: FromStatement[Unpack[TupleAny]], params: AnyParams
+) -> FromStatement[Unpack[TupleAny]]:
     query = query._generate()
     query.element = create_paginate_query(query.element, params)
     return query
@@ -323,7 +332,7 @@ def _cursor_flow(
 def _sqlalchemy_flow(
     is_async: bool,
     conn: SyncConn | AsyncConn,
-    query: Select[TupleAny],
+    query: Select[Unpack[TupleAny]],
     params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
@@ -494,7 +503,7 @@ def _old_paginate_sign(
     unique: bool = True,
     config: Config | None = None,
 ) -> tuple[
-    Select[TupleAny],
+    Select[Unpack[TupleAny]],
     Selectable | None,
     SyncConn,
     AbstractParams | None,
@@ -516,7 +525,7 @@ def _old_paginate_sign(
 
 def _new_paginate_sign(
     conn: SyncConn,
-    query: Select[TupleAny],
+    query: Select[Unpack[TupleAny]],
     params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
@@ -527,7 +536,7 @@ def _new_paginate_sign(
     unique: bool = True,
     config: Config | None = None,
 ) -> tuple[
-    Select[TupleAny],
+    Select[Unpack[TupleAny]],
     Selectable | None,
     SyncConn,
     AbstractParams | None,
