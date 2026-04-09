@@ -2,7 +2,7 @@ import pytest
 from peewee import Model, TextField
 
 from fastapi_pagination import Page, Params, set_page
-from fastapi_pagination.ext.peewee import apaginate, create_count_query, paginate
+from fastapi_pagination.ext.peewee import PEEWEE_ASYNC_AVAILABLE, apaginate, create_count_query, paginate
 from tests.base import BasePaginationTestSuite, async_sync_testsuite
 from tests.utils import maybe_async
 
@@ -214,7 +214,7 @@ class TestPeeweeAsyncAvailability:
         assert page.items == []
 
 
-class TestPeeweeRawSQL:
+class TestPeeweeRawSQL(_PeeweePaginateFunc):
     def test_paginate_raw_sql(self, peewee_db, peewee_user, entities):
         from tests.schemas import UserOut
 
@@ -233,9 +233,17 @@ class TestPeeweeRawSQL:
             assert item.id == entities[i].id
             assert item.name == entities[i].name
 
-    def test_paginate_raw_sql_missing_db(self, peewee_db, peewee_user):
+    def test_paginate_raw_sql_missing_db_sync(self, peewee_db, peewee_user):
         with pytest.raises(ValueError, match="Database is required for raw SQL"):
             paginate("SELECT * FROM users", params=Params(page=1, size=10))
+
+    def test_paginate_raw_sql_missing_db_async(self, peewee_db, peewee_user):
+        if not PEEWEE_ASYNC_AVAILABLE:
+            pytest.skip("Async not available")
+        import asyncio
+
+        with pytest.raises(ValueError, match="Database is required for raw SQL"):
+            asyncio.run(apaginate("SELECT * FROM users", params=Params(page=1, size=10)))
 
     def test_paginate_raw_sql_with_limit_offset(self, peewee_db, peewee_user, entities):
         from tests.schemas import UserOut
