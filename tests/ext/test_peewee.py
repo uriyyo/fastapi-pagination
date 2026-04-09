@@ -1,11 +1,10 @@
 import pytest
-from fastapi import Depends
 from peewee import Model, TextField
 
 from fastapi_pagination import Page, Params, set_page
-from fastapi_pagination.ext.peewee import apaginate, paginate
+from fastapi_pagination.ext.peewee import apaginate, create_count_query, paginate
 from tests.base import BasePaginationTestSuite, async_sync_testsuite
-from tests.utils import create_ctx, maybe_async
+from tests.utils import maybe_async
 
 
 @pytest.fixture(scope="class")
@@ -31,12 +30,6 @@ def peewee_db(is_async_db, sqlite_file):
         asyncio.run(db.close_pool())
     else:
         db.close()
-
-
-@pytest.fixture(scope="class")
-def peewee_db_ctx(peewee_db, is_async_db):
-    """Create database context manager."""
-    return create_ctx(peewee_db.atomic, is_async_db)
 
 
 @pytest.fixture(scope="class")
@@ -99,18 +92,17 @@ class TestPeeweeDefault(_PeeweePaginateFunc, BasePaginationTestSuite):
         return peewee_user.select().order_by(peewee_user.id)
 
     @pytest.fixture(scope="class")
-    def app(self, builder, query, peewee_user, peewee_order, peewee_db_ctx, paginate_func):
+    def app(self, builder, query, peewee_user, peewee_order, paginate_func):
         builder = builder.new()
 
         @builder.both.default
-        async def route_default(db=Depends(peewee_db_ctx)):
-            return await maybe_async(paginate_func(db, query))
+        async def route_default():
+            return await maybe_async(paginate_func(query))
 
         @builder.both.non_scalar
-        async def route_non_scalar(db=Depends(peewee_db_ctx)):
-            # Non-scalar means selecting specific columns instead of full model
-            query = peewee_user.select(peewee_user.id, peewee_user.name).order_by(peewee_user.id)
-            return await maybe_async(paginate_func(db, query))
+        async def route_non_scalar():
+            q = peewee_user.select(peewee_user.id, peewee_user.name).order_by(peewee_user.id)
+            return await maybe_async(paginate_func(q))
 
         return builder.build()
 
@@ -118,14 +110,13 @@ class TestPeeweeDefault(_PeeweePaginateFunc, BasePaginationTestSuite):
 @async_sync_testsuite
 class TestPeeweeRelationship(_PeeweePaginateFunc, BasePaginationTestSuite):
     @pytest.fixture(scope="class")
-    def app(self, builder, peewee_user, peewee_order, peewee_db_ctx, paginate_func):
+    def app(self, builder, peewee_user, peewee_order, paginate_func):
         builder = builder.new()
 
         @builder.both.relationship
-        async def route(db=Depends(peewee_db_ctx)):
-            # Use join to get related records and hydrate orders via prefetch after pagination.
-            query = peewee_user.select().join(peewee_order).order_by(peewee_user.id).distinct()
-            return await maybe_async(paginate_func(db, query, unique=False, prefetch=(peewee_order.select(),)))
+        async def route():
+            q = peewee_user.select().join(peewee_order).order_by(peewee_user.id).distinct()
+            return await maybe_async(paginate_func(q, unique=False, prefetch=(peewee_order.select(),)))
 
         return builder.build()
 
@@ -137,7 +128,7 @@ class TestPeeweeUnwrap:
         with peewee_db.atomic():
             peewee_db.create_tables([peewee_user], safe=True)
             with set_page(Page[UserOut]):
-                page = paginate(peewee_db, peewee_user.select(), params=Params(page=1, size=10))
+                page = paginate(peewee_user.select(), params=Params(page=1, size=10))
 
         assert page.dict()["items"] == [{"id": entry.id, "name": entry.name} for entry in entities[:10]]
 
@@ -148,7 +139,6 @@ class TestPeeweeUnwrap:
             peewee_db.create_tables([peewee_user], safe=True)
             with set_page(Page[UserOut]):
                 page = paginate(
-                    peewee_db,
                     peewee_user.select(peewee_user.id, peewee_user.name),
                     params=Params(page=1, size=10),
                 )
@@ -164,7 +154,6 @@ class TestPeeweeUnwrap:
             ),
             (
                 lambda peewee_user: peewee_user.select(peewee_user.id, peewee_user.name),
-                # Peewee column selection still returns Model instances
                 lambda peewee_user, item: isinstance(item, peewee_user),
             ),
         ],
@@ -173,14 +162,53 @@ class TestPeeweeUnwrap:
         q = query(peewee_user)
 
         with peewee_db.atomic():
-            page = paginate(peewee_db, q, params=Params(page=1, size=1))
+            page = paginate(q, params=Params(page=1, size=1))
 
         assert page.items
         assert validate(peewee_user, page.items[0])
 
+    @pytest.mark.parametrize(
+        ("unwrap_mode", "expected_type"),
+        [
+            (None, list),
+            ("auto", list),
+            ("no-unwrap", list),
+            ("unwrap", list),
+            ("legacy", list),
+        ],
+    )
+    def test_unwrap_mode_select_model(self, peewee_db, peewee_user, unwrap_mode, expected_type):
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+            page = paginate(
+                peewee_user.select(),
+                params=Params(page=1, size=1),
+                unwrap_mode=unwrap_mode,
+            )
+
+        assert isinstance(page.items[0], peewee_user)
+
+    def test_paginate_with_model_class(self, peewee_db, peewee_user):
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+            page = paginate(peewee_user, params=Params(page=1, size=1))
+
+        assert page.items
+
+    def test_unique_false(self, peewee_db, peewee_user):
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+            page = paginate(
+                peewee_user.select(),
+                params=Params(page=1, size=10),
+                unique=False,
+            )
+
+        assert page.items
+
 
 class TestPeeweeAsyncAvailability:
-    def test_apaginate_raises_without_async_support(self, peewee_db, peewee_user):
+    def test_apaginate_raises_without_async_support(self, peewee_user):
         from fastapi_pagination.ext.peewee import PEEWEE_ASYNC_AVAILABLE, apaginate
 
         if PEEWEE_ASYNC_AVAILABLE:
@@ -189,7 +217,7 @@ class TestPeeweeAsyncAvailability:
         import asyncio
 
         with pytest.raises(TypeError, match=r"apaginate requires peewee>=4\.0\.0"):
-            asyncio.run(apaginate(peewee_db, peewee_user.select()))
+            asyncio.run(apaginate(peewee_user.select()))
 
     def test_paginate_works_without_async_support(self, peewee_db, peewee_user):
         from fastapi_pagination import Page, Params, set_page
@@ -202,6 +230,47 @@ class TestPeeweeAsyncAvailability:
             peewee_db.create_tables([peewee_user], safe=True)
 
         with set_page(Page):
-            page = paginate(peewee_db, peewee_user.select(), params=Params(page=1, size=10))
+            page = paginate(peewee_user.select(), params=Params(page=1, size=10))
 
         assert page.items == []
+
+
+class TestPeeweeCreateCountQuery:
+    def test_create_count_query_with_model_select(self, peewee_db, peewee_user):
+        from peewee import Select
+
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+
+        query = peewee_user.select()
+        count_query = create_count_query(query, use_subquery=True)
+
+        assert isinstance(count_query, Select)
+
+        count_query_no_subquery = create_count_query(query, use_subquery=False)
+        assert isinstance(count_query_no_subquery, Select)
+
+    def test_create_count_query_with_limit_offset(self, peewee_db, peewee_user):
+        from peewee import Select
+
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+
+        query = peewee_user.select().limit(10).offset(5)
+        count_query = create_count_query(query, use_subquery=True)
+
+        assert isinstance(count_query, Select)
+
+    def test_create_count_query_with_raw_query(self, peewee_db, peewee_user):
+        from peewee import RawQuery
+
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+
+        raw_query = RawQuery(peewee_db, "SELECT * FROM users")
+        count_query = create_count_query(raw_query, use_subquery=True)
+
+        assert count_query is not None
+
+        count_query_no_subquery = create_count_query(raw_query, use_subquery=False)
+        assert count_query_no_subquery is not None

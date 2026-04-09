@@ -51,14 +51,13 @@ app = FastAPI(lifespan=lifespan)
 @app.get("/users", response_model=Page[User])
 async def get_users(params: Params = Depends()):
     set_page(Page[User])
-    return paginate(db, UserModel.select(), params)
+    return paginate(UserModel.select(), params)
 ```
 
 ## Details
 
 `paginate` accepts the following `peewee` related arguments:
 
-* `db` - can be either a sync or async Peewee database instance.
 * `query` - is the query that you want to paginate, it can be either a select query or a Model class.
 * `subquery_count` - is a boolean that indicates if the count query should be executed as a subquery or not.
 * `count_query` - is a query that will be used to count the total number of rows, if not provided, it will be generated automatically.
@@ -92,7 +91,7 @@ for name, age in [("John", 25), ("Jane", 30), ("Bob", 20)]:
 set_page(Page[User])
 set_params(Params(page=1, size=10))
 
-page = paginate(db, User.select().order_by(User.id))
+page = paginate(User.select().order_by(User.id))
 print(page)
 ```
 
@@ -124,7 +123,7 @@ async def get_users():
     set_page(Page[User])
     set_params(Params(page=1, size=10))
 
-    page = await apaginate(db, User.select().order_by(User.id))
+    page = await apaginate(User.select().order_by(User.id))
     print(page)
 ```
 
@@ -154,10 +153,10 @@ set_page(Page[User])
 set_params(Params(page=1, size=10))
 
 print("subquery_count=False")
-paginate(db, User.select(), subquery_count=False)
+paginate(User.select(), subquery_count=False)
 
 print("subquery_count=True")
-paginate(db, User.select(), subquery_count=True)
+paginate(User.select(), subquery_count=True)
 ```
 
 ### `count_query` param
@@ -188,7 +187,6 @@ set_page(Page[User])
 set_params(Params(page=1, size=10))
 
 page = paginate(
-    db,
     User.select().order_by(User.id),
     count_query=User.select(fn.COUNT()).where(User.age > 20),
 )
@@ -231,12 +229,12 @@ set_params(Params(page=1, size=10))
 
 print('unwrap_mode="auto"')
 set_page(Page[User])
-page = paginate(db, User.select(), unwrap_mode="auto")
+page = paginate(User.select(), unwrap_mode="auto")
 print(page)
 
 print('unwrap_mode="no-unwrap"')
 set_page(Page[User])
-page = paginate(db, User.select(), unwrap_mode="no-unwrap")
+page = paginate(User.select(), unwrap_mode="no-unwrap")
 print(page)
 ```
 
@@ -268,10 +266,10 @@ set_page(Page[User])
 set_params(Params(page=1, size=10))
 
 print("unique=True (default)")
-page = paginate(db, User.select(), unique=True)
+page = paginate(User.select(), unique=True)
 print(page)
 
 print("unique=False")
-page = paginate(db, User.select(), unique=False)
+page = paginate(User.select(), unique=False)
 print(page)
 ```
