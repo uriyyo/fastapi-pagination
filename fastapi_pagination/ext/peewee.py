@@ -11,7 +11,7 @@ from collections.abc import Sequence
 from functools import partial
 from typing import TYPE_CHECKING, Any, TypeAlias, cast, overload
 
-from peewee import Database, Model, Query
+from peewee import Database, Query
 
 from fastapi_pagination.api import create_page
 from fastapi_pagination.bases import AbstractParams, RawParams
@@ -44,7 +44,7 @@ RawSQL: TypeAlias = str
 
 @overload
 def paginate(
-    query: Query | type[Model] | None,
+    query: Query | None,
     params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
@@ -75,7 +75,7 @@ def paginate(
 
 def _get_database(query: Query) -> Database:
     """Extract database from query."""
-    return query.model._meta.database
+    return query.model._meta.database  # type: ignore[attr-defined]
 
 
 def _is_async_db(conn: Any) -> bool:
@@ -89,8 +89,6 @@ def _prepare_query(query: Query | None) -> Query | None:
     """Prepare a Peewee query for execution."""
     if query is None:
         return None
-    if isinstance(query, type) and issubclass(query, Model):
-        return query.select()
     return query
 
 
@@ -113,7 +111,7 @@ def create_count_query(query: Query | RawSQL, *, use_subquery: bool = True) -> Q
     if _is_raw_sql(query):
         return f"SELECT count(*) FROM ({query}) AS __count_query__"  # noqa: S608
 
-    count_query = query.clone()
+    count_query = query.clone()  # type: ignore[union-attr]
 
     if hasattr(query, "model") and query.model is not None:
         from peewee import fn
@@ -128,7 +126,7 @@ def create_count_query(query: Query | RawSQL, *, use_subquery: bool = True) -> Q
 
         return query.model.select(fn.COUNT(1))  # type: ignore[union-attr]
 
-    return count_query
+    return count_query  # type: ignore[return-value]
 
 
 def _create_raw_sql_query(sql: str, params: RawParams) -> str:
@@ -181,7 +179,7 @@ def _limit_offset_flow(
         columns = [desc[0] for desc in cursor.description] if cursor.description else []
         items = [dict(zip(columns, row, strict=True)) for row in cursor.fetchall()]
     elif _is_async_db(db):
-        query = create_paginate_query(query, raw_params)
+        query = create_paginate_query(query, raw_params)  # type: ignore[arg-type]
         if prefetch:
             items = yield db.aprefetch(query, *prefetch)  # type: ignore[union-attr]
         else:
@@ -189,10 +187,10 @@ def _limit_offset_flow(
     elif prefetch:
         from peewee import prefetch as peewee_prefetch
 
-        query = create_paginate_query(query, raw_params)
+        query = create_paginate_query(query, raw_params)  # type: ignore[arg-type]
         items = yield peewee_prefetch(query, *prefetch)
     else:
-        query = create_paginate_query(query, raw_params)
+        query = create_paginate_query(query, raw_params)  # type: ignore[arg-type]
         items = yield list(query)
 
     return items
@@ -255,7 +253,7 @@ def _inner_transformer(
 
 
 def paginate(
-    query: Query | type[Model] | RawSQL | None,
+    query: Query | RawSQL | None,
     params: AbstractParams | None = None,
     *,
     db: Database | None = None,
@@ -269,7 +267,7 @@ def paginate(
     """Paginate a Peewee query or raw SQL.
 
     Args:
-        query: Peewee query object, Model class, or raw SQL string
+        query: Peewee query object or raw SQL string
         params: Pagination parameters
         db: Database instance (required for raw SQL, optional otherwise - will be
             extracted from the query's model if not provided)
@@ -292,7 +290,7 @@ def paginate(
     if query is None:
         raise ValueError("Query cannot be None")
 
-    actual_query: Query | type[Model] | RawSQL | None
+    actual_query: Query | RawSQL
     actual_db: Database | Any
 
     if _is_raw_sql(query):
@@ -301,7 +299,7 @@ def paginate(
         actual_query = query
         actual_db = db
     else:
-        actual_query = _prepare_query(query)
+        actual_query = _prepare_query(query)  # type: ignore[arg-type]
         if actual_query is None:
             raise ValueError("Query cannot be None")
         actual_db = db if db is not None else _get_database(actual_query)
@@ -324,7 +322,7 @@ def paginate(
 
 
 async def apaginate(
-    query: Query | type[Model] | RawSQL | None,
+    query: Query | RawSQL | None,
     params: AbstractParams | None = None,
     *,
     db: Database | None = None,
@@ -339,7 +337,7 @@ async def apaginate(
     """Async paginate a Peewee query or raw SQL using Peewee v4 async support.
 
     Args:
-        query: Peewee query object, Model class, or raw SQL string
+        query: Peewee query object or raw SQL string
         params: Pagination parameters
         db: Database instance (required for raw SQL, optional otherwise - will be
             extracted from the query's model if not provided)
@@ -374,7 +372,7 @@ async def apaginate(
     if query is None:
         raise ValueError("Query cannot be None")
 
-    actual_query: Query | type[Model] | RawSQL | None
+    actual_query: Query | RawSQL
     actual_db: Database | Any
 
     if _is_raw_sql(query):
@@ -383,7 +381,7 @@ async def apaginate(
         actual_query = query
         actual_db = db
     else:
-        actual_query = _prepare_query(query)
+        actual_query = _prepare_query(query)  # type: ignore[arg-type]
         if actual_query is None:
             raise ValueError("Query cannot be None")
         actual_db = db if db is not None else _get_database(actual_query)

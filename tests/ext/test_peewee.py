@@ -80,15 +80,8 @@ class _PeeweePaginateFunc:
 
 @async_sync_testsuite
 class TestPeeweeDefault(_PeeweePaginateFunc, BasePaginationTestSuite):
-    @pytest.fixture(
-        scope="class",
-        params=[True, False],
-        ids=["model", "query"],
-    )
-    def query(self, request, peewee_user):
-        if request.param:
-            return peewee_user
-
+    @pytest.fixture(scope="class")
+    def query(self, peewee_user):
         return peewee_user.select().order_by(peewee_user.id)
 
     @pytest.fixture(scope="class")
@@ -167,10 +160,10 @@ class TestPeeweeUnwrap:
         assert page.items
         assert validate(peewee_user, page.items[0])
 
-    def test_paginate_with_model_class(self, peewee_db, peewee_user):
+    def test_paginate_with_model_select(self, peewee_db, peewee_user):
         with peewee_db.atomic():
             peewee_db.create_tables([peewee_user], safe=True)
-            page = paginate(peewee_user, params=Params(page=1, size=1))
+            page = paginate(peewee_user.select(), params=Params(page=1, size=1))
 
         assert page.items
 
