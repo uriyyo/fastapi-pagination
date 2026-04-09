@@ -167,27 +167,6 @@ class TestPeeweeUnwrap:
         assert page.items
         assert validate(peewee_user, page.items[0])
 
-    @pytest.mark.parametrize(
-        ("unwrap_mode", "expected_type"),
-        [
-            (None, list),
-            ("auto", list),
-            ("no-unwrap", list),
-            ("unwrap", list),
-            ("legacy", list),
-        ],
-    )
-    def test_unwrap_mode_select_model(self, peewee_db, peewee_user, unwrap_mode, expected_type):
-        with peewee_db.atomic():
-            peewee_db.create_tables([peewee_user], safe=True)
-            page = paginate(
-                peewee_user.select(),
-                params=Params(page=1, size=1),
-                unwrap_mode=unwrap_mode,
-            )
-
-        assert isinstance(page.items[0], peewee_user)
-
     def test_paginate_with_model_class(self, peewee_db, peewee_user):
         with peewee_db.atomic():
             peewee_db.create_tables([peewee_user], safe=True)
@@ -253,6 +232,10 @@ class TestPeeweeRawSQL:
         for i, item in enumerate(page.items):
             assert item.id == entities[i].id
             assert item.name == entities[i].name
+
+    def test_paginate_raw_sql_missing_db(self, peewee_db, peewee_user):
+        with pytest.raises(ValueError, match="Database is required for raw SQL"):
+            paginate("SELECT * FROM users", params=Params(page=1, size=10))
 
     def test_paginate_raw_sql_with_limit_offset(self, peewee_db, peewee_user, entities):
         from tests.schemas import UserOut
@@ -325,3 +308,12 @@ class TestPeeweeCreateCountQuery:
 
         count_query_no_subquery = create_count_query(raw_query, use_subquery=False)
         assert count_query_no_subquery is not None
+
+    def test_create_count_query_with_raw_sql_string(self, peewee_db, peewee_user):
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+
+        raw_sql = "SELECT * FROM users"
+        count_query = create_count_query(raw_sql, use_subquery=True)
+
+        assert count_query == "SELECT count(*) FROM (SELECT * FROM users) AS __count_query__"

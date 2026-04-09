@@ -9,9 +9,9 @@ __all__ = [
 
 from collections.abc import Sequence
 from functools import partial
-from typing import TYPE_CHECKING, Any, Literal, TypeAlias, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, TypeAlias, cast, overload
 
-from peewee import Database, Model, Query, Select
+from peewee import Database, Model, Query
 
 from fastapi_pagination.api import create_page
 from fastapi_pagination.bases import AbstractParams, RawParams
@@ -29,8 +29,6 @@ from fastapi_pagination.types import (
     SyncItemsTransformer,
 )
 
-from .utils import unwrap_scalars
-
 if TYPE_CHECKING:
     from playhouse.pwasyncio import AsyncDatabaseMixin
 
@@ -41,16 +39,7 @@ except ImportError:  # pragma: no cover
 
 PEEWEE_ASYNC_AVAILABLE = AsyncDatabaseMixin is not None
 
-UnwrapMode: TypeAlias = Literal[
-    "auto",
-    "legacy",
-    "no-unwrap",
-    "unwrap",
-]
-
 RawSQL: TypeAlias = str
-
-_TSeq = TypeVar("_TSeq", bound=Sequence[Any])
 
 
 @overload
@@ -59,7 +48,6 @@ def paginate(
     params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
-    unwrap_mode: UnwrapMode | None = None,
     prefetch: tuple[Query, ...] | None = None,
     transformer: SyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
@@ -76,7 +64,6 @@ def paginate(
     params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
-    unwrap_mode: UnwrapMode | None = None,
     prefetch: tuple[Query, ...] | None = None,
     transformer: SyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
@@ -107,50 +94,9 @@ def _prepare_query(query: Query | None) -> Query | None:
     return query
 
 
-def _should_unwrap_scalars(query: Query) -> bool:
-    """Determine if query results need unwrapping."""
-    if not isinstance(query, Select):
-        return False
-
-    select_expr = getattr(query, "_select", None)
-    if select_expr is None:
-        return False
-
-    models = getattr(select_expr, "_models", None)
-    if models is None:
-        return False
-
-    return len(models) == 1
-
-
 def _is_raw_sql(query: Any) -> bool:
     """Check if query is a raw SQL string."""
     return isinstance(query, str)
-
-
-def _unwrap_items(
-    items: _TSeq,
-    query: Query | None,
-    unwrap_mode: UnwrapMode | None = None,
-) -> _TSeq:
-    """Unwrap query results based on unwrap mode."""
-    if not items:
-        return items
-
-    first_item = items[0]
-    if isinstance(first_item, Model):
-        return items
-
-    if unwrap_mode == "legacy":
-        items = unwrap_scalars(items)  # type: ignore[assignment]
-    elif unwrap_mode == "no-unwrap":
-        pass
-    elif unwrap_mode == "unwrap":
-        items = unwrap_scalars(items, force_unwrap=True)  # type: ignore[assignment]
-    elif unwrap_mode == "auto" and query is not None and _should_unwrap_scalars(query):
-        items = unwrap_scalars(items, force_unwrap=True)  # type: ignore[assignment]
-
-    return items
 
 
 def create_paginate_query(query: Query, params: RawParams) -> Query:
@@ -260,7 +206,6 @@ def _peewee_flow(
     *,
     is_async: bool = False,
     subquery_count: bool = True,
-    unwrap_mode: UnwrapMode | None = None,
     count_query: Query | RawSQL | None = None,
     prefetch: tuple[Query, ...] | None = None,
     transformer: ItemsTransformer | None = None,
@@ -276,7 +221,7 @@ def _peewee_flow(
         total_flow=partial(_total_flow, query, db, count_query, subquery_count),
         limit_offset_flow=partial(_limit_offset_flow, query, db, prefetch=prefetch),
         params=params,
-        inner_transformer=partial(_inner_transformer, query=query, unwrap_mode=unwrap_mode, unique=unique),
+        inner_transformer=partial(_inner_transformer, query=query, unique=unique),
         transformer=transformer,
         additional_data=additional_data,
         config=config,
@@ -290,7 +235,6 @@ def _inner_transformer(
     items: Sequence[Any],
     /,
     query: Query | None,
-    unwrap_mode: UnwrapMode | None,
     unique: bool,
 ) -> Sequence[Any]:
     """Apply transformations to query results."""
@@ -307,7 +251,7 @@ def _inner_transformer(
                 unique_items.append(item)
         items = unique_items
 
-    return _unwrap_items(items, query, unwrap_mode)
+    return items
 
 
 def paginate(
@@ -316,7 +260,6 @@ def paginate(
     *,
     db: Database | None = None,
     subquery_count: bool = True,
-    unwrap_mode: UnwrapMode | None = None,
     prefetch: tuple[Query, ...] | None = None,
     transformer: SyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
@@ -331,7 +274,6 @@ def paginate(
         db: Database instance (required for raw SQL, optional otherwise - will be
             extracted from the query's model if not provided)
         subquery_count: Use subquery for count
-        unwrap_mode: How to unwrap results
         transformer: Optional transformer for results
         additional_data: Additional data to include in page
         unique: Return unique results only
@@ -371,7 +313,6 @@ def paginate(
             params=params,
             is_async=False,
             subquery_count=subquery_count,
-            unwrap_mode=unwrap_mode,
             count_query=None,
             prefetch=prefetch,
             transformer=transformer,
@@ -389,7 +330,6 @@ async def apaginate(
     db: Database | None = None,
     count_query: Query | RawSQL | None = None,
     subquery_count: bool = True,
-    unwrap_mode: UnwrapMode | None = None,
     prefetch: tuple[Query, ...] | None = None,
     transformer: AsyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
@@ -405,7 +345,6 @@ async def apaginate(
             extracted from the query's model if not provided)
         count_query: Custom count query
         subquery_count: Use subquery for count
-        unwrap_mode: How to unwrap results
         transformer: Optional transformer for results
         additional_data: Additional data to include in page
         unique: Return unique results only
@@ -456,7 +395,6 @@ async def apaginate(
             params=params,
             is_async=True,
             subquery_count=subquery_count,
-            unwrap_mode=unwrap_mode,
             count_query=count_query,
             prefetch=prefetch,
             transformer=transformer,

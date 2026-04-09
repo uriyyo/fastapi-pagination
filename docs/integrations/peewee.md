@@ -63,7 +63,6 @@ async def get_users(params: Params = Depends()):
 * `subquery_count` - is a boolean that indicates if the count query should be executed as a subquery or not.
 * `count_query` - is a query that will be used to count the total number of rows, if not provided, it will be generated automatically.
 * `unique` - is a boolean indicates if `unique` should be called on result rows or not.
-* `unwrap_mode` - indicates how to unwrap the result rows, it can be either `auto`, `legacy`, `unwrap`, `no-unwrap`.
 
 ### Sync Usage
 
@@ -220,51 +219,6 @@ page = paginate(
     User.select().order_by(User.id),
     count_query=User.select(fn.COUNT()).where(User.age > 20),
 )
-print(page)
-```
-
-### `unwrap_mode` param
-
-`peewee` `unwrap_mode` allows you to control how to unwrap result rows before passing them to items transformer and page creation.
-
-`unwrap_mode` can be set to one of the following values:
-
-* `None` - will use `auto` mode for default queries.
-* `"auto"` - will unwrap only in case if you are selecting single model.
-* `"legacy"` - will use old behavior, where row will be unwrapped if it contains only one element.
-* `"unwrap"` - will always unwrap row, even if it contains multiple elements.
-* `"no-unwrap"` - will never unwrap row, even if it contains only one element.
-
-```py
-from peewee import Model, TextField, IntegerField, SqliteDatabase
-
-from fastapi_pagination import set_params, set_page, Page, Params
-from fastapi_pagination.ext.peewee import paginate
-
-db = SqliteDatabase(":memory:")
-
-
-class User(Model):
-    name = TextField()
-    age = IntegerField()
-
-    class Meta:
-        database = db
-
-
-db.create_tables([User])
-User.create(name="John", age=25)
-
-set_params(Params(page=1, size=10))
-
-print('unwrap_mode="auto"')
-set_page(Page[User])
-page = paginate(User.select(), unwrap_mode="auto")
-print(page)
-
-print('unwrap_mode="no-unwrap"')
-set_page(Page[User])
-page = paginate(User.select(), unwrap_mode="no-unwrap")
 print(page)
 ```
 
