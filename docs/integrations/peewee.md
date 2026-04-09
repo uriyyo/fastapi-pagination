@@ -1,4 +1,4 @@
-`fastapi_pagination.ext.peewee.paginate` allows you to paginate `peewee` queries easily.
+`fastapi_pagination.ext.peewee.paginate` allows you to paginate `peewee` queries.
 It can work for both `sync` and `async` peewee databases.
 
 !!! note
@@ -58,7 +58,8 @@ async def get_users(params: Params = Depends()):
 
 `paginate` accepts the following `peewee` related arguments:
 
-* `query` - is the query that you want to paginate, it can be either a select query or a Model class.
+* `db` - Database instance. Required for raw SQL queries, optional otherwise (extracted from query's model).
+* `query` - is the query that you want to paginate, it can be either a select query, Model class, or raw SQL string.
 * `subquery_count` - is a boolean that indicates if the count query should be executed as a subquery or not.
 * `count_query` - is a query that will be used to count the total number of rows, if not provided, it will be generated automatically.
 * `unique` - is a boolean indicates if `unique` should be called on result rows or not.
@@ -125,6 +126,35 @@ async def get_users():
 
     page = await apaginate(User.select().order_by(User.id))
     print(page)
+```
+
+### Raw SQL Usage
+
+```py
+from peewee import Model, TextField, IntegerField, SqliteDatabase
+
+from fastapi_pagination import set_params, set_page, Page, Params
+from fastapi_pagination.ext.peewee import paginate
+
+db = SqliteDatabase(":memory:")
+
+
+class User(Model):
+    name = TextField()
+    age = IntegerField()
+
+    class Meta:
+        database = db
+
+
+db.create_tables([User])
+User.create(name="John", age=25)
+
+set_page(Page[User])
+set_params(Params(page=1, size=10))
+
+page = paginate("SELECT * FROM users WHERE age > 20", db=db)
+print(page)
 ```
 
 ### `subquery_count` param

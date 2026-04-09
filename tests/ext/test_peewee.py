@@ -92,7 +92,7 @@ class TestPeeweeDefault(_PeeweePaginateFunc, BasePaginationTestSuite):
         return peewee_user.select().order_by(peewee_user.id)
 
     @pytest.fixture(scope="class")
-    def app(self, builder, query, peewee_user, peewee_order, paginate_func):
+    def app(self, builder, query, peewee_user, peewee_order, paginate_func, peewee_db):
         builder = builder.new()
 
         @builder.both.default
@@ -233,6 +233,57 @@ class TestPeeweeAsyncAvailability:
             page = paginate(peewee_user.select(), params=Params(page=1, size=10))
 
         assert page.items == []
+
+
+class TestPeeweeRawSQL:
+    def test_paginate_raw_sql(self, peewee_db, peewee_user, entities):
+        from tests.schemas import UserOut
+
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+
+        with set_page(Page[UserOut]):
+            page = paginate(
+                "SELECT * FROM users ORDER BY id",
+                params=Params(page=1, size=10),
+                db=peewee_db,
+            )
+
+        assert len(page.items) == 10
+        for i, item in enumerate(page.items):
+            assert item.id == entities[i].id
+            assert item.name == entities[i].name
+
+    def test_paginate_raw_sql_with_limit_offset(self, peewee_db, peewee_user, entities):
+        from tests.schemas import UserOut
+
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+
+        with set_page(Page[UserOut]):
+            page = paginate(
+                "SELECT * FROM users ORDER BY id",
+                params=Params(page=1, size=5),
+                db=peewee_db,
+            )
+
+        assert len(page.items) == 5
+        for i, item in enumerate(page.items):
+            assert item.id == entities[i].id
+            assert item.name == entities[i].name
+
+    def test_paginate_raw_sql_count(self, peewee_db, peewee_user):
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+
+        with set_page(Page):
+            page = paginate(
+                "SELECT * FROM users",
+                params=Params(page=1, size=10),
+                db=peewee_db,
+            )
+
+        assert page.total == 100
 
 
 class TestPeeweeCreateCountQuery:

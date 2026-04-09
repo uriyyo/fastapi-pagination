@@ -9,7 +9,7 @@ __all__ = [
 
 from collections.abc import Sequence
 from functools import partial
-from typing import TYPE_CHECKING, Any, Literal, TypeAlias, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Literal, TypeAlias, TypeVar, cast, overload
 
 from peewee import Database, Model, Query, Select
 
@@ -48,7 +48,42 @@ UnwrapMode: TypeAlias = Literal[
     "unwrap",
 ]
 
+RawSQL: TypeAlias = str
+
 _TSeq = TypeVar("_TSeq", bound=Sequence[Any])
+
+
+@overload
+def paginate(
+    query: Query | type[Model] | None,
+    params: AbstractParams | None = None,
+    *,
+    subquery_count: bool = True,
+    unwrap_mode: UnwrapMode | None = None,
+    prefetch: tuple[Query, ...] | None = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    unique: bool = True,
+    config: Config | None = None,
+) -> Any:
+    pass
+
+
+@overload
+def paginate(
+    db: Database,
+    query: RawSQL,
+    params: AbstractParams | None = None,
+    *,
+    subquery_count: bool = True,
+    unwrap_mode: UnwrapMode | None = None,
+    prefetch: tuple[Query, ...] | None = None,
+    transformer: SyncItemsTransformer | None = None,
+    additional_data: AdditionalData | None = None,
+    unique: bool = True,
+    config: Config | None = None,
+) -> Any:
+    pass
 
 
 def _get_database(query: Query) -> Database:
@@ -88,9 +123,14 @@ def _should_unwrap_scalars(query: Query) -> bool:
     return len(models) == 1
 
 
+def _is_raw_sql(query: Any) -> bool:
+    """Check if query is a raw SQL string."""
+    return isinstance(query, str)
+
+
 def _unwrap_items(
     items: _TSeq,
-    query: Query | None = None,
+    query: Query | None,
     unwrap_mode: UnwrapMode | None = None,
 ) -> _TSeq:
     """Unwrap query results based on unwrap mode."""
@@ -122,8 +162,11 @@ def create_paginate_query(query: Query, params: RawParams) -> Query:
     return query
 
 
-def create_count_query(query: Query, *, use_subquery: bool = True) -> Query:
-    """Create a COUNT query from a Peewee query."""
+def create_count_query(query: Query | RawSQL, *, use_subquery: bool = True) -> Query | RawSQL:
+    """Create a COUNT query from a Peewee query or raw SQL."""
+    if _is_raw_sql(query):
+        return f"SELECT count(*) FROM ({query}) AS __count_query__"  # noqa: S608
+
     count_query = query.clone()
 
     if hasattr(query, "model") and query.model is not None:
@@ -142,19 +185,32 @@ def create_count_query(query: Query, *, use_subquery: bool = True) -> Query:
     return count_query
 
 
+def _create_raw_sql_query(sql: str, params: RawParams) -> str:
+    """Create paginated raw SQL query."""
+    suffix = ""
+    if params.limit is not None:
+        suffix += f" LIMIT {params.limit}"
+    if params.offset is not None:
+        suffix += f" OFFSET {params.offset}"
+    return f"{sql} {suffix}".strip()
+
+
 @flow
 def _total_flow(
-    query: Query,
-    count_query: Query | None,
+    query: Query | RawSQL,
+    db: Database | Any,
+    count_query: Query | RawSQL | None,
     subquery_count: bool,
 ) -> TotalFlow:
     """Get total count for pagination."""
     if count_query is None:
         count_query = create_count_query(query, use_subquery=subquery_count)
 
-    db = _get_database(query)
-
-    if _is_async_db(db):
+    if _is_raw_sql(count_query):
+        cursor = yield db.execute_sql(count_query)
+        row = cursor.fetchone()
+        total = row[0] if row else 0
+    elif _is_async_db(db):
         total = yield db.count(count_query)  # type: ignore[union-attr]
     else:
         cursor = yield db.execute(count_query)
@@ -166,17 +222,20 @@ def _total_flow(
 
 @flow
 def _limit_offset_flow(
-    query: Query,
+    query: Query | RawSQL,
+    db: Database | Any,
     raw_params: RawParams,
     *,
     prefetch: tuple[Query, ...] | None = None,
 ) -> LimitOffsetFlow:
     """Execute paginated query with limit/offset."""
-    query = create_paginate_query(query, raw_params)
-
-    db = _get_database(query)
-
-    if _is_async_db(db):
+    if _is_raw_sql(query):
+        paginated_sql = _create_raw_sql_query(query, raw_params)
+        cursor = yield db.execute_sql(paginated_sql)
+        columns = [desc[0] for desc in cursor.description] if cursor.description else []
+        items = [dict(zip(columns, row, strict=True)) for row in cursor.fetchall()]
+    elif _is_async_db(db):
+        query = create_paginate_query(query, raw_params)
         if prefetch:
             items = yield db.aprefetch(query, *prefetch)  # type: ignore[union-attr]
         else:
@@ -184,8 +243,10 @@ def _limit_offset_flow(
     elif prefetch:
         from peewee import prefetch as peewee_prefetch
 
+        query = create_paginate_query(query, raw_params)
         items = yield peewee_prefetch(query, *prefetch)
     else:
+        query = create_paginate_query(query, raw_params)
         items = yield list(query)
 
     return items
@@ -193,13 +254,14 @@ def _limit_offset_flow(
 
 @flow
 def _peewee_flow(
-    query: Query,
+    query: Query | RawSQL,
+    db: Database | Any,
     params: AbstractParams | None = None,
     *,
     is_async: bool = False,
     subquery_count: bool = True,
     unwrap_mode: UnwrapMode | None = None,
-    count_query: Query | None = None,
+    count_query: Query | RawSQL | None = None,
     prefetch: tuple[Query, ...] | None = None,
     transformer: ItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
@@ -211,8 +273,8 @@ def _peewee_flow(
 
     page = yield from generic_flow(
         async_=is_async,
-        total_flow=partial(_total_flow, query, count_query, subquery_count),
-        limit_offset_flow=partial(_limit_offset_flow, query, prefetch=prefetch),
+        total_flow=partial(_total_flow, query, db, count_query, subquery_count),
+        limit_offset_flow=partial(_limit_offset_flow, query, db, prefetch=prefetch),
         params=params,
         inner_transformer=partial(_inner_transformer, query=query, unwrap_mode=unwrap_mode, unique=unique),
         transformer=transformer,
@@ -232,14 +294,10 @@ def _inner_transformer(
     unique: bool,
 ) -> Sequence[Any]:
     """Apply transformations to query results."""
-    # Ensure items are actual data, not query objects
-    # Convert ModelSelect to list if needed
     if hasattr(items, "__iter__") and not isinstance(items, (list, tuple)):
         items = list(items)
 
     if unique:
-        # Preserve order while removing duplicates
-        # Use id() to avoid issues with Model __eq__ implementations
         seen = {}
         unique_items = []
         for item in items:
@@ -253,9 +311,10 @@ def _inner_transformer(
 
 
 def paginate(
-    query: Query | type[Model],
+    query: Query | type[Model] | RawSQL | None,
     params: AbstractParams | None = None,
     *,
+    db: Database | None = None,
     subquery_count: bool = True,
     unwrap_mode: UnwrapMode | None = None,
     prefetch: tuple[Query, ...] | None = None,
@@ -264,11 +323,13 @@ def paginate(
     unique: bool = True,
     config: Config | None = None,
 ) -> Any:
-    """Paginate a Peewee query.
+    """Paginate a Peewee query or raw SQL.
 
     Args:
-        query: Peewee query object or Model class
+        query: Peewee query object, Model class, or raw SQL string
         params: Pagination parameters
+        db: Database instance (required for raw SQL, optional otherwise - will be
+            extracted from the query's model if not provided)
         subquery_count: Use subquery for count
         unwrap_mode: How to unwrap results
         transformer: Optional transformer for results
@@ -278,15 +339,35 @@ def paginate(
 
     Returns:
         Paginated results
-    """
-    query = _prepare_query(query)  # type: ignore[assignment]
 
+    Example:
+        # Regular query - db is extracted from query
+        paginate(User.select(), params=PageParams(page=1, size=10))
+
+        # Raw SQL query - db must be provided
+        paginate("SELECT * FROM users WHERE age > 18", params=PageParams(page=1, size=10), db=db)
+    """
     if query is None:
         raise ValueError("Query cannot be None")
 
+    actual_query: Query | type[Model] | RawSQL | None
+    actual_db: Database | Any
+
+    if _is_raw_sql(query):
+        if db is None:
+            raise ValueError("Database is required for raw SQL queries")
+        actual_query = query
+        actual_db = db
+    else:
+        actual_query = _prepare_query(query)
+        if actual_query is None:
+            raise ValueError("Query cannot be None")
+        actual_db = db if db is not None else _get_database(actual_query)
+
     return run_sync_flow(
         _peewee_flow(
-            query=query,
+            query=actual_query,
+            db=actual_db,
             params=params,
             is_async=False,
             subquery_count=subquery_count,
@@ -302,10 +383,11 @@ def paginate(
 
 
 async def apaginate(
-    query: Query | type[Model],
+    query: Query | type[Model] | RawSQL | None,
     params: AbstractParams | None = None,
     *,
-    count_query: Query | None = None,
+    db: Database | None = None,
+    count_query: Query | RawSQL | None = None,
     subquery_count: bool = True,
     unwrap_mode: UnwrapMode | None = None,
     prefetch: tuple[Query, ...] | None = None,
@@ -314,11 +396,13 @@ async def apaginate(
     unique: bool = True,
     config: Config | None = None,
 ) -> Any:
-    """Async paginate a Peewee query using Peewee v4 async support.
+    """Async paginate a Peewee query or raw SQL using Peewee v4 async support.
 
     Args:
-        query: Peewee query object or Model class
+        query: Peewee query object, Model class, or raw SQL string
         params: Pagination parameters
+        db: Database instance (required for raw SQL, optional otherwise - will be
+            extracted from the query's model if not provided)
         count_query: Custom count query
         subquery_count: Use subquery for count
         unwrap_mode: How to unwrap results
@@ -333,8 +417,12 @@ async def apaginate(
     Example:
         ```python
         async def get_users(page: int, page_size: int):
-            query = User.select().order_by(User.id)
-            return await apaginate(query, params=PageParams(page, page_size))
+            return await apaginate(User.select(), params=PageParams(page, page_size))
+
+        # Raw SQL
+        async def get_active_users(page: int, page_size: int):
+            return await apaginate("SELECT * FROM users WHERE active = 1",
+                                  params=PageParams(page, page_size), db=db)
         ```
     """
     if not PEEWEE_ASYNC_AVAILABLE:
@@ -344,14 +432,27 @@ async def apaginate(
             "or use sync paginate()."
         )
 
-    query = _prepare_query(query)  # type: ignore[assignment]
-
     if query is None:
         raise ValueError("Query cannot be None")
 
+    actual_query: Query | type[Model] | RawSQL | None
+    actual_db: Database | Any
+
+    if _is_raw_sql(query):
+        if db is None:
+            raise ValueError("Database is required for raw SQL queries")
+        actual_query = query
+        actual_db = db
+    else:
+        actual_query = _prepare_query(query)
+        if actual_query is None:
+            raise ValueError("Query cannot be None")
+        actual_db = db if db is not None else _get_database(actual_query)
+
     return await run_async_flow(
         _peewee_flow(
-            query=query,
+            query=actual_query,
+            db=actual_db,
             params=params,
             is_async=True,
             subquery_count=subquery_count,
