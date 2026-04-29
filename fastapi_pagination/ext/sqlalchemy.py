@@ -14,7 +14,7 @@ import warnings
 from collections.abc import Sequence
 from contextlib import suppress
 from functools import partial
-from typing import TYPE_CHECKING, Any, Literal, TypeAlias, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias, TypeVar, cast, overload
 
 from sqlalchemy import func, select, text
 from sqlalchemy.engine import Connection
@@ -22,7 +22,7 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query, Session, noload, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import TextClause
-from typing_extensions import deprecated
+from typing_extensions import TypeVarTuple, Unpack, deprecated
 
 from fastapi_pagination.api import create_page
 from fastapi_pagination.bases import AbstractParams, CursorRawParams, RawParams
@@ -39,15 +39,11 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 try:
-    from typing import TypeVarTuple, Unpack  # ty:ignore[unresolved-import]
-except ImportError:
-    from typing_extensions import TypeVarTuple, Unpack
-
-try:
     from sqlalchemy.orm import FromStatement
 except ImportError:  # pragma: no cover
+    _Ts = TypeVarTuple("_Ts")
 
-    class FromStatement:
+    class FromStatement(Generic[Unpack[_Ts]]):
         element: Any
 
         def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -93,24 +89,23 @@ UnwrapMode: TypeAlias = Literal[
     "unwrap",  # always unwrap
 ]
 
-TupleAny = TypeVarTuple("TupleAny")
-Selectable: TypeAlias = (
-    "Select[Unpack[TupleAny]] | TextClause | FromStatement[Unpack[TupleAny]] | CompoundSelect[Unpack[TupleAny]]"
-)
+Ts = TypeVarTuple("Ts")
+
+Selectable: TypeAlias = "Select[Unpack[Ts]] | TextClause | FromStatement[Unpack[Ts]] | CompoundSelect[Unpack[Ts]]"
 SelectableOrQuery: TypeAlias = "Selectable | Query[Any]"
 
 
 @overload
-def _prepare_query(query: Select[Unpack[TupleAny]]) -> Select[Unpack[TupleAny]]:
+def _prepare_query(query: Select[Unpack[Ts]]) -> Select[Unpack[Ts]]:
     pass
 
 
 @overload
-def _prepare_query(query: Select[Unpack[TupleAny]] | None) -> Select[Unpack[TupleAny]] | None:
+def _prepare_query(query: Select[Unpack[Ts]] | None) -> Select[Unpack[Ts]] | None:
     pass
 
 
-def _prepare_query(query: Select[Unpack[TupleAny]] | None) -> Select[Unpack[TupleAny]] | None:
+def _prepare_query(query: Select[Unpack[Ts]] | None) -> Select[Unpack[Ts]] | None:
     if query is None:
         return None
 
@@ -192,8 +187,9 @@ def create_count_query_from_text(query: str) -> str:
 
 
 def _paginate_from_statement(
-    query: FromStatement[Unpack[TupleAny]], params: AnyParams
-) -> FromStatement[Unpack[TupleAny]]:
+    query: FromStatement[Unpack[Ts]],
+    params: AnyParams,
+) -> FromStatement[Unpack[Ts]]:
     query = query._generate()
     query.element = create_paginate_query(query.element, params)
     return query
@@ -332,7 +328,7 @@ def _cursor_flow(
 def _sqlalchemy_flow(
     is_async: bool,
     conn: SyncConn | AsyncConn,
-    query: Select[Unpack[TupleAny]],
+    query: Select[Unpack[Ts]],
     params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
@@ -503,7 +499,7 @@ def _old_paginate_sign(
     unique: bool = True,
     config: Config | None = None,
 ) -> tuple[
-    Select[Unpack[TupleAny]],
+    Select[Unpack[Ts]],
     Selectable | None,
     SyncConn,
     AbstractParams | None,
@@ -525,7 +521,7 @@ def _old_paginate_sign(
 
 def _new_paginate_sign(
     conn: SyncConn,
-    query: Select[Unpack[TupleAny]],
+    query: Select[Unpack[Ts]],
     params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
@@ -536,7 +532,7 @@ def _new_paginate_sign(
     unique: bool = True,
     config: Config | None = None,
 ) -> tuple[
-    Select[Unpack[TupleAny]],
+    Select[Unpack[Ts]],
     Selectable | None,
     SyncConn,
     AbstractParams | None,
