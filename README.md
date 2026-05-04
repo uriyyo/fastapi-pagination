@@ -20,20 +20,20 @@ With `fastapi-pagination`, you can easily define pagination parameters in your F
 and use them to generate paginated responses that include the requested subset of your data.
 The library supports a variety of pagination strategies, including cursor-based pagination and page-based pagination.
 
-`fastapi-pagination` is built on top of the popular `fastapi` library, and it works with a wide range 
-of SQL and NoSQL databases frameworks. It also supports async/await syntax and is compatible with Python 3.10 and higher.
+`fastapi-pagination` is built on top of the popular `fastapi` library, and it works with a wide range
+of SQL and NoSQL database frameworks. It also supports async/await syntax and is compatible with Python 3.10 and higher.
 
 Features:
 
 * Simplifies pagination in FastAPI applications.
 * Supports a variety of pagination strategies, including cursor-based pagination and page-based pagination
-* Works with a wide range of SQL and NoSQL databases frameworks, including `SQLAlchemy`, `Tortoise ORM`, and `PyMongo`.
+* Works with a wide range of SQL and NoSQL database frameworks, including `SQLAlchemy`, `Tortoise ORM`, and `PyMongo`.
 * Supports async/await syntax.
 * Compatible with Python 3.10 and higher.
 
 ----
 
-For more information on how to use fastapi-pagination, please refer to the 
+For more information on how to use fastapi-pagination, please refer to the
 [official documentation](https://uriyyo-fastapi-pagination.netlify.app/).
 
 ---
@@ -94,7 +94,7 @@ def get_users(db: Session = Depends(get_db)) -> Page[UserOut]:
 
 ---
 
-Code from `Quickstart` will generate OpenAPI schema as bellow:
+Code from `Quickstart` will generate OpenAPI schema as below:
 
 <div align="center">
 <img alt="app-example" src="https://raw.githubusercontent.com/uriyyo/fastapi-pagination/main/docs/img/example.png">

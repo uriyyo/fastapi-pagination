@@ -115,7 +115,7 @@ If you want to run only unit tests, run:
 uv run pytest tests --unit-tests
 ```
 
-If you want to run only integration tests, then you will also will need to have `PostgreSQL`, `MongoDB` and `Casandra` running.
+If you want to run only integration tests, then you will also need to have `PostgreSQL`, `MongoDB` and `Cassandra` running.
 
 To run integration tests, run:
 ```sh
