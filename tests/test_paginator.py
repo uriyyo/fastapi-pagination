@@ -43,6 +43,12 @@ def test_explicit_params():
     assert page == Page(items=[], total=0, page=2, pages=0, size=10)
 
 
+def test_custom_length_function():
+    page = paginate([1, 2, 3], Params(), length_function=lambda _: 10)
+
+    assert page == Page(items=[1, 2, 3], total=10, page=1, pages=1, size=50)
+
+
 def test_explicit_items_transformer():
     def transformer(items):
         return [item * 2 for item in items]
