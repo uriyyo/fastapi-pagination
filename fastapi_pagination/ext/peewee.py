@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from fastapi_pagination.ext.utils import generic_query_apply_params
+
 __all__ = [
     "apaginate",
     "create_count_query",
@@ -7,13 +9,12 @@ __all__ = [
     "paginate",
 ]
 
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from functools import partial
 from typing import Any, TypeAlias, cast, overload
 
 from peewee import Database, ModelSelect, Query
 
-from fastapi_pagination.api import create_page
 from fastapi_pagination.bases import AbstractParams, RawParams
 from fastapi_pagination.config import Config
 from fastapi_pagination.ext.raw_sql import create_count_query_from_text, create_paginate_query_from_text
@@ -70,11 +71,7 @@ def _resolve_query_and_db(
 
 
 def create_paginate_query(query: Query, params: RawParams) -> Query:
-    if params.limit is not None:
-        query = query.limit(params.limit)
-    if params.offset is not None:
-        query = query.offset(params.offset)
-    return query
+    return generic_query_apply_params(query, params)
 
 
 def create_count_query(query: Query | RawSQL) -> Query | RawSQL:
@@ -160,8 +157,6 @@ def _peewee_flow(
     additional_data: AdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
-    create_page_factory = partial(create_page)
-
     page = yield from generic_flow(
         async_=is_async,
         total_flow=partial(_total_flow, query, db),
@@ -171,7 +166,6 @@ def _peewee_flow(
         transformer=transformer,
         additional_data=additional_data,
         config=config,
-        create_page_factory=create_page_factory,
     )
 
     return page
@@ -180,8 +174,9 @@ def _peewee_flow(
 def _inner_transformer(
     items: Sequence[Any],
 ) -> Sequence[Any]:
-    if hasattr(items, "__iter__") and not isinstance(items, (list, tuple)):
+    if isinstance(items, Iterable):
         items = list(items)
+
     return items
 
 
