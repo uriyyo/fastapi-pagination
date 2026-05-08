@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 from fastapi import Depends
-from sqlalchemy import select, text
+from sqlalchemy import func, select, text
 from sqlalchemy.orm import selectinload
 
 from fastapi_pagination import Page, Params, set_page, set_params
@@ -276,3 +276,66 @@ class TestSQLAlchemyRaw(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite):
             return await maybe_async(paginate_func(db, text("SELECT * FROM users")))
 
         return builder.build()
+
+
+class TestSQLAlchemyInlineCount:
+    def test_inline_count_select_model(self, sa_session, sa_user, entities):
+        with closing(sa_session()) as session, set_page(Page[UserOut]):
+            page = paginate(
+                session,
+                select(sa_user),
+                params=Params(page=1, size=10),
+                inline_count=func.count().over(),
+            )
+
+        assert page.total == len(entities)
+        assert len(page.items) == 10
+        assert all(isinstance(item, UserOut) for item in page.items)
+
+    def test_inline_count_total_matches_full_count(self, sa_session, sa_user, entities):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                select(sa_user),
+                params=Params(page=1, size=10),
+                inline_count=func.count().over(),
+            )
+
+        assert page.total == len(entities)
+
+    def test_inline_count_with_filter(self, sa_session, sa_user, entities):
+        target_name = entities[0].name
+
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                select(sa_user).where(sa_user.name == target_name),
+                params=Params(page=1, size=10),
+                inline_count=func.count().over(),
+            )
+
+        assert page.total == sum(1 for e in entities if e.name == target_name)
+
+    def test_inline_count_items_are_model_instances(self, sa_session, sa_user, entities):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                select(sa_user),
+                params=Params(page=1, size=5),
+                inline_count=func.count().over(),
+            )
+
+        assert len(page.items) == 5
+        assert all(isinstance(item, sa_user) for item in page.items)
+
+    def test_inline_count_non_scalar_query(self, sa_session, sa_user, entities):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                select(sa_user.id, sa_user.name),
+                params=Params(page=1, size=10),
+                inline_count=func.count().over(),
+            )
+
+        assert page.total == len(entities)
+        assert all(item.id is not None and item.name is not None for item in page.items)
