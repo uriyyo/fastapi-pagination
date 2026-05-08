@@ -97,21 +97,21 @@ UnwrapMode: TypeAlias = Literal[
 
 Ts = TypeVarTuple("Ts")
 
-Selectable: TypeAlias = "Select[Unpack[Ts]] | TextClause | FromStatement[Unpack[Ts]] | CompoundSelect[Unpack[Ts]]"
+Selectable: TypeAlias = "Select[Unpack[Ts]] | TextClause | FromStatement[Unpack[Ts]] | CompoundSelect[Unpack[Ts]]"  # type: ignore[ty:invalid-type-form]
 SelectableOrQuery: TypeAlias = "Selectable | Query[Any]"
 
 
 @overload
-def _prepare_query(query: Select[Unpack[Ts]]) -> Select[Unpack[Ts]]:
+def _prepare_query(query: Select[Unpack[Ts]]) -> Select[Unpack[Ts]]:  # type: ignore[ty:invalid-type-form]
     pass
 
 
 @overload
-def _prepare_query(query: Select[Unpack[Ts]] | None) -> Select[Unpack[Ts]] | None:
+def _prepare_query(query: Select[Unpack[Ts]] | None) -> Select[Unpack[Ts]] | None:  # type: ignore[ty:invalid-type-form]
     pass
 
 
-def _prepare_query(query: Select[Unpack[Ts]] | None) -> Select[Unpack[Ts]] | None:
+def _prepare_query(query: Select[Unpack[Ts]] | None) -> Select[Unpack[Ts]] | None:  # type: ignore[ty:invalid-type-form]
     if query is None:
         return None
 
@@ -193,9 +193,9 @@ def create_count_query_from_text(query: str) -> str:
 
 
 def _paginate_from_statement(
-    query: FromStatement[Unpack[Ts]],
+    query: FromStatement[Unpack[Ts]],  # type: ignore[ty:invalid-type-form]
     params: AnyParams,
-) -> FromStatement[Unpack[Ts]]:
+) -> FromStatement[Unpack[Ts]]:  # type: ignore[ty:invalid-type-form]
     query = query._generate()
     query.element = create_paginate_query(query.element, params)
     return query
@@ -391,7 +391,7 @@ def _cursor_flow(
 def _sqlalchemy_flow(
     is_async: bool,
     conn: SyncConn | AsyncConn,
-    query: Select[Unpack[Ts]],
+    query: Select[Unpack[Ts]],  # type: ignore[ty:invalid-type-form]
     params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
@@ -583,7 +583,7 @@ def _old_paginate_sign(
     unique: bool = True,
     config: Config | None = None,
 ) -> tuple[
-    Select[Unpack[Ts]],
+    Select[Unpack[Ts]],  # type: ignore[ty:invalid-type-form]
     Selectable | None,
     ColumnElement[int] | None,
     SyncConn,
@@ -606,7 +606,7 @@ def _old_paginate_sign(
 
 def _new_paginate_sign(
     conn: SyncConn,
-    query: Select[Unpack[Ts]],
+    query: Select[Unpack[Ts]],  # type: ignore[ty:invalid-type-form]
     params: AbstractParams | None = None,
     *,
     subquery_count: bool = True,
@@ -618,7 +618,7 @@ def _new_paginate_sign(
     unique: bool = True,
     config: Config | None = None,
 ) -> tuple[
-    Select[Unpack[Ts]],
+    Select[Unpack[Ts]],  # type: ignore[ty:invalid-type-form]
     Selectable | None,
     ColumnElement[int] | None,
     SyncConn,

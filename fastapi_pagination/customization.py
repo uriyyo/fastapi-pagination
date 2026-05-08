@@ -552,7 +552,7 @@ def _convert_v2_field_to_v1(field_v2: FieldV2) -> tuple[Any, Any]:
     return type_, FieldInfoV1(
         default=default,
         default_factory=field_v2.default_factory,
-        alias=field_v2.alias or field_v2.validation_alias,
+        alias=cast(str, field_v2.alias or field_v2.validation_alias),
         title=field_v2.title,
         description=field_v2.description,
     )
