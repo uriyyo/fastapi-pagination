@@ -874,6 +874,14 @@ orm = [
 ormar = [
     { name = "ormar" },
 ]
+peewee = [
+    { name = "aiosqlite" },
+    { name = "greenlet" },
+    { name = "peewee" },
+]
+peewee-sync = [
+    { name = "peewee" },
+]
 piccolo = [
     { name = "piccolo" },
 ]
@@ -928,6 +936,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "aiosqlite", marker = "extra == 'aiosqlite'", specifier = ">=0.19.0,!=0.22.0,!=0.22.1" },
+    { name = "aiosqlite", marker = "extra == 'peewee'", specifier = ">=0.19.0,!=0.22.0,!=0.22.1" },
     { name = "asyncpg", marker = "extra == 'asyncpg'", specifier = ">=0.24.0" },
     { name = "beanie", marker = "extra == 'beanie'", specifier = ">=2.1.0" },
     { name = "bunnet", marker = "extra == 'bunnet'", specifier = ">=1.1.0" },
@@ -938,11 +947,14 @@ requires-dist = [
     { name = "elasticsearch-dsl", marker = "extra == 'elasticsearch'", specifier = ">=8.13.0" },
     { name = "fastapi", specifier = ">=0.93.0" },
     { name = "google-cloud-firestore", marker = "extra == 'firestore'", specifier = ">=2.19.0" },
+    { name = "greenlet", marker = "extra == 'peewee'" },
     { name = "mongoengine", marker = "extra == 'mongoengine'", specifier = ">=0.23.1" },
     { name = "motor", marker = "extra == 'motor'", specifier = ">=3.6.0" },
     { name = "odmantic", marker = "extra == 'odmantic'", specifier = ">=1.0.2" },
     { name = "orm", marker = "extra == 'orm'", specifier = ">=0.3.1" },
     { name = "ormar", marker = "extra == 'ormar'", specifier = ">=0.21.0" },
+    { name = "peewee", marker = "extra == 'peewee'", specifier = ">=4.0" },
+    { name = "peewee", marker = "extra == 'peewee-sync'", specifier = ">=4.0" },
     { name = "piccolo", marker = "extra == 'piccolo'", specifier = ">=0.89" },
     { name = "psycopg", extras = ["binary"], marker = "extra == 'psycopg'", specifier = ">=3.3.2" },
     { name = "pydantic", specifier = ">=1.9.1" },
@@ -955,7 +967,7 @@ requires-dist = [
     { name = "tortoise-orm", marker = "extra == 'tortoise'", specifier = ">=0.22.0" },
     { name = "typing-extensions", specifier = ">=4.8.0" },
 ]
-provides-extras = ["sqlmodel", "sqlalchemy", "databases", "orm", "ormar", "tortoise", "asyncpg", "django", "piccolo", "motor", "bunnet", "mongoengine", "beanie", "scylla-driver", "odmantic", "elasticsearch", "firestore", "aiosqlite", "psycopg"]
+provides-extras = ["sqlmodel", "sqlalchemy", "databases", "orm", "ormar", "tortoise", "asyncpg", "django", "piccolo", "motor", "bunnet", "mongoengine", "beanie", "scylla-driver", "odmantic", "elasticsearch", "firestore", "aiosqlite", "psycopg", "peewee", "peewee-sync"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1656,6 +1668,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/5a/82/42f767fc1c1143d6fd36efb827202a2d997a375e160a71eb2888a925aac1/pathspec-1.1.1.tar.gz", hash = "sha256:17db5ecd524104a120e173814c90367a96a98d07c45b2e10c2f3919fff91bf5a", size = 135180, upload-time = "2026-04-27T01:46:08.907Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f1/d9/7fb5aa316bc299258e68c73ba3bddbc499654a07f151cba08f6153988714/pathspec-1.1.1-py3-none-any.whl", hash = "sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189", size = 57328, upload-time = "2026-04-27T01:46:07.06Z" },
+]
+
+[[package]]
+name = "peewee"
+version = "4.0.5"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/21/04/8b1f0388389c0595ccf69fec8723983e598edb0303f6227a08bc5d8cd013/peewee-4.0.5.tar.gz", hash = "sha256:b43a21493f19f205a016cb4a9e29c7eca3500576d29447a89732022d193450ba", size = 721062, upload-time = "2026-04-23T21:17:29.419Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ef/d4/2cf83b5fb7fae8939ed596009465c6de0b8fafa70abd486ed9d192e457f7/peewee-4.0.5-py3-none-any.whl", hash = "sha256:05bf687660f04f925bcb7d744e5af826ca526322f2fad894bfa4f1d0f3bcaf50", size = 144479, upload-time = "2026-04-23T21:17:28.061Z" },
 ]
 
 [[package]]
