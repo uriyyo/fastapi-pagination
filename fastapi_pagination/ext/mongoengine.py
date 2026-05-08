@@ -36,7 +36,7 @@ def paginate(
     return run_sync_flow(
         generic_flow(
             total_flow=flow_expr(lambda: query.count()),  # type: ignore[ty:unresolved-attribute]
-            limit_offset_flow=partial(_limit_offset_flow, query),
+            limit_offset_flow=partial(_limit_offset_flow, query),  # type: ignore[ty:invalid-argument-type]
             params=params,
             transformer=transformer,
             additional_data=additional_data,
