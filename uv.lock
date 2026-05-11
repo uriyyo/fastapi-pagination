@@ -1632,15 +1632,43 @@ wheels = [
 
 [[package]]
 name = "ormar"
-version = "0.24.0"
+version = "0.25.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "ormar-utils" },
     { name = "pydantic" },
     { name = "sqlalchemy", extra = ["asyncio"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d2/bb/af61b48ccb8db726ddb65cdcf70fbf19a1cf6b1bba398311f4e2b3fe7d0c/ormar-0.24.0.tar.gz", hash = "sha256:76016e5aea4190bdfa0423adb8ea42ab281e98c204f66336a4d61ddcbe88c688", size = 132138, upload-time = "2026-04-22T11:58:11.586Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/92/73/bc475c4b659eff8e33795811e01a31a7441dcb09e5e8eed799bf6db1b541/ormar-0.25.0.tar.gz", hash = "sha256:cbc7ffe2deda00f1142a2a6db49ffd72fee0ce71bd79250959ae804975420152", size = 149627, upload-time = "2026-05-07T10:55:08.543Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/56/06/ebb5f07d59db1bc246673f213a9e8b98b424dc25e7d69375dd0ec1c757b3/ormar-0.24.0-py3-none-any.whl", hash = "sha256:2d9b57bec4bd7a81e1dc15817a162c647625d9ea174fc1d3a5669cf17c31603c", size = 164280, upload-time = "2026-04-22T11:58:10.284Z" },
+    { url = "https://files.pythonhosted.org/packages/93/5d/2317e7005ce9ca61c07e9cf7f9013be76c8db7e4a7a66770bf1143b317fa/ormar-0.25.0-py3-none-any.whl", hash = "sha256:fee132f023ec99c8ca196825aee9f8fc879043534635b4e9e510f416a444af95", size = 182607, upload-time = "2026-05-07T10:55:09.593Z" },
+]
+
+[[package]]
+name = "ormar-utils"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/02/e2/c6a9c1dad0d600a6aab06d7590405d0bcb1032e4f40a4afdb7e29a4fe35f/ormar_utils-0.1.1-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:e1abb5494942a937c317aac909979c422aac745c58121042216ba4163f22ef47", size = 374240, upload-time = "2026-03-06T14:21:04.685Z" },
+    { url = "https://files.pythonhosted.org/packages/3f/20/9e96a028b41d6655a8d307fc36e8ed2edb6aa7245cd7d4ddc100ec7cd75e/ormar_utils-0.1.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:1f80e577d840ae0f2e6455b84e6e6e6351a776a514af8b6ff1f809f24a71f432", size = 359970, upload-time = "2026-03-06T14:21:06.772Z" },
+    { url = "https://files.pythonhosted.org/packages/57/75/15d008f88a45c635beef156bbcea64e007064ef268efd525a7b061f61ce2/ormar_utils-0.1.1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:522f6fe1f68f4cd90a77a0851e2bcffbd7d473cb5eb492f53a79ecd249b4a95a", size = 391866, upload-time = "2026-03-06T14:21:08.235Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/27/6b0a0b064b639f6179d2b5604e9ed22be468a4b732c948152805238da411/ormar_utils-0.1.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:77bcfffbef6f81a61192290834b2b80fbfeaa64242a8fbcdefe00051b9f5e70d", size = 407442, upload-time = "2026-03-06T14:21:09.429Z" },
+    { url = "https://files.pythonhosted.org/packages/cb/4d/0c871f149dc6e13ea38d70b90c9871b44dbae6c53a51621cde93e496e559/ormar_utils-0.1.1-cp310-cp310-win_amd64.whl", hash = "sha256:3e316b727853f0d722663e8af74aca8f9572f8340a76694ebd8a377fc6d6bfbe", size = 257137, upload-time = "2026-03-06T14:21:10.582Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/e2/c58e5b3b2d228a2d21147a6646b7a3011e10fb996a9b056729ba33f6483a/ormar_utils-0.1.1-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:a5468770de8d01b36702fe96aa553efb30da46313304b97d113871519d4fec5b", size = 377043, upload-time = "2026-03-06T14:21:11.721Z" },
+    { url = "https://files.pythonhosted.org/packages/76/79/7cdc5e7ee3f8518e1f800e86d100fc5b363e61f7e44e030cca4a1478089d/ormar_utils-0.1.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:047f5e113e3adb68e4dc7d3915d999ed44a3e6914a5a0a8162cfc0f1bcc24a24", size = 360012, upload-time = "2026-03-06T14:21:12.912Z" },
+    { url = "https://files.pythonhosted.org/packages/45/ab/9d794aaeb8eceb9184658119b1925b42cadf5b01f74cb5bc3d160711bc43/ormar_utils-0.1.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9b510c48557a1809e53a851b7acee4bac8fb7adac12ce738d3911b6ed85dc7bb", size = 391656, upload-time = "2026-03-06T14:21:14.363Z" },
+    { url = "https://files.pythonhosted.org/packages/64/e1/1bab17843fc6a592fca0b34755fc3d5c58cc2a124c4b4d9ebbffe3de290a/ormar_utils-0.1.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:530c46dcfcfb26067abd6e148b2c2337cfcefa1945cbffcae8a8b73ee816a101", size = 407832, upload-time = "2026-03-06T14:21:15.806Z" },
+    { url = "https://files.pythonhosted.org/packages/a9/86/af4a27b4c864edd921eb283e3c80aa61928ad0621e96b73d6bbb54d18061/ormar_utils-0.1.1-cp311-cp311-win_amd64.whl", hash = "sha256:d1cec4877a86d7f654d795f3f49bb4f8d81843032dc05f5a741ce471672f5c5d", size = 257219, upload-time = "2026-03-06T14:21:17.168Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/94/176908ba964fc211c9759d6aa2478b245ec980829453f125096011127a71/ormar_utils-0.1.1-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:85e83277179776bd8d4915ce4a5e30e68054be22f3d4e4428e2f0a5515b113e1", size = 370908, upload-time = "2026-03-06T14:21:18.576Z" },
+    { url = "https://files.pythonhosted.org/packages/77/f1/e7163ff6e98ab1019f8bedcfdc7552fe84df064bc83463e4b97b06f60256/ormar_utils-0.1.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:2736d32eeeb403f7883a4ffcc67b716e492ef38940d9ca42b9be7f1c958a458a", size = 354329, upload-time = "2026-03-06T14:21:20.103Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/36/7866916bd3a01c8285e9a0a79c7966dd4d7ecce829d44ce9b827e95d3965/ormar_utils-0.1.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b69e0a1903c1eb8c63f284eec96aa550e44a417d79e673254b83d73b290c4c60", size = 387943, upload-time = "2026-03-06T14:21:21.583Z" },
+    { url = "https://files.pythonhosted.org/packages/43/52/5707fa732a24b2c0242da81f69761e2e6cfedcff82b20d0266ef0e745f33/ormar_utils-0.1.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:da04622f42cc33dd88a94f21dda0f04ff7ff0773e3e3a176ef8d9bad5e60a1c1", size = 401184, upload-time = "2026-03-06T14:21:23.082Z" },
+    { url = "https://files.pythonhosted.org/packages/05/8b/bc4e069880f1541a277b69d8aca1db1a4df8fd649d704a3d14e667c65989/ormar_utils-0.1.1-cp312-cp312-win_amd64.whl", hash = "sha256:a803c9f3b314eb54220bace76f7c49d091f305bba2fa591c19eead33ef5b1741", size = 253325, upload-time = "2026-03-06T14:21:24.49Z" },
+    { url = "https://files.pythonhosted.org/packages/2b/de/6c5ce7e7e5b792188aef1b20c75835ecb83c54fbd46808f150bc723b2b88/ormar_utils-0.1.1-cp313-cp313-macosx_10_12_x86_64.whl", hash = "sha256:f8635e83857b85e2521db8cf55c1c659169912713632b9bc8f7cb617df3235df", size = 370418, upload-time = "2026-03-06T14:21:25.625Z" },
+    { url = "https://files.pythonhosted.org/packages/64/34/c7aa0c9f0f906aa1db95bf004672319da2c1b66893ffdd2a0124aa463783/ormar_utils-0.1.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:4892b801969cbb402748a12920b8c285707fdb2540fe423b6c96bcbd6004aa98", size = 354058, upload-time = "2026-03-06T14:21:26.745Z" },
+    { url = "https://files.pythonhosted.org/packages/e9/22/37685ccb4e6b5d4ae284d020534e1932cbd6395e372b9a54b53630a10009/ormar_utils-0.1.1-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:fae770725f88168f8dcecfafaca27375397a62a97776c2818b5a99c6d4baeb8d", size = 386982, upload-time = "2026-03-06T14:21:28.254Z" },
+    { url = "https://files.pythonhosted.org/packages/61/e9/333749e116114867e8a46729e48a84a2d0073278d24d69c71250a428d9f9/ormar_utils-0.1.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b5bd489da692e9b94f27a577acf30465b30e94932f01f2745830cb94b1b413ce", size = 400844, upload-time = "2026-03-06T14:21:29.472Z" },
+    { url = "https://files.pythonhosted.org/packages/e4/1a/549e6020b7356d321c4c67f701d5b7b471cb5475cdd98dbbf7b95a656eed/ormar_utils-0.1.1-cp313-cp313-win_amd64.whl", hash = "sha256:405ed56e66cff421f293509d3e0a86af7da88663420a2d3ea5719e755421bb2a", size = 252781, upload-time = "2026-03-06T14:21:30.959Z" },
 ]
 
 [[package]]
