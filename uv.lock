@@ -1709,7 +1709,7 @@ wheels = [
 
 [[package]]
 name = "piccolo"
-version = "1.33.0"
+version = "1.34.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "black" },
@@ -1720,9 +1720,9 @@ dependencies = [
     { name = "targ" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7b/1c/97b4bdf80398eed0f9b8dc188937e4bef4c37c4432047380846e747553cc/piccolo-1.33.0.tar.gz", hash = "sha256:cee3346be3480d64ea56895a14e4cbe036c93d667a3a29dd8b174540351c92ab", size = 293036, upload-time = "2026-03-06T17:13:06.145Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b3/d1/7b5a5a3969e3d5971c8df14318fe949030b268f2d3566cb06808066d92d1/piccolo-1.34.0.tar.gz", hash = "sha256:72e27ff89fd26f78c03888d8b30b82d8707f409464fbc356e02447b5dc0145d8", size = 295369, upload-time = "2026-05-11T23:02:16.494Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/99/7f/2057295cb0bbcf5f0f0b29a4d51638294c0381c61f496ddac0029e1ac358/piccolo-1.33.0-py3-none-any.whl", hash = "sha256:34450d54c88f10b8c9fb950ea7725b7339828942e217ffa7476ee677a9dc2a80", size = 414823, upload-time = "2026-03-06T17:13:04.487Z" },
+    { url = "https://files.pythonhosted.org/packages/ac/f9/29302268e82d96d4ca35c725e82dcb14d24ffce86c0f10a187edde532640/piccolo-1.34.0-py3-none-any.whl", hash = "sha256:fff1aeb79b8e24d43c27b3586e5b7dd90712d0a55555771e65812f2c8e6fd1f5", size = 417895, upload-time = "2026-05-11T23:02:14.653Z" },
 ]
 
 [[package]]
