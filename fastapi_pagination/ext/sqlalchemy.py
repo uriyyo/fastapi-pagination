@@ -132,26 +132,37 @@ def _prepare_query_for_cursor(query: Selectable) -> Selectable:
 _selectable_classes = (Select, TextClause, FromStatement, CompoundSelect)
 
 
+def _get_orm_entity(query: Select[Any]) -> type[Any] | None:
+    """Return the mapped ORM entity class for a bare ``select(Model)`` query, else ``None``.
+
+    Returns ``None`` for multi-entity selects, column-level selects
+    (``select(Model.col)``), and aliased-entity selects.
+    """
+    cols_desc = query.column_descriptions
+    if len(cols_desc) != 1:
+        return None
+    desc = cols_desc[0]
+    entity = desc.get("entity")
+    if entity is None or desc.get("aliased"):
+        return None
+    expr = desc.get("expr")
+    return entity if (expr is not None and expr is entity) else None
+
+
 def _should_unwrap_scalars_for_query(query: Selectable) -> bool:
     cols_desc = query.column_descriptions  # type: ignore[ty:unresolved-attribute]
     all_cols = [*query._all_selected_columns]
 
-    # we have select(a, b, c) no need to unwrap
+    # select(a, b, c) — multiple entities/columns, no unwrap needed
     if len(cols_desc) != 1:
         return False
 
-    # select one thing and it has more than one column, unwrap
+    # select(Model) where Model expands to multiple columns — unwrap to get the entity instance
     if len(all_cols) > 1:
         return True
 
-    # select one thing and it has only one column, check if it actually is a select(model)
-    if len(all_cols) == 1:
-        (desc,) = cols_desc
-        expr, entity = [desc.get(key) for key in ("expr", "entity")]
-
-        return expr is not None and expr is entity
-
-    return False
+    # select(Model) where Model has a single column — only unwrap for bare entity selects
+    return isinstance(query, Select) and _get_orm_entity(query) is not None
 
 
 def _should_unwrap_scalars(query: Selectable) -> bool:
@@ -287,19 +298,22 @@ def _limit_offset_flow(query: Selectable, conn: AnyConn, raw_params: RawParams) 
     return items
 
 
-def _get_orm_entity(query: Select[Any]) -> type[Any] | None:
-    cols_desc = query.column_descriptions
-    if len(cols_desc) != 1:
-        return None
-    desc = cols_desc[0]
-    entity = desc.get("entity")
-    if entity is None or desc.get("aliased"):
-        return None
-    expr = desc.get("expr")
-    return entity if (expr is not None and expr is entity) else None
-
-
 def _apply_inline_count(query: Select[Any], inline_count: ColumnElement[int]) -> Select[Any]:
+    """Return *query* with *inline_count* embedded as an extra labeled column.
+
+    For DISTINCT queries, SQL window functions execute before deduplication, so
+    ``COUNT(*) OVER()`` would return the pre-DISTINCT row count (wrong). We wrap
+    the DISTINCT query in a subquery first, so the window function runs on the
+    already-deduplicated rows.
+
+    When the query is a bare ``select(Model)``, we use
+    ``aliased(entity, subq, flat=True)`` so result rows still carry proper ORM
+    instances rather than plain column tuples.
+
+    Note: ``query._distinct`` is a private SQLAlchemy attribute — there is no
+    public API for detecting ``SELECT DISTINCT`` on a ``Select`` object in
+    SQLAlchemy 2.0.
+    """
     if getattr(query, "_distinct", False):
         subq = query.subquery()
         entity = _get_orm_entity(query)
@@ -310,8 +324,11 @@ def _apply_inline_count(query: Select[Any], inline_count: ColumnElement[int]) ->
 
 
 def _extract_inline_count_total(items: Sequence[Any]) -> int:
-    if not items:
-        return 0
+    """Extract the window-function total from the first result row.
+
+    Returns 0 when *items* is empty — callers must decide whether that means
+    the query matched no rows or the page offset is past the end.
+    """
     try:
         return int(items[0]._mapping[_INLINE_COUNT_LABEL])
     except (AttributeError, KeyError):  # pragma: no cover
@@ -337,15 +354,23 @@ def _sqlalchemy_inline_count_flow(
 
     params_obj, raw_params = verify_params(params, "limit-offset")
 
-    count_query = _apply_inline_count(query, inline_count)
-    paginated_query = create_paginate_query(count_query, raw_params)
+    enriched_query = _apply_inline_count(query, inline_count) if raw_params.include_total else query
 
+    paginated_query = create_paginate_query(enriched_query, raw_params)
     result = yield conn.execute(paginated_query)
 
     with suppress(AttributeError):
         result = _maybe_unique(result, unique)
 
-    total = _extract_inline_count_total(result)
+    total: int | None = None
+    if raw_params.include_total:
+        if result:
+            total = _extract_inline_count_total(result)
+        else:
+            # No rows returned: the offset is likely past the end of the result set.
+            # The inline count cannot be extracted, so fall back to a separate query.
+            total = yield from _total_flow(query, conn, None, True)
+
     items = _unwrap_items(result, query, unwrap_mode)
 
     page = yield from create_page_flow(
@@ -533,6 +558,11 @@ async def paginate(
 
 
 def paginate(*args: Any, **kwargs: Any) -> Any:
+    if args and isinstance(args[0], Query) and kwargs.get("inline_count") is not None:
+        raise TypeError(
+            "inline_count is not supported with the legacy SQLAlchemy Query API; use a Select-based query instead"
+        )
+
     try:
         assert args
         assert isinstance(args[0], Query)

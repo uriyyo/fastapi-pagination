@@ -362,3 +362,53 @@ class TestSQLAlchemyInlineCount:
             )
 
         assert all(isinstance(item, sa_user) for item in page.items)
+
+    def test_inline_count_out_of_range_page_total_is_correct(self, sa_session, sa_user, entities):
+        """Out-of-range offset must still report the correct total, not 0."""
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                select(sa_user),
+                params=Params(page=9999, size=10),
+                inline_count=func.count().over(),
+            )
+
+        assert page.items == []
+        assert page.total == len(entities)
+
+    def test_inline_count_include_total_false_skips_count(self, sa_session, sa_user, entities):
+        """When include_total=False the total must be None and no count is computed."""
+        from fastapi_pagination.customization import CustomizedPage, UseIncludeTotal
+
+        NoTotalPage = CustomizedPage[Page[Any], UseIncludeTotal(False)]
+        no_total_params = NoTotalPage.__params_type__()
+
+        with closing(sa_session()) as session, set_page(NoTotalPage), set_params(no_total_params):
+            page = paginate(
+                session,
+                select(sa_user),
+                inline_count=func.count().over(),
+            )
+
+        assert page.total is None
+        assert len(page.items) > 0
+
+    @pytest.mark.asyncio(scope="session")
+    async def test_inline_count_apaginate(self, sa_user, sa_engine, entities):
+        """The async apaginate path must work with inline_count."""
+        from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+
+        if not isinstance(sa_engine, AsyncEngine):
+            pytest.skip("async engine required for this test")
+
+        async with AsyncSession(sa_engine) as session, set_page(Page[Any]):
+            page = await apaginate(
+                session,
+                select(sa_user),
+                params=Params(page=1, size=10),
+                inline_count=func.count().over(),
+            )
+
+        assert page.total == len(entities)
+        assert len(page.items) == 10
+        assert all(isinstance(item, sa_user) for item in page.items)
