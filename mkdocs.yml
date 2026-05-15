@@ -91,6 +91,8 @@ nav:
           - "Paginate Function": integrations/sqlalchemy/paginate.md
           - "Cursor Pagination": integrations/sqlalchemy/cursor_pagination.md
           - "Relationships": integrations/sqlalchemy/relationships.md
+      - "Peewee": integrations/peewee.md
+
   - "Migration to v0.13.x": "v0_13_migration.md"
   - "Migration to v0.14.x": "v0_14_migration.md"
   - "FAQ":
