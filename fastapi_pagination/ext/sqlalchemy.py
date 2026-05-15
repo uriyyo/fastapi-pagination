@@ -22,6 +22,7 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query, Session, aliased, noload, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import ColumnElement, TextClause
+from sqlalchemy.sql.util import ColumnAdapter
 from typing_extensions import TypeVarTuple, Unpack, deprecated
 
 from fastapi_pagination.api import create_page
@@ -310,14 +311,19 @@ def _apply_inline_count(query: Select[Any], inline_count: ColumnElement[int]) ->
     ``aliased(entity, subq, flat=True)`` so result rows still carry proper ORM
     instances rather than plain column tuples.
 
-    Note: ``query._distinct`` is a private SQLAlchemy attribute — there is no
-    public API for detecting ``SELECT DISTINCT`` on a ``Select`` object in
-    SQLAlchemy 2.0.
+    Note: ``query._distinct`` and ``query._order_by_clauses`` are private
+    SQLAlchemy attributes — there is no public API for detecting
+    ``SELECT DISTINCT`` or reading ORDER BY clauses on a ``Select`` object
+    in SQLAlchemy 2.0.  ``ColumnAdapter`` (``sqlalchemy.sql.util``) is used
+    to remap column references from the original table to the derived subquery.
     """
     if getattr(query, "_distinct", False):
-        subq = query.subquery()
+        subq = query.order_by(None).subquery()
         entity = _get_orm_entity(query)
         outer = select(aliased(entity, subq, flat=True)) if entity is not None else select(subq)
+        if query._order_by_clauses:
+            adapter = ColumnAdapter(subq)
+            outer = outer.order_by(*[adapter.traverse(clause) for clause in query._order_by_clauses])
         return outer.add_columns(inline_count.label(_INLINE_COUNT_LABEL))
 
     return query.add_columns(inline_count.label(_INLINE_COUNT_LABEL))
@@ -343,6 +349,8 @@ def _sqlalchemy_inline_count_flow(
     params: AbstractParams | None,
     inline_count: ColumnElement[int],
     *,
+    count_query: Selectable | None,
+    subquery_count: bool,
     unwrap_mode: UnwrapMode | None,
     transformer: ItemsTransformer | None,
     additional_data: AdditionalData | None,
@@ -369,7 +377,7 @@ def _sqlalchemy_inline_count_flow(
         else:
             # No rows returned: the offset is likely past the end of the result set.
             # The inline count cannot be extracted, so fall back to a separate query.
-            total = yield from _total_flow(query, conn, None, True)
+            total = yield from _total_flow(query, conn, count_query, subquery_count)
 
     items = _unwrap_items(result, query, unwrap_mode)
 
@@ -454,6 +462,8 @@ def _sqlalchemy_flow(
             query,
             params,
             inline_count,
+            count_query=count_query,
+            subquery_count=subquery_count,
             unwrap_mode=unwrap_mode,
             transformer=transformer,
             additional_data=additional_data,
@@ -558,10 +568,16 @@ async def paginate(
 
 
 def paginate(*args: Any, **kwargs: Any) -> Any:
-    if args and isinstance(args[0], Query) and kwargs.get("inline_count") is not None:
-        raise TypeError(
-            "inline_count is not supported with the legacy SQLAlchemy Query API; use a Select-based query instead"
-        )
+    # Guard must run before _prepare_query converts Query → Select, which would
+    # make isinstance(query, Query) always False after arg parsing.
+    if kwargs.get("inline_count") is not None:
+        raw_query = args[0] if args else None
+        if not isinstance(raw_query, Query):
+            raw_query = args[1] if len(args) >= 2 else kwargs.get("query")
+        if isinstance(raw_query, Query):
+            raise TypeError(
+                "inline_count is not supported with the legacy SQLAlchemy Query API; use a Select-based query instead"
+            )
 
     try:
         assert args

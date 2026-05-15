@@ -412,3 +412,23 @@ class TestSQLAlchemyInlineCount:
         assert page.total == len(entities)
         assert len(page.items) == 10
         assert all(isinstance(item, sa_user) for item in page.items)
+
+    def test_inline_count_distinct_preserves_order(self, sa_session, sa_user, sa_order, entities):
+        """ORDER BY must be preserved when DISTINCT wraps the query in a subquery."""
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page_asc = paginate(
+                session,
+                select(sa_user).join(sa_order).distinct().order_by(sa_user.id.asc()),
+                params=Params(page=1, size=100),
+                inline_count=func.count().over(),
+            )
+
+        ids = [item.id for item in page_asc.items]
+        assert ids == sorted(ids), "Items must be returned in ascending id order"
+
+    def test_inline_count_legacy_query_new_style_raises(self, sa_session, sa_user):
+        """paginate(conn, legacy_Query, inline_count=...) must raise TypeError."""
+        with closing(sa_session()) as session:
+            legacy_query = session.query(sa_user)
+            with pytest.raises(TypeError, match="inline_count is not supported"):
+                paginate(session, legacy_query, inline_count=func.count().over())
