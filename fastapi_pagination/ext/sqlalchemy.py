@@ -10,22 +10,18 @@ __all__ = [
     "paginate",
 ]
 
-_INLINE_COUNT_LABEL = "__pagination_inline_count__"
-
 import warnings
 from collections.abc import Sequence
 from contextlib import suppress
 from functools import partial
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias, TypeVar, cast, overload
 
-from sqlalchemy.sql.elements import ColumnElement
-
 from sqlalchemy import func, select, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy.orm import Query, Session, noload, scoped_session
+from sqlalchemy.orm import Query, Session, aliased, noload, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
-from sqlalchemy.sql.elements import TextClause
+from sqlalchemy.sql.elements import ColumnElement, TextClause
 from typing_extensions import TypeVarTuple, Unpack, deprecated
 
 from fastapi_pagination.api import create_page
@@ -35,7 +31,6 @@ from fastapi_pagination.flow import flow, run_async_flow, run_sync_flow
 from fastapi_pagination.flows import CursorFlow, LimitOffsetFlow, TotalFlow, create_page_flow, generic_flow
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 from fastapi_pagination.utils import verify_params
-
 
 from .raw_sql import create_count_query_from_text as _create_count_query_from_text
 from .raw_sql import create_paginate_query_from_text as _create_paginate_query_from_text
@@ -83,6 +78,8 @@ except ImportError:  # pragma: no cover
     paging = None  # type: ignore[ty:invalid-assignment]
     apaging = None  # type: ignore[ty:invalid-assignment]
 
+
+_INLINE_COUNT_LABEL = "__pagination_inline_count__"
 
 AsyncConn: TypeAlias = "AsyncSession | AsyncConnection | async_scoped_session[Any]"
 SyncConn: TypeAlias = "Session | Connection | scoped_session[Any]"
@@ -290,7 +287,25 @@ def _limit_offset_flow(query: Selectable, conn: AnyConn, raw_params: RawParams) 
     return items
 
 
+def _get_orm_entity(query: Select[Any]) -> type[Any] | None:
+    cols_desc = query.column_descriptions
+    if len(cols_desc) != 1:
+        return None
+    desc = cols_desc[0]
+    entity = desc.get("entity")
+    if entity is None or desc.get("aliased"):
+        return None
+    expr = desc.get("expr")
+    return entity if (expr is not None and expr is entity) else None
+
+
 def _apply_inline_count(query: Select[Any], inline_count: ColumnElement[int]) -> Select[Any]:
+    if getattr(query, "_distinct", False):
+        subq = query.subquery()
+        entity = _get_orm_entity(query)
+        outer = select(aliased(entity, subq, flat=True)) if entity is not None else select(subq)
+        return outer.add_columns(inline_count.label(_INLINE_COUNT_LABEL))
+
     return query.add_columns(inline_count.label(_INLINE_COUNT_LABEL))
 
 
@@ -521,13 +536,33 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
     try:
         assert args
         assert isinstance(args[0], Query)
-        query, count_query, inline_count, conn, params, transformer, additional_data, unique, subquery_count, unwrap_mode, config = (
-            _old_paginate_sign(*args, **kwargs)
-        )
+        (
+            query,
+            count_query,
+            inline_count,
+            conn,
+            params,
+            transformer,
+            additional_data,
+            unique,
+            subquery_count,
+            unwrap_mode,
+            config,
+        ) = _old_paginate_sign(*args, **kwargs)
     except (TypeError, AssertionError):
-        query, count_query, inline_count, conn, params, transformer, additional_data, unique, subquery_count, unwrap_mode, config = (
-            _new_paginate_sign(*args, **kwargs)
-        )
+        (
+            query,
+            count_query,
+            inline_count,
+            conn,
+            params,
+            transformer,
+            additional_data,
+            unique,
+            subquery_count,
+            unwrap_mode,
+            config,
+        ) = _new_paginate_sign(*args, **kwargs)
 
     try:
         _get_sync_conn_from_async(conn)
@@ -633,7 +668,19 @@ def _new_paginate_sign(
     query = _prepare_query(query)
     count_query = _prepare_query(count_query)  # type: ignore[ty:no-matching-overload]
 
-    return query, count_query, inline_count, conn, params, transformer, additional_data, unique, subquery_count, unwrap_mode, config
+    return (
+        query,
+        count_query,
+        inline_count,
+        conn,
+        params,
+        transformer,
+        additional_data,
+        unique,
+        subquery_count,
+        unwrap_mode,
+        config,
+    )
 
 
 async def apaginate(

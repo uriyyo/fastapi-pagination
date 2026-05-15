@@ -339,3 +339,26 @@ class TestSQLAlchemyInlineCount:
 
         assert page.total == len(entities)
         assert all(item.id is not None and item.name is not None for item in page.items)
+
+    def test_inline_count_distinct_total_is_correct(self, sa_session, sa_user, sa_order, entities):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                select(sa_user).join(sa_order).distinct(),
+                params=Params(page=1, size=10),
+                inline_count=func.count().over(),
+            )
+
+        expected_total = len({e.id for e in entities})
+        assert page.total == expected_total
+
+    def test_inline_count_distinct_items_are_model_instances(self, sa_session, sa_user, sa_order, entities):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                select(sa_user).join(sa_order).distinct(),
+                params=Params(page=1, size=10),
+                inline_count=func.count().over(),
+            )
+
+        assert all(isinstance(item, sa_user) for item in page.items)
