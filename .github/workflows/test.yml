@@ -35,9 +35,9 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
-      - name: Install dependencies
-        run: |
-          uv sync --all-extras --dev
+      # - name: Install dependencies
+      #   run: |
+      #     uv sync --all-extras --dev
 
       # - name: Cache Docker images
       #   uses: ScribeMD/docker-cache@0.5.0

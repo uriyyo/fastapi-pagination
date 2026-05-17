@@ -5,6 +5,13 @@ set -ex
 PYDANTIC_V2="${PYDANTIC_V2:-true}"
 PYDANTIC_PRE_V2_12_5="${PYDANTIC_PRE_V2_12_5:-false}"
 FASTAPI_PRE_0_112_4="${FASTAPI_PRE_0_112_4:-false}"
+SYNC_EXTRA_ARGS=()
+TEST_EXTRA_ARGS=()
+
+if [[ "$PY_VERSION" == "3.14" ]]; then
+    SYNC_EXTRA_ARGS+=(--no-extra ormar)
+    TEST_EXTRA_ARGS+=(-m "not ormar")
+fi
 
 function _pip() {
     uv pip "$@" || true > /dev/null
@@ -14,11 +21,12 @@ function _pytest() {
     uv run --no-project pytest "$@"     \
       --cov=fastapi_pagination          \
       --cov-append                      \
-      --cov-report=xml
+      --cov-report=xml                  \
+      "${TEST_EXTRA_ARGS[@]}"
 }
 
 function _restore_env() {
-    uv sync --all-extras --dev
+    uv sync --all-extras --dev "${SYNC_EXTRA_ARGS[@]}"
 }
 
 echo "Installing dependencies"
