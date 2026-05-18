@@ -29,12 +29,19 @@ from fastapi_pagination.api import create_page
 from fastapi_pagination.bases import AbstractParams, CursorRawParams, RawParams
 from fastapi_pagination.config import Config
 from fastapi_pagination.flow import flow, run_async_flow, run_sync_flow
-from fastapi_pagination.flows import CursorFlow, LimitOffsetFlow, TotalFlow, create_page_flow, generic_flow
+from fastapi_pagination.flows import (
+    CursorFlow,
+    LimitOffsetFlow,
+    TotalFlow,
+    additional_data_flow,
+    create_page_flow,
+    generic_flow,
+)
 from fastapi_pagination.types import (
     AdditionalData,
-    AdditionalDataCallable,
     AsyncItemsTransformer,
     ItemsTransformer,
+    SyncAdditionalData,
     SyncItemsTransformer,
 )
 from fastapi_pagination.utils import verify_params
@@ -387,10 +394,7 @@ def _sqlalchemy_inline_count_flow(
 
     items = _unwrap_items(result, query, unwrap_mode)
 
-    if not isinstance(additional_data, dict) and additional_data is not None:
-        resolved_additional_data: dict[str, Any] = cast(AdditionalDataCallable, additional_data)(result)
-    else:
-        resolved_additional_data = cast(dict[str, Any], additional_data or {})
+    resolved_additional_data = yield from additional_data_flow(result, additional_data)
 
     page = yield from create_page_flow(
         items,
@@ -535,7 +539,7 @@ def paginate(
     subquery_count: bool = True,
     unwrap_mode: UnwrapMode | None = None,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     unique: bool = True,
     config: Config | None = None,
 ) -> Any:
@@ -553,7 +557,7 @@ def paginate(
     subquery_count: bool = True,
     unwrap_mode: UnwrapMode | None = None,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     unique: bool = True,
     config: Config | None = None,
 ) -> Any:

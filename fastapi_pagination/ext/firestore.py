@@ -24,7 +24,7 @@ from fastapi_pagination.config import Config
 from fastapi_pagination.ext.utils import generic_query_apply_params
 from fastapi_pagination.flow import AnyFlow, Flow, flow, run_async_flow, run_sync_flow
 from fastapi_pagination.flows import CursorFlow, LimitOffsetFlow, TotalFlow, generic_flow
-from fastapi_pagination.types import AdditionalData, ItemsTransformer, SyncItemsTransformer
+from fastapi_pagination.types import AdditionalData, ItemsTransformer, SyncAdditionalData, SyncItemsTransformer
 
 TQuery = TypeVar("TQuery", Query, AsyncQuery)
 
@@ -161,7 +161,7 @@ def paginate(
     raw: bool = False,
     transaction: Transaction | None = None,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
     return run_sync_flow(

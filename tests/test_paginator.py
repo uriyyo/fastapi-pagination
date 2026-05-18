@@ -37,6 +37,18 @@ def test_paginator_additional_data():
     assert page == CustomPage(items=[], total=0, page=1, pages=0, size=50, new_field=10)
 
 
+def test_paginator_additional_data_callable():
+    with set_page(CustomPage):
+        page = paginate(
+            [1, 2, 3],
+            Params(page=1, size=2),
+            additional_data=lambda items: {"new_field": sum(items)},
+        )
+
+    assert page.items == [1, 2]
+    assert page.new_field == 3
+
+
 def test_explicit_params():
     page = paginate([], Params(page=2, size=10))
 

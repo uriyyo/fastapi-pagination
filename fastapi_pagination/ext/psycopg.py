@@ -14,7 +14,7 @@ from fastapi_pagination.bases import AbstractParams, RawParams
 from fastapi_pagination.config import Config
 from fastapi_pagination.flow import flow, run_async_flow, run_sync_flow
 from fastapi_pagination.flows import generic_flow
-from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer
+from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncAdditionalData
 
 from .raw_sql import create_count_query_from_text, create_paginate_query_from_text
 
@@ -115,7 +115,7 @@ def paginate(
     query_params: _QueryParams | None = None,
     transformer: ItemsTransformer | None = None,
     params: AbstractParams | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
     resolved = _resolve_query_args(args, query_params)

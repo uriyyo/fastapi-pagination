@@ -12,7 +12,13 @@ from typing_extensions import deprecated
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
-from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
+from fastapi_pagination.types import (
+    AdditionalData,
+    AsyncItemsTransformer,
+    ItemsTransformer,
+    SyncAdditionalData,
+    SyncItemsTransformer,
+)
 
 from .sqlalchemy import apaginate as _apaginate
 from .sqlalchemy import paginate as _paginate
@@ -50,7 +56,7 @@ def paginate(
     count_query: _InputCountQuery[TSQLModel, T] | None = None,
     subquery_count: bool = True,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     unique: bool = True,
     config: Config | None = None,
 ) -> Any:

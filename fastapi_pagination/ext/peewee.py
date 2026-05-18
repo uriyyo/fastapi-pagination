@@ -28,6 +28,7 @@ from fastapi_pagination.types import (
     AdditionalData,
     AsyncItemsTransformer,
     ItemsTransformer,
+    SyncAdditionalData,
     SyncItemsTransformer,
 )
 
@@ -188,7 +189,7 @@ def paginate(
     db: Database | None = None,
     prefetch: tuple[Query, ...] | None = None,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
     pass
@@ -202,7 +203,7 @@ def paginate(
     db: Database,
     prefetch: tuple[Query, ...] | None = None,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
     pass
@@ -215,7 +216,7 @@ def paginate(
     db: Database | None = None,
     prefetch: tuple[Query, ...] | None = None,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
     actual_query, actual_db = _resolve_query_and_db(query, db)

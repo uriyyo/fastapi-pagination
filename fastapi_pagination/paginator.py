@@ -7,7 +7,7 @@ from .bases import AbstractParams
 from .config import Config
 from .flow import flow_expr, run_sync_flow
 from .flows import generic_flow
-from .types import AdditionalData, SyncItemsTransformer
+from .types import SyncAdditionalData, SyncItemsTransformer
 from .utils import check_installed_extensions
 
 T = TypeVar("T")
@@ -20,7 +20,7 @@ def paginate(
     *,
     safe: bool = False,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
     if not safe:

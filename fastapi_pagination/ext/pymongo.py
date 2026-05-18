@@ -9,7 +9,7 @@ __all__ = [
 
 
 from collections.abc import Mapping, Sequence
-from typing import Any, Literal, TypeVar, cast
+from typing import Any, Literal, TypeVar
 
 from pymongo.asynchronous.collection import AsyncCollection
 from pymongo.collection import Collection
@@ -19,8 +19,8 @@ from fastapi_pagination.config import Config
 from fastapi_pagination.ext.mongo import AggrPipelineTransformer
 from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.flow import flow, flow_expr, run_async_flow, run_sync_flow
-from fastapi_pagination.flows import create_page_flow, generic_flow
-from fastapi_pagination.types import AdditionalData, AdditionalDataCallable, ItemsTransformer, SyncItemsTransformer
+from fastapi_pagination.flows import additional_data_flow, create_page_flow, generic_flow
+from fastapi_pagination.types import AdditionalData, ItemsTransformer, SyncAdditionalData, SyncItemsTransformer
 from fastapi_pagination.utils import verify_params
 
 T = TypeVar("T", bound=Mapping[str, Any])
@@ -34,7 +34,7 @@ def paginate(
     sort: Sequence[Any] | None = None,
     *,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     config: Config | None = None,
     **kwargs: Any,
 ) -> Any:
@@ -148,12 +148,7 @@ def _aggregate_flow(
     except IndexError:
         total = 0
 
-    if isinstance(additional_data, dict):
-        resolved_additional_data: dict[str, Any] | None = cast(dict[str, Any], additional_data)
-    elif additional_data is not None:
-        resolved_additional_data = cast(AdditionalDataCallable, additional_data)(items)
-    else:
-        resolved_additional_data = None
+    resolved_additional_data = yield from additional_data_flow(items, additional_data)
 
     page = yield from create_page_flow(
         items,
@@ -200,7 +195,7 @@ def paginate_aggregate(
     params: AbstractParams | None = None,
     *,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     aggregation_filter_end: int | Literal["auto"] | None = None,
     aggregation_pipeline_transformer: AggrPipelineTransformer | None = None,
     config: Config | None = None,

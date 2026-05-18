@@ -35,3 +35,6 @@ async def get_nums(is_admin: bool = False) -> CustomPage[int]:
         }
     )
 ```
+
+`additional_data` can also be a callable. The callable receives the current page items and should return a dictionary
+with values for the extra fields. In `fastapi_pagination.async_paginator.apaginate`, that callable may be async.

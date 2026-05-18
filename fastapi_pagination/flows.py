@@ -12,14 +12,14 @@ __all__ = [
 
 from collections.abc import Callable, Sequence
 from contextlib import ExitStack
-from typing import Any, Protocol, TypeAlias, cast
+from typing import Any, Protocol, TypeAlias
 
 from .api import apply_items_transformer, create_page, set_page
 from .bases import AbstractParams, CursorRawParams, RawParams, is_cursor, is_limit_offset
 from .config import Config
 from .flow import AnyFlow, flow
-from .types import AdditionalData, AdditionalDataCallable, ItemsTransformer, ParamsType
-from .utils import verify_params
+from .types import AdditionalData, AdditionalDataResult, ItemsTransformer, ParamsType
+from .utils import is_additional_data_callable, verify_params
 
 LimitOffsetFlow: TypeAlias = AnyFlow
 CursorFlow: TypeAlias = AnyFlow[tuple[Any, dict[str, Any] | None]]
@@ -78,6 +78,18 @@ def create_page_flow(
 
 
 @flow
+def additional_data_flow(
+    items: Sequence[Any],
+    additional_data: AdditionalData | None = None,
+) -> AnyFlow[AdditionalDataResult]:
+    if is_additional_data_callable(additional_data):
+        resolved = yield additional_data(items)
+        return resolved
+
+    return additional_data or {}
+
+
+@flow
 def generic_flow(  # noqa: C901, PLR0912
     *,
     limit_offset_flow: LimitOffsetFlowFunc | None = None,
@@ -130,10 +142,11 @@ def generic_flow(  # noqa: C901, PLR0912
             async_=async_,
         )
 
-    if not isinstance(additional_data, dict) and additional_data is not None:
-        resolved_data: dict[str, Any] = cast(AdditionalDataCallable, additional_data)(items)
-    else:
-        resolved_data = cast(dict[str, Any], additional_data or {})
+    resolved_data = yield from additional_data_flow(
+        items,
+        additional_data,
+    )
+
     if cursor_data:
         resolved_data.update(cursor_data)
 

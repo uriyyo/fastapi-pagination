@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Literal, TypeVar, cast
+from typing import Any, Literal, TypeVar
 
 from bunnet import Document
 from bunnet.odm.enums import SortDirection
@@ -13,8 +13,8 @@ from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.ext.mongo import AggrPipelineTransformer
 from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
-from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
-from fastapi_pagination.utils import verify_params
+from fastapi_pagination.types import SyncAdditionalData, SyncItemsTransformer
+from fastapi_pagination.utils import sync_resolve_additional_data, verify_params
 
 TDocument = TypeVar("TDocument", bound=Document)
 
@@ -25,7 +25,7 @@ def paginate(
     params: AbstractParams | None = None,
     *,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     projection_model: type[DocumentProjectionType] | None = None,
     sort: None | str | list[tuple[str, SortDirection]] = None,
     session: ClientSession | None = None,
@@ -97,11 +97,12 @@ def paginate(
         else:
             total = None
 
+    resolved_additional_data = sync_resolve_additional_data(items, additional_data)
     t_items = apply_items_transformer(items, transformer)
 
     return create_page(
         t_items,
         total=total,
         params=params,
-        **(cast(dict[str, Any], additional_data) if isinstance(additional_data, dict) else {}),
+        **resolved_additional_data,
     )
