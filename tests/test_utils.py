@@ -26,10 +26,23 @@ def test_get_caller():
     assert utils.get_caller(depth=1_000) is None
 
 
-def test_sync_resolve_additional_data_allows_none():
-    assert utils.sync_resolve_additional_data([], None) == {}
+def _sync_resolve_additional_data(items):
+    return {"count": len(items)}
+
+
+def test_sync_resolve_additional_data():
+    assert utils.sync_resolve_additional_data([1, 2, 3], None) == {}
+    assert utils.sync_resolve_additional_data([1, 2, 3], {}) == {}
+    assert utils.sync_resolve_additional_data([1, 2, 3], _sync_resolve_additional_data) == {"count": 3}
+
+
+async def _async_resolve_additional_data(items):
+    return {"count": len(items)}
 
 
 @pytest.mark.asyncio
-async def test_async_resolve_additional_data_allows_none():
-    assert await utils.async_resolve_additional_data([], None) == {}
+async def test_async_resolve_additional_data():
+    assert await utils.async_resolve_additional_data([1, 2, 3], None) == {}
+    assert await utils.async_resolve_additional_data([1, 2, 3], {}) == {}
+    assert await utils.async_resolve_additional_data([1, 2, 3], _sync_resolve_additional_data) == {"count": 3}
+    assert await utils.async_resolve_additional_data([1, 2, 3], _async_resolve_additional_data) == {"count": 3}
