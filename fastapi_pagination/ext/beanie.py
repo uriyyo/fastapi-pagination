@@ -4,7 +4,7 @@ __all__ = ["apaginate", "paginate"]
 
 import inspect
 from copy import copy
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal, TypeVar, cast
 
 from beanie import Document, PydanticObjectId
 from beanie.odm.enums import SortDirection
@@ -52,8 +52,9 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
     **pymongo_kwargs: Any,
 ) -> Any:
     params, raw_params = verify_params(params, "limit-offset", "cursor")
-    if additional_data is None:
+    if not isinstance(additional_data, dict):
         additional_data = {}
+    additional_data = cast(dict[str, Any], additional_data)
 
     cursor = getattr(raw_params, "cursor", None)
     if isinstance(query, AggregationQuery):

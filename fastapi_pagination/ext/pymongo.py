@@ -9,7 +9,7 @@ __all__ = [
 
 
 from collections.abc import Mapping, Sequence
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal, TypeVar, cast
 
 from pymongo.asynchronous.collection import AsyncCollection
 from pymongo.collection import Collection
@@ -153,7 +153,7 @@ def _aggregate_flow(
         params,
         total=total,
         transformer=transformer,
-        additional_data=additional_data,
+        additional_data=cast(dict[str, Any], additional_data) if isinstance(additional_data, dict) else None,
         config=config,
         async_=is_async,
     )

@@ -12,21 +12,21 @@ __all__ = [
 
 from collections.abc import Callable, Sequence
 from contextlib import ExitStack
-from typing import Any, Protocol, TypeAlias
+from typing import Any, Protocol, TypeAlias, cast
 
 from .api import apply_items_transformer, create_page, set_page
 from .bases import AbstractParams, CursorRawParams, RawParams, is_cursor, is_limit_offset
 from .config import Config
 from .flow import AnyFlow, flow
-from .types import AdditionalData, ItemsTransformer, ParamsType
+from .types import AdditionalData, AdditionalDataCallable, ItemsTransformer, ParamsType
 from .utils import verify_params
 
 LimitOffsetFlow: TypeAlias = AnyFlow
-CursorFlow: TypeAlias = AnyFlow[tuple[Any, AdditionalData | None]]
+CursorFlow: TypeAlias = AnyFlow[tuple[Any, dict[str, Any] | None]]
 TotalFlow: TypeAlias = AnyFlow[int | None]
 
 LimitOffsetFlowFunc: TypeAlias = Callable[[RawParams], AnyFlow]
-CursorFlowFunc: TypeAlias = Callable[[CursorRawParams], AnyFlow[tuple[Any, AdditionalData | None]]]
+CursorFlowFunc: TypeAlias = Callable[[CursorRawParams], AnyFlow[tuple[Any, dict[str, Any] | None]]]
 TotalFlowFunc: TypeAlias = Callable[[], AnyFlow[int | None]]
 
 
@@ -78,7 +78,7 @@ def create_page_flow(
 
 
 @flow
-def generic_flow(  # noqa: C901
+def generic_flow(  # noqa: C901, PLR0912
     *,
     limit_offset_flow: LimitOffsetFlowFunc | None = None,
     cursor_flow: CursorFlowFunc | None = None,
@@ -101,7 +101,6 @@ def generic_flow(  # noqa: C901
         raise ValueError("At least one flow must be provided")
 
     params, raw_params = verify_params(params, *types)
-    additional_data = additional_data or {}
 
     total = None
     if raw_params.include_total:
@@ -110,6 +109,7 @@ def generic_flow(  # noqa: C901
 
         total = yield from total_flow()
 
+    cursor_data: dict[str, Any] | None = None
     if is_limit_offset(raw_params):
         if limit_offset_flow is None:
             raise ValueError("limit_offset_flow is required for 'limit-offset' params")
@@ -119,8 +119,7 @@ def generic_flow(  # noqa: C901
         if cursor_flow is None:
             raise ValueError("cursor_flow is required for 'cursor' params")
 
-        items, more_data = yield from cursor_flow(raw_params)
-        additional_data.update(more_data or {})
+        items, cursor_data = yield from cursor_flow(raw_params)
     else:
         raise ValueError("Invalid params type")
 
@@ -131,12 +130,19 @@ def generic_flow(  # noqa: C901
             async_=async_,
         )
 
+    if not isinstance(additional_data, dict) and additional_data is not None:
+        resolved_data: dict[str, Any] = cast(AdditionalDataCallable, additional_data)(items)
+    else:
+        resolved_data = cast(dict[str, Any], additional_data or {})
+    if cursor_data:
+        resolved_data.update(cursor_data)
+
     page = yield from create_page_flow(
         items,
         params,
         total=total,
         transformer=transformer,
-        additional_data=additional_data,
+        additional_data=resolved_data,
         config=config,
         async_=async_,
         create_page_factory=create_page_factory,
