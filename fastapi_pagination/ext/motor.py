@@ -15,7 +15,7 @@ from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.ext.mongo import AggrPipelineTransformer
 from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
-from fastapi_pagination.utils import verify_params
+from fastapi_pagination.utils import async_resolve_additional_data, verify_params
 
 if TYPE_CHECKING:
     _AgnosticCollection: TypeAlias = AgnosticCollection[Any]
@@ -44,13 +44,14 @@ async def apaginate(
         cursor = cursor.sort(*sort) if isinstance(sort, tuple) else cursor.sort(sort)
 
     items = await cursor.to_list(length=raw_params.limit)
+    resolved_additional_data = await async_resolve_additional_data(items, additional_data)
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
     return create_page(
         t_items,
         total=total,
         params=params,
-        **(additional_data or {}),
+        **resolved_additional_data,
     )
 
 
@@ -104,13 +105,14 @@ async def apaginate_aggregate(
     except IndexError:
         total = 0
 
+    resolved_additional_data = await async_resolve_additional_data(items, additional_data)
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
     return create_page(
         t_items,
         total=total,
         params=params,
-        **(additional_data or {}),
+        **resolved_additional_data,
     )
 
 

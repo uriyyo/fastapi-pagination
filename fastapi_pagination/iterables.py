@@ -18,7 +18,7 @@ from .optional import OptionalLimitOffsetPage as LimitOffsetPage
 from .optional import OptionalLimitOffsetParams as LimitOffsetParams
 from .optional import OptionalPage as Page
 from .optional import OptionalParams as Params
-from .types import AdditionalData, SyncItemsTransformer
+from .types import SyncAdditionalData, SyncItemsTransformer
 
 
 def paginate(
@@ -27,7 +27,7 @@ def paginate(
     total: int | None = None,
     *,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
     return run_sync_flow(

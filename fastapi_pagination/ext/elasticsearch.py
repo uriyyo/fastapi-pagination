@@ -12,7 +12,7 @@ from fastapi_pagination.bases import AbstractParams, CursorRawParams
 from fastapi_pagination.config import Config
 from fastapi_pagination.flow import flow, flow_expr, run_sync_flow
 from fastapi_pagination.flows import CursorFlow, generic_flow
-from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
+from fastapi_pagination.types import SyncAdditionalData, SyncItemsTransformer
 
 
 @flow
@@ -40,7 +40,7 @@ def paginate(
     params: AbstractParams | None = None,
     *,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
     return run_sync_flow(

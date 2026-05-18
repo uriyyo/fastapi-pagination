@@ -24,3 +24,12 @@ def test_check_installed_extensions_disabled(recwarn):
 
 def test_get_caller():
     assert utils.get_caller(depth=1_000) is None
+
+
+def test_sync_resolve_additional_data_allows_none():
+    assert utils.sync_resolve_additional_data([], None) == {}
+
+
+@pytest.mark.asyncio
+async def test_async_resolve_additional_data_allows_none():
+    assert await utils.async_resolve_additional_data([], None) == {}

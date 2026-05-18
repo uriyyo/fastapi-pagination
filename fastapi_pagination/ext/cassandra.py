@@ -1,7 +1,7 @@
 __all__ = ["paginate"]
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, cast
+from typing import Any, TypeVar
 
 from cassandra.cluster import SimpleStatement
 from cassandra.cqlengine import connection
@@ -9,8 +9,8 @@ from cassandra.cqlengine.models import Model
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams
-from fastapi_pagination.types import AdditionalData, SyncItemsTransformer
-from fastapi_pagination.utils import verify_params
+from fastapi_pagination.types import SyncAdditionalData, SyncItemsTransformer
+from fastapi_pagination.utils import sync_resolve_additional_data, verify_params
 
 T = TypeVar("T", bound=Mapping[str, Any])
 
@@ -21,7 +21,7 @@ def paginate(
     params: AbstractParams | None = None,
     *,
     transformer: SyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
+    additional_data: SyncAdditionalData | None = None,
 ) -> Any:
     params, raw_params = verify_params(params, "cursor")
     assert not raw_params.include_total, "Cassandra does not support total count"
@@ -39,11 +39,12 @@ def paginate(
         paging_state=raw_params.cursor,
     )
     items = cursor.current_rows
+    resolved_additional_data = sync_resolve_additional_data(items, additional_data)
+    resolved_additional_data["next_"] = cursor.paging_state
     t_items = apply_items_transformer(items, transformer)
 
     return create_page(
         t_items,
         params=params,
-        next_=cursor.paging_state,
-        **(cast(dict[str, Any], additional_data) if isinstance(additional_data, dict) else {}),
+        **resolved_additional_data,
     )

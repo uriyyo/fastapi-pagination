@@ -3,14 +3,17 @@ from __future__ import annotations
 __all__ = [
     "IS_PYDANTIC_V2",
     "FastAPIPaginationWarning",
+    "async_resolve_additional_data",
     "await_if_async",
     "await_if_coro",
     "check_installed_extensions",
     "create_pydantic_model",
     "disable_installed_extensions_check",
     "get_caller",
+    "is_additional_data_callable",
     "is_async_callable",
     "is_coro",
+    "sync_resolve_additional_data",
     "unwrap_annotated",
     "verify_params",
 ]
@@ -18,10 +21,18 @@ __all__ = [
 import functools
 import inspect
 import warnings
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from typing import TYPE_CHECKING, Annotated, Any, Literal, TypeVar, cast, get_origin, overload
 
-from typing_extensions import ParamSpec
+from typing_extensions import ParamSpec, TypeIs
+
+from .types import (
+    AdditionalData,
+    AdditionalDataResult,
+    AsyncAdditionalDataCallable,
+    SyncAdditionalData,
+    SyncAdditionalDataCallable,
+)
 
 if TYPE_CHECKING:
     from .bases import AbstractParams, BaseRawParams, CursorRawParams, RawParams
@@ -211,3 +222,29 @@ def unwrap_annotated(ann: Any) -> Any:
         return ann.__args__[0]
 
     return ann
+
+
+def sync_resolve_additional_data(
+    items: Sequence[Any],
+    additional_data: SyncAdditionalData | None,
+) -> AdditionalDataResult:
+    if callable(additional_data):
+        return additional_data(items)  # type: ignore[ty:call-top-callable]
+
+    return additional_data or {}
+
+
+async def async_resolve_additional_data(
+    items: Sequence[Any],
+    additional_data: AdditionalData | None,
+) -> AdditionalDataResult:
+    if callable(additional_data):
+        return await await_if_coro(additional_data(items))  # type: ignore[ty:call-top-callable]
+
+    return cast(AdditionalDataResult, additional_data) or {}
+
+
+def is_additional_data_callable(
+    additional_data: AdditionalData | None,
+) -> TypeIs[SyncAdditionalDataCallable | AsyncAdditionalDataCallable]:
+    return callable(additional_data)
