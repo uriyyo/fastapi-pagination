@@ -20,7 +20,7 @@ from fastapi_pagination.ext.mongo import AggrPipelineTransformer
 from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.flow import flow, flow_expr, run_async_flow, run_sync_flow
 from fastapi_pagination.flows import create_page_flow, generic_flow
-from fastapi_pagination.types import AdditionalData, ItemsTransformer, SyncItemsTransformer
+from fastapi_pagination.types import AdditionalData, AdditionalDataCallable, ItemsTransformer, SyncItemsTransformer
 from fastapi_pagination.utils import verify_params
 
 T = TypeVar("T", bound=Mapping[str, Any])
@@ -148,12 +148,19 @@ def _aggregate_flow(
     except IndexError:
         total = 0
 
+    if isinstance(additional_data, dict):
+        resolved_additional_data: dict[str, Any] | None = cast(dict[str, Any], additional_data)
+    elif additional_data is not None:
+        resolved_additional_data = cast(AdditionalDataCallable, additional_data)(items)
+    else:
+        resolved_additional_data = None
+
     page = yield from create_page_flow(
         items,
         params,
         total=total,
         transformer=transformer,
-        additional_data=cast(dict[str, Any], additional_data) if isinstance(additional_data, dict) else None,
+        additional_data=resolved_additional_data,
         config=config,
         async_=is_async,
     )

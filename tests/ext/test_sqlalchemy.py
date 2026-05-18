@@ -479,7 +479,7 @@ class TestSQLAlchemyInlineCount:
         assert page.fallback == "empty"
         assert page.total == 0
 
-    def test_inline_additional_data_callable_requires_inline_count(self, sa_session, sa_user, entities):
+    def test_callable_additional_data_without_inline_count(self, sa_session, sa_user, entities):
         """Callable additional_data works without inline_count, receiving unwrapped items."""
         CustomPage = CustomizedPage[Page[Any], UseAdditionalFields(page_item_count=(int, ...))]
 
