@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from fastapi_pagination import Page, Params, set_page, set_params
 from fastapi_pagination.cursor import CursorPage
-from fastapi_pagination.customization import CustomizedPage, UseQuotedCursor
+from fastapi_pagination.customization import CustomizedPage, UseAdditionalFields, UseQuotedCursor
 from fastapi_pagination.ext.sqlalchemy import apaginate, paginate
 from tests.base import BasePaginationTestSuite, SuiteBuilder, async_sync_testsuite, sync_testsuite
 from tests.ext.utils import is_sqlalchemy20
@@ -432,3 +432,63 @@ class TestSQLAlchemyInlineCount:
             legacy_query = session.query(sa_user)
             with pytest.raises(TypeError, match="inline_count is not supported"):
                 paginate(session, legacy_query, inline_count=func.count().over())
+
+    def test_inline_additional_data_callable_basic(self, sa_session, sa_user, entities):
+        """Callable additional_data extracts aggregated values from raw rows."""
+
+        CustomPage = CustomizedPage[Page[Any], UseAdditionalFields(user_count_sum=(int, ...))]
+
+        stmt = select(
+            sa_user,
+            func.count(sa_user.id).over().label("_inline_total"),
+        ).order_by(sa_user.id)
+
+        def extract(rows):
+            return {"user_count_sum": rows[0]._mapping["_inline_total"] if rows else 0}
+
+        with closing(sa_session()) as session, set_page(CustomPage):
+            page = paginate(
+                session,
+                stmt,
+                params=Params(page=1, size=10),
+                inline_count=func.count().over(),
+                additional_data=extract,
+            )
+
+        assert page.user_count_sum == page.total
+
+    def test_inline_additional_data_callable_empty_page(self, sa_session, sa_user):
+        """Callable receives an empty list when query returns no rows."""
+
+        CustomPage = CustomizedPage[Page[Any], UseAdditionalFields(fallback=(str, ...))]
+
+        stmt = select(sa_user).where(sa_user.id == -999)
+
+        def extract(rows):
+            return {"fallback": "empty" if not rows else "found"}
+
+        with closing(sa_session()) as session, set_page(CustomPage):
+            page = paginate(
+                session,
+                stmt,
+                params=Params(page=1, size=10),
+                inline_count=func.count().over(),
+                additional_data=extract,
+            )
+
+        assert page.fallback == "empty"
+        assert page.total == 0
+
+    def test_callable_additional_data_without_inline_count(self, sa_session, sa_user, entities):
+        """Callable additional_data works without inline_count, receiving unwrapped items."""
+        CustomPage = CustomizedPage[Page[Any], UseAdditionalFields(page_item_count=(int, ...))]
+
+        with closing(sa_session()) as session, set_page(CustomPage):
+            page = paginate(
+                session,
+                select(sa_user),
+                params=Params(page=1, size=10),
+                additional_data=lambda items: {"page_item_count": len(items)},
+            )
+
+        assert page.page_item_count == len(page.items)

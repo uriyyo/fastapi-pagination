@@ -1,5 +1,6 @@
 __all__ = [
     "AdditionalData",
+    "AdditionalDataCallable",
     "AsyncItemsTransformer",
     "Cursor",
     "GreaterEqualOne",
@@ -15,7 +16,8 @@ from pydantic import conint
 
 Cursor: TypeAlias = str | bytes
 ParamsType: TypeAlias = Literal["cursor", "limit-offset"]
-AdditionalData: TypeAlias = dict[str, Any]
+AdditionalDataCallable: TypeAlias = Callable[[Sequence[Any]], dict[str, Any]]
+AdditionalData: TypeAlias = dict[str, Any] | AdditionalDataCallable
 
 AsyncItemsTransformer: TypeAlias = Callable[[Sequence[Any]], Sequence[Any] | Awaitable[Sequence[Any]]]
 SyncItemsTransformer: TypeAlias = Callable[[Sequence[Any]], Sequence[Any]]

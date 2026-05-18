@@ -30,7 +30,13 @@ from fastapi_pagination.bases import AbstractParams, CursorRawParams, RawParams
 from fastapi_pagination.config import Config
 from fastapi_pagination.flow import flow, run_async_flow, run_sync_flow
 from fastapi_pagination.flows import CursorFlow, LimitOffsetFlow, TotalFlow, create_page_flow, generic_flow
-from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
+from fastapi_pagination.types import (
+    AdditionalData,
+    AdditionalDataCallable,
+    AsyncItemsTransformer,
+    ItemsTransformer,
+    SyncItemsTransformer,
+)
 from fastapi_pagination.utils import verify_params
 
 from .raw_sql import create_count_query_from_text as _create_count_query_from_text
@@ -381,12 +387,17 @@ def _sqlalchemy_inline_count_flow(
 
     items = _unwrap_items(result, query, unwrap_mode)
 
+    if not isinstance(additional_data, dict) and additional_data is not None:
+        resolved_additional_data: dict[str, Any] = cast(AdditionalDataCallable, additional_data)(result)
+    else:
+        resolved_additional_data = cast(dict[str, Any], additional_data or {})
+
     page = yield from create_page_flow(
         items,
         params_obj,
         total=total,
         transformer=transformer,
-        additional_data=additional_data or {},
+        additional_data=resolved_additional_data,
         config=config,
         async_=is_async,
         create_page_factory=create_page_factory,

@@ -1,6 +1,6 @@
 __all__ = ["paginate"]
 
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal, TypeVar, cast
 
 from bunnet import Document
 from bunnet.odm.enums import SortDirection
@@ -103,5 +103,5 @@ def paginate(
         t_items,
         total=total,
         params=params,
-        **(additional_data or {}),
+        **(cast(dict[str, Any], additional_data) if isinstance(additional_data, dict) else {}),
     )

@@ -1,7 +1,7 @@
 __all__ = ["paginate"]
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 from cassandra.cluster import SimpleStatement
 from cassandra.cqlengine import connection
@@ -45,5 +45,5 @@ def paginate(
         t_items,
         params=params,
         next_=cursor.paging_state,
-        **(additional_data or {}),
+        **(cast(dict[str, Any], additional_data) if isinstance(additional_data, dict) else {}),
     )
