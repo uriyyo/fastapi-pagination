@@ -54,15 +54,15 @@ For sync `paginate`, `additional_data` can be either:
 
 For `fastapi_pagination.async_paginator.apaginate`, `additional_data` can also be an async callable.
 
-## Async `paginate` function
+## Async `apaginate` function
 
-If you want to use async `paginate` function, you can use `fastapi_pagination.async_paginator` module.
+If you want to use async pagination, you can use `apaginate` from the `fastapi_pagination.async_paginator` module.
 It exists to be able to use async `transformer` function.
 
 ```py
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination, Page
-from fastapi_pagination.async_paginator import paginate
+from fastapi_pagination.async_paginator import apaginate
 
 app = FastAPI()
 add_pagination(app)
@@ -70,10 +70,10 @@ add_pagination(app)
 # req: GET /nums?page=2&size=10
 @app.get("/nums")
 async def get_users() -> Page[int]:
-    return await paginate(range(200))
+    return await apaginate(range(200))
 ```
 
-Async `paginate` also supports async `additional_data` callbacks:
+Async `apaginate` also supports async `additional_data` callbacks:
 
 ```py
 from fastapi_pagination.async_paginator import apaginate
