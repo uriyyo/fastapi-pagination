@@ -67,12 +67,12 @@ async def another_route() -> Page[int]:
     return paginate(range(100))
 ```
 
-If `paginate` function is async, then the transformer can be async too:
+If the pagination function is async, then the transformer can be async too:
 
 ```py
 from fastapi import FastAPI
 from fastapi_pagination import Page, add_pagination
-from fastapi_pagination.async_paginator import paginate
+from fastapi_pagination.async_paginator import apaginate
 
 app = FastAPI()
 add_pagination(app)
@@ -83,5 +83,5 @@ async def transformer(items: list[int]) -> list[int]:
 # req: GET /ints?page=2&size=5
 @app.get("/ints")
 async def route() -> Page[int]:
-    return await paginate(range(100), transformer=transformer)
+    return await apaginate(range(100), transformer=transformer)
 ```
