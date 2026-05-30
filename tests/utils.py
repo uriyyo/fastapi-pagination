@@ -20,6 +20,13 @@ def parse_obj(model: type[T], obj: Any) -> T:
     return model.parse_obj(obj)
 
 
+def dump_obj(obj: T) -> dict[str, Any]:
+    if is_pydantic_v2_model(type(obj)):
+        return obj.model_dump()
+
+    return obj.dict()
+
+
 def normalize(model: type[T], *models: Any) -> list[T]:
     return [parse_obj(model, m) for m in models]
 
@@ -52,6 +59,7 @@ IS_FASTAPI_V_0_112_4_OR_NEWER = tuple(int(part) for part in __version__.split(".
 __all__ = [
     "IS_FASTAPI_V_0_112_4_OR_NEWER",
     "create_ctx",
+    "dump_obj",
     "faker",
     "maybe_async",
     "normalize",

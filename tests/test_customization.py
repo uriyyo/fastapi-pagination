@@ -14,6 +14,7 @@ from fastapi_pagination.customization import (
     UseCursorEncoding,
     UseExcludedFields,
     UseFieldsAliases,
+    UseFlattenPage,
     UseIncludeTotal,
     UseModelConfig,
     UseModule,
@@ -28,7 +29,7 @@ from fastapi_pagination.customization import (
 )
 from fastapi_pagination.pydantic import IS_PYDANTIC_V2
 from fastapi_pagination.pydantic.v1 import BaseModelV1
-from tests.utils import IS_FASTAPI_V_0_112_4_OR_NEWER
+from tests.utils import IS_FASTAPI_V_0_112_4_OR_NEWER, dump_obj
 
 
 class _NoopCustomizer(PageCustomizer):
@@ -470,3 +471,18 @@ def test_use_pydantic_v1():
 
     assert page.items == [1, 2, 3]
     assert page.total == 3
+
+
+def test_use_flatten_page():
+    CustomPage = CustomizedPage[
+        Page,
+        UseFlattenPage(),
+    ]
+
+    page = CustomPage[int].create(
+        items=["1", "2", "3"],
+        params=CustomPage.__params_type__(),
+        total=3,
+    )
+
+    assert dump_obj(page) == [1, 2, 3]

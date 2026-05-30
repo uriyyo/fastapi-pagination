@@ -11,6 +11,7 @@ __all__ = [
     "UseExcludedFields",
     "UseFieldTypeAnnotations",
     "UseFieldsAliases",
+    "UseFlattenPage",
     "UseIncludeTotal",
     "UseModelConfig",
     "UseModule",
@@ -69,6 +70,11 @@ from .types import Cursor
 from .typing_utils import create_annotated_tp
 from .utils import get_caller
 
+try:
+    from pydantic import RootModel
+except ImportError:
+    from pydantic import BaseModel as RootModel
+
 if TYPE_CHECKING:
     from .pydantic.v1 import BaseModelV1
 
@@ -77,6 +83,9 @@ ClsNamespace: TypeAlias = dict[str, Any]
 PageCls: TypeAlias = "type[AbstractPage[Any]]"
 
 TPage = TypeVar("TPage", bound=PageCls)
+
+
+_T = TypeVar("_T")
 
 
 def get_page_bases(cls: TPage) -> tuple[type[Any], ...]:
@@ -124,7 +133,7 @@ if TYPE_CHECKING:
 else:
 
     class CustomizedPage:
-        def __class_getitem__(cls, item: Any) -> Any:
+        def __class_getitem__(cls, item: Any) -> Any:  # noqa: C901
             if not isinstance(item, tuple):
                 item = (item,)
 
@@ -140,7 +149,7 @@ else:
             cls_name = f"{original_name}Customized"
 
             for customizer in customizers:
-                if not isinstance(customizer, (PageCustomizer, PageTransformer)):
+                if not isinstance(customizer, (PageCustomizer, PageTransformer, PostPageTransformer)):
                     raise TypeError(f"Expected PageCustomizer or PageTransformer, got {customizer!r}")
 
             for customizer in customizers:
@@ -171,7 +180,19 @@ else:
 
             params_type = new_params_cls(cast(type[AbstractParams], new_ns["__params_type__"]), {"__page_type__": None})
             new_ns["__params_type__"] = params_type
-            return new_page_cls(page_cls, new_ns)
+
+            new_cls = new_page_cls(page_cls, new_ns)
+            _save_point = new_cls
+
+            for customizer in customizers:
+                if isinstance(customizer, PostPageTransformer):
+                    new_cls = customizer.post_transform_page_cls(new_cls)
+
+            new_cls.__name__ = _save_point.__name__
+            new_cls.__qualname__ = _save_point.__qualname__
+            new_cls.__module__ = _save_point.__module__
+
+            return new_cls
 
 
 @runtime_checkable
@@ -185,6 +206,13 @@ class PageCustomizer(Protocol):
 class PageTransformer(Protocol):
     @abstractmethod
     def transform_page_cls(self, page_cls: PageCls) -> PageCls:
+        pass
+
+
+@runtime_checkable
+class PostPageTransformer(Protocol):
+    @abstractmethod
+    def post_transform_page_cls(self, page_cls: PageCls) -> PageCls:
         pass
 
 
@@ -617,3 +645,39 @@ class UsePydanticV1(PageTransformer):
             return page_cls
 
         return cast(PageCls, _convert_v2_page_cls_to_v1(page_cls))
+
+
+@dataclass
+class UseFlattenPage(PostPageTransformer):
+    field: str = "items"
+
+    def post_transform_page_cls(self, page_cls: PageCls) -> PageCls:
+        _is_pydantic_v2 = is_pydantic_v2_model(page_cls)
+
+        if _is_pydantic_v2:  # noqa: SIM108
+            base_cls = RootModel[list[_T]]
+        else:
+            base_cls = RootModel
+
+        class _FlattenPage(AbstractPage[_T], base_cls):  # type: ignore[ty:invalid-base]
+            if not _is_pydantic_v2:
+                __root__: list[_T]
+
+            __params_type__ = page_cls.__params_type__
+
+            @classmethod
+            def create(
+                cls,
+                items: Sequence[_T],
+                params: AbstractParams,
+                **kwargs: Any,
+            ) -> Self:
+                page = page_cls.create(items, params, **kwargs)
+                items = getattr(page, self.field)
+
+                if _is_pydantic_v2:
+                    return cls(items)  # type: ignore[ty:missing-argument]  # type: ignore[ty:too-many-positional-arguments]
+
+                return cls.parse_obj(items)
+
+        return cast(PageCls, _FlattenPage)
