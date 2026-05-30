@@ -72,7 +72,7 @@ from .utils import get_caller
 
 try:
     from pydantic import RootModel
-except ImportError:
+except ImportError:  # pragma: no cover
     from pydantic import BaseModel as RootModel
 
 if TYPE_CHECKING:
@@ -641,7 +641,7 @@ def _convert_v2_page_cls_to_v1(page_cls: type[AbstractPage], /) -> BaseModelV1:
 @dataclass
 class UsePydanticV1(PageTransformer):
     def transform_page_cls(self, page_cls: PageCls) -> PageCls:
-        if not is_pydantic_v2_model(page_cls):
+        if not is_pydantic_v2_model(page_cls):  # pragma: no cover
             return page_cls
 
         return cast(PageCls, _convert_v2_page_cls_to_v1(page_cls))
@@ -656,11 +656,11 @@ class UseFlattenPage(PostPageTransformer):
 
         if _is_pydantic_v2:  # noqa: SIM108
             base_cls = RootModel[list[_T]]
-        else:
+        else:  # pragma: no cover
             base_cls = RootModel
 
         class _FlattenPage(AbstractPage[_T], base_cls):  # type: ignore[ty:invalid-base]
-            if not _is_pydantic_v2:
+            if not _is_pydantic_v2:  # pragma: no cover
                 __root__: list[_T]
 
             __params_type__ = page_cls.__params_type__
@@ -678,6 +678,6 @@ class UseFlattenPage(PostPageTransformer):
                 if _is_pydantic_v2:
                     return cls(items)  # type: ignore[ty:missing-argument]  # type: ignore[ty:too-many-positional-arguments]
 
-                return cls.parse_obj(items)
+                return cls.parse_obj(items)  # pragma: no cover
 
         return cast(PageCls, _FlattenPage)
