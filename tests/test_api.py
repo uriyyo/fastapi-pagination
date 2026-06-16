@@ -27,6 +27,7 @@ from fastapi_pagination import (
     response,
 )
 from fastapi_pagination.api import (
+    _iter_api_routes,
     apply_items_transformer,
     create_page,
     pagination_ctx,
@@ -126,7 +127,9 @@ def test_add_pagination_include_router():
     app.include_router(router1)
     app.include_router(router2)
 
-    *_, r1, r2 = app.routes
+    # fastapi >= 0.137.0 no longer copies routes into the app on include_router,
+    # so resolve the actual APIRoutes regardless of the fastapi version.
+    *_, r1, r2 = _iter_api_routes(app.routes)
 
     assert len(r1.dependencies) == 1
     assert len(r2.dependencies) == 0
@@ -135,6 +138,33 @@ def test_add_pagination_include_router():
 
     assert len(r1.dependencies) == 1
     assert len(r2.dependencies) == 1
+
+
+def test_add_pagination_include_router_end_to_end():
+    # fastapi >= 0.137.0 stopped copying routes into the app on include_router,
+    # which previously left included routes un-paginated. Guard against a regression.
+    inner = APIRouter()
+
+    @inner.get("/items", response_model=Page[int])
+    async def get_items():
+        return paginate([1, 2, 3, 4, 5])
+
+    outer = APIRouter()
+    outer.include_router(inner, prefix="/inner")
+
+    app = FastAPI()
+    app.include_router(outer, prefix="/outer")
+    add_pagination(app)
+
+    client = TestClient(app)
+
+    rsp = client.get("/outer/inner/items", params={"page": 2, "size": 2})
+    assert rsp.status_code == status.HTTP_200_OK
+    assert rsp.json() == {"items": [3, 4], "total": 5, "page": 2, "size": 2, "pages": 3}
+
+    # pagination params must also be advertised in the OpenAPI schema
+    params = app.openapi()["paths"]["/outer/inner/items"]["get"]["parameters"]
+    assert {"page", "size"} <= {p["name"] for p in params}
 
 
 def test_add_pagination_additional_dependencies():

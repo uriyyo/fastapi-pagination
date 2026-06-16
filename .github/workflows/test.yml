@@ -13,7 +13,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    name: "py${{ matrix.python-version }}; pydantic${{ matrix.pydantic_v2 == 'false' && '-v1' || (matrix.pydantic_pre_v2_12_5 == 'true' && '<v2.12.5' || '>=v2.12.5') }}; fastapi${{ matrix.fastapi_pre_0_112_4 == 'true' && '<0.112.4' || '>=0.112.4' }}"
+    name: "py${{ matrix.python-version }}; pydantic${{ matrix.pydantic_v2 == 'false' && '-v1' || (matrix.pydantic_pre_v2_12_5 == 'true' && '<v2.12.5' || '>=v2.12.5') }}; fastapi${{ matrix.fastapi_pre_0_112_4 == 'true' && '<0.112.4' || (matrix.fastapi_pre_0_137_0 == 'true' && '>=0.112.4,<0.137.0' || '>=0.137.0') }}"
     strategy:
       fail-fast: false
       matrix:
@@ -21,9 +21,12 @@ jobs:
         pydantic_v2: [ "true" ]
         pydantic_pre_v2_12_5: [ "true", "false" ]
         fastapi_pre_0_112_4: [ "true", "false" ]
+        fastapi_pre_0_137_0: [ "true", "false" ]
         exclude:
           - pydantic_v2: "false"
             pydantic_pre_v2_12_5: "true"
+          - fastapi_pre_0_112_4: "true"
+            fastapi_pre_0_137_0: "false"
 
     steps:
       - uses: actions/checkout@v6
@@ -56,6 +59,7 @@ jobs:
           PYDANTIC_V2: ${{ matrix.pydantic_v2 }}
           PYDANTIC_PRE_V2_12_5: ${{ matrix.pydantic_pre_v2_12_5 }}
           FASTAPI_PRE_0_112_4: ${{ matrix.fastapi_pre_0_112_4 }}
+          FASTAPI_PRE_0_137_0: ${{ matrix.fastapi_pre_0_137_0 }}
         run: |
           bash scripts/ci-test.sh
 
