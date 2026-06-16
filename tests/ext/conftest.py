@@ -92,7 +92,7 @@ ROOT = Path(__file__).parent
 DUMMY = ROOT / "test_dummy.py"
 
 
-def pytest_pycollect_makemodule(module_path, path, parent):
+def pytest_pycollect_makemodule(module_path, parent):
     if not module_path.name.startswith("test_"):
         return None
 
@@ -103,4 +103,4 @@ def pytest_pycollect_makemodule(module_path, path, parent):
     try:
         __import__(f"tests.ext.{module}")
     except (ImportError, ModuleNotFoundError):
-        return DummyModule.from_parent(parent, name=module, path=path, nodeid=module)
+        return DummyModule.from_parent(parent, name=module, path=module_path, nodeid=module)
