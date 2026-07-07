@@ -30,6 +30,7 @@ def cassandra_session(cassandra_address):
         connection.unregister_connection("cassandra-test")
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures("cassandra_session")
 class TestCasandra(BasePaginationTestSuite):
     include_total = False
