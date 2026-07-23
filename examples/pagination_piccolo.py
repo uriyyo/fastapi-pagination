@@ -14,7 +14,7 @@ from piccolo.table import Table
 from pydantic import BaseModel
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.piccolo import paginate
+from fastapi_pagination.ext.piccolo import apaginate
 
 os.environ["PICCOLO_CONF"] = __name__
 
@@ -81,7 +81,7 @@ async def create_user(user_in: UserIn) -> Any:
 @app.get("/users/default", response_model=Page[UserOut])
 @app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
 async def get_users() -> Any:
-    return await paginate(_User)
+    return await apaginate(_User)
 
 
 add_pagination(app)

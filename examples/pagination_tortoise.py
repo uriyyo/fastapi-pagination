@@ -7,7 +7,7 @@ import uvicorn
 from faker import Faker
 from fastapi import FastAPI
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.tortoise import paginate
+from fastapi_pagination.ext.tortoise import apaginate
 from tortoise import Model
 from tortoise.contrib.fastapi import RegisterTortoise  # requires 'tortoise-orm>0.21.0'
 from tortoise.contrib.pydantic import PydanticModel, pydantic_model_creator
@@ -61,7 +61,7 @@ async def create_user(user_in: UserIn) -> Any:
 @app.get("/users/default", response_model=Page[UserOut])
 @app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
 async def get_users() -> Any:
-    return await paginate(User)
+    return await apaginate(User)
 
 
 add_pagination(app)

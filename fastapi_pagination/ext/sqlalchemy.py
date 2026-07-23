@@ -10,7 +10,6 @@ __all__ = [
     "paginate",
 ]
 
-import warnings
 from collections.abc import Sequence
 from contextlib import suppress
 from functools import partial
@@ -520,19 +519,6 @@ def _inner_transformer(
     return _unwrap_items(items, query, unwrap_mode)
 
 
-def _get_sync_conn_from_async(conn: Any) -> SyncConn:  # pragma: no cover
-    if isinstance(conn, async_scoped_session):
-        conn = conn()
-
-    with suppress(AttributeError):
-        return cast(Session, conn.sync_session)
-
-    with suppress(AttributeError):
-        return cast(Connection, conn.sync_connection)
-
-    raise TypeError("conn must be an AsyncConnection or AsyncSession")
-
-
 # old deprecated paginate function that use sqlalchemy.orm.Query
 @overload
 def paginate(
@@ -561,24 +547,6 @@ def paginate(
     unwrap_mode: UnwrapMode | None = None,
     transformer: SyncItemsTransformer | None = None,
     additional_data: SyncAdditionalData | None = None,
-    unique: bool = True,
-    config: Config | None = None,
-) -> Any:
-    pass
-
-
-@overload
-async def paginate(
-    conn: AsyncConn,
-    query: Selectable,
-    params: AbstractParams | None = None,
-    *,
-    count_query: Selectable | None = None,
-    inline_count: ColumnElement[int] | None = None,
-    subquery_count: bool = True,
-    unwrap_mode: UnwrapMode | None = None,
-    transformer: AsyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
     unique: bool = True,
     config: Config | None = None,
 ) -> Any:
@@ -627,31 +595,6 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
             unwrap_mode,
             config,
         ) = _new_paginate_sign(*args, **kwargs)
-
-    try:
-        _get_sync_conn_from_async(conn)
-    except TypeError:
-        pass
-    else:
-        warnings.warn(
-            "Use `apaginate` instead. This function overload will be removed in v0.16.0",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        return apaginate(
-            conn=conn,
-            query=query,
-            params=params,
-            count_query=count_query,
-            inline_count=inline_count,
-            subquery_count=subquery_count,
-            unwrap_mode=unwrap_mode,
-            transformer=transformer,
-            additional_data=additional_data,
-            unique=unique,
-            config=config,
-        )
 
     return run_sync_flow(
         _sqlalchemy_flow(

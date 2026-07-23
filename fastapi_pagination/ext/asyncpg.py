@@ -1,10 +1,9 @@
-__all__ = ["apaginate", "paginate"]
+__all__ = ["apaginate"]
 
 from functools import partial
 from typing import Any
 
 from asyncpg import Connection
-from typing_extensions import deprecated
 
 from fastapi_pagination.bases import AbstractParams, RawParams
 from fastapi_pagination.config import Config
@@ -47,25 +46,4 @@ async def apaginate(
             additional_data=additional_data,
             config=config,
         )
-    )
-
-
-@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
-async def paginate(
-    conn: Connection,
-    query: str,
-    *args: Any,
-    transformer: AsyncItemsTransformer | None = None,
-    params: AbstractParams | None = None,
-    additional_data: AdditionalData | None = None,
-    config: Config | None = None,
-) -> Any:
-    return await apaginate(
-        conn,
-        query,
-        *args,
-        transformer=transformer,
-        params=params,
-        additional_data=additional_data,
-        config=config,
     )

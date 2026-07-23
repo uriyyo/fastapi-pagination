@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.asyncpg import paginate
+from fastapi_pagination.ext.asyncpg import apaginate
 
 faker = Faker()
 
@@ -70,7 +70,7 @@ async def create_user(user_in: UserIn) -> Any:
 @app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
 async def get_users() -> Any:
     async with pool.acquire() as conn:
-        return await paginate(conn, """SELECT id, name, email FROM users WHERE id=$1""")
+        return await apaginate(conn, """SELECT id, name, email FROM users WHERE id=$1""")
 
 
 add_pagination(app)

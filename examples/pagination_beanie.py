@@ -9,7 +9,7 @@ from pydantic import Field
 from pymongo import AsyncMongoClient
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.beanie import paginate
+from fastapi_pagination.ext.beanie import apaginate
 
 faker = Faker()
 
@@ -50,7 +50,7 @@ async def create_user(user_in: UserIn) -> Any:
 @app.get("/users/default", response_model=Page[UserOut])
 @app.get("/users/limit-offset", response_model=LimitOffsetPage[UserOut])
 async def get_users() -> Any:
-    return await paginate(UserIn)
+    return await apaginate(UserIn)
 
 
 add_pagination(app)

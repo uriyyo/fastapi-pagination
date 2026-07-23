@@ -1,8 +1,7 @@
 __all__ = ["apaginate", "paginate"]
 
-import warnings
 from functools import partial
-from typing import Any, TypeAlias, overload
+from typing import Any, TypeAlias
 
 from odmantic import AIOEngine, Model, SyncEngine
 from odmantic.engine import AIOSessionType, SyncSessionType
@@ -86,10 +85,9 @@ def _paginate_flow(
     return page
 
 
-@overload
-@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
-async def paginate(
-    engine: AIOEngine,
+@deprecated("`odmantic` project is not longer maintained and this extension will be removed in v0.16.0")
+def paginate(
+    engine: SyncEngine,
     model: type[Model],
     *queries: _Query,
     # odmantic related
@@ -97,61 +95,10 @@ async def paginate(
     session: SyncSessionType | None = None,
     # fastapi-pagination related
     params: AbstractParams | None = None,
-    transformer: AsyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
-    config: Config | None = None,
-) -> Any:
-    pass
-
-
-@overload
-def paginate(
-    engine: SyncEngine,
-    model: type[Model],
-    *queries: _Query,
-    # odmantic related
-    sort: Any | None = None,
-    session: AIOSessionType | None = None,
-    # fastapi-pagination related
-    params: AbstractParams | None = None,
     transformer: SyncItemsTransformer | None = None,
     additional_data: SyncAdditionalData | None = None,
     config: Config | None = None,
 ) -> Any:
-    pass
-
-
-@deprecated("`odmantic` project is not longer maintained and this extension will be removed in v0.16.0")
-def paginate(
-    engine: SyncEngine | AIOEngine,
-    model: type[Model],
-    *queries: _Query,
-    # odmantic related
-    sort: Any | None = None,
-    session: SyncSessionType | AIOSessionType | None = None,
-    # fastapi-pagination related
-    params: AbstractParams | None = None,
-    transformer: ItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
-    config: Config | None = None,
-) -> Any:
-    if isinstance(engine, AIOEngine):
-        warnings.warn(
-            "Use `apaginate` instead. This function overload will be removed in v0.16.0",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return apaginate(
-            engine,
-            model,
-            *queries,
-            sort=sort,
-            session=session,  # type: ignore[ty:invalid-argument-type]
-            params=params,
-            transformer=transformer,
-            additional_data=additional_data,
-        )
-
     return run_sync_flow(
         _paginate_flow(
             False,

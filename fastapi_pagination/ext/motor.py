@@ -1,8 +1,6 @@
 __all__ = [
     "apaginate",
     "apaginate_aggregate",
-    "paginate",
-    "paginate_aggregate",
 ]
 
 from typing import TYPE_CHECKING, Any, Literal, TypeAlias
@@ -113,44 +111,4 @@ async def apaginate_aggregate(
         total=total,
         params=params,
         **resolved_additional_data,
-    )
-
-
-@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
-async def paginate(
-    collection: _AgnosticCollection,
-    query_filter: dict[Any, Any] | None = None,
-    params: AbstractParams | None = None,
-    sort: Any | None = None,
-    *,
-    transformer: AsyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
-    **kwargs: Any,
-) -> Any:
-    return await apaginate(
-        collection=collection,
-        query_filter=query_filter,
-        params=params,
-        sort=sort,
-        transformer=transformer,
-        additional_data=additional_data,
-        **kwargs,
-    )
-
-
-@deprecated("Use `apaginate_aggregate` instead. This function will be removed in v0.16.0")
-async def paginate_aggregate(
-    collection: _AgnosticCollection,
-    aggregate_pipeline: list[dict[Any, Any]] | None = None,
-    params: AbstractParams | None = None,
-    *,
-    transformer: AsyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
-) -> Any:
-    return await apaginate_aggregate(
-        collection=collection,
-        aggregate_pipeline=aggregate_pipeline,
-        params=params,
-        transformer=transformer,
-        additional_data=additional_data,
     )

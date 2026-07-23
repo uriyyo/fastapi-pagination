@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__all__ = ["apaginate", "paginate"]
+__all__ = ["apaginate"]
 
 import inspect
 from copy import copy
@@ -14,7 +14,6 @@ from beanie.odm.queries.find import FindMany
 from beanie.odm.utils.projection import get_projection
 from bson.errors import InvalidId
 from pymongo.asynchronous.client_session import AsyncClientSession
-from typing_extensions import deprecated
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams, is_cursor, is_limit_offset
@@ -229,36 +228,4 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
         total=total,
         params=params,
         **resolved_additional_data,
-    )
-
-
-@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
-async def paginate(
-    query: TDocument | FindMany[TDocument] | AggregationQuery[TDocument],
-    params: AbstractParams | None = None,
-    *,
-    transformer: AsyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
-    projection_model: type[DocumentProjectionType] | None = None,
-    sort: None | str | list[tuple[str, SortDirection]] = None,
-    session: AsyncClientSession | None = None,
-    ignore_cache: bool = False,
-    fetch_links: bool = False,
-    lazy_parse: bool = False,
-    aggregation_filter_end: int | None = None,
-    **pymongo_kwargs: Any,
-) -> Any:
-    return await apaginate(
-        query,
-        params=params,
-        transformer=transformer,
-        additional_data=additional_data,
-        projection_model=projection_model,
-        sort=sort,
-        session=session,
-        ignore_cache=ignore_cache,
-        fetch_links=fetch_links,
-        lazy_parse=lazy_parse,
-        aggregation_filter_end=aggregation_filter_end,
-        **pymongo_kwargs,
     )

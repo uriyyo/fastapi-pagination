@@ -223,13 +223,13 @@ class TestSQLAlchemyCursor(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite
         return builder.build()
 
     @pytest.mark.asyncio(scope="session")
-    async def test_no_order(self, sa_session, sa_user):
+    async def test_no_order(self, sa_session, sa_user, paginate_func):
         with (
             pytest.raises(ValueError, match=r"^Cursor pagination requires ordering$"),
             set_page(CursorPage[UserOut]),
             set_params(CursorPage.__params_type__()),
         ):
-            await maybe_async(paginate(sa_session(), select(sa_user)))
+            await maybe_async(paginate_func(sa_session(), select(sa_user)))
 
 
 @async_sync_testsuite
