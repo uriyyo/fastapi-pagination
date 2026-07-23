@@ -140,16 +140,12 @@ async def await_if_coro(coro: Awaitable[R] | R, /) -> R:
 
 
 _EXTENSIONS = [
-    "databases",
     "django",
     "cassandra",
     "tortoise",
-    "motor",
-    "orm",
     "ormar",
     "pony",
     "piccolo",
-    "gino",
     "beanie",
     "sqlmodel",
     "sqlalchemy",

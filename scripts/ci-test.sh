@@ -66,15 +66,5 @@ echo "Running tests with SQLAlchemy<2"
 _pip install -U "sqlalchemy<2"
 _pytest tests/ext -m "not sqlalchemy20"
 
-if [[ "$PY_VERSION" == "3.14" ]]; then
-  echo "Skipping rest of tests on Python 3.14 due to incompatibilities"
-  exit 0
-fi
-
-echo "Running orm tests"
-_pip install "databases<0.9.0" orm
-_pytest tests/ext -m orm
-_pip uninstall orm
-
 echo "Restore env"
 _restore_env

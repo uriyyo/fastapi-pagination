@@ -236,22 +236,6 @@ wheels = [
 ]
 
 [[package]]
-name = "bunnet"
-version = "1.1.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "click" },
-    { name = "lazy-model" },
-    { name = "pydantic" },
-    { name = "pymongo" },
-    { name = "toml" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e7/6a/c2d2f63c0260f0bad47168e0427bdb46e1134266d0d49854c7106a6597ac/bunnet-1.1.0.tar.gz", hash = "sha256:e8e4aa61129c164f774a6549937f85507999cccef1a6591ac0ad175e695fe8c5", size = 47159, upload-time = "2023-01-19T17:22:31.431Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ea/88/d3c15abab54d4fea31a8df0d631f9d57e271b842b1d8bf53d1d2f7d3f82b/bunnet-1.1.0-py3-none-any.whl", hash = "sha256:860d79bed3f97c0e45e631a725e6da22598712dad2a599240d62c5ee581dde1a", size = 71809, upload-time = "2023-01-19T17:22:30.073Z" },
-]
-
-[[package]]
 name = "certifi"
 version = "2026.7.22"
 source = { registry = "https://pypi.org/simple" }
@@ -657,18 +641,6 @@ wheels = [
 ]
 
 [[package]]
-name = "databases"
-version = "0.9.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "sqlalchemy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/76/de/ea55722907bd1b2389b01e362faa3c66a09d5a8463c13d44c80da7b32497/databases-0.9.0.tar.gz", hash = "sha256:d2f259677609bf187737644c95fa41701072e995dfeb8d2882f335795c5b61b0", size = 31084, upload-time = "2024-03-01T17:39:28.378Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d5/43/6035922af5471f1a196851831a1d5f403447401b395f474bf673efa8959f/databases-0.9.0-py3-none-any.whl", hash = "sha256:9ee657c9863b34f8d3a06c06eafbe1bda68af2a434b56996312edf1f1c0b6297", size = 25580, upload-time = "2024-03-01T17:39:26.352Z" },
-]
-
-[[package]]
 name = "dirty-equals"
 version = "0.11"
 source = { registry = "https://pypi.org/simple" }
@@ -834,14 +806,7 @@ asyncpg = [
 beanie = [
     { name = "beanie" },
 ]
-bunnet = [
-    { name = "bunnet" },
-]
-databases = [
-    { name = "databases" },
-]
 django = [
-    { name = "databases" },
     { name = "django" },
 ]
 elasticsearch = [
@@ -852,16 +817,6 @@ firestore = [
 ]
 mongoengine = [
     { name = "mongoengine" },
-]
-motor = [
-    { name = "motor" },
-]
-odmantic = [
-    { name = "odmantic" },
-]
-orm = [
-    { name = "databases" },
-    { name = "orm" },
 ]
 ormar = [
     { name = "ormar" },
@@ -931,19 +886,12 @@ requires-dist = [
     { name = "aiosqlite", marker = "extra == 'peewee'", specifier = ">=0.19.0,!=0.22.0,!=0.22.1" },
     { name = "asyncpg", marker = "extra == 'asyncpg'", specifier = ">=0.24.0" },
     { name = "beanie", marker = "extra == 'beanie'", specifier = ">=2.1.0" },
-    { name = "bunnet", marker = "extra == 'bunnet'", specifier = ">=1.1.0" },
-    { name = "databases", marker = "extra == 'databases'", specifier = ">=0.6.0" },
-    { name = "databases", marker = "extra == 'django'", specifier = ">=0.6.0" },
-    { name = "databases", marker = "extra == 'orm'", specifier = ">=0.6.0" },
     { name = "django", marker = "extra == 'django'", specifier = "<6.0.0" },
     { name = "elasticsearch-dsl", marker = "extra == 'elasticsearch'", specifier = ">=8.13.0" },
     { name = "fastapi", specifier = ">=0.93.0" },
     { name = "google-cloud-firestore", marker = "extra == 'firestore'", specifier = ">=2.19.0" },
     { name = "greenlet", marker = "extra == 'peewee'" },
     { name = "mongoengine", marker = "extra == 'mongoengine'", specifier = ">=0.23.1" },
-    { name = "motor", marker = "extra == 'motor'", specifier = ">=3.6.0" },
-    { name = "odmantic", marker = "extra == 'odmantic'", specifier = ">=1.0.2" },
-    { name = "orm", marker = "extra == 'orm'", specifier = ">=0.3.1" },
     { name = "ormar", marker = "extra == 'ormar'", specifier = ">=0.21.0" },
     { name = "peewee", marker = "extra == 'peewee'", specifier = ">=4.0" },
     { name = "peewee", marker = "extra == 'peewee-sync'", specifier = ">=4.0" },
@@ -959,7 +907,7 @@ requires-dist = [
     { name = "tortoise-orm", marker = "extra == 'tortoise'", specifier = ">=0.22.0" },
     { name = "typing-extensions", specifier = ">=4.8.0" },
 ]
-provides-extras = ["sqlmodel", "sqlalchemy", "databases", "orm", "ormar", "tortoise", "asyncpg", "django", "piccolo", "motor", "bunnet", "mongoengine", "beanie", "scylla-driver", "odmantic", "elasticsearch", "firestore", "aiosqlite", "psycopg", "peewee", "peewee-sync"]
+provides-extras = ["sqlmodel", "sqlalchemy", "ormar", "tortoise", "asyncpg", "django", "piccolo", "mongoengine", "beanie", "scylla-driver", "elasticsearch", "firestore", "aiosqlite", "psycopg", "peewee", "peewee-sync"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1585,18 +1533,6 @@ wheels = [
 ]
 
 [[package]]
-name = "motor"
-version = "3.7.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pymongo" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/93/ae/96b88362d6a84cb372f7977750ac2a8aed7b2053eed260615df08d5c84f4/motor-3.7.1.tar.gz", hash = "sha256:27b4d46625c87928f331a6ca9d7c51c2f518ba0e270939d395bc1ddc89d64526", size = 280997, upload-time = "2025-05-14T18:56:33.653Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/01/9a/35e053d4f442addf751ed20e0e922476508ee580786546d699b0567c4c67/motor-3.7.1-py3-none-any.whl", hash = "sha256:8a63b9049e38eeeb56b4fdd57c3312a6d1f25d01db717fe7d82222393c410298", size = 74996, upload-time = "2025-05-14T18:56:31.665Z" },
-]
-
-[[package]]
 name = "mypy-extensions"
 version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1612,21 +1548,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/24/bf/d1bda4f6168e0b2e9e5958945e01910052158313224ada5ce1fb2e1113b8/nodeenv-1.10.0.tar.gz", hash = "sha256:996c191ad80897d076bdfba80a41994c2b47c68e224c542b48feba42ba00f8bb", size = 55611, upload-time = "2025-12-20T14:08:54.006Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/88/b2/d0896bdcdc8d28a7fc5717c305f1a861c26e18c05047949fb371034d98bd/nodeenv-1.10.0-py2.py3-none-any.whl", hash = "sha256:5bb13e3eed2923615535339b3c620e76779af4cb4c6a90deccc9e36b274d3827", size = 23438, upload-time = "2025-12-20T14:08:52.782Z" },
-]
-
-[[package]]
-name = "odmantic"
-version = "1.1.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "motor" },
-    { name = "pydantic" },
-    { name = "pymongo" },
-    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/05/c5/ae957aacccc68323eaeb044aabb2e92a4ccc65a6e06ab448b18bb5a75761/odmantic-1.1.0.tar.gz", hash = "sha256:70a1cfa7211870cd3d7eacf5a3fd99db29d6b333a33c77dcaa13330d003e2982", size = 36907, upload-time = "2026-01-24T18:02:04.459Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/cd/e5/faca0638204ec90100e24cef47e9592c0d5f29b9652ec9f0e9f84ebef646/odmantic-1.1.0-py3-none-any.whl", hash = "sha256:01a851c2558e7cde69e292a54fd7b2d5cbc03b7af88b4f3a841d51c79274d159", size = 37082, upload-time = "2026-01-24T18:02:02.949Z" },
 ]
 
 [[package]]
@@ -1708,19 +1629,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/0d/ba/a23b82a0a8d0ed7bed4e5f5035aae751cad4ff6a1e8d2ecd14d8860f5929/orjson-3.11.9-cp314-cp314-win32.whl", hash = "sha256:e30ab17845bb9fa54ccf67fa4f9f5282652d54faa6d17452f47d0f369d038673", size = 131638, upload-time = "2026-05-06T15:11:03.696Z" },
     { url = "https://files.pythonhosted.org/packages/f3/c3/0c6798456bade745c75c452342dabacce5798196483e77e643be1f53877d/orjson-3.11.9-cp314-cp314-win_amd64.whl", hash = "sha256:32ef5f4283a3be81913947d19608eacb7c6608026851123790cd9cc8982af34b", size = 127078, upload-time = "2026-05-06T15:11:05.123Z" },
     { url = "https://files.pythonhosted.org/packages/16/21/5a3f1e8913103b703a436a5664238e5b965ec392b555fe68943ea3691e6b/orjson-3.11.9-cp314-cp314-win_arm64.whl", hash = "sha256:eebdbdeef0094e4f5aefa20dcd4eb2368ab5e7a3b4edea27f1e7b2892e009cf9", size = 126687, upload-time = "2026-05-06T15:11:06.602Z" },
-]
-
-[[package]]
-name = "orm"
-version = "0.3.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "databases" },
-    { name = "typesystem" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e3/19/be5a59955678c6e553b59e64accd81ebeb1082d377fbf253bc0ce8b6a75e/orm-0.3.1.tar.gz", hash = "sha256:5b41cccdd55d50f90d207f9cb66a379e6d0fefbae434af7992fddea9aa74572a", size = 10893, upload-time = "2021-11-29T09:21:27.689Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/0c/d8/68932570e09b99e0e8e28f0ffa79294a80127704d635cb500462f7e6ab9e/orm-0.3.1-py3-none-any.whl", hash = "sha256:c29342006ecea111b7d3f4b77a96d5b658e495466050f4e98a5efc623aaada25", size = 11325, upload-time = "2021-11-29T09:21:26.768Z" },
 ]
 
 [[package]]
@@ -2701,15 +2609,6 @@ wheels = [
 ]
 
 [[package]]
-name = "toml"
-version = "0.10.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/be/ba/1f744cdc819428fc6b5084ec34d9b30660f6f9daaf70eead706e3203ec3c/toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f", size = 22253, upload-time = "2020-11-01T01:40:22.204Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/6f/7120676b6d73228c96e17f1f794d8ab046fc910d781c8d151120c3f1569e/toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b", size = 16588, upload-time = "2020-11-01T01:40:20.672Z" },
-]
-
-[[package]]
 name = "tomli"
 version = "2.4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2812,15 +2711,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d0/c2/50b08b641578d6f48e8aa28a91d0de32c91aa24dd926ed199e8afd2d37ea/ty-0.0.63-py3-none-win32.whl", hash = "sha256:f0a8fbfd1f990c0c5d85cce018d438969ac79e49247e2192c9745394bb7d17ab", size = 11433155, upload-time = "2026-07-23T11:41:33.28Z" },
     { url = "https://files.pythonhosted.org/packages/92/2d/d422a5568f0d1f317186be22241288dc6e08b71dc24aca223f22038ac2d2/ty-0.0.63-py3-none-win_amd64.whl", hash = "sha256:2aa2370bdd6f42e9f37518c812379bef70b9162f9e5aad511495229b0b71cb93", size = 12450036, upload-time = "2026-07-23T11:41:35.559Z" },
     { url = "https://files.pythonhosted.org/packages/35/97/2c9748e28ead0650c7ad3e5f74f178832ceabd7cb5c272a882f29eb32ee4/ty-0.0.63-py3-none-win_arm64.whl", hash = "sha256:95ac1a62162c3c7ac204731e95ebf766d62a46a7bfa238a6acbe923fcb772cb1", size = 11826243, upload-time = "2026-07-23T11:41:37.749Z" },
-]
-
-[[package]]
-name = "typesystem"
-version = "0.3.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/12/39/fd18bc3b65d02304de12e17044922954e318961f9f3011d1d81fa67ddf88/typesystem-0.3.1.tar.gz", hash = "sha256:83ff95bb4db6f25922275eebc8ed044e42efdfa7626f8378694d231f9d58a2ac", size = 22695, upload-time = "2021-10-15T06:35:38.237Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/0c/e0/dea6e58faf68ab48ff2e6e7d13d209cc63d6d1439d658e0906bc57070257/typesystem-0.3.1-py3-none-any.whl", hash = "sha256:42d71655c735f18d891a0ccb2bcb7f94b302e38fd055a44f5e01e6735b3e063d", size = 28385, upload-time = "2021-10-15T06:35:36.887Z" },
 ]
 
 [[package]]

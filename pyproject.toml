@@ -34,28 +34,17 @@ sqlalchemy = [
     "SQLAlchemy>=1.3.20",
     "sqlakeyset>=2.0.1680321678",
 ]
-databases = ["databases>=0.6.0"]
-orm = [
-    "orm>=0.3.1",
-    "databases>=0.6.0",
-]
 ormar = ["ormar>=0.21.0"]
 tortoise = ["tortoise-orm>=0.22.0"]
 asyncpg = [
     "SQLAlchemy>=1.3.20",
     "asyncpg>=0.24.0",
 ]
-django = [
-    "django<6.0.0",
-    "databases>=0.6.0",
-]
+django = ["django<6.0.0"]
 piccolo = ["piccolo>=0.89"]
-motor = ["motor>=3.6.0"]
-bunnet = ["bunnet>=1.1.0"]
 mongoengine = ["mongoengine>=0.23.1"]
 beanie = ["beanie>=2.1.0"]
 scylla-driver = ["scylla-driver>=3.25.6"]
-odmantic = ["odmantic>=1.0.2"]
 elasticsearch = ["elasticsearch-dsl>=8.13.0"]
 firestore = ["google-cloud-firestore>=2.19.0"]
 aiosqlite = ["aiosqlite>=0.19.0,!=0.22.0,!=0.22.1"]
@@ -175,9 +164,7 @@ max-complexity = 10
 [tool.ty.src]
 exclude = [
     "fastapi_pagination/ext/pony.py",
-    "fastapi_pagination/ext/gino.py",
     "fastapi_pagination/ext/ormar.py",
-    "fastapi_pagination/ext/motor.py",
     "fastapi_pagination/ext/peewee.py",
 ]
 

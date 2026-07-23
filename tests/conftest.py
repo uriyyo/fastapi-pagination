@@ -16,7 +16,7 @@ from cassandra.cluster import Cluster
 from cassandra.cqlengine import columns, connection, management, models
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import AsyncMongoClient
 from pytest_asyncio import fixture as async_fixture
 
 from .schemas import UserWithOrderOut
@@ -249,12 +249,9 @@ async def _setup_sqlite(_sqlite_file: str, raw_data: RawData):
 
 @async_fixture(scope="session")
 async def _setup_mongodb(_mongodb_url: str, raw_data: RawData):
-    motor = AsyncIOMotorClient(_mongodb_url)
-
-    await motor.test.users.delete_many({})
-    await motor.test.users.insert_many(deepcopy(raw_data))
-
-    motor.close()
+    async with AsyncMongoClient(_mongodb_url) as client:
+        await client.test.users.delete_many({})
+        await client.test.users.insert_many(deepcopy(raw_data))
 
 
 @pytest.fixture(scope="session")
