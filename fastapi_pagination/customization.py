@@ -51,16 +51,16 @@ from fastapi.params import Param
 from pydantic import BaseModel, ConfigDict, RootModel, create_model
 from typing_extensions import Self, Unpack
 
-from ._pydantic import (
+from .api import response
+from .bases import AbstractPage, AbstractParams, BaseAbstractPage, BaseRawParams
+from .cursor import CursorDecoder, CursorEncoder
+from .pydantic import (
     get_field_tp,
     get_model_fields,
     is_pydantic_field,
     make_field_optional,
     make_field_required,
 )
-from .api import response
-from .bases import AbstractPage, AbstractParams, BaseAbstractPage, BaseRawParams
-from .cursor import CursorDecoder, CursorEncoder
 from .types import Cursor
 from .typing_utils import create_annotated_tp
 from .utils import get_caller

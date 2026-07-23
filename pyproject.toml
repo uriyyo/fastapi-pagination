@@ -21,7 +21,7 @@ classifiers = [
 ]
 dependencies = [
     "fastapi>=0.137.0",
-    "pydantic>=2.12.5",
+    "pydantic>=2.13.4",
     "typing-extensions>=4.8.0",
 ]
 

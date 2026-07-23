@@ -2,7 +2,7 @@
 
 set -ex
 
-DEPS="${DEPS:-latest}"
+DEPS_RESOLUTION="${DEPS_RESOLUTION:-highest}"
 SYNC_EXTRA_ARGS=()
 TEST_EXTRA_ARGS=()
 
@@ -30,13 +30,9 @@ function _restore_env() {
 echo "Installing dependencies"
 _restore_env
 
-echo "Config: deps=$DEPS"
+echo "Config: resolution=$DEPS_RESOLUTION"
 
-if [[ "$DEPS" == lowest ]]; then
-    _pip install "fastapi==0.137.0" "pydantic==2.12.5"
-else
-    _pip install -U fastapi pydantic
-fi
+_pip install -U -r pyproject.toml --resolution "$DEPS_RESOLUTION"
 
 echo "Running unit-tests"
 _pytest tests --ignore=tests/ext

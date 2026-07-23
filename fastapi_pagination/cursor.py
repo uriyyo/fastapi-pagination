@@ -24,8 +24,8 @@ from fastapi import HTTPException, Query, status
 from pydantic import BaseModel, Field
 from typing_extensions import TypeVar
 
-from ._pydantic import create_pydantic_model
 from .bases import AbstractParams, BasePage, CursorRawParams
+from .pydantic import create_pydantic_model
 from .types import Cursor
 
 TAny = TypeVar("TAny", default=Any)

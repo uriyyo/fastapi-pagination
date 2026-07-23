@@ -897,7 +897,7 @@ requires-dist = [
     { name = "peewee", marker = "extra == 'peewee-sync'", specifier = ">=4.0" },
     { name = "piccolo", marker = "extra == 'piccolo'", specifier = ">=0.89" },
     { name = "psycopg", extras = ["binary"], marker = "extra == 'psycopg'", specifier = ">=3.3.2" },
-    { name = "pydantic", specifier = ">=2.12.5" },
+    { name = "pydantic", specifier = ">=2.13.4" },
     { name = "scylla-driver", marker = "extra == 'scylla-driver'", specifier = ">=3.25.6" },
     { name = "sqlakeyset", marker = "extra == 'sqlalchemy'", specifier = ">=2.0.1680321678" },
     { name = "sqlakeyset", marker = "extra == 'sqlmodel'", specifier = ">=2.0.1680321678" },

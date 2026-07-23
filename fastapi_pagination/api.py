@@ -18,7 +18,6 @@ import inspect
 from collections.abc import AsyncIterator, Callable, Iterator, Sequence
 from contextlib import AbstractContextManager, ExitStack, asynccontextmanager, contextmanager, suppress
 from contextvars import ContextVar
-from copy import copy
 from typing import (
     Annotated,
     Any,
@@ -36,9 +35,7 @@ from fastapi.dependencies.utils import (
 )
 from fastapi.routing import APIRoute, APIRouter, _IncludedRouter, request_response
 from pydantic import BaseModel
-from pydantic.fields import FieldInfo, PydanticUndefined
-
-from fastapi_pagination.typing_utils import create_annotated_tp
+from pydantic.fields import FieldInfo
 
 from .bases import AbstractPage, AbstractParams, BaseAbstractPage
 from .errors import UninitializedConfigurationError
@@ -230,21 +227,11 @@ def _create_params_dependency(
     sign = inspect.signature(params)
 
     def _get_param(name: str, field: FieldInfo) -> inspect.Parameter:
-        field = copy(field)
-
-        param_default: Any
-        if field.default is not PydanticUndefined:
-            # for pydantic v2.12.5+ we need to move default value to be as parameter default
-            param_default = field.default
-            field.default = PydanticUndefined
-        else:
-            param_default = inspect.Parameter.empty
-
         return inspect.Parameter(
             name=name,
             kind=inspect.Parameter.KEYWORD_ONLY,
-            annotation=create_annotated_tp(field.annotation, field),
-            default=param_default,
+            annotation=field.annotation,
+            default=field,
         )
 
     with suppress(ValueError, TypeError):

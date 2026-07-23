@@ -13,12 +13,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    name: "py${{ matrix.python-version }}; ${{ matrix.deps }} deps"
+    name: "py${{ matrix.python-version }}; ${{ matrix.resolution }} deps"
     strategy:
       fail-fast: false
       matrix:
         python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14" ]
-        deps: [ "lowest", "latest" ]
+        resolution: [ "lowest-direct", "highest" ]
 
     steps:
       - uses: actions/checkout@v7
@@ -48,7 +48,7 @@ jobs:
         shell: bash
         env:
           PY_VERSION: ${{ matrix.python-version }}
-          DEPS: ${{ matrix.deps }}
+          DEPS_RESOLUTION: ${{ matrix.resolution }}
         run: |
           bash scripts/ci-test.sh
 
