@@ -718,21 +718,6 @@ wheels = [
 ]
 
 [[package]]
-name = "elasticsearch-dsl"
-version = "8.18.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "elastic-transport" },
-    { name = "elasticsearch" },
-    { name = "python-dateutil" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/72/6d/00cbeee412a2dc825f0df18c98463a2e0b423b86800fba6c50ea2c627962/elasticsearch_dsl-8.18.0.tar.gz", hash = "sha256:763465dba9eae166add10567e924c65730aa122819b08bfe9a077e91b13b30d1", size = 31886, upload-time = "2025-04-16T11:54:14.412Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/77/a9/b200790a22585aeb023d88bd8b9fb222820e2976ce4239d401670116ae3c/elasticsearch_dsl-8.18.0-py3-none-any.whl", hash = "sha256:0522c5bb20c7abae69855109e650bf1166d486cbf706b5e1b29c28936a9102a3", size = 10406, upload-time = "2025-04-16T11:54:12.677Z" },
-]
-
-[[package]]
 name = "email-validator"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -810,7 +795,7 @@ django = [
     { name = "django" },
 ]
 elasticsearch = [
-    { name = "elasticsearch-dsl" },
+    { name = "elasticsearch" },
 ]
 firestore = [
     { name = "google-cloud-firestore" },
@@ -887,7 +872,7 @@ requires-dist = [
     { name = "asyncpg", marker = "extra == 'asyncpg'", specifier = ">=0.24.0" },
     { name = "beanie", marker = "extra == 'beanie'", specifier = ">=2.1.0" },
     { name = "django", marker = "extra == 'django'", specifier = "<6.0.0" },
-    { name = "elasticsearch-dsl", marker = "extra == 'elasticsearch'", specifier = ">=8.13.0" },
+    { name = "elasticsearch", marker = "extra == 'elasticsearch'", specifier = ">=8.18.0" },
     { name = "fastapi", specifier = ">=0.137.0" },
     { name = "google-cloud-firestore", marker = "extra == 'firestore'", specifier = ">=2.19.0" },
     { name = "greenlet", marker = "extra == 'peewee'" },

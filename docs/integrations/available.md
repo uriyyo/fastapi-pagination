@@ -9,7 +9,6 @@ Currently, `fastapi-pagination` supports:
 | [Django ORM](https://docs.djangoproject.com/en/3.2/topics/db/queries/) | `fastapi_pagination.ext.django.paginate`       |
 | [ormar](https://collerek.github.io/ormar/)                             | `fastapi_pagination.ext.ormar.apaginate`       |
 | [Piccolo](https://piccolo-orm.readthedocs.io/en/latest/)               | `fastapi_pagination.ext.piccolo.apaginate`     |
-| [Pony ORM](https://docs.ponyorm.org/)                                  | `fastapi_pagination.ext.pony.paginate`         |
 | [Tortoise ORM](https://tortoise.github.io/)                            | `fastapi_pagination.ext.tortoise.apaginate`    |
 | [Beanie](https://roman-right.github.io/beanie/)                        | `fastapi_pagination.ext.beanie.apaginate`      |
 | [PyMongo](https://pymongo.readthedocs.io/en/stable/)                   | `fastapi_pagination.ext.pymongo.paginate`      |

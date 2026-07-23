@@ -111,7 +111,6 @@ _EXTENSIONS = [
     "cassandra",
     "tortoise",
     "ormar",
-    "pony",
     "piccolo",
     "beanie",
     "sqlmodel",
