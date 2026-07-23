@@ -1,5 +1,3 @@
-from functools import cache
-
 __all__ = [
     "add_pagination",
     "apply_items_transformer",
@@ -20,7 +18,6 @@ import inspect
 from collections.abc import AsyncIterator, Callable, Iterator, Sequence
 from contextlib import AbstractContextManager, ExitStack, asynccontextmanager, contextmanager, suppress
 from contextvars import ContextVar
-from copy import copy
 from typing import (
     Annotated,
     Any,
@@ -36,30 +33,12 @@ from fastapi.dependencies.utils import (
     get_parameterless_sub_dependant,
     lenient_issubclass,
 )
-from fastapi.routing import APIRoute, APIRouter
+from fastapi.routing import APIRoute, APIRouter, _IncludedRouter, request_response
 from pydantic import BaseModel
-
-from fastapi_pagination.pydantic.consts import IS_PYDANTIC_V2_12_5_OR_HIGHER
-from fastapi_pagination.typing_utils import create_annotated_tp
-
-from .pydantic.v2 import FieldV2, UndefinedV2
-
-try:
-    from fastapi.routing import request_response
-except ImportError:  # pragma: no cover
-    from starlette.routing import request_response
-
-try:
-    from fastapi.routing import _IncludedRouter
-except ImportError:  # pragma: no cover
-
-    class _IncludedRouter:
-        pass
-
+from pydantic.fields import FieldInfo
 
 from .bases import AbstractPage, AbstractParams, BaseAbstractPage
 from .errors import UninitializedConfigurationError
-from .pydantic import IS_PYDANTIC_V2
 from .types import AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
 from .utils import is_async_callable, unwrap_annotated
 
@@ -224,22 +203,16 @@ def apply_items_transformer(
     return async_wrapped(items) if async_ else items
 
 
-@cache
-def _model_validate_has_by_name_param() -> bool:
-    sign = inspect.signature(BaseModel.model_validate)
-    return "by_name" in sign.parameters
-
-
-def _create_params_dependency(  # noqa: C901
+def _create_params_dependency(
     params: type[TAbstractParams_co],
 ) -> Callable[[TAbstractParams_co], AsyncIterator[TAbstractParams_co]]:
-    is_pydantic_v2_model = False
+    is_pydantic_model = False
 
     async def _pagination_params(*args: Any, **kwargs: Any) -> AsyncIterator[TAbstractParams_co]:
-        if is_pydantic_v2_model and _model_validate_has_by_name_param():
+        if is_pydantic_model:
             # should not happen cause all , but let's be safe
             if args:  # pragma: no cover
-                raise ValueError("Positional arguments are not supported for Pydantic v2 models")
+                raise ValueError("Positional arguments are not supported for Pydantic models")
 
             val = cast(
                 AbstractParams,
@@ -253,42 +226,20 @@ def _create_params_dependency(  # noqa: C901
 
     sign = inspect.signature(params)
 
-    if IS_PYDANTIC_V2:
-        if IS_PYDANTIC_V2_12_5_OR_HIGHER:
+    def _get_param(name: str, field: FieldInfo) -> inspect.Parameter:
+        return inspect.Parameter(
+            name=name,
+            kind=inspect.Parameter.KEYWORD_ONLY,
+            annotation=field.annotation,
+            default=field,
+        )
 
-            def _get_param(name: str, field: FieldV2) -> inspect.Parameter:
-                field = copy(field)
+    with suppress(ValueError, TypeError):
+        is_pydantic_model = issubclass(params, BaseModel)
 
-                param_default: Any
-                if field.default is not UndefinedV2:
-                    # for pydantic v2.12.5+ we need to move default value to be as parameter default
-                    param_default = field.default
-                    field.default = UndefinedV2
-                else:
-                    param_default = inspect.Parameter.empty
-
-                return inspect.Parameter(
-                    name=name,
-                    kind=inspect.Parameter.KEYWORD_ONLY,
-                    annotation=create_annotated_tp(field.annotation, field),
-                    default=param_default,
-                )
-        else:
-
-            def _get_param(name: str, field: FieldV2) -> inspect.Parameter:
-                return inspect.Parameter(
-                    name=name,
-                    kind=inspect.Parameter.KEYWORD_ONLY,
-                    annotation=field.annotation,
-                    default=field,
-                )
-
-        with suppress(ValueError, TypeError):
-            is_pydantic_v2_model = issubclass(params, BaseModel)
-
-        if is_pydantic_v2_model:
-            sign_params = [_get_param(name, field) for name, field in cast(BaseModel, params).model_fields.items()]
-            sign = sign.replace(parameters=sign_params)
+    if is_pydantic_model:
+        sign_params = [_get_param(name, field) for name, field in cast(BaseModel, params).model_fields.items()]
+        sign = sign.replace(parameters=sign_params)
 
     _pagination_params.__signature__ = sign  # type: ignore[ty:unresolved-attribute]
 
@@ -332,21 +283,6 @@ def pagination_ctx(
     return _page_ctx_dependency
 
 
-def _bet_body_field(route: APIRoute) -> Any | None:
-    try:
-        # starting from fastapi 0.113.0 get_body_field changed its signature
-        return get_body_field(
-            flat_dependant=route.dependant,
-            name=route.unique_id,
-            embed_body_fields=route._embed_body_fields,
-        )
-    except (TypeError, AttributeError):
-        return get_body_field(  # type: ignore[ty:missing-argument]
-            dependant=route.dependant,  # type: ignore[ty:unknown-argument]
-            name=route.unique_id,
-        )
-
-
 ParentT = TypeVar("ParentT", APIRouter, FastAPI)
 
 
@@ -370,7 +306,11 @@ def _update_route(route: APIRoute) -> None:
         ),
     )
 
-    route.body_field = _bet_body_field(route)
+    route.body_field = get_body_field(
+        flat_dependant=route.dependant,
+        name=route.unique_id,
+        embed_body_fields=route._embed_body_fields,
+    )
     route.app = request_response(route.get_route_handler())
 
 

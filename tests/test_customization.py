@@ -22,14 +22,11 @@ from fastapi_pagination.customization import (
     UseOptionalParams,
     UseParams,
     UseParamsFields,
-    UsePydanticV1,
     UseQuotedCursor,
     UseResponseHeaders,
     UseStrCursor,
 )
-from fastapi_pagination.pydantic import IS_PYDANTIC_V2
-from fastapi_pagination.pydantic.v1 import BaseModelV1
-from tests.utils import IS_FASTAPI_V_0_112_4_OR_NEWER, dump_obj
+from tests.utils import dump_obj
 
 
 class _NoopCustomizer(PageCustomizer):
@@ -122,10 +119,6 @@ def test_customization_use_params_fields():
     assert params.size == 20
 
 
-@pytest.mark.skipif(
-    not (IS_PYDANTIC_V2 and IS_FASTAPI_V_0_112_4_OR_NEWER),
-    reason="default_factory is only supported in Pydantic v2",
-)
 class TestUseParamsFields:
     @pytest.fixture(scope="session")
     def app(self):
@@ -178,10 +171,6 @@ class TestUseParamsFields:
                 pytest.fail(f"Unexpected response JSON: {response.json()}")
 
 
-@pytest.mark.skipif(
-    not (IS_PYDANTIC_V2 and IS_FASTAPI_V_0_112_4_OR_NEWER),
-    reason="alias and validation_alias are only supported in Pydantic v2",
-)
 class TestUseParamsFieldsAlias:
     @pytest.fixture(scope="session")
     def app(self):
@@ -273,7 +262,6 @@ def test_use_include_total(include_total):
     assert raw_params.include_total == include_total
 
 
-@pytest.mark.skipif(not IS_PYDANTIC_V2, reason="Only for Pydantic v2")
 @pytest.mark.parametrize("include_total", [True, False])
 def test_use_include_total_update_tp_json_schema(include_total):
     app = FastAPI()
@@ -309,17 +297,12 @@ def test_custom_customizer():
 
 
 def test_use_model_config():
-    key = "populate_by_name" if IS_PYDANTIC_V2 else "allow_population_by_field_name"
-
     CustomPage = CustomizedPage[
         Page,
-        UseModelConfig(**{key: False}),
+        UseModelConfig(populate_by_name=False),
     ]
 
-    if IS_PYDANTIC_V2:
-        assert CustomPage.model_config["populate_by_name"] is False
-    else:
-        assert CustomPage.__config__.allow_population_by_field_name is False
+    assert CustomPage.model_config["populate_by_name"] is False
 
 
 def test_use_excluded_fields():
@@ -328,10 +311,7 @@ def test_use_excluded_fields():
         UseExcludedFields("total"),
     ]
 
-    if IS_PYDANTIC_V2:
-        assert CustomPage.model_fields["total"].exclude
-    else:
-        assert "total" in CustomPage.__exclude_fields__
+    assert CustomPage.model_fields["total"].exclude
 
 
 def test_use_aliases():
@@ -340,10 +320,7 @@ def test_use_aliases():
         UseFieldsAliases(total="count"),
     ]
 
-    if IS_PYDANTIC_V2:
-        assert CustomPage.model_fields["total"].serialization_alias == "count"
-    else:
-        assert CustomPage.__fields__["total"].alias == "count"
+    assert CustomPage.model_fields["total"].serialization_alias == "count"
 
 
 def test_additional_fields():
@@ -355,20 +332,13 @@ def test_additional_fields():
         ),
     ]
 
-    if IS_PYDANTIC_V2:
-        from pydantic_core import PydanticUndefined
+    from pydantic_core import PydanticUndefined
 
-        assert CustomPage.model_fields["a"].annotation is int
-        assert CustomPage.model_fields["a"].default is PydanticUndefined
+    assert CustomPage.model_fields["a"].annotation is int
+    assert CustomPage.model_fields["a"].default is PydanticUndefined
 
-        assert CustomPage.model_fields["b"].annotation is str
-        assert CustomPage.model_fields["b"].default == "my-default"
-    else:
-        assert CustomPage.__fields__["a"].type_ is int
-        assert CustomPage.__fields__["a"].default is None
-
-        assert CustomPage.__fields__["b"].type_ is str
-        assert CustomPage.__fields__["b"].default == "my-default"
+    assert CustomPage.model_fields["b"].annotation is str
+    assert CustomPage.model_fields["b"].default == "my-default"
 
 
 @pytest.mark.parametrize(
@@ -417,10 +387,6 @@ def test_str_cursor(str_cursor):
     assert CustomPage.__params_type__.str_cursor == str_cursor
 
 
-@pytest.mark.skipif(
-    not IS_PYDANTIC_V2,
-    reason="UseResponseHeaders is only supported in Pydantic v2",
-)
 class TestUseResponseHeaders:
     @pytest.fixture(scope="session")
     def app(self):
@@ -453,24 +419,6 @@ class TestUseResponseHeaders:
         assert response.status_code == status.HTTP_200_OK
         assert response.headers["X-Total-Count"] == "100"
         assert response.headers.get_list("X-Params") == ["page=2", "size=20"]
-
-
-def test_use_pydantic_v1():
-    CustomPage = CustomizedPage[
-        Page,
-        UsePydanticV1(),
-    ]
-
-    assert issubclass(CustomPage, BaseModelV1)
-
-    page = CustomPage[int].create(
-        items=["1", "2", "3"],
-        params=CustomPage.__params_type__(),
-        total=3,
-    )
-
-    assert page.items == [1, 2, 3]
-    assert page.total == 3
 
 
 def test_use_flatten_page():

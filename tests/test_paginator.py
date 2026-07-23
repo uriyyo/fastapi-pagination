@@ -13,8 +13,6 @@ from .base import BasePaginationTestSuite
 
 
 class TestPaginationParams(BasePaginationTestSuite):
-    add_pydantic_v1_suites = True
-
     @pytest.fixture(scope="session")
     def app(self, builder, entities):
         @builder.both.default.optional

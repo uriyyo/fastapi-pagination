@@ -2,10 +2,7 @@
 
 set -ex
 
-PYDANTIC_V2="${PYDANTIC_V2:-true}"
-PYDANTIC_PRE_V2_12_5="${PYDANTIC_PRE_V2_12_5:-false}"
-FASTAPI_PRE_0_112_4="${FASTAPI_PRE_0_112_4:-false}"
-FASTAPI_PRE_0_137_0="${FASTAPI_PRE_0_137_0:-false}"
+DEPS_RESOLUTION="${DEPS_RESOLUTION:-highest}"
 SYNC_EXTRA_ARGS=()
 TEST_EXTRA_ARGS=()
 
@@ -33,28 +30,9 @@ function _restore_env() {
 echo "Installing dependencies"
 _restore_env
 
-echo "Config: fastapi<0.112.4=$FASTAPI_PRE_0_112_4, fastapi<0.137.0=$FASTAPI_PRE_0_137_0, is-pydantic-v2=$PYDANTIC_V2"
+echo "Config: resolution=$DEPS_RESOLUTION"
 
-if [[ "$FASTAPI_PRE_0_112_4" == true ]]; then
-    _pip install "fastapi<0.112.4"
-elif [[ "$FASTAPI_PRE_0_137_0" == true ]]; then
-    _pip install "fastapi>=0.112.4,<0.137.0"
-else
-    _pip install -U "fastapi>=0.137.0"
-fi
-
-if [[ "$PYDANTIC_V2" == true && "$PYDANTIC_PRE_V2_12_5" == true ]]; then
-    _pip install "pydantic>=2.0.0,<2.12.5"
-elif [[ "$PYDANTIC_V2" == true ]]; then
-    _pip install -U "pydantic>2.0.0"
-else
-  if [[ "$PY_VERSION" == "3.14" ]]; then
-    echo "Skipping tests with Pydantic v1 on Python 3.14 due to incompatibilities"
-    exit 0
-  fi
-
-  _pip install "pydantic<2"
-fi
+_pip install -U -r pyproject.toml --resolution "$DEPS_RESOLUTION"
 
 echo "Running unit-tests"
 _pytest tests --ignore=tests/ext

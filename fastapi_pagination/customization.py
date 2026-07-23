@@ -20,7 +20,6 @@ __all__ = [
     "UseOptionalParams",
     "UseParams",
     "UseParamsFields",
-    "UsePydanticV1",
     "UseQuotedCursor",
     "UseRequiredFields",
     "UseResponseHeaders",
@@ -36,7 +35,6 @@ from dataclasses import dataclass
 from types import new_class
 from typing import (
     TYPE_CHECKING,
-    Annotated,
     Any,
     ClassVar,
     Generic,
@@ -44,20 +42,18 @@ from typing import (
     TypeAlias,
     TypeVar,
     cast,
-    get_origin,
     get_type_hints,
     runtime_checkable,
 )
 
 from fastapi import Query
 from fastapi.params import Param
-from pydantic import BaseModel, ConfigDict, create_model
+from pydantic import BaseModel, ConfigDict, RootModel, create_model
 from typing_extensions import Self, Unpack
 
 from .api import response
 from .bases import AbstractPage, AbstractParams, BaseAbstractPage, BaseRawParams
 from .cursor import CursorDecoder, CursorEncoder
-from .errors import UnsupportedFeatureError
 from .pydantic import (
     get_field_tp,
     get_model_fields,
@@ -65,19 +61,9 @@ from .pydantic import (
     make_field_optional,
     make_field_required,
 )
-from .pydantic.v2 import FieldV2, UndefinedV2, is_pydantic_v2_model
 from .types import Cursor
 from .typing_utils import create_annotated_tp
 from .utils import get_caller
-
-try:
-    from pydantic import RootModel
-except ImportError:  # pragma: no cover
-    from pydantic import BaseModel as RootModel
-
-if TYPE_CHECKING:
-    from .pydantic.v1 import BaseModelV1
-
 
 ClsNamespace: TypeAlias = dict[str, Any]
 PageCls: TypeAlias = "type[AbstractPage[Any]]"
@@ -89,21 +75,13 @@ _T = TypeVar("_T")
 
 
 def get_page_bases(cls: TPage) -> tuple[type[Any], ...]:
-    bases: tuple[type[Any], ...]
+    bases: tuple[type[Any], ...] = (cls,)
 
-    if is_pydantic_v2_model(cls):
-        params = cls.__pydantic_generic_metadata__["parameters"]
-        bases = (cls,)
-        if params:
-            bases = (  # type: ignore[ty:invalid-assignment]
-                cls[params],  # type: ignore[ty:invalid-argument-type]
-                Generic[params],  # type: ignore[ty:invalid-argument-type]
-            )
-    elif cls.__concrete__:
-        bases = (cls,)
-    else:
-        params = tuple(cls.__parameters__)
-        bases = (cls[params], Generic[params])
+    if params := cls.__pydantic_generic_metadata__["parameters"]:
+        bases = (  # type: ignore[ty:invalid-assignment]
+            cls[params],  # type: ignore[ty:invalid-argument-type]
+            Generic[params],  # type: ignore[ty:invalid-argument-type]
+        )
 
     return bases
 
@@ -163,16 +141,8 @@ else:
                 "__params_type__": page_cls.__params_type__,
                 "__model_aliases__": copy(page_cls.__model_aliases__),
                 "__model_exclude__": copy(page_cls.__model_exclude__),
+                "model_config": {},
             }
-
-            if is_pydantic_v2_model(page_cls):
-                new_ns["model_config"] = {}
-            else:
-
-                class Config:
-                    pass
-
-                new_ns["Config"] = Config
 
             for customizer in customizers:
                 if isinstance(customizer, PageCustomizer):
@@ -252,26 +222,17 @@ class _UseOptionalRequiredFields(PageCustomizer):
         if not fields_to_update:
             return
 
-        # wtf is going on here? :(((
         customizer: PageCustomizer
         if self.required:
             fields_to_update = {k: make_field_required(v) for k, v in fields_to_update.items()}
 
-            if is_pydantic_v2_model(page_cls):
-                # to make field required in pydantic v2 we just need to update its type annotation
-                customizer = UseFieldTypeAnnotations(**{k: get_field_tp(v) for k, v in fields_to_update.items()})
-            else:
-                customizer = UseAdditionalFields(**{k: (get_field_tp(v), ...) for k, v in fields_to_update.items()})
-        else:  # noqa: PLR5501
-            if is_pydantic_v2_model(page_cls):
-                fields_to_update = {k: make_field_optional(v) or v for k, v in fields_to_update.items()}
-                customizer = UseAdditionalFields(
-                    **{k: (create_annotated_tp(get_field_tp(v), v), None) for k, v in fields_to_update.items()}
-                )
-            else:
-                customizer = UseAdditionalFields(
-                    **{k: (get_field_tp(v) | None, None) for k, v in fields_to_update.items()},
-                )
+            # to make field required we just need to update its type annotation
+            customizer = UseFieldTypeAnnotations(**{k: get_field_tp(v) for k, v in fields_to_update.items()})
+        else:
+            fields_to_update = {k: make_field_optional(v) for k, v in fields_to_update.items()}
+            customizer = UseAdditionalFields(
+                **{k: (create_annotated_tp(get_field_tp(v), v), None) for k, v in fields_to_update.items()}
+            )
 
         customizer.customize_page_ns(page_cls, ns)
 
@@ -425,10 +386,7 @@ def _update_params_fields(cls: type[AbstractParams], fields: ClsNamespace) -> Cl
         return v
 
     def _get_ann(name: str, v: Any) -> Any:
-        if is_pydantic_v2_model(cls):
-            return getattr(v, "annotation", None) or anns[name]
-
-        return anns[name]
+        return getattr(v, "annotation", None) or anns[name]
 
     return {name: (_get_ann(name, val), _wrap_val(name, val)) for name, val in fields.items()}
 
@@ -466,21 +424,7 @@ class UseModelConfig(PageCustomizer):
         self.config = kwargs
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
-        if is_pydantic_v2_model(page_cls):
-            ns["model_config"].update(self.config)
-        else:
-            for key, val in self.config.items():
-                setattr(ns["Config"], key, val)
-
-
-def _pydantic_v1_get_inited_fields(cls: Any, /, *fields: str) -> ClsNamespace:
-    if not hasattr(cls, "fields"):
-        cls.fields = {}
-
-    for f in fields:
-        cls.fields.setdefault(f, {})
-
-    return cls.fields
+        ns["model_config"].update(self.config)
 
 
 class UseExcludedFields(PageCustomizer):
@@ -488,13 +432,7 @@ class UseExcludedFields(PageCustomizer):
         self.fields = fields
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
-        if is_pydantic_v2_model(page_cls):
-            ns["__model_exclude__"].update(self.fields)
-        else:
-            fields_config = _pydantic_v1_get_inited_fields(ns["Config"], *self.fields)
-
-            for f in self.fields:
-                fields_config[f]["exclude"] = True
+        ns["__model_exclude__"].update(self.fields)
 
 
 class UseFieldsAliases(PageCustomizer):
@@ -502,14 +440,7 @@ class UseFieldsAliases(PageCustomizer):
         self.aliases = aliases
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
-        if is_pydantic_v2_model(page_cls):
-            ns["__model_aliases__"].update(self.aliases)
-        else:
-            fields_config = _pydantic_v1_get_inited_fields(ns["Config"], *self.aliases)
-
-            for name, alias in self.aliases.items():
-                assert name in page_cls.__fields__, f"Unknown field {name!r}"
-                fields_config[name]["alias"] = alias
+        ns["__model_aliases__"].update(self.aliases)
 
 
 _RawFieldDef: TypeAlias = Any | tuple[Any, Any]
@@ -543,9 +474,6 @@ class UseResponseHeaders(PageCustomizer):
     resolver: Callable[[AbstractPage[Any]], dict[str, str | Sequence[str]]]
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
-        if not is_pydantic_v2_model(page_cls):  # pragma: no cover
-            raise UnsupportedFeatureError("UseResponseHeaders is only supported in Pydantic v2")
-
         def model_post_init(_self: AbstractPage[Any], context: Any, /) -> None:
             page_cls.model_post_init(_self, context)
 
@@ -567,102 +495,12 @@ class UseResponseHeaders(PageCustomizer):
         ns["model_post_init"] = model_post_init
 
 
-def _convert_v2_field_to_v1(field_v2: FieldV2) -> tuple[Any, Any]:
-    from .pydantic.v1 import (
-        FieldInfoV1,
-        UndefinedV1,
-    )
-
-    default = field_v2.default
-    if default is UndefinedV2:
-        default = UndefinedV1
-
-    type_ = get_field_tp(field_v2)
-
-    if get_origin(type_) is Annotated:
-        type_, *_ = type_.__args__
-
-    return type_, FieldInfoV1(
-        default=default,
-        default_factory=field_v2.default_factory,
-        alias=cast(str, field_v2.alias or field_v2.validation_alias),
-        title=field_v2.title,
-        description=field_v2.description,
-    )
-
-
-def _convert_v2_page_cls_to_v1(page_cls: type[AbstractPage], /) -> BaseModelV1:
-    from .pydantic.v1 import (
-        BaseModelV1,
-        ConfiguredBaseModelV1,
-        GenericModelV1,
-        create_model_v1,
-    )
-
-    assert issubclass(page_cls, AbstractPage)
-
-    _create = page_cls.create.__func__
-    *_, generic_base = get_page_bases(page_cls)
-    tp_params = generic_base.__parameters__
-
-    class _PydanticV2ToV1(
-        BaseAbstractPage,
-        GenericModelV1,
-        ConfiguredBaseModelV1,
-        generic_base,
-    ):
-        __params_type__ = copy(page_cls.__params_type__)
-        __model_aliases__ = copy(page_cls.__model_aliases__)
-        __model_exclude__ = copy(page_cls.__model_exclude__)
-
-        @classmethod
-        def create(
-            cls,
-            items: Sequence[Any],
-            params: AbstractParams,
-            **kwargs: Any,
-        ) -> Self:
-            return _create(
-                cls,
-                items=items,
-                params=params,
-                **kwargs,
-            )
-
-    new_cls = create_model_v1(  # type: ignore[ty:no-matching-overload]
-        page_cls.__name__,
-        __base__=(_PydanticV2ToV1[tp_params], Generic[tp_params]),  # type: ignore[ty:invalid-argument-type]
-        **{k: _convert_v2_field_to_v1(cast(FieldV2, v)) for k, v in get_model_fields(page_cls).items()},
-    )
-
-    return cast(BaseModelV1, new_cls)
-
-
-@dataclass
-class UsePydanticV1(PageTransformer):
-    def transform_page_cls(self, page_cls: PageCls) -> PageCls:
-        if not is_pydantic_v2_model(page_cls):  # pragma: no cover
-            return page_cls
-
-        return cast(PageCls, _convert_v2_page_cls_to_v1(page_cls))
-
-
 @dataclass
 class UseFlattenPage(PostPageTransformer):
     field: str = "items"
 
     def post_transform_page_cls(self, page_cls: PageCls) -> PageCls:
-        _is_pydantic_v2 = is_pydantic_v2_model(page_cls)
-
-        if _is_pydantic_v2:  # noqa: SIM108
-            base_cls = RootModel[list[_T]]
-        else:  # pragma: no cover
-            base_cls = RootModel
-
-        class _FlattenPage(AbstractPage[_T], base_cls):  # type: ignore[ty:invalid-base]
-            if not _is_pydantic_v2:  # pragma: no cover
-                __root__: list[_T]
-
+        class _FlattenPage(AbstractPage[_T], RootModel[list[_T]]):
             __params_type__ = page_cls.__params_type__
 
             @classmethod
@@ -675,9 +513,6 @@ class UseFlattenPage(PostPageTransformer):
                 page = page_cls.create(items, params, **kwargs)
                 items = getattr(page, self.field)
 
-                if _is_pydantic_v2:
-                    return cls(items)  # type: ignore[ty:missing-argument]  # type: ignore[ty:too-many-positional-arguments]
-
-                return cls.parse_obj(items)  # pragma: no cover
+                return cls(items)
 
         return cast(PageCls, _FlattenPage)

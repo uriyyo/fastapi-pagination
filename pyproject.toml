@@ -20,8 +20,8 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
 ]
 dependencies = [
-    "fastapi>=0.93.0",
-    "pydantic>=1.9.1",
+    "fastapi>=0.137.0",
+    "pydantic>=2.13.4",
     "typing-extensions>=4.8.0",
 ]
 

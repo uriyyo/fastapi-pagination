@@ -3,10 +3,10 @@ from contextlib import suppress
 
 import pytest
 from pony.orm import Database, Required, Set, db_session, select
+from pydantic import field_validator
 from sqlalchemy.engine.url import make_url
 
 from fastapi_pagination.ext.pony import paginate
-from fastapi_pagination.pydantic import IS_PYDANTIC_V2
 from tests.base import BasePaginationTestSuite
 
 
@@ -52,14 +52,7 @@ def pony_order(pony_db, pony_user):
     return Order
 
 
-if IS_PYDANTIC_V2:
-    from pydantic import field_validator
-
-    _field_validator = field_validator("orders", mode="before")
-else:
-    from pydantic import validator
-
-    _field_validator = validator("orders", pre=True, allow_reuse=True)
+_field_validator = field_validator("orders", mode="before")
 
 
 @pytest.mark.skipif(
