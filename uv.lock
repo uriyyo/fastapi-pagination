@@ -815,7 +815,7 @@ wheels = [
 
 [[package]]
 name = "fastapi-pagination"
-version = "0.15.15"
+version = "0.16.0b1"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
