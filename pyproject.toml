@@ -41,7 +41,7 @@ asyncpg = [
     "asyncpg>=0.24.0",
 ]
 django = ["django<6.0.0"]
-piccolo = ["piccolo>=0.89"]
+piccolo = ["piccolo>=1.0"]
 mongoengine = ["mongoengine>=0.23.1"]
 beanie = ["beanie>=2.1.0"]
 scylla-driver = ["scylla-driver>=3.25.6"]

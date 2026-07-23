@@ -880,7 +880,7 @@ requires-dist = [
     { name = "ormar", marker = "extra == 'ormar'", specifier = ">=0.21.0" },
     { name = "peewee", marker = "extra == 'peewee'", specifier = ">=4.0" },
     { name = "peewee", marker = "extra == 'peewee-sync'", specifier = ">=4.0" },
-    { name = "piccolo", marker = "extra == 'piccolo'", specifier = ">=0.89" },
+    { name = "piccolo", marker = "extra == 'piccolo'", specifier = ">=1.0" },
     { name = "psycopg", extras = ["binary"], marker = "extra == 'psycopg'", specifier = ">=3.3.2" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "scylla-driver", marker = "extra == 'scylla-driver'", specifier = ">=3.25.6" },
