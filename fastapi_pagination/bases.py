@@ -17,17 +17,14 @@ from collections.abc import Sequence
 from contextlib import suppress
 from dataclasses import dataclass
 from typing import (
-    TYPE_CHECKING,
     Any,
     ClassVar,
     Generic,
 )
 
+from pydantic import BaseModel, ConfigDict, PydanticUndefinedAnnotation
 from typing_extensions import Self, TypeIs, TypeVar
 
-from .pydantic import IS_PYDANTIC_V2
-from .pydantic.types import LatestConfiguredBaseModel, LatestGenericModel
-from .pydantic.v2 import PydanticUndefinedAnnotationV2
 from .types import Cursor, GreaterEqualZero, ParamsType
 
 TAny = TypeVar("TAny", default=Any)
@@ -119,14 +116,15 @@ class BaseAbstractPage(ABC, Generic[TAny]):
         pass
 
 
-class AbstractPage(BaseAbstractPage[TAny], LatestConfiguredBaseModel, LatestGenericModel, ABC, Generic[TAny]):
-    # used by pydantic v2
+class AbstractPage(BaseAbstractPage[TAny], BaseModel, ABC, Generic[TAny]):
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        from_attributes=True,
+        populate_by_name=True,
+    )
+
     __model_aliases__: ClassVar[dict[str, str]] = {}
     __model_exclude__: ClassVar[set[str]] = set()
-
-    if TYPE_CHECKING:  # only for pydantic v1
-        __concrete__: ClassVar[bool]
-        __parameters__: ClassVar[tuple[Any, ...]]
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
@@ -140,21 +138,19 @@ class AbstractPage(BaseAbstractPage[TAny], LatestConfiguredBaseModel, LatestGene
     def set_params(cls, params_cls: type[AbstractParams], /) -> None:
         connect_page_and_params(cls, params_cls)
 
-    if IS_PYDANTIC_V2:
+    @classmethod
+    def __pydantic_init_subclass__(cls, **kwargs: Any) -> None:
+        super().__pydantic_init_subclass__(**kwargs)
 
-        @classmethod
-        def __pydantic_init_subclass__(cls, **kwargs: Any) -> None:
-            super().__pydantic_init_subclass__(**kwargs)
+        for exclude in cls.__model_exclude__:
+            cls.model_fields[exclude].exclude = True
+        for name, alias in cls.__model_aliases__.items():
+            cls.model_fields[name].serialization_alias = alias
 
-            for exclude in cls.__model_exclude__:
-                cls.model_fields[exclude].exclude = True
-            for name, alias in cls.__model_aliases__.items():
-                cls.model_fields[name].serialization_alias = alias
-
-            # rebuild model only in case if customizations is present
-            if cls.__model_exclude__ or cls.__model_aliases__:
-                with suppress(PydanticUndefinedAnnotationV2):
-                    cls.model_rebuild(force=True)
+        # rebuild model only in case if customizations is present
+        if cls.__model_exclude__ or cls.__model_aliases__:
+            with suppress(PydanticUndefinedAnnotation):
+                cls.model_rebuild(force=True)
 
 
 class BasePage(AbstractPage[TAny], ABC, Generic[TAny]):

@@ -41,7 +41,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
     transformer: AsyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     projection_model: type[DocumentProjectionType] | None = None,
-    sort: None | str | list[tuple[str, SortDirection]] = None,
+    sort: str | list[tuple[str, SortDirection]] | None = None,
     session: AsyncClientSession | None = None,
     ignore_cache: bool = False,
     fetch_links: bool = False,

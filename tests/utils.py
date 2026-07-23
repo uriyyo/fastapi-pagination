@@ -3,10 +3,7 @@ from contextlib import AbstractAsyncContextManager, AbstractContextManager
 from typing import Any, TypeVar
 
 from faker import Faker
-from fastapi import __version__
 from pydantic import BaseModel
-
-from fastapi_pagination.pydantic.v2 import is_pydantic_v2_model
 
 faker = Faker()
 
@@ -14,17 +11,11 @@ T = TypeVar("T", bound=BaseModel)
 
 
 def parse_obj(model: type[T], obj: Any) -> T:
-    if is_pydantic_v2_model(model):
-        return model.model_validate(obj, from_attributes=True)
-
-    return model.parse_obj(obj)
+    return model.model_validate(obj, from_attributes=True)
 
 
 def dump_obj(obj: T) -> dict[str, Any]:
-    if is_pydantic_v2_model(type(obj)):
-        return obj.model_dump()
-
-    return obj.dict()
+    return obj.model_dump()
 
 
 def normalize(model: type[T], *models: Any) -> list[T]:
@@ -53,11 +44,7 @@ def create_ctx(
     return ctx_func
 
 
-IS_FASTAPI_V_0_112_4_OR_NEWER = tuple(int(part) for part in __version__.split(".") if part.isdigit()) >= (0, 112, 4)
-
-
 __all__ = [
-    "IS_FASTAPI_V_0_112_4_OR_NEWER",
     "create_ctx",
     "dump_obj",
     "faker",

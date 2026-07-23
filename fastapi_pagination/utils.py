@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 __all__ = [
-    "IS_PYDANTIC_V2",
     "FastAPIPaginationWarning",
     "async_resolve_additional_data",
     "await_if_async",
     "await_if_coro",
     "check_installed_extensions",
-    "create_pydantic_model",
     "disable_installed_extensions_check",
     "get_caller",
     "is_additional_data_callable",
@@ -36,40 +34,9 @@ from .types import (
 
 if TYPE_CHECKING:
     from .bases import AbstractParams, BaseRawParams, CursorRawParams, RawParams
-    from .pydantic import create_pydantic_model
     from .types import ParamsType
 
     TParams = TypeVar("TParams", bound=AbstractParams)
-
-    from .pydantic import IS_PYDANTIC_V2
-
-
-def __getattr__(name: str) -> Any:
-    if name == "IS_PYDANTIC_V2":  # pragma: no cover
-        from .pydantic import IS_PYDANTIC_V2
-
-        warnings.warn(
-            "Importing 'IS_PYDANTIC_V2' from 'fastapi_pagination.utils' is deprecated. "
-            "Please import it from 'fastapi_pagination.pydantic' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        return IS_PYDANTIC_V2
-
-    if name == "create_pydantic_model":  # pragma: no cover
-        from .pydantic import create_pydantic_model
-
-        warnings.warn(
-            "Importing 'create_pydantic_model' from 'fastapi_pagination.utils' is deprecated. "
-            "Please import it from 'fastapi_pagination.pydantic' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        return create_pydantic_model
-
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 @overload

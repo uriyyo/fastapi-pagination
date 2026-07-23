@@ -9,23 +9,17 @@ __all__ = [
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from dataclasses import dataclass
-from types import SimpleNamespace
 from typing import Any, Generic
 
-from pydantic import BaseModel, Field, root_validator  # type: ignore[ty:deprecated]
+from pydantic import BaseModel, Field, computed_field
 from starlette.requests import URL
 from typing_extensions import TypeVar
 
 from fastapi_pagination.api import request, response
 from fastapi_pagination.bases import AbstractPage
-from fastapi_pagination.customization import ClsNamespace, PageCls, PageCustomizer, UseAdditionalFields
-from fastapi_pagination.pydantic import IS_PYDANTIC_V2
+from fastapi_pagination.customization import ClsNamespace, PageCls, PageCustomizer
 
-_link_field = (
-    Field(default=None, examples=["/api/v1/users?limit=1&offset1"])
-    if IS_PYDANTIC_V2
-    else Field(default=None, example="/api/v1/users?limit=1&offset1")
-)
+_link_field = Field(default=None, examples=["/api/v1/users?limit=1&offset1"])
 
 
 class Links(BaseModel):
@@ -102,21 +96,7 @@ class BaseUseLinks(BaseLinksCustomizer[TPage_contra], ABC):
     field: str = "links"
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
-        if IS_PYDANTIC_V2:
-            from pydantic import computed_field
-
-            ns[self.field] = computed_field(return_type=Links)(lambda _self: self.resolve_links(_self))
-            return
-
-        add_field = UseAdditionalFields(**{self.field: (Links, Field(default_factory=Links))})
-        add_field.customize_page_ns(page_cls, ns)
-
-        @root_validator(skip_on_failure=True, allow_reuse=True)
-        def __links_root_validator__(cls: Any, values: dict[str, Any]) -> dict[str, Any]:  # noqa: N807
-            values[self.field] = self.resolve_links(SimpleNamespace(**values))
-            return values
-
-        ns["__links_root_validator__"] = __links_root_validator__
+        ns[self.field] = computed_field(return_type=Links)(lambda _self: self.resolve_links(_self))
 
 
 @dataclass
@@ -136,17 +116,7 @@ class BaseUseHeaderLinks(BaseLinksCustomizer[TPage_contra], ABC):
             rsp = response()
             rsp.headers["Link"] = ", ".join(parts)
 
-    def _customize_page_ns_pydantic_v1(self, page_cls: PageCls, ns: ClsNamespace, /) -> None:
-        @root_validator(skip_on_failure=True, allow_reuse=True)  # type: ignore[ty:deprecated]
-        def __add_links_to_header__(cls: Any, values: dict[str, Any]) -> dict[str, Any]:  # noqa: N807
-            links = self.resolve_links(SimpleNamespace(**values))  # type: ignore[ty:invalid-argument-type]
-            self._add_links_to_header(links)
-
-            return values
-
-        ns["__add_links_to_header__"] = __add_links_to_header__
-
-    def _customize_page_ns_pydantic_v2(self, page_cls: PageCls, ns: ClsNamespace, /) -> None:
+    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
         def __model_post_init__(  # noqa: N807
             page_self: TPage_contra,
             _: Any,
@@ -155,9 +125,3 @@ class BaseUseHeaderLinks(BaseLinksCustomizer[TPage_contra], ABC):
             self._add_links_to_header(links)
 
         ns["model_post_init"] = __model_post_init__
-
-    def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
-        if IS_PYDANTIC_V2:
-            self._customize_page_ns_pydantic_v2(page_cls, ns)
-        else:
-            self._customize_page_ns_pydantic_v1(page_cls, ns)
