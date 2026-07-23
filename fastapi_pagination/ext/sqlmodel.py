@@ -40,7 +40,7 @@ _InputQuery: TypeAlias = Select[TSQLModel] | type[TSQLModel] | SelectBase[TSQLMo
 _InputCountQuery: TypeAlias = Select[TSQLModel] | SelectOfScalar[T]
 
 
-def _prepare_query(query: _InputQuery[TSQLModel, T], /) -> _InputQuery[TSQLModel, T]:
+def _prepare_query(query: _InputQuery[TSQLModel, T], /) -> Select[TSQLModel] | SelectOfScalar[T]:
     if not isinstance(query, (Select, SelectOfScalar)):
         query = select(query)  # type: ignore[ty:no-matching-overload]
 
@@ -108,7 +108,7 @@ def paginate(
             session,
             query,
             params,
-            count_query=count_query,  # type: ignore[ty:invalid-argument-type]
+            count_query=count_query,
             subquery_count=subquery_count,
             transformer=transformer,
             additional_data=additional_data,
@@ -144,7 +144,7 @@ async def apaginate(
     query = _prepare_query(query)
 
     if count_query is not None:
-        count_query = _prepare_query(count_query)  # type: ignore[ty:invalid-assignment]
+        count_query = _prepare_query(count_query)
 
     return await _apaginate(
         session,
