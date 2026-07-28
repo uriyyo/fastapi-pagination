@@ -32,7 +32,6 @@ from typing import (
 
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.dependencies.utils import (
-    get_body_field,
     get_parameterless_sub_dependant,
     lenient_issubclass,
 )
@@ -56,6 +55,20 @@ except ImportError:  # pragma: no cover
     class _IncludedRouter:
         pass
 
+
+try:
+    from fastapi.dependencies.utils import _get_body_field as get_body_field
+    from fastapi.dependencies.utils import _get_flat_body_params as get_flat_body_params
+
+    _get_body_field_new_signature = True
+    _get_flat_body_params_new_signature = True
+except ImportError:  # pragma: no cover
+    from fastapi.dependencies.utils import get_body_field  # type: ignore[ty:unresolved-import]
+
+    def get_flat_body_params(_: Any) -> list[Any]:
+        return []
+
+    _get_body_field_new_signature = True
 
 from .bases import AbstractPage, AbstractParams, BaseAbstractPage
 from .errors import UninitializedConfigurationError
@@ -333,6 +346,15 @@ def pagination_ctx(
 
 
 def _bet_body_field(route: APIRoute) -> Any | None:
+    if _get_body_field_new_signature:
+        # get_body_field was converted into private function and changed signature in fastapi 0.140.5
+
+        return get_body_field(
+            body_params=get_flat_body_params(route.dependant),
+            name=route.unique_id,
+            embed_body_fields=route._embed_body_fields,
+        )
+
     try:
         # starting from fastapi 0.113.0 get_body_field changed its signature
         return get_body_field(
@@ -341,8 +363,8 @@ def _bet_body_field(route: APIRoute) -> Any | None:
             embed_body_fields=route._embed_body_fields,
         )
     except (TypeError, AttributeError):
-        return get_body_field(  # type: ignore[ty:missing-argument]
-            dependant=route.dependant,  # type: ignore[ty:unknown-argument]
+        return get_body_field(
+            dependant=route.dependant,
             name=route.unique_id,
         )
 
@@ -371,6 +393,7 @@ def _update_route(route: APIRoute) -> None:
     )
 
     route.body_field = _bet_body_field(route)
+
     route.app = request_response(route.get_route_handler())
 
 
