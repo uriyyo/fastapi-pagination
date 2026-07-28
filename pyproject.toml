@@ -115,6 +115,7 @@ ignore = [
     "FAST002", # allow to use non-annotated dependencies
     "PLR0913", # allow more than 5 arguments
     "PLR2004", # allow to compare with "magic numbers"
+    "PLR0917", # allow too many positional arguments
     "PLW0108", # allow lambda with unnecessary function call
     "TC001",   # ignore moving things to if TYPE_CHECKING block
     "TC002",   # ignore moving things to if TYPE_CHECKING block
@@ -122,6 +123,7 @@ ignore = [
     "A005",    # allow module name to shadow a Python standard-library module
     "TC006",   # ignore quotes in typing.cast calls
     "PLC0415", # allow to have local imports
+    "CPY001",  # ignore copyright
 
     # full rule exclude
     "D",    # ignore docstrings
