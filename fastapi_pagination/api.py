@@ -28,8 +28,9 @@ from typing import (
 )
 
 from fastapi import Depends, FastAPI, Request, Response
+from fastapi.dependencies.utils import _get_body_field as get_body_field
+from fastapi.dependencies.utils import _get_flat_body_params as get_flat_body_params
 from fastapi.dependencies.utils import (
-    get_body_field,
     get_parameterless_sub_dependant,
     lenient_issubclass,
 )
@@ -307,7 +308,7 @@ def _update_route(route: APIRoute) -> None:
     )
 
     route.body_field = get_body_field(
-        flat_dependant=route.dependant,
+        body_params=get_flat_body_params(route.dependant),
         name=route.unique_id,
         embed_body_fields=route._embed_body_fields,
     )
