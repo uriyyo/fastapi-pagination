@@ -14,7 +14,6 @@ __all__ = [
     "set_params",
 ]
 
-from . import _warns  # noqa: F401
 from .api import (
     add_pagination,
     create_page,

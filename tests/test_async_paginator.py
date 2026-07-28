@@ -26,8 +26,6 @@ CustomPage = CustomizedPage[
 
 
 class TestAsyncPaginationParams(BasePaginationTestSuite):
-    add_pydantic_v1_suites = True
-
     @pytest.fixture(
         scope="session",
         params=[len, _len_func, None],

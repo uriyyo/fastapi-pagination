@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from ormar import Integer, Model, String
 
 from fastapi_pagination import LimitOffsetPage, Page, add_pagination
-from fastapi_pagination.ext.ormar import paginate
+from fastapi_pagination.ext.ormar import apaginate
 
 faker = Faker()
 
@@ -60,7 +60,7 @@ async def create_user(user_in: User) -> Any:
 @app.get("/users/default", response_model=Page[User])
 @app.get("/users/limit-offset", response_model=LimitOffsetPage[User])
 async def get_users() -> Any:
-    return await paginate(User.objects)
+    return await apaginate(User.objects)
 
 
 add_pagination(app)

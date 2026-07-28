@@ -1,11 +1,10 @@
-__all__ = ["apaginate", "paginate"]
+__all__ = ["apaginate"]
 
 from typing import Any, TypeVar
 
 from tortoise.models import Model
 from tortoise.query_utils import Prefetch
 from tortoise.queryset import QuerySet
-from typing_extensions import deprecated
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
@@ -59,26 +58,4 @@ async def apaginate(
             additional_data=additional_data,
             config=config,
         ),
-    )
-
-
-@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
-async def paginate(
-    query: QuerySet[TModel] | type[TModel],
-    params: AbstractParams | None = None,
-    prefetch_related: bool | list[str | Prefetch] = False,
-    *,
-    transformer: AsyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
-    total: int | None = None,
-    config: Config | None = None,
-) -> Any:
-    return await apaginate(
-        query,
-        params=params,
-        prefetch_related=prefetch_related,
-        transformer=transformer,
-        additional_data=additional_data,
-        total=total,
-        config=config,
     )

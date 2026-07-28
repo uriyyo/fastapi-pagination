@@ -1,9 +1,8 @@
-__all__ = ["apaginate", "paginate"]
+__all__ = ["apaginate"]
 
 from typing import Any, TypeVar
 
 from ormar import Model, QuerySet
-from typing_extensions import deprecated
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
@@ -37,22 +36,4 @@ async def apaginate(
             additional_data=additional_data,
             config=config,
         )
-    )
-
-
-@deprecated("Use `apaginate` instead. This function will be removed in v0.16.0")
-async def paginate(
-    query: QuerySet[TModel] | type[TModel],
-    params: AbstractParams | None = None,
-    *,
-    transformer: AsyncItemsTransformer | None = None,
-    additional_data: AdditionalData | None = None,
-    config: Config | None = None,
-) -> Any:
-    return await apaginate(
-        query,
-        params=params,
-        transformer=transformer,
-        additional_data=additional_data,
-        config=config,
     )
