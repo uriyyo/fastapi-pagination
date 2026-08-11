@@ -177,7 +177,7 @@ wheels = [
 
 [[package]]
 name = "beanie"
-version = "2.1.0"
+version = "2.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -186,9 +186,9 @@ dependencies = [
     { name = "pymongo" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/53/9c/f3037fff9ea059d7b0c72b6c6e4f3dcfeb28bf544fe0fc5420335d7c49d0/beanie-2.1.0.tar.gz", hash = "sha256:44f3c50710aa90daa9c9c40f9bf9c8954968fe16d7e5398c1f2fd462daf94fe1", size = 185979, upload-time = "2026-03-26T01:27:03.63Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6b/a1/4abc93d5437999c55465f68c3c81e4735cdfe22827072c0e9cab00f63d11/beanie-2.2.0.tar.gz", hash = "sha256:2dc116e7f4a6650f8066f95851d34d898983af6ffaf5366dcfef892993537a51", size = 70115, upload-time = "2026-08-07T17:15:24.494Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/00/b5/1c6c404bcce8fa53d3f422dce6e58bff99c3e3cb2a3c49d519e3e5822125/beanie-2.1.0-py3-none-any.whl", hash = "sha256:077381dad0e0129fd4dc38cdaa3d85cb517da7338e3d893a689314884df4379b", size = 92697, upload-time = "2026-03-26T01:27:02.191Z" },
+    { url = "https://files.pythonhosted.org/packages/c5/ae/2584fb9871b58f3c5334110f8ce00bd1421fe5fbda28eeac9a8d01d10ba6/beanie-2.2.0-py3-none-any.whl", hash = "sha256:4074f893ef00c52b8538b814c9dfd55130eea4ed0579abfae72853657c9029e4", size = 93116, upload-time = "2026-08-07T17:15:22.777Z" },
 ]
 
 [[package]]
