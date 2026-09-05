@@ -15,7 +15,7 @@ T = TypeVar("T", bound=Model)
 
 
 def paginate(
-    query: type[T] | QuerySet[T],
+    query: type[T] | QuerySet,
     params: AbstractParams | None = None,
     *,
     transformer: SyncItemsTransformer | None = None,

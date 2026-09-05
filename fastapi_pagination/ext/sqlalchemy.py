@@ -78,26 +78,30 @@ except ImportError:  # pragma: no cover
         raise ImportError("sqlalchemy.util.await_only is not available")
 
 
-try:
+if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import async_scoped_session
-except ImportError:  # pragma: no cover
+else:
+    try:
+        from sqlalchemy.ext.asyncio import async_scoped_session
+    except ImportError:  # pragma: no cover
+        _AS = TypeVar("_AS")
 
-    class async_scoped_session:  # noqa: N801
-        def __init__(self, *_: Any, **__: Any) -> None:
-            raise ImportError("sqlalchemy.ext.asyncio is not available")
+        class async_scoped_session(Generic[_AS]):  # noqa: N801
+            def __init__(self, *_: Any, **__: Any) -> None:
+                raise ImportError("sqlalchemy.ext.asyncio is not available")
 
 
 try:
     from sqlakeyset import asyncio as apaging
     from sqlakeyset import paging
 except ImportError:  # pragma: no cover
-    paging = None  # type: ignore[ty:invalid-assignment]
+    paging = None
     apaging = None  # type: ignore[ty:invalid-assignment]
 
 
 _INLINE_COUNT_LABEL = "__pagination_inline_count__"
 
-AsyncConn: TypeAlias = "AsyncSession | AsyncConnection | async_scoped_session[Any]"
+AsyncConn: TypeAlias = "AsyncSession | AsyncConnection | async_scoped_session[AsyncSession]"
 SyncConn: TypeAlias = "Session | Connection | scoped_session[Any]"
 AnyConn: TypeAlias = "AsyncConn | SyncConn"
 

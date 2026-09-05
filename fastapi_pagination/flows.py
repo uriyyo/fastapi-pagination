@@ -12,7 +12,7 @@ __all__ = [
 
 from collections.abc import Callable, Sequence
 from contextlib import ExitStack
-from typing import Any, Protocol, TypeAlias
+from typing import Any, Protocol, TypeAlias, cast
 
 from .api import apply_items_transformer, create_page, set_page
 from .bases import AbstractParams, CursorRawParams, RawParams, is_cursor, is_limit_offset
@@ -86,7 +86,7 @@ def additional_data_flow(
         resolved = yield additional_data(items)
         return resolved
 
-    return additional_data or {}
+    return cast(AdditionalDataResult, additional_data or {})
 
 
 @flow
