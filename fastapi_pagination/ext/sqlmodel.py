@@ -2,11 +2,12 @@ from __future__ import annotations
 
 __all__ = ["apaginate", "paginate"]
 
-from typing import Any, Generic, TypeAlias, TypeVar
+from typing import Any, Generic, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlmodel import Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
+from typing_extensions import TypeAliasType
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
@@ -33,13 +34,21 @@ T = TypeVar("T")
 TSQLModel = TypeVar("TSQLModel", bound=SQLModel)
 
 
-_InputQuery: TypeAlias = Select[TSQLModel] | type[TSQLModel] | SelectBase[TSQLModel] | SelectOfScalar[T]
-_InputCountQuery: TypeAlias = Select[TSQLModel] | SelectOfScalar[T]
+_InputQuery = TypeAliasType(
+    "_InputQuery",
+    "type[TSQLModel] | SelectBase[T]",
+    type_params=(TSQLModel, T),
+)
+_InputCountQuery = TypeAliasType(
+    "_InputCountQuery",
+    "type[TSQLModel] | SelectBase[T]",
+    type_params=(TSQLModel, T),
+)
 
 
-def _prepare_query(query: _InputQuery[TSQLModel, T], /) -> Select[TSQLModel] | SelectOfScalar[T]:
+def _prepare_query(query: _InputQuery[TSQLModel, T], /) -> Any:
     if not isinstance(query, (Select, SelectOfScalar)):
-        query = select(query)  # type: ignore[ty:no-matching-overload]
+        return select(query)  # type: ignore[ty:no-matching-overload]
 
     return query
 
@@ -56,16 +65,14 @@ def paginate(
     unique: bool = True,
     config: Config | None = None,
 ) -> Any:
-    query = _prepare_query(query)
-
-    if count_query is not None:
-        count_query = _prepare_query(count_query)
+    prepared_query = _prepare_query(query)
+    prepared_count_query = _prepare_query(count_query) if count_query is not None else None
 
     return _paginate(
         session,
-        query,
+        prepared_query,
         params,
-        count_query=count_query,
+        count_query=prepared_count_query,
         subquery_count=subquery_count,
         transformer=transformer,
         additional_data=additional_data,
@@ -86,16 +93,14 @@ async def apaginate(
     unique: bool = True,
     config: Config | None = None,
 ) -> Any:
-    query = _prepare_query(query)
-
-    if count_query is not None:
-        count_query = _prepare_query(count_query)
+    prepared_query = _prepare_query(query)
+    prepared_count_query = _prepare_query(count_query) if count_query is not None else None
 
     return await _apaginate(
         session,
-        query,
+        prepared_query,
         params,
-        count_query=count_query,
+        count_query=prepared_count_query,
         subquery_count=subquery_count,
         transformer=transformer,
         additional_data=additional_data,
