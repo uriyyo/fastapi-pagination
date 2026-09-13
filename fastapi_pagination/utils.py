@@ -191,7 +191,7 @@ def sync_resolve_additional_data(
     additional_data: SyncAdditionalData | None,
 ) -> AdditionalDataResult:
     if callable(additional_data):
-        return cast(AdditionalDataResult, additional_data(items))  # type: ignore[ty:call-top-callable]
+        return cast(AdditionalDataResult, additional_data(items))
 
     return additional_data or {}
 
@@ -201,7 +201,7 @@ async def async_resolve_additional_data(
     additional_data: AdditionalData | None,
 ) -> AdditionalDataResult:
     if callable(additional_data):
-        return cast(AdditionalDataResult, await await_if_coro(additional_data(items)))  # type: ignore[ty:call-top-callable]
+        return cast(AdditionalDataResult, await await_if_coro(additional_data(items)))
 
     return cast(AdditionalDataResult, additional_data) or {}
 
