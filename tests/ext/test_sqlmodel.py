@@ -1,12 +1,16 @@
+from contextlib import closing
 from functools import partial
 from typing import Any
 
 import pytest
 from fastapi import Depends
+from sqlalchemy import bindparam
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import selectinload
 from sqlmodel import Field, Relationship, Session, SQLModel, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from fastapi_pagination import Page, Params, set_page
 from fastapi_pagination.ext.sqlmodel import apaginate, paginate
 from tests.base import BasePaginationTestSuite, async_sync_testsuite
 from tests.utils import create_ctx, maybe_async
@@ -91,3 +95,51 @@ class TestSQLModelRelationship(_SQLModelPaginateFunc, BasePaginationTestSuite):
             return await maybe_async(paginate_func(db, select(sm_user).options(selectinload(sm_user.orders))))
 
         return builder.build()
+
+
+class TestSQLModelBindParams:
+    @pytest.fixture(scope="session")
+    def bound_query(self, sm_user):
+        return select(sm_user).where(sm_user.name == bindparam("target_name"))
+
+    @pytest.fixture(scope="session")
+    def target_name(self, entities):
+        return entities[0].name
+
+    @pytest.fixture(scope="session")
+    def expected_total(self, entities, target_name):
+        return sum(1 for entry in entities if entry.name == target_name)
+
+    @pytest.fixture(scope="session")
+    def async_sa_engine(self, database_url):
+        async_url = database_url.replace("postgresql", "postgresql+asyncpg", 1).replace("sqlite", "sqlite+aiosqlite", 1)
+
+        return create_async_engine(async_url)
+
+    def test_bind_params_paginate(self, sm_session, bound_query, target_name, expected_total):
+        with closing(sm_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                bound_query,
+                params=Params(page=1, size=10),
+                bind_params={"target_name": target_name},
+                execute_options={"logging_token": "bind-params-test"},
+            )
+
+        assert page.total == expected_total
+        assert all(item.name == target_name for item in page.items)
+
+    @pytest.mark.asyncio(scope="session")
+    async def test_bind_params_apaginate(self, async_sa_engine, bound_query, target_name, expected_total):
+        with set_page(Page[Any]):
+            async with AsyncSession(async_sa_engine) as session:
+                page = await apaginate(
+                    session,
+                    bound_query,
+                    params=Params(page=1, size=10),
+                    bind_params={"target_name": target_name},
+                    execute_options={"logging_token": "bind-params-test"},
+                )
+
+        assert page.total == expected_total
+        assert all(item.name == target_name for item in page.items)
