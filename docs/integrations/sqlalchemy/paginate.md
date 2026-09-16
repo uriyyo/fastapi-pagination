@@ -9,6 +9,8 @@ It can work for both `sync` and `async` SQLAlchemy engines.
 * `count_query` - is a query that will be used to count the total number of rows, if not provided, it will be generated automatically.
 * `unique` - is a boolean indicates if `unique` should be called on a result rows or not, might be required when you have `joinedload` relationships.
 * `unwrap_mode` - indicates how to unwrap the result rows, it can be either `auto`, `legacy`, `unwrap`, `no-unwrap`.
+* `bind_params` - a mapping of values for the bound parameters of the query, passed to every statement that is executed.
+* `execute_options` - a mapping of SQLAlchemy execution options, passed to every statement that is executed.
 
 ## `subquery_count` param
 
@@ -191,3 +193,63 @@ page = paginate(
 print(page.model_dump_json(indent=4))
 print()
 ```
+## `bind_params` and `execute_options` params
+
+If your query uses [bound parameters](https://docs.sqlalchemy.org/en/20/core/sqlelement.html#sqlalchemy.sql.expression.bindparam),
+pass their values with `bind_params`. They are applied to both the count query and the page query, so the total
+matches the rows you get back.
+
+`execute_options` works the same way for
+[execution options](https://docs.sqlalchemy.org/en/20/core/connections.html#sqlalchemy.engine.Connection.execution_options).
+
+```py
+from sqlalchemy import bindparam, create_engine, select
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass, Mapped, Session, mapped_column
+
+from fastapi_pagination import set_params, set_page, Page, Params
+from fastapi_pagination.ext.sqlalchemy import paginate
+
+engine = create_engine("sqlite:///:memory:")
+
+
+class Base(MappedAsDataclass, DeclarativeBase, kw_only=True):
+    pass
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(default=None, primary_key=True)
+
+    name: Mapped[str] = mapped_column()
+    age: Mapped[int] = mapped_column()
+
+
+with Session(engine) as session:
+    Base.metadata.create_all(session.bind)
+
+    session.add_all(
+        [
+            User(name="John", age=25),
+            User(name="Jane", age=30),
+            User(name="Bob", age=20),
+        ],
+    )
+    session.commit()
+
+set_page(Page[User])
+set_params(Params(size=10))
+
+page = paginate(
+    session,
+    select(User).where(User.age > bindparam("min_age")),
+    bind_params={"min_age": 21},
+    execute_options={"logging_token": "users-page"},
+)
+```
+
+!!! warning
+
+    `bind_params` and `execute_options` are not supported together with cursor pagination -
+    passing either one raises a `ValueError`. Cursor pagination is driven by `sqlakeyset`,
+    which issues the query itself.

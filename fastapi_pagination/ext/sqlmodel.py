@@ -2,7 +2,8 @@ from __future__ import annotations
 
 __all__ = ["apaginate", "paginate"]
 
-from typing import Any, Generic, TypeVar
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 from sqlmodel import Session, SQLModel, select
@@ -20,6 +21,9 @@ from fastapi_pagination.types import (
 
 from .sqlalchemy import apaginate as _apaginate
 from .sqlalchemy import paginate as _paginate
+
+if TYPE_CHECKING:
+    from sqlalchemy.engine.interfaces import CoreExecuteOptionsParameter
 
 try:
     from sqlmodel.sql._expression_select_cls import SelectBase
@@ -45,6 +49,11 @@ _InputCountQuery = TypeAliasType(
     type_params=(TSQLModel, T),
 )
 
+_BindParams = TypeAliasType(
+    "_BindParams",
+    "Mapping[str, Any]",
+)
+
 
 def _prepare_query(query: _InputQuery[TSQLModel, T], /) -> Any:
     if not isinstance(query, (Select, SelectOfScalar)):
@@ -60,6 +69,8 @@ def paginate(
     *,
     count_query: _InputCountQuery[TSQLModel, T] | None = None,
     subquery_count: bool = True,
+    bind_params: _BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
     transformer: SyncItemsTransformer | None = None,
     additional_data: SyncAdditionalData | None = None,
     unique: bool = True,
@@ -74,6 +85,8 @@ def paginate(
         params,
         count_query=prepared_count_query,
         subquery_count=subquery_count,
+        bind_params=bind_params,
+        execute_options=execute_options,
         transformer=transformer,
         additional_data=additional_data,
         unique=unique,
@@ -88,6 +101,8 @@ async def apaginate(
     *,
     count_query: _InputCountQuery[TSQLModel, T] | None = None,
     subquery_count: bool = True,
+    bind_params: _BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
     transformer: AsyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     unique: bool = True,
@@ -102,6 +117,8 @@ async def apaginate(
         params,
         count_query=prepared_count_query,
         subquery_count=subquery_count,
+        bind_params=bind_params,
+        execute_options=execute_options,
         transformer=transformer,
         additional_data=additional_data,
         unique=unique,

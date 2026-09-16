@@ -3,11 +3,12 @@ from typing import Any
 
 import pytest
 from fastapi import Depends
-from sqlalchemy import func, select, text
-from sqlalchemy.orm import selectinload
+from sqlalchemy import bindparam, func, select, text
+from sqlalchemy.exc import InvalidRequestError, StatementError
+from sqlalchemy.orm import scoped_session, selectinload, sessionmaker
 
 from fastapi_pagination import Page, Params, set_page, set_params
-from fastapi_pagination.cursor import CursorPage
+from fastapi_pagination.cursor import CursorPage, CursorParams
 from fastapi_pagination.customization import CustomizedPage, UseAdditionalFields, UseQuotedCursor
 from fastapi_pagination.ext.sqlalchemy import apaginate, paginate
 from tests.base import BasePaginationTestSuite, SuiteBuilder, async_sync_testsuite, sync_testsuite
@@ -490,3 +491,161 @@ class TestSQLAlchemyInlineCount:
             )
 
         assert page.page_item_count == len(page.items)
+
+
+class TestSQLAlchemyBindParams:
+    @pytest.fixture(scope="session")
+    def bound_query(self, sa_user):
+        return select(sa_user).where(sa_user.name == bindparam("target_name"))
+
+    @pytest.fixture(scope="session")
+    def target_name(self, entities):
+        return entities[0].name
+
+    @pytest.fixture(scope="session")
+    def expected_total(self, entities, target_name):
+        return sum(1 for entry in entities if entry.name == target_name)
+
+    @pytest.fixture(scope="session")
+    def async_sa_engine(self, database_url):
+        async_url = database_url.replace("postgresql", "postgresql+asyncpg", 1).replace("sqlite", "sqlite+aiosqlite", 1)
+
+        try:
+            from sqlalchemy.ext.asyncio import create_async_engine
+        except ImportError:  # pragma: no cover
+            pytest.skip("async sqlalchemy is not available")
+
+        try:
+            return create_async_engine(async_url)
+        except InvalidRequestError as exc:  # pragma: no cover
+            pytest.skip(f"async driver is not available: {exc}")
+
+    def test_bind_params_orm_session(self, sa_session, bound_query, target_name, expected_total):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                bound_query,
+                params=Params(page=1, size=10),
+                bind_params={"target_name": target_name},
+            )
+
+        assert page.total == expected_total
+        assert all(item.name == target_name for item in page.items)
+
+    def test_bind_params_core_connection(self, sa_engine, bound_query, target_name, expected_total):
+        with sa_engine.connect() as conn, set_page(Page[Any]):
+            page = paginate(
+                conn,
+                bound_query,
+                params=Params(page=1, size=10),
+                bind_params={"target_name": target_name},
+            )
+
+        assert page.total == expected_total
+
+    def test_bind_params_scoped_session(self, sa_engine, bound_query, target_name, expected_total):
+        session_factory = scoped_session(sessionmaker(bind=sa_engine))
+
+        try:
+            with set_page(Page[Any]):
+                page = paginate(
+                    session_factory,
+                    bound_query,
+                    params=Params(page=1, size=10),
+                    bind_params={"target_name": target_name},
+                )
+        finally:
+            session_factory.remove()
+
+        assert page.total == expected_total
+
+    def test_missing_bind_params_raises(self, sa_session, bound_query):
+        with closing(sa_session()) as session, set_page(Page[Any]), pytest.raises(StatementError):
+            paginate(session, bound_query, params=Params(page=1, size=10))
+
+    def test_execute_options_are_passed_through(self, sa_session, bound_query, target_name, expected_total):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                bound_query,
+                params=Params(page=1, size=10),
+                bind_params={"target_name": target_name},
+                execute_options={"logging_token": "bind-params-test"},
+            )
+
+        assert page.total == expected_total
+
+    def test_bind_params_with_inline_count(self, sa_session, bound_query, target_name, expected_total):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                bound_query,
+                params=Params(page=1, size=10),
+                inline_count=func.count().over(),
+                bind_params={"target_name": target_name},
+            )
+
+        assert page.total == expected_total
+
+    def test_bind_params_with_inline_count_out_of_range_page(
+        self,
+        sa_session,
+        bound_query,
+        target_name,
+        expected_total,
+    ):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(
+                session,
+                bound_query,
+                params=Params(page=9999, size=10),
+                inline_count=func.count().over(),
+                bind_params={"target_name": target_name},
+            )
+
+        assert page.items == []
+        assert page.total == expected_total
+
+    def test_legacy_query_sign_accepts_bind_params(self, sa_session, sa_user, entities):
+        with closing(sa_session()) as session, set_page(Page[Any]):
+            page = paginate(session.query(sa_user), params=Params(page=1, size=10))
+
+        assert page.total == len(entities)
+
+    @pytest.mark.parametrize("kwargs", [{"bind_params": {"a": 1}}, {"execute_options": {"logging_token": "x"}}])
+    def test_cursor_pagination_rejects_bind_params(self, sa_session, sa_user, kwargs):
+        with closing(sa_session()) as session, set_page(CursorPage[Any]), pytest.raises(ValueError, match="cursor"):
+            paginate(
+                session,
+                select(sa_user).order_by(sa_user.id),
+                params=CursorParams(size=10),
+                **kwargs,
+            )
+
+    @pytest.mark.asyncio(scope="session")
+    async def test_bind_params_async_session(self, async_sa_engine, bound_query, target_name, expected_total):
+        from sqlalchemy.ext.asyncio import AsyncSession
+
+        with set_page(Page[Any]):
+            async with AsyncSession(async_sa_engine) as session:
+                page = await apaginate(
+                    session,
+                    bound_query,
+                    params=Params(page=1, size=10),
+                    bind_params={"target_name": target_name},
+                )
+
+        assert page.total == expected_total
+
+    @pytest.mark.asyncio(scope="session")
+    async def test_bind_params_async_connection(self, async_sa_engine, bound_query, target_name, expected_total):
+        with set_page(Page[Any]):
+            async with async_sa_engine.connect() as conn:
+                page = await apaginate(
+                    conn,
+                    bound_query,
+                    params=Params(page=1, size=10),
+                    bind_params={"target_name": target_name},
+                )
+
+        assert page.total == expected_total

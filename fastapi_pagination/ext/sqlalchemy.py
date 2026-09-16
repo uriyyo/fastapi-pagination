@@ -10,7 +10,7 @@ __all__ = [
     "paginate",
 ]
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from contextlib import suppress
 from functools import partial
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias, TypeVar, cast, overload
@@ -50,6 +50,7 @@ from .raw_sql import create_paginate_query_from_text as _create_paginate_query_f
 from .utils import generic_query_apply_params, unwrap_scalars
 
 if TYPE_CHECKING:
+    from sqlalchemy.engine.interfaces import CoreExecuteOptionsParameter
     from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 if TYPE_CHECKING:
@@ -116,6 +117,8 @@ Selectable: TypeAlias = (
     "Select[tuple[Any, ...]] | TextClause | FromStatement[tuple[Any, ...]] | CompoundSelect[tuple[Any, ...]]"
 )
 SelectableOrQuery: TypeAlias = "Selectable | Query[Any]"
+
+BindParams: TypeAlias = "Mapping[str, Any]"
 
 
 @overload
@@ -302,18 +305,36 @@ def _total_flow(
     conn: AnyConn,
     count_query: Selectable | None,
     subquery_count: bool,
+    bind_params: BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
 ) -> TotalFlow:
     if count_query is None:
         count_query = create_count_query(query, use_subquery=subquery_count)
 
-    total = yield conn.scalar(count_query)
+    total = yield conn.scalar(
+        count_query,
+        bind_params,
+        execution_options=execute_options or {},
+    )
+
     return cast(int | None, total)
 
 
 @flow
-def _limit_offset_flow(query: Selectable, conn: AnyConn, raw_params: RawParams) -> LimitOffsetFlow:
+def _limit_offset_flow(
+    query: Selectable,
+    conn: AnyConn,
+    raw_params: RawParams,
+    bind_params: BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
+) -> LimitOffsetFlow:
     query = create_paginate_query(query, raw_params)
-    items = yield conn.execute(query)
+
+    items = yield conn.execute(
+        query,
+        bind_params,
+        execution_options=execute_options or {},
+    )
 
     return items
 
@@ -371,6 +392,8 @@ def _sqlalchemy_inline_count_flow(
     count_query: Selectable | None,
     subquery_count: bool,
     unwrap_mode: UnwrapMode | None,
+    bind_params: BindParams | None,
+    execute_options: CoreExecuteOptionsParameter | None,
     transformer: ItemsTransformer | None,
     additional_data: AdditionalData | None,
     unique: bool,
@@ -384,7 +407,11 @@ def _sqlalchemy_inline_count_flow(
     enriched_query = _apply_inline_count(query, inline_count) if raw_params.include_total else query
 
     paginated_query = create_paginate_query(enriched_query, raw_params)
-    result = yield conn.execute(paginated_query)
+    result = yield conn.execute(
+        paginated_query,
+        bind_params,
+        execution_options=execute_options or {},
+    )
 
     with suppress(AttributeError):
         result = _maybe_unique(result, unique)
@@ -396,7 +423,14 @@ def _sqlalchemy_inline_count_flow(
         else:
             # No rows returned: the offset is likely past the end of the result set.
             # The inline count cannot be extracted, so fall back to a separate query.
-            total = yield from _total_flow(query, conn, count_query, subquery_count)
+            total = yield from _total_flow(
+                query,
+                conn,
+                count_query,
+                subquery_count,
+                bind_params=bind_params,
+                execute_options=execute_options,
+            )
 
     items = _unwrap_items(result, query, unwrap_mode)
 
@@ -423,7 +457,13 @@ def _cursor_flow(
     unique: bool,
     is_async: bool,
     raw_params: CursorRawParams,
+    bind_params: BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
 ) -> CursorFlow:
+    # sqlakeyset issues the query itself, so there is nowhere to thread these through.
+    if bind_params is not None or execute_options is not None:
+        raise ValueError("bind_params and execute_options are not supported with cursor pagination")
+
     query = _prepare_query_for_cursor(query)
 
     if isinstance(query, TextClause):
@@ -467,6 +507,8 @@ def _sqlalchemy_flow(
     unwrap_mode: UnwrapMode | None = None,
     count_query: Selectable | None = None,
     inline_count: ColumnElement[int] | None = None,
+    bind_params: BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
     transformer: ItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     unique: bool = True,
@@ -486,6 +528,8 @@ def _sqlalchemy_flow(
             count_query=count_query,
             subquery_count=subquery_count,
             unwrap_mode=unwrap_mode,
+            bind_params=bind_params,
+            execute_options=execute_options,
             transformer=transformer,
             additional_data=additional_data,
             unique=unique,
@@ -496,9 +540,31 @@ def _sqlalchemy_flow(
 
     page = yield from generic_flow(
         async_=is_async,
-        total_flow=partial(_total_flow, query, conn, count_query, subquery_count),
-        limit_offset_flow=partial(_limit_offset_flow, query, conn),
-        cursor_flow=partial(_cursor_flow, query, conn, unique, is_async),
+        total_flow=partial(
+            _total_flow,
+            query,
+            conn,
+            count_query,
+            subquery_count,
+            bind_params=bind_params,
+            execute_options=execute_options,
+        ),
+        limit_offset_flow=partial(
+            _limit_offset_flow,
+            query,
+            conn,
+            bind_params=bind_params,
+            execute_options=execute_options,
+        ),
+        cursor_flow=partial(
+            _cursor_flow,
+            query,
+            conn,
+            unique,
+            is_async,
+            bind_params=bind_params,
+            execute_options=execute_options,
+        ),
         params=params,
         inner_transformer=partial(_inner_transformer, query=query, unwrap_mode=unwrap_mode, unique=unique),
         transformer=transformer,
@@ -531,6 +597,8 @@ def paginate(
     *,
     subquery_count: bool = True,
     unwrap_mode: UnwrapMode | None = None,
+    bind_params: BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
     transformer: SyncItemsTransformer | None = None,
     additional_data: SyncAdditionalData | None = None,
     unique: bool = True,
@@ -549,6 +617,8 @@ def paginate(
     inline_count: ColumnElement[int] | None = None,
     subquery_count: bool = True,
     unwrap_mode: UnwrapMode | None = None,
+    bind_params: BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
     transformer: SyncItemsTransformer | None = None,
     additional_data: SyncAdditionalData | None = None,
     unique: bool = True,
@@ -583,6 +653,8 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
             unique,
             subquery_count,
             unwrap_mode,
+            bind_params,
+            execute_options,
             config,
         ) = _old_paginate_sign(*args, **kwargs)
     except (TypeError, AssertionError):
@@ -597,6 +669,8 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
             unique,
             subquery_count,
             unwrap_mode,
+            bind_params,
+            execute_options,
             config,
         ) = _new_paginate_sign(*args, **kwargs)
 
@@ -610,6 +684,8 @@ def paginate(*args: Any, **kwargs: Any) -> Any:
             unwrap_mode=unwrap_mode,
             count_query=count_query,
             inline_count=inline_count,
+            bind_params=bind_params,
+            execute_options=execute_options,
             transformer=transformer,
             additional_data=additional_data,
             unique=unique,
@@ -624,6 +700,8 @@ def _old_paginate_sign(
     *,
     subquery_count: bool = True,
     unwrap_mode: UnwrapMode | None = None,
+    bind_params: BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
     transformer: ItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     unique: bool = True,
@@ -639,6 +717,8 @@ def _old_paginate_sign(
     bool,
     bool,
     UnwrapMode | None,
+    BindParams | None,
+    CoreExecuteOptionsParameter | None,
     Config | None,
 ]:
     if query.session is None:
@@ -647,7 +727,21 @@ def _old_paginate_sign(
     session = query.session
     stmt = _prepare_query(query)
 
-    return stmt, None, None, session, params, transformer, additional_data, unique, subquery_count, unwrap_mode, config
+    return (
+        stmt,
+        None,
+        None,
+        session,
+        params,
+        transformer,
+        additional_data,
+        unique,
+        subquery_count,
+        unwrap_mode,
+        bind_params,
+        execute_options,
+        config,
+    )
 
 
 def _new_paginate_sign(
@@ -659,6 +753,8 @@ def _new_paginate_sign(
     unwrap_mode: UnwrapMode | None = None,
     count_query: Selectable | None = None,
     inline_count: ColumnElement[int] | None = None,
+    bind_params: BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
     transformer: ItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     unique: bool = True,
@@ -674,6 +770,8 @@ def _new_paginate_sign(
     bool,
     bool,
     UnwrapMode | None,
+    BindParams | None,
+    CoreExecuteOptionsParameter | None,
     Config | None,
 ]:
     query = _prepare_query(query)
@@ -690,6 +788,8 @@ def _new_paginate_sign(
         unique,
         subquery_count,
         unwrap_mode,
+        bind_params,
+        execute_options,
         config,
     )
 
@@ -703,6 +803,8 @@ async def apaginate(
     inline_count: ColumnElement[int] | None = None,
     subquery_count: bool = True,
     unwrap_mode: UnwrapMode | None = None,
+    bind_params: BindParams | None = None,
+    execute_options: CoreExecuteOptionsParameter | None = None,
     transformer: AsyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
     unique: bool = True,
@@ -721,6 +823,8 @@ async def apaginate(
             unwrap_mode=unwrap_mode,
             count_query=count_query,
             inline_count=inline_count,
+            bind_params=bind_params,
+            execute_options=execute_options,
             transformer=transformer,
             additional_data=additional_data,
             unique=unique,
