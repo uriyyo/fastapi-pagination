@@ -53,7 +53,7 @@ jobs:
           bash scripts/ci-test.sh
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.0
         with:
           files: ./coverage.xml
         env:
