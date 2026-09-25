@@ -2676,16 +2676,16 @@ asyncio = [
 
 [[package]]
 name = "sqlmodel"
-version = "0.0.42"
+version = "0.0.45"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "sqlalchemy" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ab/50/27188d8cbccabf9968d74d4095765399dbc4f9fcae95e928fda69aa44a21/sqlmodel-0.0.42.tar.gz", hash = "sha256:9ecec2b6aa4c2aa58da39d2572e7bef4373419dcd6ec52973c07de7be2b1c516", size = 91737, upload-time = "2026-08-28T19:42:01.611Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/33/05/2883610972556b37dcbe6e98cdf81f0117bd78f2abc7bf42864d27218611/sqlmodel-0.0.45.tar.gz", hash = "sha256:cd9761e964400311c2fb8f052b8adba4fa8ed569c4681d4573763d12d5efc91e", size = 97782, upload-time = "2026-09-21T21:51:54.149Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/67/37/d7d6b12b9066005c237de3d52b599298a2693ac423bff0e6b97a90b90bf8/sqlmodel-0.0.42-py3-none-any.whl", hash = "sha256:a732dab1a40e5cbd6ac250cf2b12e8d9b1bf1a47edf27c34d612f359e8875c63", size = 29991, upload-time = "2026-08-28T19:42:00.568Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/68/95308ae84de8a4cb07ab32ec961e17f274a4d503393e62e61d702b47f488/sqlmodel-0.0.45-py3-none-any.whl", hash = "sha256:f5abab62baea9a0d2c2483b8511e3a581b245f1e2fc78c92b49f84e0c5c66302", size = 31217, upload-time = "2026-09-21T21:51:53.29Z" },
 ]
 
 [[package]]
