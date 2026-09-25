@@ -15,6 +15,7 @@ from contextlib import suppress
 from functools import partial
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias, TypeVar, cast, overload
 
+from fastapi import HTTPException, status
 from sqlalchemy import func, select, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.exc import InvalidRequestError
@@ -475,15 +476,23 @@ def _cursor_flow(
     if not getattr(query, "_order_by_clauses", True):
         raise ValueError("Cursor pagination requires ordering")
 
+    from sqlakeyset import InvalidPage
+
     _select_page = apaging.select_page if is_async else paging.select_page
 
-    page = yield _select_page(
-        conn,  # type: ignore[ty:invalid-argument-type]
-        selectable=query,  # type: ignore[ty:invalid-argument-type]
-        unique=unique,
-        per_page=raw_params.size,
-        page=raw_params.cursor,  # type: ignore[ty:invalid-argument-type]
-    )
+    try:
+        page = yield _select_page(
+            conn,  # type: ignore[ty:invalid-argument-type]
+            selectable=query,  # type: ignore[ty:invalid-argument-type]
+            unique=unique,
+            per_page=raw_params.size,
+            page=raw_params.cursor,  # type: ignore[ty:invalid-argument-type]
+        )
+    except InvalidPage:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid cursor value",
+        ) from None
     items = [*page]
 
     data = {

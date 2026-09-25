@@ -2,13 +2,13 @@ from contextlib import closing
 from typing import Any
 
 import pytest
-from fastapi import Depends
+from fastapi import Depends, status
 from sqlalchemy import bindparam, func, select, text
 from sqlalchemy.exc import InvalidRequestError, StatementError
 from sqlalchemy.orm import scoped_session, selectinload, sessionmaker
 
 from fastapi_pagination import Page, Params, set_page, set_params
-from fastapi_pagination.cursor import CursorPage, CursorParams
+from fastapi_pagination.cursor import CursorPage, CursorParams, encode_cursor
 from fastapi_pagination.customization import CustomizedPage, UseAdditionalFields, UseQuotedCursor
 from fastapi_pagination.ext.sqlalchemy import apaginate, paginate
 from tests.base import BasePaginationTestSuite, SuiteBuilder, async_sync_testsuite, sync_testsuite
@@ -220,6 +220,21 @@ class TestSQLAlchemyCursor(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite
             )
 
         return builder.build()
+
+    @pytest.mark.parametrize(
+        "bookmark",
+        ["invalid", ">i:not-an-int", ">unknown:1", ">i:1~i:2"],
+        ids=["missing-direction", "invalid-value", "unknown-type", "wrong-column-count"],
+    )
+    @pytest.mark.asyncio(loop_scope="session")
+    async def test_invalid_bookmark(self, client, builder, quoted_cursor, bookmark):
+        response = await client.get(
+            builder.get_route_path("cursor", "default"),
+            params={"cursor": encode_cursor(bookmark, quoted=quoted_cursor)},
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {"detail": "Invalid cursor value"}
 
     @pytest.mark.asyncio(scope="session")
     async def test_no_order(self, sa_session, sa_user, paginate_func):
