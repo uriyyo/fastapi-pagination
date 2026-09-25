@@ -1011,7 +1011,7 @@ dev = [
     { name = "mkdocs-material", specifier = ">=9.5.50" },
     { name = "pre-commit", specifier = ">=4.1.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
-    { name = "pymdown-extensions", specifier = ">=10.14,<12.0" },
+    { name = "pymdown-extensions", specifier = ">=10.14,<13.0" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "pytest-asyncio", specifier = ">=0.25.3" },
     { name = "pytest-cov", specifier = ">=6.0.0" },
@@ -1025,7 +1025,7 @@ docs = [
     { name = "mdx-include" },
     { name = "mkdocs", specifier = ">=1.6.1" },
     { name = "mkdocs-material", specifier = ">=9.5.50" },
-    { name = "pymdown-extensions", specifier = ">=10.14,<12.0" },
+    { name = "pymdown-extensions", specifier = ">=10.14,<13.0" },
 ]
 
 [[package]]
@@ -1130,7 +1130,7 @@ wheels = [
 
 [[package]]
 name = "google-cloud-firestore"
-version = "2.30.0"
+version = "2.31.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "google-api-core", extra = ["grpc"] },
@@ -1140,9 +1140,9 @@ dependencies = [
     { name = "proto-plus" },
     { name = "protobuf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ca/ec/5d88afbf5b0a06f68fe632cfe0729d39ef3f26468334d03be7705a873ab5/google_cloud_firestore-2.30.0.tar.gz", hash = "sha256:4959011b0dba6c71c056653ace1caef362169475314eddb036683010e99d98eb", size = 658312, upload-time = "2026-09-03T22:31:11.811Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/83/7b/9b0b58d897b20478f08ebd456cae1d87f6d4b06c70d23761b678a25d769c/google_cloud_firestore-2.31.0.tar.gz", hash = "sha256:f1e0f1352edbab3d327d3926fbd6f499eeecf41258b1d5edc3459c2c781bd5e5", size = 662451, upload-time = "2026-09-17T20:30:25.787Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/30/67/c0ccbec09c76f0750d736c0138d7380f9693c8fa8e8a33babc6ce6e50556/google_cloud_firestore-2.30.0-py3-none-any.whl", hash = "sha256:85098db598fbd8747efd2265836152f2f05abfb2b6e1c001a31cdce0964ba447", size = 436499, upload-time = "2026-09-03T22:30:32.085Z" },
+    { url = "https://files.pythonhosted.org/packages/ae/16/3a42e7ddd0c5de64a68d7e62f1c1c8ff6c99c6130e8671b2f9c94e4afb3d/google_cloud_firestore-2.31.0-py3-none-any.whl", hash = "sha256:4101b832b666481c51c6828790afccdc8f71c64542556bcc89ff995be9f62ec7", size = 438713, upload-time = "2026-09-17T20:29:54.024Z" },
 ]
 
 [[package]]
@@ -2210,15 +2210,15 @@ wheels = [
 
 [[package]]
 name = "pymdown-extensions"
-version = "11.0.2"
+version = "12.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ad/17/2db4b414de89659144488e0d9c6c0bf0c8395841dc12d81d0532cc6ef310/pymdown_extensions-11.0.2.tar.gz", hash = "sha256:9506fcbe66fa355a775b768084334238dd6805020ac4b92bea0c0dda6f8f223d", size = 855419, upload-time = "2026-08-22T19:28:47.236Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/eb/7e/53144b512818c75d459523e3a91d9bf7b65cd6a1dfb964fe690adc8b3670/pymdown_extensions-12.0.1.tar.gz", hash = "sha256:88fe2c97fb9153b9f2cc1da59f1d7c7cb74971110daf33cccb2a5514e0f7e970", size = 866904, upload-time = "2026-09-15T23:20:33.187Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a6/43/9f45ec4d14e596efc32c925a78104934790438b0c0628b70d741016734ad/pymdown_extensions-11.0.2-py3-none-any.whl", hash = "sha256:259910762019732caa1dfd76f3faa62c59f191d46573e80bcb1d13c0f675bbe5", size = 269929, upload-time = "2026-08-22T19:28:45.389Z" },
+    { url = "https://files.pythonhosted.org/packages/8c/30/c866b3ca8ad5cca79a3ee1a55c12d61d3e72381e5eadbfdaceb6006ebc84/pymdown_extensions-12.0.1-py3-none-any.whl", hash = "sha256:15d629e8035892b93d788a8424ccea754d4aa3cec247a64cbfe7b15089c9ad7f", size = 276957, upload-time = "2026-09-15T23:20:31.551Z" },
 ]
 
 [[package]]
@@ -2676,16 +2676,16 @@ asyncio = [
 
 [[package]]
 name = "sqlmodel"
-version = "0.0.42"
+version = "0.0.45"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "sqlalchemy" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ab/50/27188d8cbccabf9968d74d4095765399dbc4f9fcae95e928fda69aa44a21/sqlmodel-0.0.42.tar.gz", hash = "sha256:9ecec2b6aa4c2aa58da39d2572e7bef4373419dcd6ec52973c07de7be2b1c516", size = 91737, upload-time = "2026-08-28T19:42:01.611Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/33/05/2883610972556b37dcbe6e98cdf81f0117bd78f2abc7bf42864d27218611/sqlmodel-0.0.45.tar.gz", hash = "sha256:cd9761e964400311c2fb8f052b8adba4fa8ed569c4681d4573763d12d5efc91e", size = 97782, upload-time = "2026-09-21T21:51:54.149Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/67/37/d7d6b12b9066005c237de3d52b599298a2693ac423bff0e6b97a90b90bf8/sqlmodel-0.0.42-py3-none-any.whl", hash = "sha256:a732dab1a40e5cbd6ac250cf2b12e8d9b1bf1a47edf27c34d612f359e8875c63", size = 29991, upload-time = "2026-08-28T19:42:00.568Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/68/95308ae84de8a4cb07ab32ec961e17f274a4d503393e62e61d702b47f488/sqlmodel-0.0.45-py3-none-any.whl", hash = "sha256:f5abab62baea9a0d2c2483b8511e3a581b245f1e2fc78c92b49f84e0c5c66302", size = 31217, upload-time = "2026-09-21T21:51:53.29Z" },
 ]
 
 [[package]]
