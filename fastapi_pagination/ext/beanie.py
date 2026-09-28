@@ -180,7 +180,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                 **pymongo_kwargs,
             ).to_list()
         else:
-            query = query.find_many(
+            find_query: FindMany[Any] = query.find_many(
                 projection_model=projection_model,
                 sort=sort,
                 session=session,
@@ -191,7 +191,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
             )
             if cursor:
                 if cursor.startswith("prev_"):
-                    query = query.find(
+                    find_query = find_query.find(
                         {
                             "_id": {
                                 "$lt": parse_cursor(cursor),
@@ -199,7 +199,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                         },
                     ).sort("-_id")
                 else:
-                    query = query.find(
+                    find_query = find_query.find(
                         {
                             "_id": {
                                 "$gt": parse_cursor(cursor),
@@ -207,7 +207,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                         },
                     )
 
-            items = await query.limit(raw_params.size + 1).to_list()  # type: ignore[ty:unresolved-attribute]
+            items = await find_query.limit(raw_params.size + 1).to_list()  # type: ignore[ty:unresolved-attribute]
             next_link_available = items and len(items) >= raw_params.size  # type: ignore[ty:unresolved-attribute]
             items = items[: raw_params.size]  # type: ignore[ty:unresolved-attribute]
             if cursor and cursor.startswith("prev_"):
