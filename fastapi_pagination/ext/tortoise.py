@@ -1,5 +1,6 @@
 __all__ = ["apaginate"]
 
+from collections.abc import Sequence
 from typing import Any, TypeVar
 
 from tortoise.models import Model
@@ -19,7 +20,7 @@ TModel = TypeVar("TModel", bound=Model)
 
 def _generate_query(
     query: QuerySet[TModel],
-    prefetch_related: bool | list[str | Prefetch],
+    prefetch_related: bool | Sequence[str | Prefetch],
 ) -> QuerySet[TModel]:
     if prefetch_related:
         if prefetch_related is True:
@@ -33,7 +34,7 @@ def _generate_query(
 async def apaginate(
     query: QuerySet[TModel] | type[TModel],
     params: AbstractParams | None = None,
-    prefetch_related: bool | list[str | Prefetch] = False,
+    prefetch_related: bool | Sequence[str | Prefetch] = False,
     *,
     transformer: AsyncItemsTransformer | None = None,
     additional_data: AdditionalData | None = None,
