@@ -1,7 +1,7 @@
 #!/usr/bin/env python
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, AsyncGenerator
+from typing import TYPE_CHECKING, Any
 
 import uvicorn
 from faker import Faker
@@ -55,7 +55,7 @@ app = FastAPI(title="Pagination example -- Tortoise ORM", lifespan=lifespan)
 
 @app.post("/users", response_model=UserOut)
 async def create_user(user_in: UserIn) -> Any:
-    return await User.create(**user_in.dict())
+    return await User.create(**user_in.model_dump())
 
 
 @app.get("/users/default", response_model=Page[UserOut])
@@ -67,4 +67,4 @@ async def get_users() -> Any:
 add_pagination(app)
 
 if __name__ == "__main__":
-    uvicorn.run(f"{Path(__file__).stem}:app")
+    uvicorn.run("__main__:app")

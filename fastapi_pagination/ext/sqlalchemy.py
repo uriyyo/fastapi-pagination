@@ -98,7 +98,7 @@ try:
     from sqlakeyset import paging
 except ImportError:  # pragma: no cover
     paging = None
-    apaging = None  # type: ignore[ty:invalid-assignment]
+    apaging = None
 
 
 _INLINE_COUNT_LABEL = "__pagination_inline_count__"
@@ -473,6 +473,8 @@ def _cursor_flow(
         raise ValueError("Cursor pagination cannot be used with FromStatement queries")  # noqa: TRY004
     if paging is None:  # pragma: no cover
         raise ImportError("sqlakeyset is not installed")
+    if apaging is None:  # pragma: no cover
+        raise ImportError("async_sqlakeyset is not installed")
     if not getattr(query, "_order_by_clauses", True):
         raise ValueError("Cursor pagination requires ordering")
 
