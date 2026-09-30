@@ -1,16 +1,17 @@
+import warnings
 from contextlib import closing
 from typing import Any
 
 import pytest
 from fastapi import Depends
 from sqlalchemy import bindparam, func, select, text
-from sqlalchemy.exc import InvalidRequestError, StatementError
+from sqlalchemy.exc import InvalidRequestError, SADeprecationWarning, StatementError
 from sqlalchemy.orm import scoped_session, selectinload, sessionmaker
 
 from fastapi_pagination import Page, Params, set_page, set_params
 from fastapi_pagination.cursor import CursorPage, CursorParams
 from fastapi_pagination.customization import CustomizedPage, UseAdditionalFields, UseQuotedCursor
-from fastapi_pagination.ext.sqlalchemy import apaginate, paginate
+from fastapi_pagination.ext.sqlalchemy import apaginate, create_count_query, paginate
 from tests.base import BasePaginationTestSuite, SuiteBuilder, async_sync_testsuite, sync_testsuite
 from tests.ext.utils import is_sqlalchemy20
 from tests.schemas import UserOut, UserWithoutIDOut
@@ -63,6 +64,17 @@ class TestSQLAlchemyBaseSuite(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSu
             )
 
         return builder.build()
+
+
+@pytest.mark.parametrize("use_subquery", [True, False])
+def test_create_count_query_without_deprecated_loader(sa_user, use_subquery):
+    query = select(sa_user).options(selectinload(sa_user.orders))
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", SADeprecationWarning)
+        count_query = create_count_query(query, use_subquery=use_subquery)
+
+    assert "count(*)" in str(count_query)
 
 
 class TestSQLAlchemyUnwrap:
