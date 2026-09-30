@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias, TypeVar, cas
 from sqlalchemy import func, select, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy.orm import Query, Session, aliased, noload, scoped_session
+from sqlalchemy.orm import Query, Session, aliased, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
 from sqlalchemy.sql.elements import ColumnElement, TextClause
 from sqlalchemy.sql.util import ColumnAdapter
@@ -247,7 +247,7 @@ def create_count_query(query: Selectable, *, use_subquery: bool = True) -> Selec
     if isinstance(query, FromStatement):
         return create_count_query(cast("Selectable", query.element))
 
-    query = query.order_by(None).options(noload("*"))
+    query = query.order_by(None)
 
     if use_subquery:
         return select(func.count()).select_from(query.subquery())
