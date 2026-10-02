@@ -38,6 +38,9 @@ def resolve_limit_offset_links(_page: BasePage, /) -> Links:
     if last == total:
         last = total - limit
 
+    # Fall back to the first page when this offset sequence has no valid page.
+    last = max(0, last)
+
     return create_links(
         first={"offset": 0},
         last={"offset": last},

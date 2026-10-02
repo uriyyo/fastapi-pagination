@@ -33,8 +33,16 @@ async def route_1():
 
 @app.get("/default-empty", response_model=Page[int])
 @app.get("/default-header-links-empty", response_model=PageDefaultLinks[int])
+@app.get("/limit-offset-empty", response_model=LimitOffsetPage[int])
+@app.get("/limit-offset-header-links-empty", response_model=PageLimitOffsetHeaderLinks[int])
 async def route_2():
     return paginate([])
+
+
+@app.get("/limit-offset-small", response_model=LimitOffsetPage[int])
+@app.get("/limit-offset-header-links-small", response_model=PageLimitOffsetHeaderLinks[int])
+async def route_small():
+    return paginate([0, 1, 2])
 
 
 class MySchemaPage(BaseModel):
@@ -234,6 +242,45 @@ def test_header_links(self, prev, next, first, last):  # noqa: A002
     assert response.status_code == status.HTTP_200_OK
     assert response.headers.get("link") is not None
     assert response.headers.get("link") == ", ".join(parts)
+
+
+@pytest.mark.parametrize("header_links", [False, True], ids=["body", "header"])
+@pytest.mark.parametrize(
+    ("suffix", "limit", "offset", "last_offset", "last_items"),
+    [
+        ("-empty", 10, 0, 0, []),
+        ("-empty", 10, 4, 0, []),
+        ("-small", 10, 0, 0, [0, 1, 2]),
+        ("-small", 10, 3, 0, [0, 1, 2]),
+        ("-small", 10, 4, 0, [0, 1, 2]),
+        ("-small", 10, 13, 0, [0, 1, 2]),
+        ("-small", 10, 10, 0, [0, 1, 2]),
+        ("", 30, 50, 170, [*range(170, 200)]),
+        ("", 30, 10000, 190, [*range(190, 200)]),
+    ],
+    ids=[
+        "empty",
+        "empty-nonzero-offset",
+        "small-first",
+        "offset-at-total",
+        "offset-beyond-total",
+        "offset-beyond-total-same-remainder",
+        "offset-beyond-total-aligned",
+        "nonaligned-offset",
+        "nonaligned-offset-beyond-total",
+    ],
+)
+def test_limit_offset_last_link_is_followable(header_links, suffix, limit, offset, last_offset, last_items):
+    path = f"/limit-offset{'-header-links' if header_links else ''}{suffix}"
+    response = client.get(f"{path}?limit={limit}&offset={offset}&filter=kept")
+
+    assert response.status_code == status.HTTP_200_OK
+    last = response.links["last"]["url"] if header_links else response.json()["links"]["last"]
+    assert last == f"{path}?limit={limit}&filter=kept&offset={last_offset}"
+
+    last_response = client.get(last)
+    assert last_response.status_code == status.HTTP_200_OK
+    assert last_response.json()["items"] == last_items
 
 
 def test_revalidation_default():
