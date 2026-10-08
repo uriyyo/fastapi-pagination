@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 import inspect
-from collections.abc import AsyncIterator, Callable, Iterator, Sequence
+from collections.abc import AsyncGenerator, AsyncIterator, Callable, Generator, Iterator, Sequence
 from contextlib import AbstractContextManager, ExitStack, asynccontextmanager, contextmanager, suppress
 from contextvars import ContextVar
 from typing import (
@@ -120,7 +120,7 @@ def _ctx_var_with_reset(var: ContextVar[T], value: T) -> AbstractContextManager[
     token = var.set(value)
 
     @contextmanager
-    def _reset_ctx() -> Iterator[None]:
+    def _reset_ctx() -> Generator[None]:
         yield
 
         with suppress(ValueError):
@@ -351,7 +351,7 @@ def add_pagination(parent: ParentT) -> ParentT:
     _original_lifespan_context = router.lifespan_context
 
     @asynccontextmanager
-    async def lifespan(app: Any) -> AsyncIterator[Any]:
+    async def lifespan(app: Any) -> AsyncGenerator[Any]:
         _add_pagination(parent)
 
         async with _original_lifespan_context(app) as maybe_state:

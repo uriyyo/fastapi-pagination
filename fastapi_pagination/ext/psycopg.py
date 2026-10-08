@@ -1,6 +1,6 @@
 __all__ = ["apaginate", "paginate"]
 
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Generator, Mapping, Sequence
 from contextlib import contextmanager
 from functools import partial
 from typing import Any, TypeAlias, cast
@@ -28,7 +28,7 @@ _QueryParams: TypeAlias = Mapping[str, Any] | Sequence[Any]
 
 
 @contextmanager
-def _switch_factory(conn: _AnyConn, factory: _AnyFactory) -> Iterator[None]:
+def _switch_factory(conn: _AnyConn, factory: _AnyFactory) -> Generator[None]:
     original_factory, conn.row_factory = conn.row_factory, factory  # type: ignore[ty:invalid-assignment]
     try:
         yield
