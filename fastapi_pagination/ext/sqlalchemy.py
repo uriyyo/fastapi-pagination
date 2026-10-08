@@ -113,9 +113,8 @@ UnwrapMode: TypeAlias = Literal[
     "unwrap",  # always unwrap
 ]
 
-Selectable: TypeAlias = (
-    "Select[tuple[Any, ...]] | TextClause | FromStatement[tuple[Any, ...]] | CompoundSelect[tuple[Any, ...]]"
-)
+# to support both SQLAlchemy 2.0 and 2.1 version of Select[T1, T2, ...] and Select[tuple[T1, T2, ...]]
+Selectable: TypeAlias = "Select | TextClause | FromStatement | CompoundSelect"
 SelectableOrQuery: TypeAlias = "Selectable | Query[Any]"
 
 BindParams: TypeAlias = "Mapping[str, Any]"
@@ -155,7 +154,7 @@ def _prepare_query_for_cursor(query: Selectable) -> Selectable:
 _selectable_classes = (Select, TextClause, FromStatement, CompoundSelect)
 
 
-def _get_orm_entity(query: Select[Any]) -> type[Any] | None:
+def _get_orm_entity(query: Select) -> type[Any] | None:
     """Return the mapped ORM entity class for a bare ``select(Model)`` query, else ``None``.
 
     Returns ``None`` for multi-entity selects, column-level selects
@@ -224,9 +223,9 @@ def create_count_query_from_text(query: str) -> str:
 
 
 def _paginate_from_statement(
-    query: FromStatement[Any],
+    query: FromStatement,
     params: AnyParams,
-) -> FromStatement[Any]:
+) -> FromStatement:
     query = query._generate()
     query.element = create_paginate_query(cast("Selectable", query.element), params)
     return query
@@ -339,7 +338,7 @@ def _limit_offset_flow(
     return items
 
 
-def _apply_inline_count(query: Select[Any], inline_count: ColumnElement[int]) -> Select[Any]:
+def _apply_inline_count(query: Select, inline_count: ColumnElement[int]) -> Select:
     """Return *query* with *inline_count* embedded as an extra labeled column.
 
     For DISTINCT queries, SQL window functions execute before deduplication, so
@@ -385,7 +384,7 @@ def _extract_inline_count_total(items: Sequence[Any]) -> int:
 def _sqlalchemy_inline_count_flow(
     is_async: bool,
     conn: AnyConn,
-    query: Select[Any],
+    query: Select,
     params: AbstractParams | None,
     inline_count: ColumnElement[int],
     *,
