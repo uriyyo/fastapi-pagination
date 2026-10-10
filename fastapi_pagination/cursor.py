@@ -88,7 +88,7 @@ def encode_cursor(
 
 class CursorParams(BaseModel, AbstractParams):
     cursor: str | None = Query(None, description="Cursor for the next page")
-    size: int = Query(50, ge=0, le=100, description="Page size")
+    size: int = Query(50, ge=1, le=100, description="Page size")
 
     str_cursor: ClassVar[bool] = True
     quoted_cursor: ClassVar[bool] = True
