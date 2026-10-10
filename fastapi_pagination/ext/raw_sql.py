@@ -28,8 +28,10 @@ def create_paginate_query_from_text(query: str, params: AnyParams) -> str:
     if raw_params.offset is not None:
         suffix += f" OFFSET {raw_params.offset}"
 
-    return f"{query} {suffix}".strip()
+    query = query.rstrip().removesuffix(";")
+    return f"{query}\n{suffix}".strip()
 
 
 def create_count_query_from_text(query: str) -> str:
-    return f"SELECT count(*) FROM ({query}) AS __count_query__"  # noqa: S608
+    query = query.rstrip().removesuffix(";")
+    return f"SELECT count(*) FROM ({query}\n) AS __count_query__"  # noqa: S608
