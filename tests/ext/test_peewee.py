@@ -284,4 +284,4 @@ class TestPeeweeCreateCountQuery:
         raw_sql = "SELECT * FROM users"
         count_query = create_count_query(raw_sql)
 
-        assert count_query == "SELECT count(*) FROM (SELECT * FROM users) AS __count_query__"
+        assert count_query == "SELECT count(*) FROM (SELECT * FROM users\n) AS __count_query__"
