@@ -40,7 +40,7 @@ def paginate(
     )
     items = cursor.current_rows
     resolved_additional_data = sync_resolve_additional_data(items, additional_data)
-    resolved_additional_data["next_"] = cursor.paging_state
+    resolved_additional_data = {**resolved_additional_data, "next_": cursor.paging_state}
     t_items = apply_items_transformer(items, transformer)
 
     return create_page(
