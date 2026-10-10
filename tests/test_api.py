@@ -207,6 +207,17 @@ def test_page_resolve_set_page() -> None:
         assert resolve_page(CursorParams()) is CustomPage
 
 
+def test_set_page_reset_on_error() -> None:
+    class CustomPage(AbstractPage[int]):
+        pass
+
+    with pytest.raises(RuntimeError), set_page(CustomPage):
+        raise RuntimeError
+
+    with pytest.raises(UninitializedConfigurationError):
+        resolve_page()
+
+
 def test_resolve_page_no_page_set() -> None:
     with pytest.raises(UninitializedConfigurationError):
         resolve_page()
