@@ -121,10 +121,11 @@ def _ctx_var_with_reset(var: ContextVar[T], value: T) -> AbstractContextManager[
 
     @contextmanager
     def _reset_ctx() -> Generator[None]:
-        yield
-
-        with suppress(ValueError):
-            var.reset(token)
+        try:
+            yield
+        finally:
+            with suppress(ValueError):
+                var.reset(token)
 
     return _reset_ctx()
 
