@@ -24,10 +24,10 @@ def paginate(
     # validate input params to be of correct type
     params, raw_params = verify_params(params, "limit-offset")
 
-    # apply pagination to items
-    items = items[raw_params.as_slice()]
     # calculate total number of items if needed
     total = len(items) if raw_params.include_total else None
+    # apply pagination to items
+    items = items[raw_params.as_slice()]
     # apply transformer to items
     t_items = apply_items_transformer(items, transformer)
 
