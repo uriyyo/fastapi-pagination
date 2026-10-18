@@ -180,18 +180,19 @@ class TestPeeweeAsyncAvailability:
         assert page.items == []
 
 
+@async_sync_testsuite
 class TestPeeweeRawSQL(_PeeweePaginateFunc):
-    def test_paginate_raw_sql(self, peewee_db, peewee_user, entities):
+    @pytest.mark.asyncio
+    async def test_paginate_raw_sql(self, peewee_db, peewee_user, entities, paginate_func):
         from tests.schemas import UserOut
 
-        with peewee_db.atomic():
-            peewee_db.create_tables([peewee_user], safe=True)
-
         with set_page(Page[UserOut]):
-            page = paginate(
-                "SELECT * FROM users ORDER BY id",
-                params=Params(page=1, size=10),
-                db=peewee_db,
+            page = await maybe_async(
+                paginate_func(
+                    "SELECT * FROM users ORDER BY id",
+                    params=Params(page=1, size=10),
+                    db=peewee_db,
+                )
             )
 
         assert len(page.items) == 10
@@ -211,17 +212,17 @@ class TestPeeweeRawSQL(_PeeweePaginateFunc):
         with pytest.raises(ValueError, match="Database is required for raw SQL"):
             asyncio.run(apaginate("SELECT * FROM users", params=Params(page=1, size=10)))
 
-    def test_paginate_raw_sql_with_limit_offset(self, peewee_db, peewee_user, entities):
+    @pytest.mark.asyncio
+    async def test_paginate_raw_sql_with_limit_offset(self, peewee_db, peewee_user, entities, paginate_func):
         from tests.schemas import UserOut
 
-        with peewee_db.atomic():
-            peewee_db.create_tables([peewee_user], safe=True)
-
         with set_page(Page[UserOut]):
-            page = paginate(
-                "SELECT * FROM users ORDER BY id",
-                params=Params(page=1, size=5),
-                db=peewee_db,
+            page = await maybe_async(
+                paginate_func(
+                    "SELECT * FROM users ORDER BY id",
+                    params=Params(page=1, size=5),
+                    db=peewee_db,
+                )
             )
 
         assert len(page.items) == 5
@@ -229,15 +230,15 @@ class TestPeeweeRawSQL(_PeeweePaginateFunc):
             assert item.id == entities[i].id
             assert item.name == entities[i].name
 
-    def test_paginate_raw_sql_count(self, peewee_db, peewee_user):
-        with peewee_db.atomic():
-            peewee_db.create_tables([peewee_user], safe=True)
-
+    @pytest.mark.asyncio
+    async def test_paginate_raw_sql_count(self, peewee_db, peewee_user, paginate_func):
         with set_page(Page):
-            page = paginate(
-                "SELECT * FROM users",
-                params=Params(page=1, size=10),
-                db=peewee_db,
+            page = await maybe_async(
+                paginate_func(
+                    "SELECT * FROM users",
+                    params=Params(page=1, size=10),
+                    db=peewee_db,
+                )
             )
 
         assert page.total == 100
