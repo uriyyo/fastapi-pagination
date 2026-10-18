@@ -86,13 +86,7 @@ def create_count_query(query: Query | RawSQL) -> Query | RawSQL:
 
     from peewee import fn
 
-    query_clone = cast(Query, query)
-    if hasattr(query_clone, "limit"):
-        query_clone = query_clone.limit(None)
-    if hasattr(query_clone, "offset"):
-        query_clone = query_clone.offset(None)
-
-    return model.select(fn.COUNT(1)).from_(query_clone)
+    return model.select(fn.COUNT(1)).from_(cast(Query, query))
 
 
 @flow
