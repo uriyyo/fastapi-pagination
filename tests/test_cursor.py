@@ -48,6 +48,26 @@ def test_invalid_cursor(cursor):
     assert response.json() == {"detail": "Invalid cursor value"}
 
 
+@pytest.mark.parametrize(
+    ("size", "status_code"),
+    [
+        (0, status.HTTP_422_UNPROCESSABLE_ENTITY),
+        (1, status.HTTP_200_OK),
+    ],
+)
+def test_cursor_params_size_min(size, status_code):
+    app = FastAPI()
+    client = TestClient(app)
+
+    @app.get("/route", response_model=CursorPage[int])
+    def route():
+        return CursorPage(items=[], total=0)
+
+    add_pagination(app)
+
+    assert client.get("/route", params={"size": size}).status_code == status_code
+
+
 def test_cursor_does_not_mutate_additional_data():
     @flow
     def cursor_flow(raw_params):
