@@ -219,7 +219,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
             }
 
     resolved_additional_data = await async_resolve_additional_data(items, additional_data)
-    resolved_additional_data.update(cursor_data)
+    resolved_additional_data = {**resolved_additional_data, **cursor_data}
 
     t_items = await apply_items_transformer(items, transformer, async_=True)
 
