@@ -269,15 +269,11 @@ class TestPeeweeCreateCountQuery:
     def test_create_count_query_keeps_limit(self, peewee_db, peewee_user):
         with peewee_db.atomic():
             peewee_db.create_tables([peewee_user], safe=True)
-            peewee_user.insert_many([{"id": i, "name": f"n{i}"} for i in range(1000, 1020)]).execute()
 
-        try:
-            query = peewee_user.select().order_by(peewee_user.id).limit(10)
-            total = peewee_db.execute(create_count_query(query)).fetchone()[0]
+        query = peewee_user.select().order_by(peewee_user.id).limit(10)
+        total = peewee_db.execute(create_count_query(query)).fetchone()[0]
 
-            assert total == 10
-        finally:
-            peewee_user.delete().where(peewee_user.id >= 1000).execute()
+        assert total == 10
 
     def test_create_count_query_with_raw_query(self, peewee_db, peewee_user):
         from peewee import RawQuery
