@@ -10,6 +10,7 @@ __all__ = [
     "paginate",
 ]
 
+from collections import namedtuple
 from collections.abc import Mapping, Sequence
 from contextlib import suppress
 from functools import partial
@@ -431,7 +432,13 @@ def _sqlalchemy_inline_count_flow(
                 execute_options=execute_options,
             )
 
-    items = _unwrap_items(result, query, unwrap_mode)
+    items = result
+    if raw_params.include_total and result:
+        # drop the trailing inline count column, keep named access to the rest
+        fields = result[0]._fields[:-1]
+        make = namedtuple("row_type", fields, rename=True)._make if len(fields) == len(result[0]) - 1 else tuple  # noqa: PYI024
+        items = [make(row[:-1]) for row in result]
+    items = _unwrap_items(items, query, unwrap_mode)
 
     resolved_additional_data = yield from additional_data_flow(result, additional_data)
 
