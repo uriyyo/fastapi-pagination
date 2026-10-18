@@ -148,7 +148,7 @@ def generic_flow(  # noqa: C901, PLR0912
     )
 
     if cursor_data:
-        resolved_data.update(cursor_data)
+        resolved_data = {**resolved_data, **cursor_data}
 
     page = yield from create_page_flow(
         items,
