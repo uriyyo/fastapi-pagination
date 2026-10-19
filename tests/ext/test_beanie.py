@@ -190,4 +190,12 @@ class TestBeanieAggregateCursor:
             be_user.aggregate([{"$match": {}}]),
             CursorParams(size=4, cursor=page.previous_page),
         )
-        assert [item["_id"] for item in prev_page.items] == [item["_id"] for item in seen[-8:-4]]
+        last = len(page.items)
+        assert [item["_id"] for item in prev_page.items] == [item["_id"] for item in seen[-(last + 4) : -last]]
+
+        # prev_ then next_ must round-trip to the page we came from
+        back = await apaginate(
+            be_user.aggregate([{"$match": {}}]),
+            CursorParams(size=4, cursor=prev_page.next_page),
+        )
+        assert [item["_id"] for item in back.items] == [item["_id"] for item in seen[-last:]][:4]

@@ -128,6 +128,8 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
             items = items[: raw_params.size]
             if cursor and cursor.startswith("prev_"):
                 items = list(reversed(items))
+                # the prev_ cursor itself proves newer rows exist
+                next_link_available = bool(items)
 
         try:
             total = data["metadata"][0]["total"]
