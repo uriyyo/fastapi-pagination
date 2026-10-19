@@ -215,7 +215,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                 items = list(reversed(items))
 
             has_next = bool(items) and (is_prev or has_more)
-            has_previous = bool(items) and ((cursor and not is_prev) or (is_prev and has_more))
+            has_previous = bool(items) and ((bool(cursor) and not is_prev) or (is_prev and has_more))
 
             cursor_data = {
                 "next_": str(items[-1].id) if has_next else None,

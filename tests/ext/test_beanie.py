@@ -89,6 +89,19 @@ class TestBeanie(BasePaginationTestSuite):
         assert back.next_page is not None
         assert back.previous_page is None
 
+    @pytest.mark.asyncio(scope="session")
+    async def test_cursor_links_middle_page(self, be_user, entities):
+        first = await apaginate(be_user, CursorParams(size=1))
+        middle = await apaginate(be_user, CursorParams(size=1, cursor=first.next_page))
+        assert middle.next_page is not None
+        assert middle.previous_page is not None
+
+        third = await apaginate(be_user, CursorParams(size=1, cursor=middle.next_page))
+        back = await apaginate(be_user, CursorParams(size=1, cursor=third.previous_page))
+        assert back.items == middle.items
+        assert back.next_page is not None
+        assert back.previous_page is not None
+
 
 @pytest.mark.usefixtures("db_client")
 @mongodb_test
