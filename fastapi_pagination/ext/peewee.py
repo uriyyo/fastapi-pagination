@@ -71,6 +71,17 @@ def _resolve_query_and_db(
     return query, db if db is not None else _get_database(cast(ModelSelect, query))
 
 
+def _fetch_raw_total(db: Database, sql: str) -> int:
+    row = db.execute_sql(sql).fetchone()
+    return row[0] if row else 0
+
+
+def _fetch_raw_items(db: Database, sql: str) -> list[dict[str, Any]]:
+    cursor = db.execute_sql(sql)
+    columns = [desc[0] for desc in cursor.description] if cursor.description else []
+    return [dict(zip(columns, row, strict=True)) for row in cursor.fetchall()]
+
+
 def create_paginate_query(query: Query, params: RawParams) -> Query:
     return generic_query_apply_params(query, params)
 
@@ -101,10 +112,11 @@ def _total_flow(
     db: Database | Any,
 ) -> TotalFlow:
     if _is_raw_sql(query):
-        count_query = create_count_query(query)
-        cursor = yield db.execute_sql(count_query)
-        row = cursor.fetchone()
-        total = row[0] if row else 0
+        count_query = cast(str, create_count_query(query))
+        if _is_async_db(db):
+            total = yield db.run(_fetch_raw_total, db, count_query)
+        else:
+            total = yield _fetch_raw_total(db, count_query)
     elif AsyncDatabaseMixin is not None and isinstance(db, AsyncDatabaseMixin):
         total = yield db.count(query)  # type: ignore[unresolved-attr]
     else:
@@ -126,9 +138,10 @@ def _limit_offset_flow(
 ) -> LimitOffsetFlow:
     if _is_raw_sql(query):
         paginated_sql = create_paginate_query_from_text(cast(RawSQL, query), raw_params)
-        cursor = yield db.execute_sql(paginated_sql)
-        columns = [desc[0] for desc in cursor.description] if cursor.description else []
-        items = [dict(zip(columns, row, strict=True)) for row in cursor.fetchall()]
+        if _is_async_db(db):
+            items = yield db.run(_fetch_raw_items, db, paginated_sql)
+        else:
+            items = yield _fetch_raw_items(db, paginated_sql)
     else:
         query = create_paginate_query(cast(Query, query), raw_params)
         if _is_async_db(db):
