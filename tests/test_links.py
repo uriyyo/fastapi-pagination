@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
 from fastapi_pagination import add_pagination, paginate, pagination_ctx
-from fastapi_pagination.customization import CustomizedPage
+from fastapi_pagination.customization import CustomizedPage, UseIncludeTotal
 from fastapi_pagination.links import LimitOffsetPage, Page, UseHeaderLinks, UseLimitOffsetHeaderLinks
 
 app = FastAPI()
@@ -19,6 +19,17 @@ PageDefaultLinks = CustomizedPage[
 
 PageLimitOffsetHeaderLinks = CustomizedPage[
     LimitOffsetPage,
+    UseLimitOffsetHeaderLinks(),
+]
+
+PageLimitOffsetNoTotal = CustomizedPage[
+    LimitOffsetPage,
+    UseIncludeTotal(False),
+]
+
+PageLimitOffsetHeaderNoTotal = CustomizedPage[
+    LimitOffsetPage,
+    UseIncludeTotal(False),
     UseLimitOffsetHeaderLinks(),
 ]
 
@@ -42,6 +53,18 @@ async def route_2():
 @app.get("/limit-offset-small", response_model=LimitOffsetPage[int])
 @app.get("/limit-offset-header-links-small", response_model=PageLimitOffsetHeaderLinks[int])
 async def route_small():
+    return paginate([0, 1, 2])
+
+
+@app.get("/limit-offset-no-total", response_model=PageLimitOffsetNoTotal[int])
+@app.get("/limit-offset-header-links-no-total", response_model=PageLimitOffsetHeaderNoTotal[int])
+async def route_no_total():
+    return paginate([*range(200)])
+
+
+@app.get("/limit-offset-no-total-small", response_model=PageLimitOffsetNoTotal[int])
+@app.get("/limit-offset-header-links-no-total-small", response_model=PageLimitOffsetHeaderNoTotal[int])
+async def route_no_total_small():
     return paginate([0, 1, 2])
 
 
@@ -130,6 +153,20 @@ add_pagination(app)
             "/limit-offset?limit=30&offset=0",
             "/limit-offset?limit=30&offset=170",
         ),
+        (
+            "/limit-offset-no-total",
+            None,
+            "/limit-offset-no-total?offset=50",
+            "/limit-offset-no-total?offset=0",
+            None,
+        ),
+        (
+            "/limit-offset-no-total-small",
+            None,
+            None,
+            "/limit-offset-no-total-small?offset=0",
+            None,
+        ),
     ],
     ids=[
         "default-first",
@@ -140,6 +177,8 @@ add_pagination(app)
         "limit-offset-middle",
         "limit-offset-last",
         "limit-offset-custom-offset",
+        "limit-offset-no-total",
+        "limit-offset-no-total-small",
     ],
 )
 def test_links(self, prev, next, first, last):  # noqa: A002
@@ -214,6 +253,20 @@ def test_links(self, prev, next, first, last):  # noqa: A002
             "/limit-offset-header-links?limit=30&offset=0",
             "/limit-offset-header-links?limit=30&offset=170",
         ),
+        (
+            "/limit-offset-header-links-no-total",
+            None,
+            "/limit-offset-header-links-no-total?offset=50",
+            "/limit-offset-header-links-no-total?offset=0",
+            None,
+        ),
+        (
+            "/limit-offset-header-links-no-total-small",
+            None,
+            None,
+            "/limit-offset-header-links-no-total-small?offset=0",
+            None,
+        ),
     ],
     ids=[
         "default-header-links-first",
@@ -224,6 +277,8 @@ def test_links(self, prev, next, first, last):  # noqa: A002
         "limit-offset-header-links-middle",
         "limit-offset-header-links-last",
         "limit-offset-header-links-custom-offset",
+        "limit-offset-header-links-no-total",
+        "limit-offset-header-links-no-total-small",
     ],
 )
 def test_header_links(self, prev, next, first, last):  # noqa: A002

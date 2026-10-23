@@ -8,8 +8,9 @@ __all__ = [
 ]
 
 from abc import ABC
-from math import floor, inf
-from typing import Any, TypeAlias, cast
+from collections.abc import Mapping
+from math import floor
+from typing import Any, TypeAlias
 
 from typing_extensions import TypeVar
 
@@ -26,26 +27,33 @@ def resolve_limit_offset_links(_page: BasePage, /) -> Links:
 
     if offset is None:
         offset = 0
-    if limit is None:
-        limit = cast(int, inf)
-    if total is None:
-        total = cast(int, inf)
 
-    # FIXME: it should not be so hard to calculate last page for limit-offset based pages
-    start_offset = offset % limit
-    last = start_offset + floor((total - start_offset) / limit) * limit
+    last: Mapping[str, Any] | None = None
+    if total is not None and limit is not None:
+        # FIXME: it should not be so hard to calculate last page for limit-offset based pages
+        start_offset = offset % limit
+        last_offset = start_offset + floor((total - start_offset) / limit) * limit
 
-    if last == total:
-        last = total - limit
+        if last_offset == total:
+            last_offset = total - limit
 
-    # Fall back to the first page when this offset sequence has no valid page.
-    last = max(0, last)
+        # Fall back to the first page when this offset sequence has no valid page.
+        last = {"offset": max(0, last_offset)}
+
+    if total is not None:
+        has_next = limit is not None and offset + limit < total
+    elif limit is not None and hasattr(_page, "items") and _page.items is not None:
+        has_next = len(_page.items) >= limit
+    else:
+        has_next = False
+
+    has_prev = limit is not None and offset - limit >= 0
 
     return create_links(
         first={"offset": 0},
-        last={"offset": last},
-        next={"offset": offset + limit} if offset + limit < total else None,
-        prev={"offset": offset - limit} if offset - limit >= 0 else None,
+        last=last,
+        next={"offset": offset + limit} if has_next else None,
+        prev={"offset": offset - limit} if has_prev else None,
     )
 
 
