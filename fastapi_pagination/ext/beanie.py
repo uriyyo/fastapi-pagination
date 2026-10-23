@@ -75,23 +75,12 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                 paginate_data.append({"$limit": raw_params.limit + (raw_params.offset or 0)})
             if raw_params.offset is not None:
                 paginate_data.append({"$skip": raw_params.offset})
-        elif cursor:
-            if cursor.startswith("prev_"):
-                paginate_data.append(
-                    {
-                        "_id": {
-                            "$lt": parse_cursor(cursor),
-                        },
-                    },
-                )
-            else:
-                paginate_data.append(
-                    {
-                        "_id": {
-                            "$gt": parse_cursor(cursor),
-                        },
-                    },
-                )
+        elif is_cursor(raw_params):
+            if cursor:
+                op = "$lt" if cursor.startswith("prev_") else "$gt"
+                paginate_data.append({"$match": {"_id": {op: parse_cursor(cursor)}}})
+            paginate_data.append({"$sort": {"_id": -1 if cursor and cursor.startswith("prev_") else 1}})
+            paginate_data.append({"$limit": raw_params.size + 1})
         if aggregation_filter_end is not None:
             if aggregation_filter_end == "auto":
                 aggregation_filter_end = get_mongo_pipeline_filter_end(aggregation_query.aggregation_pipeline)
@@ -133,8 +122,14 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
 
         data = (await mongo_cursor.to_list(length=None))[0]
         items = data["data"]
-        if is_cursor(raw_params) and cursor and cursor.startswith("prev_"):
-            items = list(reversed(items))
+        next_link_available = False
+        if is_cursor(raw_params):
+            next_link_available = len(items) > raw_params.size
+            items = items[: raw_params.size]
+            if cursor and cursor.startswith("prev_"):
+                items = list(reversed(items))
+                # the prev_ cursor itself proves newer rows exist
+                next_link_available = bool(items)
 
         try:
             total = data["metadata"][0]["total"]
@@ -143,8 +138,8 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
 
         cursor_data = (
             {
-                "next_": str(items[-1].id) if items else None,
-                "previous": f"prev_{items[0].id}" if items else None,
+                "next_": str(items[-1]["_id"]) if next_link_available else None,
+                "previous": f"prev_{items[0]['_id']}" if items else None,
             }
             if is_cursor(raw_params)
             else {}
