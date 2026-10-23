@@ -10,6 +10,7 @@ __all__ = [
     "paginate",
 ]
 
+from collections import namedtuple
 from collections.abc import Mapping, Sequence
 from contextlib import suppress
 from functools import partial
@@ -380,6 +381,23 @@ def _extract_inline_count_total(items: Sequence[Any]) -> int:
         return 0
 
 
+def _strip_inline_count(items: Sequence[Any]) -> Sequence[Any]:
+    """Drop the trailing inline count column from every row of *items*.
+
+    Rows keep named access to the remaining columns, so the items match
+    the ones returned by a query without ``inline_count``.
+    """
+    if not items:
+        return items
+
+    fields = items[0]._fields[:-1]
+    if len(fields) != len(items[0]) - 1:
+        return [tuple(row[:-1]) for row in items]
+
+    Row = namedtuple("Row", fields, rename=True)  # noqa: PYI024
+    return [Row._make(row[:-1]) for row in items]
+
+
 @flow
 def _sqlalchemy_inline_count_flow(
     is_async: bool,
@@ -431,7 +449,8 @@ def _sqlalchemy_inline_count_flow(
                 execute_options=execute_options,
             )
 
-    items = _unwrap_items(result, query, unwrap_mode)
+    items = _strip_inline_count(result) if raw_params.include_total else result
+    items = _unwrap_items(items, query, unwrap_mode)
 
     resolved_additional_data = yield from additional_data_flow(result, additional_data)
 
