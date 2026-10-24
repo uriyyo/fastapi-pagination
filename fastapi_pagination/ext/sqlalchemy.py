@@ -146,7 +146,8 @@ def _prepare_query_for_cursor(query: Selectable) -> Selectable:
         query = query.order_by(None)  # reset ordering, it will be applied later
 
         subquery = query.subquery("__cursor_subquery__")
-        return select(subquery).order_by(*ordering)
+        adapter = ColumnAdapter(subquery)
+        return select(subquery).order_by(*[adapter.traverse(clause) for clause in ordering])
 
     return query
 
