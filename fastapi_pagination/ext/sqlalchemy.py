@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias, TypeVar, cas
 
 from sqlalchemy import func, select, text
 from sqlalchemy.engine import Connection
+from sqlalchemy.engine.result import result_tuple
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query, Session, aliased, scoped_session
 from sqlalchemy.sql import CompoundSelect, Select
@@ -368,6 +369,17 @@ def _apply_inline_count(query: Select, inline_count: ColumnElement[int]) -> Sele
     return query.add_columns(inline_count.label(_INLINE_COUNT_LABEL))
 
 
+def _strip_inline_count(rows: Sequence[Any]) -> Sequence[Any]:
+    """Drop the trailing inline count column so items keep their shape without ``inline_count``."""
+    try:
+        fields = rows[0]._fields
+    except (AttributeError, IndexError):  # pragma: no cover
+        return rows
+
+    make_row = result_tuple(fields[:-1])
+    return [make_row(tuple(row)[:-1]) for row in rows]
+
+
 def _extract_inline_count_total(items: Sequence[Any]) -> int:
     """Extract the window-function total from the first result row.
 
@@ -419,6 +431,7 @@ def _sqlalchemy_inline_count_flow(
     if raw_params.include_total:
         if result:
             total = _extract_inline_count_total(result)
+            result = _strip_inline_count(result)
         else:
             # No rows returned: the offset is likely past the end of the result set.
             # The inline count cannot be extracted, so fall back to a separate query.
