@@ -7,7 +7,14 @@ from pydantic import BaseModel
 
 from fastapi_pagination import add_pagination, paginate, pagination_ctx
 from fastapi_pagination.customization import CustomizedPage
-from fastapi_pagination.links import LimitOffsetPage, Page, UseHeaderLinks, UseLimitOffsetHeaderLinks
+from fastapi_pagination.limit_offset import LimitOffsetPage as BaseLimitOffsetPage
+from fastapi_pagination.links import (
+    LimitOffsetPage,
+    Page,
+    UseHeaderLinks,
+    UseLimitOffsetHeaderLinks,
+    UseLimitOffsetLinks,
+)
 
 app = FastAPI()
 client = TestClient(app)
@@ -281,6 +288,52 @@ def test_limit_offset_last_link_is_followable(header_links, suffix, limit, offse
     last_response = client.get(last)
     assert last_response.status_code == status.HTTP_200_OK
     assert last_response.json()["items"] == last_items
+
+
+@pytest.mark.parametrize("header_links", [False, True], ids=["body", "header"])
+@pytest.mark.parametrize("only_path", [None, True, False], ids=["default", "relative", "absolute"])
+@pytest.mark.parametrize(
+    ("total", "offset", "prev_offset", "next_offset", "last_offset"),
+    [(200, 0, None, 50, 150), (200, 100, 50, 150, 150), (200, 150, 100, None, 150), (0, 0, None, None, 0)],
+    ids=["first", "middle", "last", "empty"],
+)
+def test_limit_offset_links_only_path(header_links, only_path, total, offset, prev_offset, next_offset, last_offset):
+    customizer = UseLimitOffsetHeaderLinks if header_links else UseLimitOffsetLinks
+    page = CustomizedPage[
+        BaseLimitOffsetPage[int],
+        customizer() if only_path is None else customizer(only_path=only_path),
+    ]
+    app = FastAPI()
+
+    @app.get("/items", response_model=page)
+    async def route():
+        return paginate([*range(total)])
+
+    add_pagination(app)
+    with TestClient(app, base_url="https://example.test:8443") as client:
+        path = f"/items?limit=50&offset={offset}&filter=kept"
+        response = client.get(path)
+        assert response.status_code == status.HTTP_200_OK
+
+        prefix = "https://example.test:8443" if only_path is False else ""
+        link = f"{prefix}/items?limit=50&filter=kept&offset="
+        expected = {
+            "self": f"{prefix}{path}",
+            "first": f"{link}0",
+            "last": f"{link}{last_offset}",
+            "next": f"{link}{next_offset}" if next_offset is not None else None,
+            "prev": f"{link}{prev_offset}" if prev_offset is not None else None,
+        }
+        if header_links:
+            assert {rel: value["url"] for rel, value in response.links.items()} == {
+                rel: url for rel, url in expected.items() if rel != "self" and url is not None
+            }
+        else:
+            assert response.json()["links"] == expected
+
+        first_response = client.get(expected["first"])
+        assert first_response.status_code == status.HTTP_200_OK
+        assert first_response.json()["items"] == [*range(min(total, 50))]
 
 
 def test_revalidation_default():
