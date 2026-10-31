@@ -351,6 +351,17 @@ class TestSQLAlchemyInlineCount:
         assert page.total == len(entities)
         assert all(item.id is not None and item.name is not None for item in page.items)
 
+    @pytest.mark.parametrize("unwrap_mode", [None, "legacy", "no-unwrap"])
+    def test_inline_count_items_match_plain_query(self, sa_session, sa_user, entities, unwrap_mode):
+        for query in (select(sa_user.name).order_by(sa_user.id), select(sa_user.id, sa_user.name).order_by(sa_user.id)):
+            with closing(sa_session()) as session, set_page(Page[Any]):
+                kwargs = {"params": Params(page=1, size=5), "unwrap_mode": unwrap_mode}
+                expected = paginate(session, query, **kwargs).items
+                page = paginate(session, query, inline_count=func.count().over(), **kwargs)
+
+            assert page.items == expected
+            assert page.total == len(entities)
+
     def test_inline_count_distinct_total_is_correct(self, sa_session, sa_user, sa_order, entities):
         with closing(sa_session()) as session, set_page(Page[Any]):
             page = paginate(
