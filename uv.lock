@@ -1847,7 +1847,7 @@ wheels = [
 
 [[package]]
 name = "ormar"
-version = "0.26.0"
+version = "0.27.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "orjson" },
@@ -1855,9 +1855,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "sqlalchemy", extra = ["asyncio"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e2/3a/9b89d69978209d9f213ad93b63b9bd76dd181ae9346ac785e343f732e90f/ormar-0.26.0.tar.gz", hash = "sha256:91875d530e28cab9656fe8be31c1d8e270c9b2b6f3561dc8f8d659e7f6c79cb6", size = 264862, upload-time = "2026-06-08T16:37:52.692Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/85/05/2533cce1c5471677adf33b1a7d2c56026bd858d62ca5e38caeca13ef07be/ormar-0.27.0.tar.gz", hash = "sha256:e2a651bf2a5a0a566ddc1ab46263d4471be30b20390b3994fdf06c772e495194", size = 339591, upload-time = "2026-10-27T11:04:35.345Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/32/ef799158e16b1b1510c034b7aee966ec937a28e91ed685cfa17a54fac455/ormar-0.26.0-py3-none-any.whl", hash = "sha256:1f7cc1bedea10804e9ded5a988858cf5429d8a44ec6c4bfd38adda7fe1299686", size = 187325, upload-time = "2026-06-08T16:37:53.809Z" },
+    { url = "https://files.pythonhosted.org/packages/a6/83/6ec36b0879e304a6721017f3f0992a561ae2af87ccc74f48ce32b2353db4/ormar-0.27.0-py3-none-any.whl", hash = "sha256:94e916e8d03ffeb2dfeafbe93068d18d7c7e4ab2f6a97e3f0ab053a0524456bd", size = 235605, upload-time = "2026-10-27T11:04:36.549Z" },
 ]
 
 [[package]]
