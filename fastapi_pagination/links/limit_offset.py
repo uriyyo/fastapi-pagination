@@ -42,10 +42,8 @@ def resolve_limit_offset_links(_page: BasePage, /) -> Links:
 
     if total is not None:
         has_next = limit is not None and offset + limit < total
-    elif limit is not None and hasattr(_page, "items") and _page.items is not None:
-        has_next = len(_page.items) >= limit
     else:
-        has_next = False
+        has_next = limit is not None and getattr(_page, "items", None) is not None and len(_page.items) >= limit
 
     has_prev = limit is not None and offset - limit >= 0
 
