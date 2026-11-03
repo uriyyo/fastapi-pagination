@@ -198,3 +198,40 @@ class TestBeanieAggregate(BasePaginationTestSuite):
             return await apaginate(aggr_query)
 
         return builder.build()
+
+
+@pytest.mark.usefixtures("db_client")
+@mongodb_test
+class TestBeanieAggregateCursor:
+    @pytest.mark.asyncio(loop_scope="session")
+    async def test_cursor_pages(self, be_user, entities):
+        params = CursorParams(size=4)
+        page = await apaginate(be_user.aggregate([{"$match": {}}]), params)
+
+        assert len(page.items) == 4
+        assert page.previous_page is not None
+
+        seen = list(page.items)
+        while page.next_page:
+            page = await apaginate(
+                be_user.aggregate([{"$match": {}}]),
+                CursorParams(size=4, cursor=page.next_page),
+            )
+            seen.extend(page.items)
+
+        assert len(seen) == len(entities)
+        assert len({item["_id"] for item in seen}) == len(entities)
+
+        prev_page = await apaginate(
+            be_user.aggregate([{"$match": {}}]),
+            CursorParams(size=4, cursor=page.previous_page),
+        )
+        last = len(page.items)
+        assert [item["_id"] for item in prev_page.items] == [item["_id"] for item in seen[-(last + 4) : -last]]
+
+        # prev_ then next_ must round-trip to the page we came from
+        back = await apaginate(
+            be_user.aggregate([{"$match": {}}]),
+            CursorParams(size=4, cursor=prev_page.next_page),
+        )
+        assert [item["_id"] for item in back.items] == [item["_id"] for item in seen[-last:]][:4]
