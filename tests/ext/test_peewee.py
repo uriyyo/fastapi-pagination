@@ -266,6 +266,24 @@ class TestPeeweeCreateCountQuery:
 
         assert isinstance(count_query, Select)
 
+    def test_create_count_query_keeps_limit(self, peewee_db, peewee_user):
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+
+        query = peewee_user.select().order_by(peewee_user.id).limit(10)
+        total = peewee_db.execute(create_count_query(query)).fetchone()[0]
+
+        assert total == 10
+
+    def test_create_count_query_keeps_offset(self, peewee_db, peewee_user):
+        with peewee_db.atomic():
+            peewee_db.create_tables([peewee_user], safe=True)
+
+        query = peewee_user.select().order_by(peewee_user.id).limit(10).offset(95)
+        total = peewee_db.execute(create_count_query(query)).fetchone()[0]
+
+        assert total == 5
+
     def test_create_count_query_with_raw_query(self, peewee_db, peewee_user):
         from peewee import RawQuery
 
