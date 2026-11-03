@@ -16,7 +16,7 @@ from pymongo.collection import Collection
 
 from fastapi_pagination.bases import AbstractParams
 from fastapi_pagination.config import Config
-from fastapi_pagination.ext.mongo import AggrPipelineTransformer
+from fastapi_pagination.ext.mongo import AggrPipelineTransformer, _extract_total, _facet_stage
 from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.flow import flow, flow_expr, run_async_flow, run_sync_flow
 from fastapi_pagination.flows import additional_data_flow, create_page_flow, generic_flow
@@ -121,18 +121,13 @@ def _aggregate_flow(
     if aggregation_filter_end is not None:
         if aggregation_filter_end == "auto":
             aggregation_filter_end = get_mongo_pipeline_filter_end(aggregate_pipeline)
-        transform_part = aggregate_pipeline[:aggregation_filter_end]
-        aggregate_pipeline = aggregate_pipeline[aggregation_filter_end:]
+        transform_part = aggregate_pipeline[aggregation_filter_end:]
+        aggregate_pipeline = aggregate_pipeline[:aggregation_filter_end]
         paginate_data.extend(transform_part)
 
     pipeline = [
         *aggregate_pipeline,
-        {
-            "$facet": {
-                "metadata": [{"$count": "total"}],
-                "data": paginate_data,
-            },
-        },
+        _facet_stage(paginate_data, raw_params.include_total),
     ]
 
     if aggregation_pipeline_transformer is not None:
@@ -143,10 +138,7 @@ def _aggregate_flow(
     data, *_ = yield cursor.to_list(length=None)
 
     items = data["data"]
-    try:
-        total = data["metadata"][0]["total"]
-    except IndexError:
-        total = 0
+    total = _extract_total(data) if raw_params.include_total else None
 
     resolved_additional_data = yield from additional_data_flow(items, additional_data)
 

@@ -1,10 +1,14 @@
+from typing import Any
+
 import pytest
 from beanie import Document, init_beanie
 from pydantic import BaseModel, Field
 from pymongo import AsyncMongoClient
 from pytest_asyncio import fixture as async_fixture
 
+from fastapi_pagination import Page, set_page, set_params
 from fastapi_pagination.cursor import CursorParams
+from fastapi_pagination.customization import CustomizedPage, UseIncludeTotal
 from fastapi_pagination.ext.beanie import apaginate
 from tests.base import BasePaginationTestSuite
 
@@ -235,3 +239,31 @@ class TestBeanieAggregateCursor:
             CursorParams(size=4, cursor=prev_page.next_page),
         )
         assert [item["_id"] for item in back.items] == [item["_id"] for item in seen[-last:]][:4]
+
+
+@pytest.mark.usefixtures("db_client")
+@mongodb_test
+class TestBeanieAggregateIncludeTotal:
+    @pytest.mark.asyncio(loop_scope="session")
+    async def test_include_total_false(self, be_user, entities):
+        NoTotalPage = CustomizedPage[Page[Any], UseIncludeTotal(False)]
+
+        with set_page(NoTotalPage), set_params(NoTotalPage.__params_type__(page=1, size=10)):
+            page = await apaginate(be_user.aggregate([{"$sort": {"id": 1}}]))
+
+        assert page.total is None
+        assert [item["id"] for item in page.items] == [entity.id for entity in entities[:10]]
+
+    @pytest.mark.asyncio(loop_scope="session")
+    async def test_include_total_false_with_filter_end(self, be_user, entities):
+        NoTotalPage = CustomizedPage[Page[Any], UseIncludeTotal(False)]
+
+        with set_page(NoTotalPage), set_params(NoTotalPage.__params_type__(page=1, size=10)):
+            page = await apaginate(
+                be_user.aggregate([{"$sort": {"id": 1}}, {"$addFields": {"flag": True}}]),
+                aggregation_filter_end="auto",
+            )
+
+        assert page.total is None
+        assert all(item["flag"] for item in page.items)
+        assert len(page.items) == 10

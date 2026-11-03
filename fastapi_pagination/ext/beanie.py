@@ -17,7 +17,7 @@ from pymongo.asynchronous.client_session import AsyncClientSession
 
 from fastapi_pagination.api import apply_items_transformer, create_page
 from fastapi_pagination.bases import AbstractParams, is_cursor, is_limit_offset
-from fastapi_pagination.ext.mongo import AggrPipelineTransformer
+from fastapi_pagination.ext.mongo import AggrPipelineTransformer, _extract_total, _facet_stage
 from fastapi_pagination.ext.utils import get_mongo_pipeline_filter_end
 from fastapi_pagination.types import AdditionalData, AsyncItemsTransformer
 from fastapi_pagination.utils import async_resolve_additional_data, verify_params
@@ -88,18 +88,11 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
             transform_part = aggregation_query.aggregation_pipeline[aggregation_filter_end:]
             aggregation_query.aggregation_pipeline = [
                 *filter_part,
-                {
-                    "$facet": {
-                        "metadata": [{"$count": "total"}],
-                        "data": [*paginate_data, *transform_part, *projection_pipeline],
-                    }
-                },
+                _facet_stage([*paginate_data, *transform_part, *projection_pipeline], raw_params.include_total),
             ]
         else:
-            aggregation_query.aggregation_pipeline.extend(
-                [
-                    {"$facet": {"metadata": [{"$count": "total"}], "data": [*paginate_data, *projection_pipeline]}},
-                ],
+            aggregation_query.aggregation_pipeline.append(
+                _facet_stage([*paginate_data, *projection_pipeline], raw_params.include_total),
             )
 
         # Execute the aggregation pipeline directly using the underlying collection.
@@ -131,10 +124,7 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                 # the prev_ cursor itself proves newer rows exist
                 next_link_available = bool(items)
 
-        try:
-            total = data["metadata"][0]["total"]
-        except IndexError:
-            total = 0
+        total = _extract_total(data) if raw_params.include_total else None
 
         cursor_data = (
             {
