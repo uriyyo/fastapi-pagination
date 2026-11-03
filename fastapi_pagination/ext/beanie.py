@@ -208,14 +208,18 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                     )
 
             items = await find_query.limit(raw_params.size + 1).to_list()  # type: ignore[ty:unresolved-attribute]
-            next_link_available = items and len(items) >= raw_params.size  # type: ignore[ty:unresolved-attribute]
+            has_more = len(items) > raw_params.size  # type: ignore[ty:unresolved-attribute]
             items = items[: raw_params.size]  # type: ignore[ty:unresolved-attribute]
-            if cursor and cursor.startswith("prev_"):
+            is_prev = bool(cursor and cursor.startswith("prev_"))
+            if is_prev:
                 items = list(reversed(items))
 
+            has_next = bool(items) and (is_prev or has_more)
+            has_previous = bool(items) and ((bool(cursor) and not is_prev) or (is_prev and has_more))
+
             cursor_data = {
-                "next_": str(items[-1].id) if next_link_available else None,
-                "previous": f"prev_{items[0].id}" if items else None,
+                "next_": str(items[-1].id) if has_next else None,
+                "previous": f"prev_{items[0].id}" if has_previous else None,
             }
 
     resolved_additional_data = await async_resolve_additional_data(items, additional_data)

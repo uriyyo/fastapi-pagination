@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from pymongo import AsyncMongoClient
 from pytest_asyncio import fixture as async_fixture
 
+from fastapi_pagination.cursor import CursorParams
 from fastapi_pagination.ext.beanie import apaginate
 from tests.base import BasePaginationTestSuite
 
@@ -64,6 +65,42 @@ class TestBeanie(BasePaginationTestSuite):
             return await apaginate(query)
 
         return builder.build()
+
+    @pytest.mark.asyncio(scope="session")
+    async def test_cursor_links(self, be_user, entities):
+        total = len(entities)
+
+        page = await apaginate(be_user, CursorParams(size=total))
+        assert len(page.items) == total
+        assert page.next_page is None
+        assert page.previous_page is None
+
+        first = await apaginate(be_user, CursorParams(size=total - 1))
+        assert first.next_page is not None
+        assert first.previous_page is None
+
+        last = await apaginate(be_user, CursorParams(size=total - 1, cursor=first.next_page))
+        assert len(last.items) == 1
+        assert last.next_page is None
+        assert last.previous_page is not None
+
+        back = await apaginate(be_user, CursorParams(size=total - 1, cursor=last.previous_page))
+        assert len(back.items) == total - 1
+        assert back.next_page is not None
+        assert back.previous_page is None
+
+    @pytest.mark.asyncio(scope="session")
+    async def test_cursor_links_middle_page(self, be_user, entities):
+        first = await apaginate(be_user, CursorParams(size=1))
+        middle = await apaginate(be_user, CursorParams(size=1, cursor=first.next_page))
+        assert middle.next_page is not None
+        assert middle.previous_page is not None
+
+        third = await apaginate(be_user, CursorParams(size=1, cursor=middle.next_page))
+        back = await apaginate(be_user, CursorParams(size=1, cursor=third.previous_page))
+        assert back.items == middle.items
+        assert back.next_page is not None
+        assert back.previous_page is not None
 
 
 @pytest.mark.usefixtures("db_client")
