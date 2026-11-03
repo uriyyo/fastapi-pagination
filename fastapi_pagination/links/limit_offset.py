@@ -22,7 +22,7 @@ from .bases import BaseLinksCustomizer, BaseUseHeaderLinks, BaseUseLinks, Links,
 TAny = TypeVar("TAny", default=Any)
 
 
-def resolve_limit_offset_links(_page: BasePage, /) -> Links:
+def resolve_limit_offset_links(_page: BasePage, /, only_path: bool | None = None) -> Links:
     offset, limit, total = _page.offset, _page.limit, _page.total
 
     if offset is None:
@@ -52,12 +52,13 @@ def resolve_limit_offset_links(_page: BasePage, /) -> Links:
         last=last,
         next={"offset": offset + limit} if has_next else None,
         prev={"offset": offset - limit} if has_prev else None,
+        only_path=only_path,
     )
 
 
 class LimitOffsetLinksCustomizer(BaseLinksCustomizer, ABC):
     def resolve_links(self, _page: BasePage, /) -> Links:
-        return resolve_limit_offset_links(_page)
+        return resolve_limit_offset_links(_page, only_path=self.only_path)
 
 
 class UseLimitOffsetLinks(LimitOffsetLinksCustomizer, BaseUseLinks):
