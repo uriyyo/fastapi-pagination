@@ -1,7 +1,11 @@
+from typing import Any
+
 import pytest
 from pymongo import AsyncMongoClient, MongoClient
 from pytest_asyncio import fixture as async_fixture
 
+from fastapi_pagination import Page, Params, set_page, set_params
+from fastapi_pagination.customization import CustomizedPage, UseIncludeTotal
 from fastapi_pagination.ext.pymongo import apaginate, apaginate_aggregate, paginate, paginate_aggregate
 from tests.base import BasePaginationTestSuite, async_sync_testsuite
 from tests.utils import maybe_async
@@ -78,3 +82,43 @@ class TestPymongoAggregate(_BasePymongoSuite, BasePaginationTestSuite):
             )
 
         return builder.build()
+
+
+@mongodb_test
+class TestPymongoAggregateOptions(_BasePymongoSuite):
+    @pytest.fixture(scope="session")
+    def paginate_func(self, is_async_db):
+        return apaginate_aggregate if is_async_db else paginate_aggregate
+
+    @pytest.mark.asyncio(loop_scope="session")
+    async def test_aggregation_filter_end_auto(self, db_client, paginate_func):
+        pipeline = [
+            {"$match": {"id": {"$gt": 50}}},
+            {"$sort": {"id": 1}},
+            {"$addFields": {"flag": True}},
+        ]
+
+        with set_page(Page[Any]):
+            page = await maybe_async(
+                paginate_func(
+                    db_client.test.users,
+                    pipeline,
+                    Params(page=1, size=10),
+                    aggregation_filter_end="auto",
+                )
+            )
+
+        assert page.total == 50
+        assert [item["id"] for item in page.items] == list(range(51, 61))
+        assert all(item["flag"] for item in page.items)
+
+    @pytest.mark.asyncio(loop_scope="session")
+    async def test_include_total_false(self, db_client, paginate_func):
+        NoTotalPage = CustomizedPage[Page[Any], UseIncludeTotal(False)]
+        pipeline = [{"$sort": {"id": 1}}]
+
+        with set_page(NoTotalPage), set_params(NoTotalPage.__params_type__(page=1, size=10)):
+            page = await maybe_async(paginate_func(db_client.test.users, pipeline))
+
+        assert page.total is None
+        assert [item["id"] for item in page.items] == list(range(1, 11))
