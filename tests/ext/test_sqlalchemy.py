@@ -261,6 +261,22 @@ class TestCompoundSelectSQLAlchemyCursor(_SQLAlchemyPaginateFuncMixin, BasePagin
         return entities + entities
 
 
+def test_compound_select_cursor_order_by_column_attribute(sa_session, sa_user, entities):
+    stmt = select(sa_user.id, sa_user.name).union_all(select(sa_user.id + 100000, sa_user.name)).order_by(sa_user.id)
+
+    ids = []
+    cursor = None
+    with closing(sa_session()) as session, set_page(CursorPage[Any]):
+        for _ in range(len(entities) * 2):
+            page = paginate(session, stmt, params=CursorParams(size=3, cursor=cursor), unique=False)
+            ids.extend(item[0] for item in page.items)
+            cursor = page.next_page
+            if cursor is None:
+                break
+
+    assert ids == sorted(entity.id + offset for offset in (0, 100000) for entity in entities)
+
+
 @async_sync_testsuite
 class TestSQLAlchemyFromStatement(_SQLAlchemyPaginateFuncMixin, BasePaginationTestSuite):
     @pytest.fixture(scope="session")
