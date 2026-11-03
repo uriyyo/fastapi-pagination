@@ -195,6 +195,9 @@ class TestPeeweeRawSQL(_PeeweePaginateFunc):
                 )
             )
 
+        if hasattr(peewee_db, "aclose"):
+            await peewee_db.aclose()
+
         assert len(page.items) == 10
         for i, item in enumerate(page.items):
             assert item.id == entities[i].id
@@ -225,6 +228,9 @@ class TestPeeweeRawSQL(_PeeweePaginateFunc):
                 )
             )
 
+        if hasattr(peewee_db, "aclose"):
+            await peewee_db.aclose()
+
         assert len(page.items) == 5
         for i, item in enumerate(page.items):
             assert item.id == entities[i].id
@@ -240,6 +246,9 @@ class TestPeeweeRawSQL(_PeeweePaginateFunc):
                     db=peewee_db,
                 )
             )
+
+        if hasattr(peewee_db, "aclose"):
+            await peewee_db.aclose()
 
         assert page.total == 100
 
