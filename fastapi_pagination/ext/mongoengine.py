@@ -31,11 +31,11 @@ def paginate(
     config: Config | None = None,
 ) -> Any:
     if isinstance(query, TopLevelDocumentMetaclass):
-        query = query.objects().all()  # type: ignore[ty:unresolved-attribute]
+        query = query.objects().all()  # type: ignore[ty:missing-attribute]
 
     return run_sync_flow(
         generic_flow(
-            total_flow=flow_expr(lambda: query.count()),  # type: ignore[ty:unresolved-attribute]
+            total_flow=flow_expr(lambda: query.count()),  # type: ignore[ty:missing-union-attribute]
             limit_offset_flow=partial(_limit_offset_flow, query),  # type: ignore[ty:invalid-argument-type]
             params=params,
             transformer=transformer,

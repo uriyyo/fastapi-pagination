@@ -243,7 +243,7 @@ def _create_params_dependency(
         sign_params = [_get_param(name, field) for name, field in cast(BaseModel, params).model_fields.items()]
         sign = sign.replace(parameters=sign_params)
 
-    _pagination_params.__signature__ = sign  # type: ignore[ty:unresolved-attribute]
+    _pagination_params.__signature__ = sign  # type: ignore[ty:missing-attribute]
 
     return _pagination_params
 
@@ -280,7 +280,7 @@ def pagination_ctx(
             yield cast(AbstractParams, _params)
 
     if __page_ctx_dep__:
-        _page_ctx_dependency.__page_ctx_dep__ = True  # type: ignore[ty:unresolved-attribute]
+        _page_ctx_dependency.__page_ctx_dep__ = True  # type: ignore[ty:missing-attribute]
 
     return _page_ctx_dependency
 

@@ -136,7 +136,7 @@ def _prepare_query(query: SelectableOrQuery | None) -> Selectable | None:
         return None
 
     with suppress(AttributeError):
-        query = query._statement_20()  # type: ignore[ty:unresolved-attribute]
+        query = query._statement_20()  # type: ignore[ty:missing-union-attribute]
 
     return cast("Selectable", query)
 
@@ -174,7 +174,7 @@ def _get_orm_entity(query: Select) -> type[Any] | None:
 
 
 def _should_unwrap_scalars_for_query(query: Selectable) -> bool:
-    cols_desc = query.column_descriptions  # type: ignore[ty:unresolved-attribute]
+    cols_desc = query.column_descriptions  # type: ignore[ty:missing-union-attribute]
     all_cols = [*query._all_selected_columns]
 
     # select(a, b, c) — multiple entities/columns, no unwrap needed
@@ -253,7 +253,7 @@ def create_count_query(query: Selectable, *, use_subquery: bool = True) -> Selec
     if use_subquery:
         return select(func.count()).select_from(query.subquery())
 
-    return query.with_only_columns(  # type: ignore[ty:unresolved-attribute]
+    return query.with_only_columns(  # type: ignore[ty:missing-union-attribute]
         func.count(),
         maintain_column_froms=True,
     )

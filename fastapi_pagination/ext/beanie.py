@@ -192,9 +192,9 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
                         },
                     )
 
-            items = await find_query.limit(raw_params.size + 1).to_list()  # type: ignore[ty:unresolved-attribute]
-            has_more = len(items) > raw_params.size  # type: ignore[ty:unresolved-attribute]
-            items = items[: raw_params.size]  # type: ignore[ty:unresolved-attribute]
+            items = await find_query.limit(raw_params.size + 1).to_list()  # type: ignore[ty:missing-attribute]
+            has_more = len(items) > raw_params.size  # type: ignore[ty:missing-attribute]
+            items = items[: raw_params.size]  # type: ignore[ty:missing-attribute]
             is_prev = bool(cursor and cursor.startswith("prev_"))
             if is_prev:
                 items = list(reversed(items))
