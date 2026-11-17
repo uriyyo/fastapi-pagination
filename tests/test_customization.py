@@ -26,6 +26,7 @@ from fastapi_pagination.customization import (
     UseResponseHeaders,
     UseStrCursor,
 )
+from fastapi_pagination.links import UseHeaderLinks
 from tests.utils import dump_obj
 
 
@@ -419,6 +420,63 @@ class TestUseResponseHeaders:
         assert response.status_code == status.HTTP_200_OK
         assert response.headers["X-Total-Count"] == "100"
         assert response.headers.get_list("X-Params") == ["page=2", "size=20"]
+
+
+class TestCombinedResponseHeaders:
+    @pytest.fixture(scope="session")
+    def app(self):
+        _app = FastAPI()
+        add_pagination(_app)
+
+        total_headers = UseResponseHeaders(lambda page: {"X-Total-Count": str(page.total)})
+
+        HeadersThenLinks = CustomizedPage[Page, total_headers, UseHeaderLinks()]
+        LinksThenHeaders = CustomizedPage[Page, UseHeaderLinks(), total_headers]
+        TwoHeaders = CustomizedPage[
+            Page,
+            UseResponseHeaders(lambda _: {"X-A": "a"}),
+            UseResponseHeaders(lambda _: {"X-B": "b"}),
+        ]
+        NestedLinks = CustomizedPage[CustomizedPage[Page, total_headers], UseHeaderLinks()]
+
+        @_app.get("/headers-then-links")
+        def _headers_then_links() -> HeadersThenLinks[int]:
+            return paginate([*range(10)])
+
+        @_app.get("/links-then-headers")
+        def _links_then_headers() -> LinksThenHeaders[int]:
+            return paginate([*range(10)])
+
+        @_app.get("/two-headers")
+        def _two_headers() -> TwoHeaders[int]:
+            return paginate([*range(10)])
+
+        @_app.get("/nested-links")
+        def _nested_links() -> NestedLinks[int]:
+            return paginate([*range(10)])
+
+        return _app
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("path", ["/headers-then-links", "/links-then-headers", "/nested-links"])
+    async def test_response_headers_with_header_links(self, client, path):
+        response = await client.get(path, params={"size": 3})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers["X-Total-Count"] == "10"
+        assert response.headers["Link"] == (
+            f'<{path}?size=3&page=1>; rel="first", '
+            f'<{path}?size=3&page=4>; rel="last", '
+            f'<{path}?size=3&page=2>; rel="next"'
+        )
+
+    @pytest.mark.asyncio
+    async def test_multiple_response_headers(self, client):
+        response = await client.get("/two-headers")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers["X-A"] == "a"
+        assert response.headers["X-B"] == "b"
 
 
 def test_use_flatten_page():
