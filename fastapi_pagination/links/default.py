@@ -23,12 +23,15 @@ TAny = TypeVar("TAny", default=Any)
 def resolve_default_links(_page: BasePage, /, only_path: bool | None = None) -> Links:
     page, size, total = _page.page, _page.size, _page.total
 
+    if total is None:
+        has_next = page is not None and size is not None and len(_page.items) >= size
+    else:
+        has_next = page is not None and size is not None and page * size < total
+
     return create_links(
         first={"page": 1},
-        last={"page": ceil(total / size) if total and size else 1},
-        next={"page": page + 1}
-        if page is not None and size is not None and total is not None and page * size < total
-        else None,
+        last={"page": ceil(total / size) if total and size else 1} if total is not None else None,
+        next={"page": page + 1} if has_next else None,
         prev={"page": page - 1} if page is not None and page - 1 >= 1 else None,
         only_path=only_path,
     )
