@@ -17,6 +17,12 @@ def items():
     return paginate(list(range(95)))
 
 
+@app.get("/exact", response_model=NoTotalPage)
+@app.get("/exact-headers", response_model=NoTotalHeaderPage)
+def exact_items():
+    return paginate(list(range(100)))
+
+
 add_pagination(app)
 
 
@@ -47,3 +53,21 @@ def test_body_and_header_links(page, next_page):
     header = response.headers["link"]
     assert 'rel="last"' not in header
     assert ('rel="next"' in header) == (next_page is not None)
+
+
+def test_full_final_page_without_total_links_to_one_empty_page():
+    client = TestClient(app)
+    response = client.get("/exact?size=10&page=10")
+    assert response.status_code == 200
+    next_link = response.json()["links"]["next"]
+    assert next_link == "/exact?size=10&page=11"
+
+    empty = client.get(next_link)
+    assert empty.status_code == 200
+    assert empty.json()["items"] == []
+    assert empty.json()["links"]["next"] is None
+
+    header = client.get("/exact-headers?size=10&page=10").headers["link"]
+    assert '</exact-headers?size=10&page=11>; rel="next"' in header
+    empty_header = client.get("/exact-headers?size=10&page=11").headers["link"]
+    assert 'rel="next"' not in empty_header
