@@ -474,8 +474,10 @@ class UseResponseHeaders(PageCustomizer):
     resolver: Callable[[AbstractPage[Any]], dict[str, str | Sequence[str]]]
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        prev_post_init = ns.get("model_post_init", page_cls.model_post_init)
+
         def model_post_init(_self: AbstractPage[Any], context: Any, /) -> None:
-            page_cls.model_post_init(_self, context)
+            prev_post_init(_self, context)
 
             rsp = response()
 

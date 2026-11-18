@@ -117,10 +117,14 @@ class BaseUseHeaderLinks(BaseLinksCustomizer[TPage_contra], ABC):
             rsp.headers["Link"] = ", ".join(parts)
 
     def customize_page_ns(self, page_cls: PageCls, ns: ClsNamespace) -> None:
+        prev_post_init = ns.get("model_post_init", page_cls.model_post_init)
+
         def __model_post_init__(  # noqa: N807
             page_self: TPage_contra,
-            _: Any,
+            context: Any,
         ) -> None:
+            prev_post_init(page_self, context)
+
             links = self.resolve_links(page_self)
             self._add_links_to_header(links)
 
