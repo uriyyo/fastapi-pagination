@@ -115,21 +115,23 @@ async def apaginate(  # noqa: C901, PLR0912, PLR0915
 
         data = (await mongo_cursor.to_list(length=None))[0]
         items = data["data"]
-        next_link_available = False
+        next_link_available = previous_link_available = False
         if is_cursor(raw_params):
-            next_link_available = len(items) > raw_params.size
+            has_more = len(items) > raw_params.size
             items = items[: raw_params.size]
-            if cursor and cursor.startswith("prev_"):
+            is_prev = bool(cursor and cursor.startswith("prev_"))
+            if is_prev:
                 items = list(reversed(items))
-                # the prev_ cursor itself proves newer rows exist
-                next_link_available = bool(items)
+            # the prev_ cursor itself proves newer rows exist
+            next_link_available = bool(items) and (is_prev or has_more)
+            previous_link_available = bool(items) and ((bool(cursor) and not is_prev) or (is_prev and has_more))
 
         total = _extract_total(data) if raw_params.include_total else None
 
         cursor_data = (
             {
                 "next_": str(items[-1]["_id"]) if next_link_available else None,
-                "previous": f"prev_{items[0]['_id']}" if items else None,
+                "previous": f"prev_{items[0]['_id']}" if previous_link_available else None,
             }
             if is_cursor(raw_params)
             else {}

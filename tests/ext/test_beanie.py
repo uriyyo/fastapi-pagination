@@ -213,7 +213,7 @@ class TestBeanieAggregateCursor:
         page = await apaginate(be_user.aggregate([{"$match": {}}]), params)
 
         assert len(page.items) == 4
-        assert page.previous_page is not None
+        assert page.previous_page is None
 
         seen = list(page.items)
         while page.next_page:
@@ -239,6 +239,43 @@ class TestBeanieAggregateCursor:
             CursorParams(size=4, cursor=prev_page.next_page),
         )
         assert [item["_id"] for item in back.items] == [item["_id"] for item in seen[-last:]][:4]
+
+    @pytest.mark.asyncio(loop_scope="session")
+    async def test_cursor_links(self, be_user, entities):
+        total = len(entities)
+
+        def query():
+            return be_user.aggregate([{"$match": {}}])
+
+        first = await apaginate(query(), CursorParams(size=total - 1))
+        assert first.next_page is not None
+        assert first.previous_page is None
+
+        last = await apaginate(query(), CursorParams(size=total - 1, cursor=first.next_page))
+        assert len(last.items) == 1
+        assert last.next_page is None
+        assert last.previous_page is not None
+
+        back = await apaginate(query(), CursorParams(size=total - 1, cursor=last.previous_page))
+        assert len(back.items) == total - 1
+        assert back.next_page is not None
+        assert back.previous_page is None
+
+    @pytest.mark.asyncio(loop_scope="session")
+    async def test_cursor_links_middle_page(self, be_user, entities):
+        def query():
+            return be_user.aggregate([{"$match": {}}])
+
+        first = await apaginate(query(), CursorParams(size=1))
+        middle = await apaginate(query(), CursorParams(size=1, cursor=first.next_page))
+        assert middle.next_page is not None
+        assert middle.previous_page is not None
+
+        third = await apaginate(query(), CursorParams(size=1, cursor=middle.next_page))
+        back = await apaginate(query(), CursorParams(size=1, cursor=third.previous_page))
+        assert back.items == middle.items
+        assert back.next_page is not None
+        assert back.previous_page is not None
 
 
 @pytest.mark.usefixtures("db_client")
