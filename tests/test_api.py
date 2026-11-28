@@ -3,10 +3,10 @@ from contextlib import asynccontextmanager
 from typing import Annotated, Any, Generic, TypeVar
 
 import pytest
-from fastapi import Depends, FastAPI, Request, Response, status
+from fastapi import Body, Depends, FastAPI, Query, Request, Response, status
 from fastapi.routing import APIRouter
 from fastapi.testclient import TestClient
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from fastapi_pagination.cursor import CursorPage, CursorParams
 from fastapi_pagination.errors import UninitializedConfigurationError
@@ -415,3 +415,100 @@ class TestPatchOpenAPI:
 
         data = rsp.json()
         assert data["info"]["title"] == "Custom Title"
+
+
+@pytest.mark.parametrize(
+    ("page_field", "size_field", "required", "constrained"),
+    [
+        pytest.param(Field(1, ge=1), Field(10, ge=1, le=100), False, True, id="field-default"),
+        pytest.param(Field(..., ge=1), Field(..., ge=1, le=100), True, True, id="field-required"),
+        pytest.param(1, 10, False, False, id="plain-default"),
+        pytest.param(Query(1, ge=1), Query(10, ge=1, le=100), False, True, id="query-default"),
+    ],
+)
+def test_custom_params_field_kinds(page_field: Any, size_field: Any, required: bool, constrained: bool) -> None:
+    class CustomParams(BaseModel, AbstractParams):
+        page: int = page_field
+        size: int = size_field
+
+        def to_raw_params(self) -> RawParams:
+            return RawParams(limit=self.size, offset=self.size * (self.page - 1))
+
+    class CustomPage(AbstractPage[int]):
+        items: Sequence[int]
+        page: int
+
+        __params_type__ = CustomParams
+
+        @classmethod
+        def create(cls, items: Sequence[int], params: AbstractParams, **kwargs: Any) -> "CustomPage":
+            assert isinstance(params, CustomParams)
+            return cls(items=items, page=params.page)
+
+    app = FastAPI()
+
+    @app.get("/", response_model=CustomPage)
+    async def route() -> Any:
+        return paginate(list(range(50)))
+
+    add_pagination(app)
+    client = TestClient(app)
+
+    rsp = client.get("/", params={"page": 2, "size": 5})
+    assert rsp.status_code == status.HTTP_200_OK
+    assert rsp.json() == {"items": [5, 6, 7, 8, 9], "page": 2}
+
+    if constrained:
+        # constraints from the field must still be applied
+        assert client.get("/", params={"page": 0, "size": 5}).status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+
+    if required:
+        assert client.get("/").status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    else:
+        assert client.get("/").status_code == status.HTTP_200_OK
+
+    params = client.get("/openapi.json").json()["paths"]["/"]["get"]["parameters"]
+    assert [(p["name"], p["in"], p["required"]) for p in params] == [
+        ("page", "query", required),
+        ("size", "query", required),
+    ]
+
+
+def test_custom_params_body_fields() -> None:
+    class CustomParams(BaseModel, AbstractParams):
+        page: int = Body(1, ge=1)
+        size: int = Body(10, ge=1, le=100)
+
+        def to_raw_params(self) -> RawParams:
+            return RawParams(limit=self.size, offset=self.size * (self.page - 1))
+
+    class CustomPage(AbstractPage[int]):
+        items: Sequence[int]
+        page: int
+
+        __params_type__ = CustomParams
+
+        @classmethod
+        def create(cls, items: Sequence[int], params: AbstractParams, **kwargs: Any) -> "CustomPage":
+            assert isinstance(params, CustomParams)
+            return cls(items=items, page=params.page)
+
+    app = FastAPI()
+
+    @app.post("/", response_model=CustomPage)
+    async def route() -> Any:
+        return paginate(list(range(50)))
+
+    add_pagination(app)
+    client = TestClient(app)
+
+    rsp = client.post("/", json={"page": 2, "size": 5})
+    assert rsp.status_code == status.HTTP_200_OK
+    assert rsp.json() == {"items": [5, 6, 7, 8, 9], "page": 2}
+
+    # constraints from the field must still be applied
+    assert client.post("/", json={"page": 0, "size": 5}).status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+
+    schema = client.get("/openapi.json").json()["paths"]["/"]["post"]
+    assert "parameters" not in schema
+    assert "requestBody" in schema
