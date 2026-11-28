@@ -18,6 +18,7 @@ import inspect
 from collections.abc import AsyncGenerator, AsyncIterator, Callable, Generator, Iterator, Sequence
 from contextlib import AbstractContextManager, ExitStack, asynccontextmanager, contextmanager, suppress
 from contextvars import ContextVar
+from copy import copy
 from typing import (
     Annotated,
     Any,
@@ -34,13 +35,16 @@ from fastapi.dependencies.utils import (
     get_parameterless_sub_dependant,
     lenient_issubclass,
 )
+from fastapi.params import Body, Param
 from fastapi.routing import APIRoute, APIRouter, _IncludedRouter, request_response
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
+from pydantic_core import PydanticUndefined
 
 from .bases import AbstractPage, AbstractParams, BaseAbstractPage
 from .errors import UninitializedConfigurationError
 from .types import AsyncItemsTransformer, ItemsTransformer, SyncItemsTransformer
+from .typing_utils import create_annotated_tp
 from .utils import is_async_callable, unwrap_annotated
 
 T = TypeVar("T")
@@ -229,11 +233,32 @@ def _create_params_dependency(
     sign = inspect.signature(params)
 
     def _get_param(name: str, field: FieldInfo) -> inspect.Parameter:
+        if isinstance(field, (Param, Body)):
+            # fastapi params (Query, Header, Body, etc.) are understood by fastapi when used as a default value
+            return inspect.Parameter(
+                name=name,
+                kind=inspect.Parameter.KEYWORD_ONLY,
+                annotation=field.annotation,
+                default=field,
+            )
+
+        # plain pydantic fields (Field(...) or just a default value) are not understood by fastapi
+        # when used as a default value, so move the default out of the field and into the parameter
+        # and let fastapi infer the location as for a plain parameter (query for scalar types)
+        field = copy(field)
+
+        param_default: Any
+        if field.default is not PydanticUndefined:
+            param_default = field.default
+            field.default = PydanticUndefined
+        else:
+            param_default = inspect.Parameter.empty
+
         return inspect.Parameter(
             name=name,
             kind=inspect.Parameter.KEYWORD_ONLY,
-            annotation=field.annotation,
-            default=field,
+            annotation=create_annotated_tp(field.annotation, field),
+            default=param_default,
         )
 
     with suppress(ValueError, TypeError):
